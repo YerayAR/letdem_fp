@@ -1,0 +1,14 @@
+import 'dart:ui';
+
+class AppColors {
+  static Color primary500 = const Color(0xFF9D00FF);
+  static Color primary400 = const Color(0xFFB133FF);
+
+  static Color secondary600 = const Color(0xffCC9F00);
+  static Color secondary50 = const Color(0xffFFF9E6);
+
+  static Color neutral600 = const Color(0xff364A59);
+  static Color neutral500 = const Color(0xff4B5D6B);
+  static Color neutral400 = const Color(0xff6B7C8C);
+  static Color neutral300 = const Color(0xff8F9EA9);
+}
