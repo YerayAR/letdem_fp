@@ -21,6 +21,8 @@ class PrimaryButton extends StatelessWidget {
   final IconData? icon;
   final Widget? widgetImage;
 
+  final Color? textColor;
+
   const PrimaryButton({
     super.key,
     this.color,
@@ -35,6 +37,7 @@ class PrimaryButton extends StatelessWidget {
     this.loadingIndicatorColor,
     this.icon,
     this.widgetImage,
+    this.textColor,
   });
 
   @override
@@ -147,11 +150,13 @@ class PrimaryButton extends StatelessWidget {
                         fontSize: 16,
                         fontWeight:
                             icon != null ? FontWeight.w700 : FontWeight.w500,
-                        color: isDisabled
-                            ? Colors.white.withOpacity(0.8)
-                            : outline
-                                ? color ?? AppColors.primary500
-                                : Colors.white,
+                        color: textColor != null
+                            ? textColor
+                            : isDisabled
+                                ? Colors.white.withOpacity(0.8)
+                                : outline
+                                    ? color ?? AppColors.primary500
+                                    : Colors.white,
                       ),
                     ),
                     Row(

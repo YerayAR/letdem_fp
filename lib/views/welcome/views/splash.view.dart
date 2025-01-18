@@ -15,7 +15,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     Future.delayed(const Duration(seconds: 1), () {
-      NavigatorHelper.to(const WelcomeView());
+      NavigatorHelper.replaceAll(const WelcomeView());
     });
     super.initState();
   }

@@ -17,6 +17,10 @@ class LetDemApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+        ),
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'DMSans',
       ),

@@ -4,6 +4,9 @@ import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/auth/views/login.view.dart';
+import 'package:letdem/views/auth/views/register.view.dart';
 
 import '../../../constants/ui/typo.dart';
 
@@ -43,7 +46,10 @@ class WelcomeView extends StatelessWidget {
                 ),
               ),
               Dimens.space(3),
-              const PrimaryButton(
+              PrimaryButton(
+                onTap: () {
+                  NavigatorHelper.to(RegisterView());
+                },
                 iconRight: Icons.arrow_forward,
                 text: 'Get Started',
               ),
@@ -64,8 +70,7 @@ class WelcomeView extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // Add your login navigation logic here
-                          print("Login tapped");
+                          NavigatorHelper.to(LoginView());
                         },
                     ),
                   ],
