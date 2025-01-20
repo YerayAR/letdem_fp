@@ -9,6 +9,8 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/auth/views/permissions/request_permission.view.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
@@ -211,6 +213,9 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                       PrimaryButton(
                         onTap: () {
                           Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          NavigatorHelper.to(const RequestPermissionView());
                         },
                         text: 'Proceed',
                       ),
