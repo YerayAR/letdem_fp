@@ -9,5 +9,5 @@ class Dimens {
   static double defaultRadiusLarge = 15;
 
   // ==
-  static Gap space(int multiplier) => Gap(baseSize * multiplier);
+  static Gap space(double multiplier) => Gap(baseSize * multiplier);
 }

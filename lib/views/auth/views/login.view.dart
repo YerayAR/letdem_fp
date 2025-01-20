@@ -11,6 +11,7 @@ import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/auth/views/register.view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -75,7 +76,8 @@ class LoginView extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // NavigatorHelper.to(LoginView());
+                          NavigatorHelper.pop();
+                          NavigatorHelper.to(RegisterView());
                         },
                     ),
                   ],
