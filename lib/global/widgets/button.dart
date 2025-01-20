@@ -79,6 +79,9 @@ class PrimaryButton extends StatelessWidget {
         loadingTexts[Random().nextInt(loadingTexts.length)];
 
     return InkWell(
+      highlightColor: Colors.white.withOpacity(0.1),
+      splashColor: Colors.grey.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(10000),
       onTap: () {
         if (isLoading && onTap == null) {
           return;
