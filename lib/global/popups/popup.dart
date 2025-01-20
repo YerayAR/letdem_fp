@@ -1,0 +1,23 @@
+import 'package:flutter/material.dart';
+import 'package:letdem/global/popups/popup_container.dart';
+
+class AppPopup {
+  static Future showDialogSheet(BuildContext context, Widget child) {
+    return showDialog(
+      // barrierDismissible: false,
+      context: context,
+      builder: (context) => Center(child: PopupContainer(child: child)),
+    );
+  }
+
+  static showBottomSheet(BuildContext context, Widget child) {
+    return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) => PopupContainer(
+        bottomSheet: true,
+        child: child,
+      ),
+    );
+  }
+}

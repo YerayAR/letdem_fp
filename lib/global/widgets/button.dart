@@ -152,14 +152,13 @@ class PrimaryButton extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight:
-                            icon != null ? FontWeight.w700 : FontWeight.w500,
-                        color: textColor != null
-                            ? textColor
-                            : isDisabled
+                            icon != null ? FontWeight.w700 : FontWeight.w600,
+                        color: textColor ??
+                            (isDisabled
                                 ? Colors.white.withOpacity(0.8)
                                 : outline
                                     ? color ?? AppColors.primary500
-                                    : Colors.white,
+                                    : Colors.white),
                       ),
                     ),
                     Row(
