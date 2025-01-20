@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
@@ -39,7 +40,9 @@ class RequestPermissionView extends StatelessWidget {
           ),
           Dimens.space(15),
           PrimaryButton(
-            onTap: () {},
+            onTap: () {
+              Geolocator.requestPermission();
+            },
             text: 'Enable Geolocation',
           ),
           Dimens.space(1),
