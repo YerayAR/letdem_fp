@@ -3,12 +3,14 @@ import 'package:letdem/constants/ui/dimens.dart';
 
 class StyledBody extends StatelessWidget {
   final List<Widget> children;
+  final bool isBottomPadding;
   final MainAxisAlignment? mainAxisAlignment;
   final CrossAxisAlignment? crossAxisAlignment;
 
   const StyledBody({
     super.key,
     required this.children,
+    this.isBottomPadding = false,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
   });
@@ -19,6 +21,7 @@ class StyledBody extends StatelessWidget {
       padding: EdgeInsets.only(
         top: Dimens.defaultMargin,
         left: Dimens.defaultMargin,
+        bottom: isBottomPadding ? Dimens.defaultMargin : 0,
         right: Dimens.defaultMargin,
       ),
       child: SafeArea(

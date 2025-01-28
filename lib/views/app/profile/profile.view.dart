@@ -15,23 +15,6 @@ class ProfileView extends StatelessWidget {
       color: const Color(0xffF5F5F5),
       child: StyledBody(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Profile',
-                style: Typo.heading4,
-              ),
-              CircleAvatar(
-                radius: 23,
-                backgroundColor: AppColors.neutral50,
-                child: Icon(
-                  Iconsax.notification5,
-                  color: AppColors.neutral500,
-                ),
-              ),
-            ],
-          ),
           Expanded(
             child: ListView(children: <Widget>[
               AccountSection(
@@ -185,9 +168,12 @@ class ProfileView extends StatelessWidget {
 }
 
 class AccountSection extends StatelessWidget {
-  final List<SettingsContainer> child;
+  final List<Widget> child;
   final String? title;
-  const AccountSection({super.key, required this.child, this.title});
+
+  final String? callToAction;
+  const AccountSection(
+      {super.key, required this.child, this.title, this.callToAction});
 
   @override
   Widget build(BuildContext context) {
@@ -199,9 +185,24 @@ class AccountSection extends StatelessWidget {
           if (title != null)
             Column(
               children: [
-                Text(
-                  title!,
-                  style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title!,
+                      style:
+                          Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    if (callToAction != null)
+                      Text(
+                        callToAction!,
+                        style: Typo.mediumBody.copyWith(
+                          color: AppColors.primary400,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                  ],
                 ),
                 Dimens.space(2),
               ],
@@ -215,21 +216,27 @@ class AccountSection extends StatelessWidget {
 
 class SettingsContainer extends StatelessWidget {
   final Widget child;
-  const SettingsContainer({super.key, required this.child});
+
+  final bool isExpanded;
+  const SettingsContainer(
+      {super.key, required this.child, this.isExpanded = false});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        vertical: 25,
-        horizontal: 25,
+    return Expanded(
+      flex: isExpanded ? 1 : 0,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          vertical: 25,
+          horizontal: 25,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: child,
       ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: child,
     );
   }
 }
@@ -274,6 +281,36 @@ class SettingsRow extends StatelessWidget {
             color: AppColors.neutral50,
           ),
       ],
+    );
+  }
+}
+
+class StyledAppBar extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const StyledAppBar({super.key, required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: Typo.heading4,
+          ),
+          CircleAvatar(
+            radius: 23,
+            backgroundColor: AppColors.neutral50,
+            child: Icon(
+              icon,
+              color: AppColors.neutral500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

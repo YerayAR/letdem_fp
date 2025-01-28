@@ -7,6 +7,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/views/app/activities/activities.view.dart';
 import 'package:letdem/views/app/profile/profile.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 
@@ -21,7 +22,7 @@ class _BaseViewState extends State<BaseView> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
     const HomeView(),
-    const Center(child: Text('Search View')),
+    const ActivitiesView(),
     const ProfileView()
   ];
 
