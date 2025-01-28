@@ -11,7 +11,7 @@ import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/auth/views/register.view.dart';
+import 'package:letdem/views/auth/views/onboard/register.view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -27,7 +27,7 @@ class LoginView extends StatelessWidget {
             onTap: () {},
             color: Colors.white,
             widgetImage: SvgPicture.asset(AppAssets.google),
-            textColor: Color(0xFF344054),
+            textColor: const Color(0xFF344054),
             borderColor: AppColors.neutral50,
             text: 'Sign in with Google',
           ),
@@ -47,7 +47,7 @@ class LoginView extends StatelessWidget {
                     color: AppColors.secondary600,
                   ),
                   IconButton(
-                    icon: Icon(Iconsax.close_circle5),
+                    icon: const Icon(Iconsax.close_circle5),
                     color: AppColors.neutral100,
                     onPressed: () {
                       NavigatorHelper.pop();
@@ -77,7 +77,7 @@ class LoginView extends StatelessWidget {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           NavigatorHelper.pop();
-                          NavigatorHelper.to(RegisterView());
+                          NavigatorHelper.to(const RegisterView());
                         },
                     ),
                   ],

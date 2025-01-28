@@ -6,6 +6,8 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/app/home/base.dart';
 
 class RequestPermissionView extends StatelessWidget {
   const RequestPermissionView({super.key});
@@ -42,6 +44,8 @@ class RequestPermissionView extends StatelessWidget {
           PrimaryButton(
             onTap: () {
               Geolocator.requestPermission();
+              NavigatorHelper.popAll();
+              NavigatorHelper.replaceAll(const BaseView());
             },
             text: 'Enable Geolocation',
           ),

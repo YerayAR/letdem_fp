@@ -20,7 +20,7 @@ class TextInputField extends StatefulWidget {
 
   final bool isEnabled;
 
-  final String label;
+  final String? label;
 
   final List<TextInputFormatter>? inputFormatters;
 
@@ -64,13 +64,19 @@ class TextInputFieldState extends State<TextInputField> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.label,
-            style: Typo.mediumBody.copyWith(
-              color: AppColors.neutral400,
-            ),
+          Column(
+            children: widget.label == null
+                ? []
+                : [
+                    Text(
+                      widget.label!,
+                      style: Typo.mediumBody.copyWith(
+                        color: AppColors.neutral400,
+                      ),
+                    ),
+                    Dimens.space(1),
+                  ],
           ),
-          Dimens.space(1),
           TextFormField(
               enabled: widget.isEnabled,
               onChanged: widget.onChanged,
@@ -137,7 +143,7 @@ class TextInputFieldState extends State<TextInputField> {
                       : OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10000),
                           borderSide: BorderSide(
-                            color: AppColors.neutral50,
+                            color: AppColors.neutral100.withOpacity(0.8),
                           ), // Border color when not focused
                         ),
                   errorBorder: !widget.enableBorder

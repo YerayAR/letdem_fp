@@ -12,7 +12,7 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
-import 'package:letdem/views/auth/views/verify_account.view.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 class RegisterView extends StatelessWidget {
   const RegisterView({super.key});
@@ -28,7 +28,7 @@ class RegisterView extends StatelessWidget {
             onTap: () {},
             color: Colors.white,
             widgetImage: SvgPicture.asset(AppAssets.google),
-            textColor: Color(0xFF344054),
+            textColor: const Color(0xFF344054),
             borderColor: AppColors.neutral50,
             text: 'Sign up with Google',
           ),
@@ -48,7 +48,7 @@ class RegisterView extends StatelessWidget {
                     color: AppColors.secondary600,
                   ),
                   IconButton(
-                    icon: Icon(Iconsax.close_circle5),
+                    icon: const Icon(Iconsax.close_circle5),
                     color: AppColors.neutral100,
                     onPressed: () {
                       NavigatorHelper.pop();
@@ -108,7 +108,7 @@ class RegisterView extends StatelessWidget {
               Dimens.space(2),
               PrimaryButton(
                 onTap: () {
-                  NavigatorHelper.to(VerifyAccountView());
+                  NavigatorHelper.to(const VerifyAccountView());
                 },
                 text: 'Register',
               ),

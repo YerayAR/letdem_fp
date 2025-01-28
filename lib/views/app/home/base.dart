@@ -7,6 +7,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/views/app/profile/profile.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 
 class BaseView extends StatefulWidget {
@@ -19,9 +20,9 @@ class BaseView extends StatefulWidget {
 class _BaseViewState extends State<BaseView> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
-    HomeView(),
+    const HomeView(),
     const Center(child: Text('Search View')),
-    const Center(child: Text('Profile View')),
+    const ProfileView()
   ];
 
   void _onItemTapped(int index) {
@@ -146,7 +147,7 @@ class _HomeViewState extends State<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Dimens.space(2),
-                        TextInputField(
+                        const TextInputField(
                           label: null,
                           placeHolder: 'Enter your destination',
                         ),

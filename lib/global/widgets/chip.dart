@@ -11,23 +11,30 @@ class DecoratedChip extends StatelessWidget {
   final double? textSize;
   final IconData? icon;
 
+  final TextStyle? textStyle;
+
+  final EdgeInsetsGeometry? padding;
+
   const DecoratedChip({
     super.key,
     required this.text,
+    this.padding,
     required this.color,
     this.backgroundColor,
-    this.icon,
     this.textSize,
+    this.icon,
+    this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return FittedBox(
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: Dimens.baseSize * 2,
-          vertical: Dimens.baseSize,
-        ),
+        padding: padding ??
+            EdgeInsets.symmetric(
+              horizontal: Dimens.baseSize * 2,
+              vertical: Dimens.baseSize,
+            ),
         decoration: BoxDecoration(
           color: backgroundColor ??
               color.withOpacity(0.1), // Adjust the opacity as needed
@@ -52,11 +59,12 @@ class DecoratedChip extends StatelessWidget {
               ),
               Text(
                 text,
-                style: Typo.smallBody.copyWith(
-                  color: color,
-                  fontSize: textSize ?? 12,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: textStyle ??
+                    Typo.smallBody.copyWith(
+                      color: color,
+                      fontSize: textSize ?? 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                 overflow: TextOverflow.clip,
               ),
             ],

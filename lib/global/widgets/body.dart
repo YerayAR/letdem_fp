@@ -16,9 +16,10 @@ class StyledBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: Dimens.defaultMargin,
-        horizontal: Dimens.defaultMargin,
+      padding: EdgeInsets.only(
+        top: Dimens.defaultMargin,
+        left: Dimens.defaultMargin,
+        right: Dimens.defaultMargin,
       ),
       child: SafeArea(
         child: Column(

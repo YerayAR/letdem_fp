@@ -6,7 +6,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
-import 'package:letdem/views/auth/views/register.view.dart';
+import 'package:letdem/views/auth/views/onboard/register.view.dart';
 
 import '../../../constants/ui/typo.dart';
 
@@ -48,7 +48,7 @@ class WelcomeView extends StatelessWidget {
               Dimens.space(3),
               PrimaryButton(
                 onTap: () {
-                  NavigatorHelper.to(RegisterView());
+                  NavigatorHelper.to(const RegisterView());
                 },
                 iconRight: Icons.arrow_forward,
                 text: 'Get Started',
@@ -70,7 +70,7 @@ class WelcomeView extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          NavigatorHelper.to(LoginView());
+                          NavigatorHelper.to(const LoginView());
                         },
                     ),
                   ],

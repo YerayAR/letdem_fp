@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "904131384719",
+    "project_id": "letdem-6bd25",
+    "storage_bucket": "letdem-6bd25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:904131384719:android:bb9750c568f76947b3e7fa",
+        "android_client_info": {
+          "package_name": "com.example.letdem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChnBpuM1QyIUcQgummXL4VD_uvRjm_mUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
