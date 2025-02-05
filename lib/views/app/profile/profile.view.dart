@@ -15,6 +15,10 @@ class ProfileView extends StatelessWidget {
       color: const Color(0xffF5F5F5),
       child: StyledBody(
         children: [
+          const StyledAppBar(
+            title: 'Profile',
+            icon: Iconsax.notification5,
+          ),
           Expanded(
             child: ListView(children: <Widget>[
               AccountSection(
@@ -276,9 +280,14 @@ class SettingsRow extends StatelessWidget {
           ),
         ),
         if (showDivider)
-          Container(
-            height: 1,
-            color: AppColors.neutral50,
+          Column(
+            children: [
+              Dimens.space(1),
+              Container(
+                height: 1,
+                color: AppColors.neutral50,
+              ),
+            ],
           ),
       ],
     );

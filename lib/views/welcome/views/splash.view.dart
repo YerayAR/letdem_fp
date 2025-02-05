@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/home/base.dart';
+import 'package:letdem/views/app/base.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});

@@ -23,9 +23,12 @@ class PrimaryButton extends StatelessWidget {
 
   final Color? textColor;
 
+  final Color? background;
+
   const PrimaryButton({
     super.key,
     this.color,
+    this.background,
     this.borderWidth,
     this.outline = false,
     required this.text,
@@ -98,7 +101,8 @@ class PrimaryButton extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10000),
-          color: outline ? Colors.transparent : color ?? AppColors.primary500,
+          color: background ??
+              (outline ? Colors.transparent : color ?? AppColors.primary500),
           border: outline
               ? Border.all(
                   color: borderColor ?? AppColors.primary500,
