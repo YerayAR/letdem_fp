@@ -36,7 +36,7 @@ class PopupContainer extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(
-                  Dimens.defaultRadius * 2,
+                  Dimens.defaultRadius * 1.5,
                 ),
               ),
               child: child,

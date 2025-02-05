@@ -13,6 +13,7 @@ class AppPopup {
   static showBottomSheet(BuildContext context, Widget child) {
     return showModalBottomSheet(
       backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.1),
       context: context,
       builder: (context) => PopupContainer(
         bottomSheet: true,

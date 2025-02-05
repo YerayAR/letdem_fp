@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/extenstions/location.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 
 import '../../../constants/ui/colors.dart';
@@ -77,26 +78,6 @@ class _HomeViewState extends State<HomeView> {
 
   late mapbox.CameraOptions _cameraPosition;
 
-  // void startNav() {
-  //   MapBoxNavigation.instance.setDefaultOptions(MapBoxOptions(
-  //       initialLatitude: 36.1175275,
-  //       initialLongitude: -115.1839524,
-  //       zoom: 7.0,
-  //       tilt: 0.0,
-  //       bearing: 0.0,
-  //       enableRefresh: false,
-  //       alternatives: true,
-  //       voiceInstructionsEnabled: true,
-  //       bannerInstructionsEnabled: true,
-  //       allowsUTurnAtWayPoints: true,
-  //       mode: MapBoxNavigationMode.drivingWithTraffic,
-  //       mapStyleUrlDay: "https://url_to_day_style",
-  //       mapStyleUrlNight: "https://url_to_night_style",
-  //       units: VoiceUnits.imperial,
-  //       simulateRoute: true,
-  //       language: "en"));
-  // }
-
   @override
   Widget build(BuildContext context) {
     return _currentPosition == null
@@ -135,10 +116,81 @@ class _HomeViewState extends State<HomeView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Dimens.space(2),
-                          TextInputField(
-                            label: null,
-                            prefixIcon: IconlyLight.search,
-                            placeHolder: 'Enter destination',
+                          GestureDetector(
+                            onTap: () async {
+                              AppPopup.showBottomSheet(
+                                  context,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Where are you going to?",
+                                              style: Typo.largeBody.copyWith(
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(
+                                                CupertinoIcons
+                                                    .clear_circled_solid,
+                                                color: AppColors.neutral400,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                            )
+                                          ],
+                                        ),
+                                        Dimens.space(2),
+                                        const TextInputField(
+                                          label: null,
+                                          prefixIcon: IconlyLight.search,
+                                          placeHolder: 'Enter destination',
+                                        ),
+                                        Dimens.space(2),
+                                        Text(
+                                          'Favourites',
+                                          style: Typo.mediumBody.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        Dimens.space(2),
+                                        const Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                SavedAddressComponent(),
+                                                SavedAddressComponent(
+                                                  showDivider: false,
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        Dimens.space(52),
+                                      ],
+                                    ),
+                                  ));
+                            },
+                            child: AbsorbPointer(
+                              child: TextInputField(
+                                label: null,
+                                prefixIcon: IconlyLight.search,
+                                placeHolder: 'Enter destination',
+                              ),
+                            ),
                           ),
                           Dimens.space(2),
                           Text(
@@ -177,5 +229,63 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
           );
+  }
+}
+
+class SavedAddressComponent extends StatelessWidget {
+  final bool showDivider;
+  const SavedAddressComponent({super.key, this.showDivider = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          Row(
+            children: <Widget>[
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: AppColors.neutral50,
+                child: Icon(
+                  IconlyBold.home,
+                  color: AppColors.neutral600,
+                ),
+              ),
+              Dimens.space(2),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  "HOME LOCATION",
+                  style: Typo.smallBody.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.neutral400,
+                  ),
+                ),
+                Dimens.space(1),
+                Text(
+                  "Set Home Location",
+                  style: Typo.mediumBody.copyWith(
+                    color: AppColors.primary400,
+                    fontWeight: FontWeight.w500,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ]),
+            ],
+          ),
+          Column(
+            children: !showDivider
+                ? []
+                : [
+                    Dimens.space(1),
+                    Divider(
+                      color: AppColors.neutral50,
+                      thickness: 1,
+                    ),
+                  ],
+          ),
+        ],
+      ),
+    );
   }
 }

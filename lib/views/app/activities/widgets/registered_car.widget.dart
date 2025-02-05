@@ -18,7 +18,7 @@ class RegisteredCarWidget extends StatelessWidget {
         horizontal: 0,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primary400,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Stack(
@@ -33,7 +33,7 @@ class RegisteredCarWidget extends StatelessWidget {
                 Text(
                   "Your Car Details",
                   style: Typo.smallBody.copyWith(
-                    color: Colors.white,
+                    color: AppColors.neutral500,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -42,7 +42,7 @@ class RegisteredCarWidget extends StatelessWidget {
                 Text(
                   "Mercedes Benz E350",
                   style: Typo.largeBody.copyWith(
-                      color: Colors.white,
+                      // color: Colors.white,
                       fontWeight: FontWeight.w800,
                       fontSize: 19),
                 ),
@@ -53,16 +53,17 @@ class RegisteredCarWidget extends StatelessWidget {
                   children: <Widget>[
                     Text("Year: 2024",
                         style: Typo.largeBody.copyWith(
-                          color: Colors.white,
+                          color: AppColors.neutral500,
                           fontWeight: FontWeight.w500,
                         )),
                     CircleAvatar(
                       radius: 3,
-                      backgroundColor: AppColors.primary200,
+                      backgroundColor: AppColors.neutral500,
                     ),
                     Text("Tag: Eco",
                         style: Typo.largeBody.copyWith(
-                          color: Colors.white,
+                          color: AppColors.neutral500,
+                          // color: Colors.white,
                           fontWeight: FontWeight.w500,
                         )),
                   ],
@@ -70,14 +71,19 @@ class RegisteredCarWidget extends StatelessWidget {
                 Dimens.space(2),
 
                 DecoratedChip(
-                  backgroundColor: AppColors.primary600,
+                  backgroundColor: AppColors.primary50,
                   text: 'Edit Details',
                   padding: const EdgeInsets.symmetric(
-                    vertical: 5,
-                    horizontal: 10,
+                    vertical: 8,
+                    horizontal: 14,
                   ),
-                  textSize: 14,
-                  color: Colors.white,
+                  textStyle: Typo.smallBody.copyWith(
+                    color: AppColors.primary500,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textSize: 11,
+                  color: AppColors.primary500,
                 ),
               ],
             ),
@@ -100,6 +106,25 @@ class RegisteredCarWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class LastParkedWidget extends StatelessWidget {
+  const LastParkedWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        vertical: 0,
+        horizontal: 0,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.primary500,
+        borderRadius: BorderRadius.circular(20),
       ),
     );
   }

@@ -77,6 +77,11 @@ class ContributionItem extends StatelessWidget {
               DecoratedChip(
                 backgroundColor: AppColors.secondary50,
                 text: '+2 Pts',
+                textStyle: Typo.smallBody.copyWith(
+                  color: AppColors.secondary600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
                 icon: Iconsax.cup5,
                 color: AppColors.secondary600,
               ),

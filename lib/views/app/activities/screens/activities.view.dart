@@ -53,7 +53,7 @@ class ActivitiesView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Center(
-                      child: false
+                      child: true
                           ? NoContributionsWidget()
                           : ListView(
                               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
