@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/views/app/profile/profile.view.dart';
+import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 
 class NoCarRegisteredWidget extends StatelessWidget {
   const NoCarRegisteredWidget({super.key});

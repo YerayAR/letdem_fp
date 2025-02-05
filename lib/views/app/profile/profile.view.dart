@@ -7,6 +7,8 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
+import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
+import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -169,82 +171,6 @@ class ProfileView extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class SettingsContainer extends StatelessWidget {
-  final Widget child;
-
-  final bool isExpanded;
-  const SettingsContainer(
-      {super.key, required this.child, this.isExpanded = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: isExpanded ? 1 : 0,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          vertical: 25,
-          horizontal: 25,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: child,
-      ),
-    );
-  }
-}
-
-class SettingsRow extends StatelessWidget {
-  final String text;
-  final VoidCallback? onTap;
-  final bool showDivider;
-  const SettingsRow(
-      {super.key, required this.text, this.onTap, this.showDivider = true});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  text,
-                  style: Typo.mediumBody.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.neutral600,
-                  ),
-                ),
-                Icon(
-                  Iconsax.arrow_right_3,
-                  color: AppColors.neutral300,
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (showDivider)
-          Column(
-            children: [
-              Dimens.space(1),
-              Container(
-                height: 1,
-                color: AppColors.neutral50,
-              ),
-            ],
-          ),
-      ],
     );
   }
 }

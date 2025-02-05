@@ -4,7 +4,8 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart'; // Ensure these imports are correct
 import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dart';
 import 'package:letdem/views/app/activities/widgets/no_contribution.widget.dart';
-import 'package:letdem/views/app/activities/widgets/registered_car.widgetile_section.widget.dart';
+import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
+import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 
 enum ContributionType {
   space,
