@@ -3,8 +3,10 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -21,7 +23,7 @@ class ProfileView extends StatelessWidget {
           ),
           Expanded(
             child: ListView(children: <Widget>[
-              AccountSection(
+              ProfileSection(
                 child: [
                   SettingsContainer(
                     child: Row(
@@ -82,7 +84,7 @@ class ProfileView extends StatelessWidget {
                   )
                 ],
               ),
-              AccountSection(
+              ProfileSection(
                 title: "Account Settings",
                 child: [
                   SettingsContainer(
@@ -105,7 +107,7 @@ class ProfileView extends StatelessWidget {
                   ))
                 ],
               ),
-              AccountSection(
+              ProfileSection(
                 title: "Other Settings",
                 child: [
                   SettingsContainer(
@@ -165,53 +167,6 @@ class ProfileView extends StatelessWidget {
               ),
             ]),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class AccountSection extends StatelessWidget {
-  final List<Widget> child;
-  final String? title;
-
-  final String? callToAction;
-  const AccountSection(
-      {super.key, required this.child, this.title, this.callToAction});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (title != null)
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title!,
-                      style:
-                          Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    if (callToAction != null)
-                      Text(
-                        callToAction!,
-                        style: Typo.mediumBody.copyWith(
-                          color: AppColors.primary400,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                  ],
-                ),
-                Dimens.space(2),
-              ],
-            ),
-          ...child,
         ],
       ),
     );
@@ -290,36 +245,6 @@ class SettingsRow extends StatelessWidget {
             ],
           ),
       ],
-    );
-  }
-}
-
-class StyledAppBar extends StatelessWidget {
-  final String title;
-  final IconData icon;
-
-  const StyledAppBar({super.key, required this.title, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: Typo.heading4,
-          ),
-          CircleAvatar(
-            radius: 23,
-            backgroundColor: AppColors.neutral50,
-            child: Icon(
-              icon,
-              color: AppColors.neutral500,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

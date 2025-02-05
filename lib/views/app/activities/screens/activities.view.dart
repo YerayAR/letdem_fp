@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart'; // Ensure these imports are correct
 import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dart';
 import 'package:letdem/views/app/activities/widgets/no_contribution.widget.dart';
-import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
-import 'package:letdem/views/app/profile/profile.view.dart';
+import 'package:letdem/views/app/activities/widgets/registered_car.widgetile_section.widget.dart';
 
 enum ContributionType {
   space,
@@ -26,7 +26,7 @@ class ActivitiesView extends StatelessWidget {
             icon: Iconsax.notification5,
           ),
 
-          const AccountSection(
+          const ProfileSection(
             child: [
               RegisteredCarWidget(),
             ],
@@ -34,7 +34,7 @@ class ActivitiesView extends StatelessWidget {
           // AccountSection(
           //   child: [
           Expanded(
-            child: AccountSection(
+            child: ProfileSection(
               title: "Contributions",
               callToAction: "See all",
               child: [
