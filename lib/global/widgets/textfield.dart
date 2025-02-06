@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:letdem/constants/ui/colors.dart';
@@ -23,6 +24,7 @@ class TextInputField extends StatefulWidget {
   final String? label;
 
   final List<TextInputFormatter>? inputFormatters;
+  final bool isLoading;
 
   const TextInputField({
     super.key,
@@ -37,6 +39,7 @@ class TextInputField extends StatefulWidget {
     this.maxLines,
     this.enableBorder = true,
     this.prefixIcon,
+    this.isLoading = false,
   });
 
   @override
@@ -118,13 +121,17 @@ class TextInputFieldState extends State<TextInputField> {
                         ),
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: 20.0, horizontal: 20),
-                  prefixIcon: widget.prefixIcon == null
-                      ? null
-                      : Icon(
-                          widget.prefixIcon,
-                          size: 18,
-                          color: AppColors.neutral300,
-                        ),
+                  prefixIcon: widget.isLoading
+                      ? CupertinoActivityIndicator(
+                          color: AppColors.primary400,
+                        )
+                      : widget.prefixIcon == null
+                          ? null
+                          : Icon(
+                              widget.prefixIcon,
+                              size: 18,
+                              color: AppColors.neutral300,
+                            ),
                   hintText: widget.placeHolder,
                   hintStyle: Typo.largeBody.copyWith(
                     color: AppColors.neutral300,
