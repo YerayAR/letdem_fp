@@ -8,6 +8,8 @@ import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/main.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
+import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 
 import '../../../constants/ui/colors.dart';
@@ -122,7 +124,7 @@ class _HomeViewState extends State<HomeView> {
                           GestureDetector(
                             onTap: () async {
                               AppPopup.showBottomSheet(
-                                  context, MapSearchBottomSheet());
+                                  context, const MapSearchBottomSheet());
                             },
                             child: AbsorbPointer(
                               child: TextInputField(
@@ -131,9 +133,9 @@ class _HomeViewState extends State<HomeView> {
                                   MapboxSearchApiService()
                                       .getLocationResults(value)
                                       .then((value) {
-                                    value.forEach((element) {
+                                    for (var element in value) {
                                       print(element.fullAddress);
-                                    });
+                                    }
                                   });
                                 },
                                 prefixIcon: IconlyLight.search,
@@ -152,7 +154,10 @@ class _HomeViewState extends State<HomeView> {
                             children: [
                               Flexible(
                                 child: PrimaryButton(
-                                  onTap: () async {},
+                                  onTap: () async {
+                                    NavigatorHelper.to(
+                                        const PublishSpaceScreen());
+                                  },
                                   icon: Iconsax.location5,
                                   text: 'Publish Space',
                                 ),
@@ -190,7 +195,7 @@ class SavedAddressComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return (place != null && place!.placeFormatted == "")
-        ? SizedBox()
+        ? const SizedBox()
         : Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Column(

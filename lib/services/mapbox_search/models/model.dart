@@ -280,3 +280,33 @@ class Street extends Equatable {
   @override
   List<Object?> get props => [name];
 }
+
+final samplePlace = MapBoxPlace(
+  name: "Tower Bridge",
+  mapboxId: "abc123",
+  featureType: "landmark",
+  address: "Tower Bridge Rd",
+  fullAddress: "Tower Bridge Rd, London, UK",
+  placeFormatted: "Tower Bridge, London",
+  context: Context(
+    country: Country(
+      name: "United Kingdom",
+      countryCode: "GB",
+      countryCodeAlpha3: "GBR",
+    ),
+    postcode: Postcode(id: "EC3N 4DT", name: "EC3N 4DT"),
+    place: PlaceLocation(id: "london", name: "London"),
+    locality: Locality(id: "city_of_london", name: "City of London"),
+    neighborhood: Neighborhood(id: "tower_hamlets", name: "Tower Hamlets"),
+    address: Address(
+      name: "Tower Bridge",
+      addressNumber: "206",
+      streetName: "Tower Bridge Rd",
+    ),
+    street: Street(name: "Tower Bridge Rd"),
+  ),
+  language: "en",
+  maki: "landmark",
+  poiCategory: ["landmark", "tourist attraction"],
+  externalIds: {"google": "ChIJc5B9WZsDdkgR7k9YyIJ1zVw"},
+);

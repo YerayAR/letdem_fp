@@ -8,6 +8,7 @@ class StyledAppBar extends StatelessWidget {
 
   const StyledAppBar({super.key, required this.title, required this.icon});
 
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Row(

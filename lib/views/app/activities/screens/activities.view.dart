@@ -54,7 +54,7 @@ class ActivitiesView extends StatelessWidget {
                     ),
                     child: Center(
                       child: true
-                          ? NoContributionsWidget()
+                          ? const NoContributionsWidget()
                           : ListView(
                               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               // crossAxisAlignment: CrossAxisAlignment.center,

@@ -36,8 +36,13 @@ class LetDemApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,
+          titleTextStyle: TextStyle(
+            color: AppColors.neutral600,
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+          ),
           elevation: 0,
         ),
         scaffoldBackgroundColor: Colors.white,
@@ -158,8 +163,35 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                             .map((e) => SavedAddressComponent(place: e))
                             .toList()
                         : [
-                            SavedAddressComponent(),
-                            SavedAddressComponent(showDivider: false),
+                            const SavedAddressComponent(),
+                            const SavedAddressComponent(showDivider: false),
+                            Dimens.space(2),
+                            Row(
+                              children: [
+                                Text(
+                                  'Favourites',
+                                  style: Typo.mediumBody
+                                      .copyWith(fontWeight: FontWeight.w500),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  'Clear all',
+                                  style: Typo.mediumBody.copyWith(
+                                    color: AppColors.primary400,
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Dimens.space(2),
+                            SavedAddressComponent(
+                              place: samplePlace,
+                            ),
+                            SavedAddressComponent(
+                              place: samplePlace,
+                              showDivider: false,
+                            ),
                           ],
               ),
             ),

@@ -50,6 +50,7 @@ dependencies:
   iconly: ^1.0.1
   equatable: ^2.0.7
   mapbox_search: ^4.3.0
+  sqflite: ^2.4.1
 
 dev_dependencies:
   flutter_test:
