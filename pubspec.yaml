@@ -51,6 +51,7 @@ dependencies:
   equatable: ^2.0.7
   mapbox_search: ^4.3.0
   sqflite: ^2.4.1
+  flashy_flushbar: ^1.4.0
 
 dev_dependencies:
   flutter_test:
