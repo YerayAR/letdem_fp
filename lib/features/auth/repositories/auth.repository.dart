@@ -1,0 +1,15 @@
+import 'package:letdem/features/auth/dto/login.dto.dart';
+import 'package:letdem/features/auth/repositories/auth.interface.dart';
+import 'package:letdem/models/auth/tokens.model.dart';
+import 'package:letdem/services/api/api.service.dart';
+import 'package:letdem/services/api/endpoints.dart';
+import 'package:letdem/services/api/models/response.model.dart';
+
+class AuthRepository extends AuthInterface {
+  @override
+  Future<Tokens> login(LoginDTO loginDTO) async {
+    ApiResponse response = await ApiService.sendRequest(
+        endpoint: EndPoints.loginEndpoint.copyWithDTO(loginDTO));
+    return Tokens(accessToken: response.data['token']);
+  }
+}

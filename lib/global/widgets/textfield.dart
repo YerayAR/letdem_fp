@@ -10,6 +10,8 @@ enum TextFieldType { email, password, number, text }
 class TextInputField extends StatefulWidget {
   final TextEditingController? controller;
   final String placeHolder;
+
+  final bool showPasswordStrengthIndicator;
   final Function(String value)? onChanged;
   final TextFieldType inputType;
   final int? maxLines;
@@ -32,6 +34,7 @@ class TextInputField extends StatefulWidget {
     this.inputFormatters,
     required this.label,
     this.isEnabled = true,
+    this.showPasswordStrengthIndicator = false,
     this.mustValidate = true,
     this.onChanged,
     required this.placeHolder,
@@ -48,6 +51,17 @@ class TextInputField extends StatefulWidget {
 
 class TextInputFieldState extends State<TextInputField> {
   bool isPasswordVisible = false;
+
+  Map<String, bool> passwordValid = {
+    'isLength': false,
+    'isSpecial': false,
+    'isNumber': false,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +96,38 @@ class TextInputFieldState extends State<TextInputField> {
           ),
           TextFormField(
               enabled: widget.isEnabled,
-              onChanged: widget.onChanged,
+              onChanged: widget.showPasswordStrengthIndicator
+                  ? (e) {
+                      if (e.length >= 8) {
+                        setState(() {
+                          passwordValid['isLength'] = true;
+                        });
+                      } else {
+                        setState(() {
+                          passwordValid['isLength'] = false;
+                        });
+                      }
+                      if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]')
+                          .hasMatch(e)) {
+                        setState(() {
+                          passwordValid['isSpecial'] = true;
+                        });
+                      } else {
+                        setState(() {
+                          passwordValid['isSpecial'] = false;
+                        });
+                      }
+                      if (RegExp(r'[0-9]').hasMatch(e)) {
+                        setState(() {
+                          passwordValid['isNumber'] = true;
+                        });
+                      } else {
+                        setState(() {
+                          passwordValid['isNumber'] = false;
+                        });
+                      }
+                    }
+                  : widget.onChanged,
               validator: (value) {
                 if (!widget.mustValidate) {
                   return null;
@@ -186,6 +231,32 @@ class TextInputFieldState extends State<TextInputField> {
                           },
                         )
                       : null)),
+          Column(
+            children: widget.showPasswordStrengthIndicator
+                ? <Widget>[
+                    Dimens.space(1),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: passwordValid.keys.map((key) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: AnimatedContainer(
+                            height: 7,
+                            duration: const Duration(milliseconds: 600),
+                            width: 20,
+                            decoration: BoxDecoration(
+                              color: passwordValid[key] == true
+                                  ? AppColors.green500
+                                  : AppColors.neutral50,
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ]
+                : [],
+          ),
         ],
       ),
     );

@@ -5,7 +5,7 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/storage/storage.service.dart';
 
 class BaseApiService {
-  Future<Map<String, String>> getHeaders(
+  static Future<Map<String, String>> getHeaders(
       bool mustAuthenticated, String? tokenKey) async {
     Locale currentLocale = Localizations.localeOf(
         NavigatorHelper.navigatorKey.currentState!.context);

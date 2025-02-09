@@ -1,13 +1,17 @@
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/auth/auth_bloc.dart';
+import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
@@ -26,7 +30,25 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const LetDemApp());
+  runApp(
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AuthRepository>(
+          create: (_) => AuthRepository(),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (context) => AuthBloc(
+              authRepository: context.read<AuthRepository>(),
+            ),
+          ),
+        ],
+        child: const LetDemApp(),
+      ),
+    ),
+  );
 }
 
 class LetDemApp extends StatelessWidget {
@@ -35,6 +57,7 @@ class LetDemApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: FlashyFlushbarProvider.init(),
       theme: ThemeData(
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,

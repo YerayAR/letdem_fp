@@ -11,14 +11,14 @@ import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/services/api/sub/base.dart';
 
 class ApiService extends BaseApiService {
-  final Dio _dio = Dio(
+  static final Dio _dio = Dio(
     BaseOptions(
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 20),
     ),
   );
 
-  Future<ApiResponse> sendMultiPartRequest({
+  static Future<ApiResponse> sendMultiPartRequest({
     required Endpoint endpoint,
     required Function(double v) onProgress,
   }) async {
@@ -37,7 +37,8 @@ class ApiService extends BaseApiService {
 
       // Add headers
       Options options = Options(
-        headers: await getHeaders(endpoint.isProtected, endpoint.tokenKey),
+        headers: await BaseApiService.getHeaders(
+            endpoint.isProtected, endpoint.tokenKey),
       );
 
       // Create form data
@@ -126,7 +127,7 @@ class ApiService extends BaseApiService {
   }
 
   // Send an HTTP request and handle the response
-  Future<ApiResponse> sendRequest({
+  static Future<ApiResponse> sendRequest({
     required Endpoint endpoint,
   }) async {
     try {
@@ -144,7 +145,8 @@ class ApiService extends BaseApiService {
       }
 
       Options options = Options(
-        headers: await getHeaders(endpoint.isProtected, endpoint.tokenKey),
+        headers: await BaseApiService.getHeaders(
+            endpoint.isProtected, endpoint.tokenKey),
       );
       if (EndPoints.showApiLogs) {
         debugPrint("""
@@ -230,7 +232,7 @@ ${response.data}
     throw ApiError(message: "Unexpected error occurred, no response received");
   }
 
-  void _handleDioError(DioException e) {
+  static void _handleDioError(DioException e) {
     if (e.type == DioExceptionType.connectionError) {
       // throw ApiError(
       //     message: NavigatorHelper
@@ -240,6 +242,19 @@ ${response.data}
       // Toast.showError(NavigatorHelper
       //     .navigatorKey.currentState!.context.l10n.no_connection);
     } else {
+      if (EndPoints.showApiLogs) {
+        debugPrint("""
+════════════════════════════════════════════════════════════════════════════════════════════════
+      API RESPONSE    🐶
+════════════════════════════════════════════════════════════════════════════════════════════════
+      URL       :- ${e.response?.data ?? e.error}
+      StatusCode:- ${e.message}
+      Response  :-
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════
+""");
+      }
       debugPrint('Dio error occurred: ${e.message}');
       var message = e.response == null
           ? "Unknown error"
