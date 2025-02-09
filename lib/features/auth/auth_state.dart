@@ -30,3 +30,42 @@ final class LoginError extends AuthState {
   // TODO: implement props
   List<Object?> get props => [];
 }
+
+final class RegisterLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class RegisterSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class RegisterError extends AuthState {
+  final String error;
+
+  const RegisterError({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
+final class OTPVerificationLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class OTPVerificationSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class PersonalInfoLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class PersonalInfoSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}

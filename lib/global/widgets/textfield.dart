@@ -107,8 +107,7 @@ class TextInputFieldState extends State<TextInputField> {
                           passwordValid['isLength'] = false;
                         });
                       }
-                      if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]')
-                          .hasMatch(e)) {
+                      if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]').hasMatch(e)) {
                         setState(() {
                           passwordValid['isSpecial'] = true;
                         });
@@ -232,27 +231,41 @@ class TextInputFieldState extends State<TextInputField> {
                         )
                       : null)),
           Column(
-            children: widget.showPasswordStrengthIndicator
+            children: widget.showPasswordStrengthIndicator &&
+                    widget.controller != null &&
+                    widget.controller!.text.isNotEmpty
                 ? <Widget>[
-                    Dimens.space(1),
+                    Dimens.space(2),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: passwordValid.keys.map((key) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 5),
-                          child: AnimatedContainer(
-                            height: 7,
-                            duration: const Duration(milliseconds: 600),
-                            width: 20,
-                            decoration: BoxDecoration(
-                              color: passwordValid[key] == true
-                                  ? AppColors.green500
-                                  : AppColors.neutral50,
-                              borderRadius: BorderRadius.circular(100),
-                            ),
+                      children: [
+                        Text(
+                          "Password Strength",
+                          style: Typo.mediumBody.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
-                        );
-                      }).toList(),
+                        ),
+                        Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: passwordValid.keys.map((key) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: AnimatedContainer(
+                                height: 7,
+                                duration: const Duration(milliseconds: 600),
+                                width: 24,
+                                decoration: BoxDecoration(
+                                  color: passwordValid[key] == true
+                                      ? AppColors.green500
+                                      : AppColors.neutral50,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ),
                   ]
                 : [],

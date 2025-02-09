@@ -1,4 +1,5 @@
 import 'package:letdem/features/auth/dto/login.dto.dart';
+import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
 enum Environment { STG, PROD, DEV }
@@ -10,6 +11,18 @@ class EndPoints {
 
   static Endpoint<LoginDTO> loginEndpoint = Endpoint(
     url: "/auth/login",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+
+  static Endpoint<RegisterDTO> registerEndpoint = Endpoint(
+    url: "/auth/signup",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+
+  static Endpoint verifyEmailEndpoint = Endpoint(
+    url: "/auth/account-verification/validate",
     method: HTTPMethod.POST,
     isProtected: false,
   );

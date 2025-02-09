@@ -16,7 +16,8 @@ import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
 
 class VerifyAccountView extends StatefulWidget {
-  const VerifyAccountView({super.key});
+  final String email;
+  const VerifyAccountView({super.key, required this.email});
 
   @override
   State<VerifyAccountView> createState() => _VerifyAccountViewState();
@@ -131,21 +132,17 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                       Center(
                         child: Text.rich(
                           TextSpan(
-                            text:
-                                'Mail is sent to: ', // Default style for this text
+                            text: 'Mail is sent to: ',
                             style: Typo.smallBody.copyWith(),
                             children: [
                               TextSpan(
-                                text:
-                                    'mistalogik@outlook.com', // Styled differently
+                                text: widget.email,
                                 style: Typo.smallBody.copyWith(
                                   decorationColor: AppColors.primary400,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    // NavigatorHelper.to(LoginView());
-                                  },
+                                  ..onTap = () {},
                               ),
                             ],
                           ),

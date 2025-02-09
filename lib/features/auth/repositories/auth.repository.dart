@@ -1,4 +1,5 @@
 import 'package:letdem/features/auth/dto/login.dto.dart';
+import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/api.service.dart';
@@ -11,5 +12,11 @@ class AuthRepository extends AuthInterface {
     ApiResponse response = await ApiService.sendRequest(
         endpoint: EndPoints.loginEndpoint.copyWithDTO(loginDTO));
     return Tokens(accessToken: response.data['token']);
+  }
+
+  @override
+  Future register(RegisterDTO registerDTO) async {
+    await ApiService.sendRequest(
+        endpoint: EndPoints.registerEndpoint.copyWithDTO(registerDTO));
   }
 }

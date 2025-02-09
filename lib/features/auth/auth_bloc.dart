@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
+import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
@@ -13,6 +14,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
     on<LoginEvent>(_onLoginUserEvent);
+    on<RegisterEvent>(_onRegisterUserEvent);
+  }
+
+  Future<void> _onRegisterUserEvent(
+      RegisterEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(RegisterLoading());
+      await authRepository
+          .register(RegisterDTO(email: event.email, password: event.password));
+
+      emit(RegisterSuccess());
+    } on ApiError catch (err) {
+      emit(RegisterError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const RegisterError(error: 'Unable to Register'));
+    }
   }
 
   Future<void> _onLoginUserEvent(
