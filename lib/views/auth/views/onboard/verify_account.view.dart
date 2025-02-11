@@ -9,7 +9,6 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
@@ -184,6 +183,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
+                                        NavigatorHelper.pop();
                                         // NavigatorHelper.to(LoginView());
                                       },
                                   ),
@@ -199,46 +199,51 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                 const Spacer(),
                 PrimaryButton(
                   onTap: () {
-                    AppPopup.showDialogSheet(
-                      context,
-                      Column(
-                        children: <Widget>[
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundColor: AppColors.green50,
-                            child: Icon(
-                              Icons.done,
-                              size: 45,
-                              color: AppColors.green600,
-                            ),
-                          ),
-                          Dimens.space(3),
-                          Text(
-                            "Verification Success",
-                            textAlign: TextAlign.center,
-                            style: Typo.heading4
-                                .copyWith(color: AppColors.neutral600),
-                          ),
-                          Text(
-                            "Your account email has been verified successfully you can proceed to the app.",
-                            textAlign: TextAlign.center,
-                            style: Typo.mediumBody
-                                .copyWith(color: AppColors.neutral400),
-                          ),
-                          Dimens.space(5),
-                          PrimaryButton(
-                            isLoading: state is OTPVerificationLoading,
-                            onTap: () {
-                              context.read<AuthBloc>().add(VerifyEmailEvent(
-                                  email: widget.email, code: otp!));
-                            },
-                            text: 'Proceed',
-                          ),
-                        ],
-                      ),
-                    );
+                    context
+                        .read<AuthBloc>()
+                        .add(VerifyEmailEvent(email: widget.email, code: otp!));
+                    // AppPopup.showDialogSheet(
+                    //   context,
+                    //   Column(
+                    //     children: <Widget>[
+                    //       CircleAvatar(
+                    //         radius: 45,
+                    //         backgroundColor: AppColors.green50,
+                    //         child: Icon(
+                    //           Icons.done,
+                    //           size: 45,
+                    //           color: AppColors.green600,
+                    //         ),
+                    //       ),
+                    //       Dimens.space(3),
+                    //       Text(
+                    //         "Verification Success",
+                    //         textAlign: TextAlign.center,
+                    //         style: Typo.heading4
+                    //             .copyWith(color: AppColors.neutral600),
+                    //       ),
+                    //       Text(
+                    //         "Your account email has been verified successfully you can proceed to the app.",
+                    //         textAlign: TextAlign.center,
+                    //         style: Typo.mediumBody
+                    //             .copyWith(color: AppColors.neutral400),
+                    //       ),
+                    //       Dimens.space(5),
+                    //       PrimaryButton(
+                    //         isLoading: state is OTPVerificationLoading,
+                    //         onTap: () {
+                    //           context.read<AuthBloc>().add(VerifyEmailEvent(
+                    //               email: widget.email, code: otp!));
+                    //         },
+                    //         text: 'Proceed',
+                    //       ),
+                    //     ],
+                    //   ),
+                    // );
+
                     // NavigatorHelper.to(VerifyAccountView());
                   },
+                  isLoading: state is OTPVerificationLoading,
                   text: 'Proceed',
                 ),
                 Dimens.space(2),

@@ -30,7 +30,7 @@ class EndPoints {
   );
 
   static Endpoint<EmailDTO> resendVerificationCodeEndpoint = Endpoint(
-    url: "/auth/account-verification/resend",
+    url: "/auth/account-verification/resend-otp",
     method: HTTPMethod.POST,
     isProtected: false,
   );

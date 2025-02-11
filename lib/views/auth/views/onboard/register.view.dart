@@ -73,6 +73,10 @@ class _RegisterViewState extends State<RegisterView> {
               Toast.showError(state.error);
               return;
             }
+            if (state is ResendVerificationCodeError) {
+              Toast.showError("Unable to resend verification code");
+              return;
+            }
             if (state is RegisterSuccess) {
               NavigatorHelper.to(VerifyAccountView(
                 email: _emailCTRL.text,
