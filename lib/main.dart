@@ -12,6 +12,8 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
+import 'package:letdem/features/users/repository/user.repository.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
@@ -36,12 +38,20 @@ void main() async {
         RepositoryProvider<AuthRepository>(
           create: (_) => AuthRepository(),
         ),
+        RepositoryProvider<UserRepository>(
+          create: (_) => UserRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),
+            ),
+          ),
+          BlocProvider<UserBloc>(
+            create: (context) => UserBloc(
+              userRepository: context.read<UserRepository>(),
             ),
           ),
         ],

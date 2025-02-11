@@ -26,4 +26,9 @@ class EndPoints {
     method: HTTPMethod.POST,
     isProtected: false,
   );
+
+  static Endpoint getUserProfileEndpoint = Endpoint(
+    url: "/users/me",
+    method: HTTPMethod.GET,
+  );
 }

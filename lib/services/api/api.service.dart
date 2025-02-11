@@ -260,7 +260,8 @@ ${response.data}
           ? "Unknown error"
           : e.response!.data?['message'] ?? "Unknown error";
 
-      throw ApiError(message: message);
+      throw ApiError(
+          message: message, status: fromCode(e.response?.statusCode ?? 0));
     }
   }
 }
