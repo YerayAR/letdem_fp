@@ -39,7 +39,8 @@ class _SplashViewState extends State<SplashView> {
             if (state.apiError != null) {
               print(state.apiError!.status);
               if (state.apiError!.status == ErrorStatus.unauthorized) {
-                NavigatorHelper.replaceAll(const LoginView());
+                Toast.showError("The session has expired. Please login again.");
+                NavigatorHelper.to(const LoginView());
                 return;
               }
             }

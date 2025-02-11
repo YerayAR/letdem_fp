@@ -223,7 +223,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
               },
               text: 'Proceed',
             ),
-            Dimens.space(1),
+            Dimens.space(2),
             Center(
               child: Text.rich(
                 TextSpan(
@@ -231,7 +231,9 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                   style: Typo.mediumBody.copyWith(),
                   children: [
                     TextSpan(
-                      text: ' Resend in 00:23', // Styled differently
+                      text: _isResendEnabled
+                          ? "Tap to resend."
+                          : ' Resend in 00:$_secondsRemaining',
                       style: Typo.mediumBody.copyWith(
                         color: AppColors.primary400,
                         fontWeight: FontWeight.w600,
