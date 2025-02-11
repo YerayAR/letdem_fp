@@ -10,6 +10,8 @@ import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
@@ -41,6 +43,9 @@ void main() async {
         RepositoryProvider<UserRepository>(
           create: (_) => UserRepository(),
         ),
+        RepositoryProvider<ActivityRepository>(
+          create: (_) => ActivityRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -52,6 +57,11 @@ void main() async {
           BlocProvider<UserBloc>(
             create: (context) => UserBloc(
               userRepository: context.read<UserRepository>(),
+            ),
+          ),
+          BlocProvider<ActivitiesBloc>(
+            create: (context) => ActivitiesBloc(
+              activityRepository: context.read<ActivityRepository>(),
             ),
           ),
         ],

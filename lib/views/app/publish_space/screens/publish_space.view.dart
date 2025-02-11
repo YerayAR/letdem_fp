@@ -1,14 +1,60 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 
-class PublishSpaceScreen extends StatelessWidget {
+enum PublishSpaceType {
+  free,
+  blueZone,
+  disabled,
+  greenZone,
+}
+
+String getSpaceTypeText(PublishSpaceType type) {
+  switch (type) {
+    case PublishSpaceType.free:
+      return 'Free';
+    case PublishSpaceType.blueZone:
+      return 'Blue Zone';
+    case PublishSpaceType.disabled:
+      return 'Disabled';
+    case PublishSpaceType.greenZone:
+      return 'Green Zone';
+  }
+}
+
+String getSpaceTypeIcon(PublishSpaceType type) {
+  switch (type) {
+    case PublishSpaceType.free:
+      return AppAssets.free;
+    case PublishSpaceType.blueZone:
+      return AppAssets.blue;
+    case PublishSpaceType.disabled:
+      return AppAssets.disabled;
+    case PublishSpaceType.greenZone:
+      return AppAssets.green;
+  }
+}
+
+class PublishSpaceScreen extends StatefulWidget {
   const PublishSpaceScreen({super.key});
+
+  @override
+  State<PublishSpaceScreen> createState() => _PublishSpaceScreenState();
+}
+
+class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
+  File? selectedSpace;
+  PublishSpaceType selectedType = PublishSpaceType.free;
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +73,62 @@ class PublishSpaceScreen extends StatelessWidget {
       ),
       body: StyledBody(
         children: [
-          const TakePictureWidget(),
+          TakePictureWidget(
+            file: selectedSpace,
+            onImageSelected: (File file) {
+              setState(() {
+                selectedSpace = file;
+              });
+            },
+          ),
           Dimens.space(2),
           const PublishingLocationWidget(),
+          Dimens.space(2),
+          Row(
+            spacing: 10,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: PublishSpaceType.values
+                .map((e) => Flexible(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedType = e;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          height: 90,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: selectedType == e
+                                ? Border.all(color: AppColors.primary200)
+                                : Border.all(color: AppColors.neutral50),
+                          ),
+                          child: Center(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                getSpaceTypeIcon(e),
+                                width: 30,
+                                height: 30,
+                              ),
+                              Dimens.space(1),
+                              Text(
+                                getSpaceTypeText(e),
+                                style: Typo.smallBody.copyWith(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          )),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
         ],
       ),
     );
@@ -83,30 +182,55 @@ class PublishingLocationWidget extends StatelessWidget {
   }
 }
 
-class TakePictureWidget extends StatelessWidget {
-  const TakePictureWidget({super.key});
+class TakePictureWidget extends StatefulWidget {
+  final Function(File file) onImageSelected;
+  final File? file;
+  const TakePictureWidget(
+      {super.key, required this.onImageSelected, this.file});
+
+  @override
+  State<TakePictureWidget> createState() => _TakePictureWidgetState();
+}
+
+class _TakePictureWidgetState extends State<TakePictureWidget> {
+  void takePhoto() async {
+    ImagePicker picker = ImagePicker();
+    XFile? file = await picker.pickImage(source: ImageSource.camera);
+    if (file != null) {
+      widget.onImageSelected(File(file.path));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.4,
-      padding: const EdgeInsets.all(25),
-      decoration: BoxDecoration(
-        color: AppColors.neutral50,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(IconlyBold.camera, size: 30, color: AppColors.neutral400),
-          Dimens.space(1),
-          const Text(
-            "Click to open camera",
-            style: Typo.largeBody,
-          ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        takePhoto();
+      },
+      child: Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.4,
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          image: widget.file != null
+              ? DecorationImage(
+                  image: FileImage(widget.file!), fit: BoxFit.cover)
+              : null,
+          color: AppColors.neutral50,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(IconlyBold.camera, size: 30, color: AppColors.neutral400),
+            Dimens.space(1),
+            const Text(
+              "Click to open camera",
+              style: Typo.largeBody,
+            ),
+          ],
+        ),
       ),
     );
   }

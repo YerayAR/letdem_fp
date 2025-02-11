@@ -20,6 +20,12 @@
 	<string>letdem</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires access to your photo library to allow users to upload parking-related images, such as parking spots and receipts.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app requires access to your camera to scan parking tickets, capture parking spots, and take profile photos.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app requires access to your microphone to enable voice search for finding nearby parking spots.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>

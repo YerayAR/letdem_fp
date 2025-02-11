@@ -9,9 +9,14 @@ import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/base.dart';
 
-class RequestPermissionView extends StatelessWidget {
+class RequestPermissionView extends StatefulWidget {
   const RequestPermissionView({super.key});
 
+  @override
+  State<RequestPermissionView> createState() => _RequestPermissionViewState();
+}
+
+class _RequestPermissionViewState extends State<RequestPermissionView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +57,8 @@ class RequestPermissionView extends StatelessWidget {
           Dimens.space(1),
           PrimaryButton(
             onTap: () {
-              Navigator.pop(context);
+              NavigatorHelper.popAll();
+              NavigatorHelper.replaceAll(const BaseView());
             },
             borderColor: Colors.transparent,
             textColor: Colors.black,
