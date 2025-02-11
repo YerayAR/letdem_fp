@@ -8,4 +8,8 @@ class Tokens {
   write() async {
     await SecureStorageHelper().write('access_token', accessToken);
   }
+
+  static delete() async {
+    await SecureStorageHelper().delete('access_token');
+  }
 }

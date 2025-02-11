@@ -4,6 +4,12 @@ sealed class UserState extends Equatable {
   const UserState();
 }
 
+final class UserLoggedOutState extends UserState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
 final class UserInitial extends UserState {
   @override
   List<Object> get props => [];

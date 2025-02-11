@@ -9,3 +9,9 @@ class FetchUserInfoEvent extends UserEvent {
   // TODO: implement props
   List<Object?> get props => [];
 }
+
+class UserLoggedOutEvent extends UserEvent {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}

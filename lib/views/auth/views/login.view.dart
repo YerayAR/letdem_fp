@@ -14,6 +14,7 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/app/base.dart';
 import 'package:letdem/views/auth/views/forgot_password/request_forgot_password.view.dart';
 import 'package:letdem/views/auth/views/onboard/register.view.dart';
 
@@ -65,6 +66,9 @@ class _LoginViewState extends State<LoginView> {
         listener: (context, state) {
           if (state is LoginError) {
             Toast.showError(state.error);
+          }
+          if (state is LoginSuccess) {
+            NavigatorHelper.replaceAll(BaseView());
           }
           // TODO: implement listener
         },

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
+import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 
 part 'user_event.dart';
@@ -11,6 +12,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   UserBloc({required this.userRepository}) : super(UserInitial()) {
     on<FetchUserInfoEvent>(_onFetchUserInfo);
+    on<UserLoggedOutEvent>(_onUserLoggedOut);
+  }
+
+  Future<void> _onUserLoggedOut(
+      UserLoggedOutEvent event, Emitter<UserState> emit) async {
+    await Tokens.delete();
+    emit(UserLoggedOutState());
   }
 
   Future<void> _onFetchUserInfo(

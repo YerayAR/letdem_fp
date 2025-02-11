@@ -8,8 +8,8 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/app/base.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
-import 'package:letdem/views/welcome/views/welcome.view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -31,9 +31,7 @@ class _SplashViewState extends State<SplashView> {
       body: BlocConsumer<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserLoaded) {
-            Future.delayed(const Duration(seconds: 1), () {
-              NavigatorHelper.replaceAll(const WelcomeView());
-            });
+            NavigatorHelper.to(const BaseView());
           }
           if (state is UserError) {
             if (state.apiError != null) {

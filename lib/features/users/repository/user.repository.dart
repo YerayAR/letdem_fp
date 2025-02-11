@@ -40,14 +40,40 @@ abstract class IUserRepository {
 
 class LetDemUser {
   final String email;
-  final String name;
+  final String firstName;
+  final String lastName;
+  final bool isSocial;
+  final int totalPoints;
+  final int notificationsCount;
 
   LetDemUser({
     required this.email,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
+    required this.isSocial,
+    required this.totalPoints,
+    required this.notificationsCount,
   });
 
   factory LetDemUser.fromJSON(Map<String, dynamic> json) {
-    return LetDemUser(email: '', name: '');
+    return LetDemUser(
+      email: json['email'] ?? '',
+      firstName: json['first_name'] ?? '',
+      lastName: json['last_name'] ?? '',
+      isSocial: json['is_social'] ?? false,
+      totalPoints: json['total_points'] ?? 0,
+      notificationsCount: json['notifications_count'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJSON() {
+    return {
+      'email': email,
+      'first_name': firstName,
+      'last_name': lastName,
+      'is_social': isSocial,
+      'total_points': totalPoints,
+      'notifications_count': notificationsCount,
+    };
   }
 }

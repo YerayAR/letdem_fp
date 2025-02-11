@@ -26,7 +26,7 @@ class BaseApiService {
         }
         print(token);
 
-        headers['Authorization'] = 'Bearer $token';
+        headers['Authorization'] = 'Token $token';
       } catch (e) {
         rethrow;
       }
