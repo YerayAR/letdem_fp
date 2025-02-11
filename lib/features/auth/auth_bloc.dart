@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
+import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
@@ -15,6 +17,39 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
     on<LoginEvent>(_onLoginUserEvent);
     on<RegisterEvent>(_onRegisterUserEvent);
+    on<VerifyEmailEvent>(_onVerifyEmail);
+    on<ResendVerificationCodeEvent>(_onResendVerificationCode);
+  }
+
+  Future<void> _onResendVerificationCode(
+      ResendVerificationCodeEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(ResendVerificationCodeLoading());
+      await authRepository.resendVerificationCode(EmailDTO(email: event.email));
+
+      emit(ResendVerificationCodeSuccess());
+    } on ApiError catch (err) {
+      emit(RegisterError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const RegisterError(error: 'Unable to Resend Verification Code'));
+    }
+  }
+
+  Future<void> _onVerifyEmail(
+      VerifyEmailEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(OTPVerificationLoading());
+      await authRepository.verifyEmailEvent(
+          VerifyEmailDTO(email: event.email, otp: event.code));
+
+      emit(OTPVerificationSuccess());
+    } on ApiError catch (err) {
+      emit(RegisterError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const RegisterError(error: 'Unable to Verify Email'));
+    }
   }
 
   Future<void> _onRegisterUserEvent(

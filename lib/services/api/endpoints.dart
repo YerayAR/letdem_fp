@@ -1,5 +1,7 @@
+import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
+import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
 enum Environment { STG, PROD, DEV }
@@ -21,8 +23,14 @@ class EndPoints {
     isProtected: false,
   );
 
-  static Endpoint verifyEmailEndpoint = Endpoint(
+  static Endpoint<VerifyEmailDTO> verifyEmailEndpoint = Endpoint(
     url: "/auth/account-verification/validate",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+
+  static Endpoint<EmailDTO> resendVerificationCodeEndpoint = Endpoint(
+    url: "/auth/account-verification/resend",
     method: HTTPMethod.POST,
     isProtected: false,
   );

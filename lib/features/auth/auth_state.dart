@@ -9,6 +9,25 @@ final class AuthInitial extends AuthState {
   List<Object> get props => [];
 }
 
+final class ResendVerificationCodeLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class ResendVerificationCodeSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class ResendVerificationCodeError extends AuthState {
+  final String error;
+
+  const ResendVerificationCodeError({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
 final class LoginLoading extends AuthState {
   @override
   // TODO: implement props

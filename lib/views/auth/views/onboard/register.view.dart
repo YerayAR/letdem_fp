@@ -163,6 +163,10 @@ class _RegisterViewState extends State<RegisterView> {
                       isLoading: state is RegisterLoading,
                       onTap: () {
                         if (_formKey.currentState!.validate()) {
+                          if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
+                            Toast.showError('Passwords do not match');
+                            return;
+                          }
                           context.read<AuthBloc>().add(RegisterEvent(
                               email: _emailCTRL.text,
                               password: _passwordCTRL.text));

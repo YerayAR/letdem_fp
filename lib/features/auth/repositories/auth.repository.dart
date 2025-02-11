@@ -1,5 +1,7 @@
+import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
+import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/api.service.dart';
@@ -18,5 +20,17 @@ class AuthRepository extends AuthInterface {
   Future register(RegisterDTO registerDTO) async {
     await ApiService.sendRequest(
         endpoint: EndPoints.registerEndpoint.copyWithDTO(registerDTO));
+  }
+
+  @override
+  Future verifyEmailEvent(VerifyEmailDTO dto) {
+    return ApiService.sendRequest(
+        endpoint: EndPoints.verifyEmailEndpoint.copyWithDTO(dto));
+  }
+
+  @override
+  Future resendVerificationCode(EmailDTO dto) {
+    return ApiService.sendRequest(
+        endpoint: EndPoints.resendVerificationCodeEndpoint.copyWithDTO(dto));
   }
 }
