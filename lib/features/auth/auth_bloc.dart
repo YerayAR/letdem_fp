@@ -40,8 +40,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       VerifyEmailEvent event, Emitter<AuthState> emit) async {
     try {
       emit(OTPVerificationLoading());
-      await authRepository.verifyEmailEvent(
+      Tokens tokens = await authRepository.verifyEmailEvent(
           VerifyEmailDTO(email: event.email, otp: event.code));
+
+      await tokens.write();
 
       emit(OTPVerificationSuccess());
     } on ApiError catch (err) {

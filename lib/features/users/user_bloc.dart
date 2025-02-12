@@ -13,6 +13,27 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc({required this.userRepository}) : super(UserInitial()) {
     on<FetchUserInfoEvent>(_onFetchUserInfo);
     on<UserLoggedOutEvent>(_onUserLoggedOut);
+    on<EditBasicInfoEvent>(_onEditBasicInfo);
+  }
+
+  Future<void> _onEditBasicInfo(
+      EditBasicInfoEvent event, Emitter<UserState> emit) async {
+    try {
+      emit(UserLoading());
+
+      await userRepository.updateUser(
+        EditBasicInfoDTO(
+          firstName: event.firstName,
+          lastName: event.lastName,
+        ),
+      );
+
+      emit(UserLoaded(user: await userRepository.getUser()));
+    } on ApiError catch (err) {
+      emit(UserError(error: err.message, apiError: err));
+    } catch (err) {
+      emit(const UserError(error: "Unable to load user"));
+    }
   }
 
   Future<void> _onUserLoggedOut(

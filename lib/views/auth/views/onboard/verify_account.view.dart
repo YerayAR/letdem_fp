@@ -13,7 +13,7 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/permissions/request_permission.view.dart';
+import 'package:letdem/views/auth/views/onboard/basic_info.view.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
@@ -73,7 +73,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
             Toast.showError(state.error);
           }
           if (state is OTPVerificationSuccess) {
-            NavigatorHelper.replaceAll(const RequestPermissionView());
+            NavigatorHelper.replaceAll(const BasicInfoView());
           }
 
           // TODO: implement listener

@@ -1,5 +1,6 @@
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
+import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 
 class UserRepository extends IUserRepository {
@@ -25,9 +26,10 @@ class UserRepository extends IUserRepository {
   }
 
   @override
-  Future<void> updateUser() {
-    // TODO: implement updateUser
-    throw UnimplementedError();
+  Future<void> updateUser(EditBasicInfoDTO dto) {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.updateUserProfileEndpoint.copyWithDTO(dto),
+    );
   }
 }
 
@@ -35,7 +37,7 @@ abstract class IUserRepository {
   Future<void> createUser();
   Future<void> deleteUser();
   Future<LetDemUser> getUser();
-  Future<void> updateUser();
+  Future<void> updateUser(EditBasicInfoDTO dto);
 }
 
 class LetDemUser {
@@ -74,6 +76,24 @@ class LetDemUser {
       'is_social': isSocial,
       'total_points': totalPoints,
       'notifications_count': notificationsCount,
+    };
+  }
+}
+
+class EditBasicInfoDTO extends DTO {
+  final String firstName;
+  final String lastName;
+
+  EditBasicInfoDTO({
+    required this.firstName,
+    required this.lastName,
+  });
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'first_name': firstName,
+      'last_name': lastName,
     };
   }
 }

@@ -2,6 +2,7 @@ import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
 enum Environment { STG, PROD, DEV }
@@ -10,6 +11,11 @@ class EndPoints {
   static String baseURL = "https://api-staging.letdem.org/v1";
 
   static bool showApiLogs = true;
+
+  static Endpoint<EditBasicInfoDTO> updateUserProfileEndpoint = Endpoint(
+    url: "/users/me",
+    method: HTTPMethod.PUT,
+  );
 
   static Endpoint<LoginDTO> loginEndpoint = Endpoint(
     url: "/auth/login",

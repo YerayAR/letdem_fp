@@ -23,9 +23,11 @@ class AuthRepository extends AuthInterface {
   }
 
   @override
-  Future verifyEmailEvent(VerifyEmailDTO dto) {
-    return ApiService.sendRequest(
+  Future<Tokens> verifyEmailEvent(VerifyEmailDTO dto) async {
+    ApiResponse res = await ApiService.sendRequest(
         endpoint: EndPoints.verifyEmailEndpoint.copyWithDTO(dto));
+
+    return Tokens(accessToken: res.data['token']);
   }
 
   @override
