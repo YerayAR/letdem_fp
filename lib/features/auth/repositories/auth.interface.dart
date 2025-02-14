@@ -10,5 +10,9 @@ abstract class AuthInterface {
 
   Future verifyEmailEvent(VerifyEmailDTO dto);
 
+  Future findForgotPasswordAccount(EmailDTO dto);
+
   Future resendVerificationCode(EmailDTO dto);
+
+  Future validateResetPassword(VerifyEmailDTO dto);
 }

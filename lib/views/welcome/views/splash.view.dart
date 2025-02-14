@@ -9,7 +9,7 @@ import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/base.dart';
-import 'package:letdem/views/auth/views/login.view.dart';
+import 'package:letdem/views/welcome/views/welcome.view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -37,8 +37,9 @@ class _SplashViewState extends State<SplashView> {
             if (state.apiError != null) {
               print(state.apiError!.status);
               if (state.apiError!.status == ErrorStatus.unauthorized) {
-                Toast.showError("The session has expired. Please login again.");
-                NavigatorHelper.to(const LoginView());
+                // Toast.showError("The session has expired. Please login again.");
+                NavigatorHelper.popAll();
+                NavigatorHelper.to(const WelcomeView());
                 return;
               }
             }

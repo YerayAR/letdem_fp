@@ -1,6 +1,8 @@
 enum ErrorStatus {
   ok, // 200
   badRequest, // 400
+
+  noInternet, // 403
   unauthorized, // 401
   forbidden, // 403
   notFound, // 404

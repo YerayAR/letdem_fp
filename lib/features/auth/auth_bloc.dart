@@ -19,6 +19,61 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_onRegisterUserEvent);
     on<VerifyEmailEvent>(_onVerifyEmail);
     on<ResendVerificationCodeEvent>(_onResendVerificationCode);
+    on<FindForgotPasswordAccountEvent>(_onFindForgotPasswordAccount);
+    on<ResendForgotPasswordVerificationCodeEvent>(
+        _onResendForgotPasswordVerificationCode);
+    on<ValidateResetPasswordEvent>(_onValidateResetPassword);
+  }
+
+  Future<void> _onValidateResetPassword(
+      ValidateResetPasswordEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(ValidateResetPasswordLoading());
+      await authRepository.validateResetPassword(
+          VerifyEmailDTO(email: event.email, otp: event.code));
+
+      emit(ValidateResetPasswordSuccess());
+    } on ApiError catch (err) {
+      emit(ValidateResetPasswordError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const ValidateResetPasswordError(
+          error: 'Unable to Validate Reset Password'));
+    }
+  }
+
+  Future<void> _onResendForgotPasswordVerificationCode(
+      ResendForgotPasswordVerificationCodeEvent event,
+      Emitter<AuthState> emit) async {
+    try {
+      emit(ResendVerificationCodeLoading());
+      await authRepository.resendVerificationCode(EmailDTO(email: event.email));
+
+      emit(ResendVerificationCodeSuccess());
+    } on ApiError catch (err) {
+      emit(FindForgotPasswordAccountError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const FindForgotPasswordAccountError(
+          error: 'Unable to Resend Verification Code'));
+    }
+  }
+
+  Future<void> _onFindForgotPasswordAccount(
+      FindForgotPasswordAccountEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(FindForgotPasswordAccountLoading());
+      await authRepository
+          .findForgotPasswordAccount(EmailDTO(email: event.email));
+
+      emit(FindForgotPasswordAccountSuccess());
+    } on ApiError catch (err) {
+      emit(FindForgotPasswordAccountError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const FindForgotPasswordAccountError(
+          error: 'Unable to Find Forgot Password Account'));
+    }
   }
 
   Future<void> _onResendVerificationCode(

@@ -50,6 +50,44 @@ final class LoginError extends AuthState {
   List<Object?> get props => [];
 }
 
+final class FindForgotPasswordAccountLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class FindForgotPasswordAccountSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class FindForgotPasswordAccountError extends AuthState {
+  final String error;
+
+  const FindForgotPasswordAccountError({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
+class ValidateResetPasswordLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+class ValidateResetPasswordSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+class ValidateResetPasswordError extends AuthState {
+  final String error;
+
+  const ValidateResetPasswordError({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
 final class RegisterLoading extends AuthState {
   @override
   List<Object?> get props => [];

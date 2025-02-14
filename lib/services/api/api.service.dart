@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/services/api/sub/base.dart';
+import 'package:letdem/services/toast/toast.dart';
 
 class ApiService extends BaseApiService {
   static final Dio _dio = Dio(
@@ -198,12 +200,17 @@ ${response.data}
         }
       }
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         return ApiResponse(
           success: true,
           status: RequestStatus.success,
-          data:
-              (response.data is List) ? {'data': response.data} : response.data,
+          data: response.data == null
+              ? {}
+              : (response.data is List)
+                  ? {'data': response.data}
+                  : response.data,
         );
       }
 
@@ -215,6 +222,11 @@ ${response.data}
         message: err,
         status: fromCode(response.statusCode ?? 0),
         data: (response.data is List) ? {'data': response.data} : response.data,
+      );
+    } on HandshakeException {
+      throw ApiError(
+        message: 'No internet connection',
+        status: ErrorStatus.noInternet,
       );
     } on DioException catch (e) {
       _handleDioError(e);
@@ -233,17 +245,20 @@ ${response.data}
   }
 
   static void _handleDioError(DioException e) {
-    if (e.type == DioExceptionType.connectionError) {
-      // throw ApiError(
-      //     message: NavigatorHelper
-      //         .navigatorKey.currentState!.context.l10n.no_connection);
+    print("-----------------");
+    print(e.type);
+    print("-----------------");
+
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.badCertificate ||
+        e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout) {
+      Toast.showError("No internet connection");
+      throw ApiError(
+          message: "No internet connection", status: ErrorStatus.noInternet);
     }
-    if (e.type == DioExceptionType.connectionTimeout) {
-      // Toast.showError(NavigatorHelper
-      //     .navigatorKey.currentState!.context.l10n.no_connection);
-    } else {
-      if (EndPoints.showApiLogs) {
-        debugPrint("""
+    if (EndPoints.showApiLogs) {
+      debugPrint("""
 ════════════════════════════════════════════════════════════════════════════════════════════════
       API RESPONSE    🐶
 ════════════════════════════════════════════════════════════════════════════════════════════════
@@ -254,15 +269,14 @@ ${response.data}
 
 ════════════════════════════════════════════════════════════════════════════════════════════════
 """);
-      }
-      debugPrint('Dio error occurred: ${e.message}');
-      var message = e.response == null
-          ? "Unknown error"
-          : e.response!.data?['message'] ?? "Unknown error";
-
-      throw ApiError(
-          message: message, status: fromCode(e.response?.statusCode ?? 0));
     }
+    debugPrint('Dio error occurred: ${e.message}');
+    var message = e.response == null
+        ? "Unknown error"
+        : e.response!.data?['message'] ?? "Unknown error";
+
+    throw ApiError(
+        message: message, status: fromCode(e.response?.statusCode ?? 0));
   }
 }
 

@@ -35,4 +35,16 @@ class AuthRepository extends AuthInterface {
     return ApiService.sendRequest(
         endpoint: EndPoints.resendVerificationCodeEndpoint.copyWithDTO(dto));
   }
+
+  @override
+  Future findForgotPasswordAccount(EmailDTO dto) {
+    return ApiService.sendRequest(
+        endpoint: EndPoints.requestForgotPasswordEndpoint.copyWithDTO(dto));
+  }
+
+  @override
+  Future validateResetPassword(VerifyEmailDTO dto) {
+    return ApiService.sendRequest(
+        endpoint: EndPoints.resetPasswordEndpoint.copyWithDTO(dto));
+  }
 }

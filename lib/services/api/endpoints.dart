@@ -8,7 +8,8 @@ import 'package:letdem/services/api/models/endpoint.dart';
 enum Environment { STG, PROD, DEV }
 
 class EndPoints {
-  static String baseURL = "https://api-staging.letdem.org/v1";
+  static String baseURL =
+      "http://letdemstagingalb-901145735.eu-central-1.elb.amazonaws.com/v1";
 
   static bool showApiLogs = true;
 
@@ -44,5 +45,22 @@ class EndPoints {
   static Endpoint getUserProfileEndpoint = Endpoint(
     url: "/users/me",
     method: HTTPMethod.GET,
+  );
+
+  static Endpoint<EmailDTO> requestForgotPasswordEndpoint = Endpoint(
+    url: "/auth/password-reset/request",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+  static Endpoint<VerifyEmailDTO> resetPasswordEndpoint = Endpoint(
+    url: "/auth/password-reset/validate",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+
+  static Endpoint resendForgotPasswordVerificationCodeEndpoint = Endpoint(
+    url: "/auth/password-reset/resend-otp",
+    method: HTTPMethod.POST,
+    isProtected: false,
   );
 }
