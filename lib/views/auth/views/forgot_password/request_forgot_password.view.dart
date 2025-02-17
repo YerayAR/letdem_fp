@@ -26,7 +26,7 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
   late TextEditingController _emailCTRL;
   late TextEditingController _passwordCTRL;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void initState() {
     _emailCTRL = TextEditingController();

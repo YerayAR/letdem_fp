@@ -1,0 +1,28 @@
+import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/services/api/models/endpoint.dart';
+
+class PostLetDemoLocationDTO extends DTO {
+  final String name;
+
+  final LetDemLocationType type;
+  final double latitude;
+  final double longitude;
+
+  PostLetDemoLocationDTO({
+    required this.name,
+    required this.latitude,
+    required this.type,
+    required this.longitude,
+  });
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'address': {
+        'street_name': name,
+        'lat': latitude,
+        'lng': longitude,
+      }
+    };
+  }
+}

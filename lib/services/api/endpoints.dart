@@ -1,7 +1,9 @@
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
+import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
@@ -58,9 +60,39 @@ class EndPoints {
     isProtected: false,
   );
 
+  static Endpoint<ResetPasswordDTO> resetForgotPasswordEndpoint = Endpoint(
+    url: "/auth/password-reset",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+
   static Endpoint resendForgotPasswordVerificationCodeEndpoint = Endpoint(
     url: "/auth/password-reset/resend-otp",
     method: HTTPMethod.POST,
     isProtected: false,
+  );
+
+  static Endpoint locationListEndpoint = Endpoint(
+    url: "/users/me/addresses",
+    method: HTTPMethod.GET,
+  );
+  static Endpoint<PostLetDemoLocationDTO> addWorkLocation = Endpoint(
+    url: "/users/me/addresses/work",
+    method: HTTPMethod.POST,
+  );
+
+  static Endpoint<PostLetDemoLocationDTO> addHomeLocation = Endpoint(
+    url: "/users/me/addresses/home",
+    method: HTTPMethod.POST,
+  );
+
+  static Endpoint deleteWorkLocation = Endpoint(
+    url: "/users/me/addresses/work",
+    method: HTTPMethod.DELETE,
+  );
+
+  static Endpoint deleteHomeLocation = Endpoint(
+    url: "/users/me/addresses/home",
+    method: HTTPMethod.DELETE,
   );
 }

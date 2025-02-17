@@ -12,6 +12,7 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/auth/views/forgot_password/reset_password.view.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
@@ -71,8 +72,9 @@ class _VerifyForgotPasswordEmailViewState
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is ValidateResetPasswordSuccess) {
-              NavigatorHelper.to(
-                  VerifyForgotPasswordEmailView(email: widget.email));
+              NavigatorHelper.to(ResetPasswordView(
+                email: widget.email,
+              ));
             }
             if (state is ValidateResetPasswordError) {
               Toast.showError(state.error);

@@ -88,6 +88,25 @@ class ValidateResetPasswordError extends AuthState {
   List<Object?> get props => [error];
 }
 
+final class ResetPasswordLoading extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class ResetPasswordSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class ResetPasswordError extends AuthState {
+  final String error;
+
+  const ResetPasswordError({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
 final class RegisterLoading extends AuthState {
   @override
   List<Object?> get props => [];

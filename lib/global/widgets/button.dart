@@ -101,8 +101,12 @@ class PrimaryButton extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10000),
-          color: background ??
-              (outline ? Colors.transparent : color ?? AppColors.primary500),
+          color: isDisabled
+              ? AppColors.primary200
+              : background ??
+                  (outline
+                      ? Colors.transparent
+                      : color ?? AppColors.primary500),
           border: outline
               ? Border.all(
                   color: borderColor ?? AppColors.primary500,

@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/extenstions/location.dart';
+import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/main.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
@@ -25,7 +29,8 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView>
+    with AutomaticKeepAliveClientMixin {
   mapbox.Position? _currentPosition;
 
   @override
@@ -184,82 +189,159 @@ class _HomeViewState extends State<HomeView> {
             ),
           );
   }
+
+  @override
+  void updateKeepAlive() {
+    // TODO: implement updateKeepAlive
+  }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class SavedAddressComponent extends StatelessWidget {
   final bool showDivider;
 
+  final bool isLocationCreating;
+  final LetDemLocationType locationType;
+
+  final Function(MapBoxPlace) onPlaceSelected;
+
   final MapBoxPlace? place;
-  const SavedAddressComponent({super.key, this.showDivider = true, this.place});
+
+  final LetDemLocation? apiPlace;
+  const SavedAddressComponent(
+      {super.key,
+      this.showDivider = true,
+      this.apiPlace,
+      this.isLocationCreating = false,
+      this.locationType = LetDemLocationType.other,
+      this.place,
+      required this.onPlaceSelected});
 
   @override
   Widget build(BuildContext context) {
     return (place != null && place!.placeFormatted == "")
         ? const SizedBox()
-        : Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: AppColors.neutral50,
-                      child: Icon(
-                        place != null ? Iconsax.location5 : IconlyBold.home,
-                        color: AppColors.neutral600,
-                      ),
-                    ),
-                    Dimens.space(2),
-                    Flexible(
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              place != null
-                                  ? place!.name.toUpperCase()
-                                  : "HOME LOCATION",
-                              style: Typo.smallBody.copyWith(
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.neutral400,
+        : GestureDetector(
+            onTap: () {
+              if (place != null) {
+                onPlaceSelected(place!);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                children: [
+                  Row(
+                    children: <Widget>[
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: AppColors.neutral50,
+                        child: isLocationCreating
+                            ? const CupertinoActivityIndicator()
+                            : Icon(
+                                locationType == LetDemLocationType.other
+                                    ? Iconsax.location5
+                                    : locationType == LetDemLocationType.home
+                                        ? IconlyBold.home
+                                        : IconlyBold.work,
+                                color: AppColors.neutral600,
                               ),
-                            ),
-                            Dimens.space(1),
-                            SizedBox(
-                              child: place != null
-                                  ? Text(
-                                      place!.placeFormatted,
-                                      style: Typo.mediumBody.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  : Text(
-                                      "Set Home Location",
-                                      style: Typo.mediumBody.copyWith(
-                                        color: AppColors.primary400,
-                                        fontWeight: FontWeight.w500,
-                                        decoration: TextDecoration.underline,
-                                      ),
+                      ),
+                      Dimens.space(2),
+                      Flexible(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isLocationCreating
+                                        ? ""
+                                            "UPDATING ${locationType.name.toUpperCase()} LOCATION"
+                                        : place != null || apiPlace != null
+                                            ? apiPlace != null
+                                                ? "${locationType.name.toUpperCase()} LOCATION"
+                                                : place!.name.toUpperCase()
+                                            : "${locationType.name.toUpperCase()} LOCATION",
+                                    style: Typo.smallBody.copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.neutral400,
                                     ),
+                                  ),
+                                  Dimens.space(1),
+                                  SizedBox(
+                                    child: place != null || apiPlace != null
+                                        ? Text(
+                                            apiPlace != null
+                                                ? apiPlace!.name
+                                                : place!.placeFormatted,
+                                            style: Typo.mediumBody.copyWith(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          )
+                                        : GestureDetector(
+                                            onTap: () {
+                                              AppPopup.showBottomSheet(context,
+                                                  AddLocationBottomSheet(
+                                                onLocationSelected:
+                                                    (MapBoxPlace place) {
+                                                  onPlaceSelected(place);
+                                                },
+                                              ));
+                                            },
+                                            child: Text(
+                                              "Set ${toBeginningOfSentenceCase(locationType.name)} Location",
+                                              style: Typo.mediumBody.copyWith(
+                                                color: AppColors.primary400,
+                                                fontWeight: FontWeight.w500,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ),
+                                  ),
+                                ]),
+                            //   delete button
+                            SizedBox(
+                                child: apiPlace != null
+                                    ? IconButton(
+                                        onPressed: () {
+                                          context
+                                              .read<SearchLocationBloc>()
+                                              .add(DeleteLocationEvent(
+                                                  locationType: locationType));
+                                          // delete location
+                                        },
+                                        icon: Icon(
+                                          IconlyBold.delete,
+                                          color: AppColors.neutral100,
+                                        ),
+                                      )
+                                    : const SizedBox())
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: !showDivider
+                        ? []
+                        : [
+                            Dimens.space(1),
+                            Divider(
+                              color: AppColors.neutral50,
+                              thickness: 1,
                             ),
-                          ]),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: !showDivider
-                      ? []
-                      : [
-                          Dimens.space(1),
-                          Divider(
-                            color: AppColors.neutral50,
-                            thickness: 1,
-                          ),
-                        ],
-                ),
-              ],
+                          ],
+                  ),
+                ],
+              ),
             ),
           );
   }

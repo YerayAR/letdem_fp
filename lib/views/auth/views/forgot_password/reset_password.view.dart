@@ -10,10 +10,11 @@ import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
+import 'package:letdem/views/auth/views/login.view.dart';
 
 class ResetPasswordView extends StatefulWidget {
-  const ResetPasswordView({super.key});
+  final String email;
+  const ResetPasswordView({super.key, required this.email});
 
   @override
   State<ResetPasswordView> createState() => _ResetPasswordViewState();
@@ -45,71 +46,84 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(Dimens.defaultMargin),
-          child: PrimaryButton(
-            onTap: () {},
-            text: 'Reset Password',
-          ),
-        ),
-      ),
-      body: Form(
-        key: _formKey,
-        child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is RegisterError) {
-              Toast.showError(state.error);
-              return;
-            }
-            if (state is RegisterSuccess) {
-              NavigatorHelper.to(VerifyAccountView(
-                email: _emailCTRL.text,
-              ));
-            }
-            // TODO: implement listener
-          },
-          builder: (context, state) {
-            return ListView(
-              children: [
-                StyledBody(
-                  children: [
-                    Dimens.space(3),
-                    Text(
-                      'Set a New Password',
-                      style:
-                          Typo.heading4.copyWith(color: AppColors.neutral600),
-                    ),
-                    Dimens.space(1),
-                    Text('Create a strong password for your account',
-                        style: Typo.mediumBody
-                            .copyWith(color: AppColors.neutral500)),
-                    Dimens.space(5),
-                    TextInputField(
-                      prefixIcon: Iconsax.lock,
-                      label: 'New Password',
-                      controller: _passwordCTRL,
-                      inputType: TextFieldType.password,
-                      showPasswordStrengthIndicator: true,
-                      placeHolder: 'Enter your password',
-                    ),
-                    Dimens.space(1),
-                    TextInputField(
-                      prefixIcon: Iconsax.lock,
-                      controller: _repeatPasswordCTRL,
-                      label: 'Repeat Password',
-                      showPasswordStrengthIndicator: true,
-                      inputType: TextFieldType.password,
-                      placeHolder: 'Enter your password',
-                    ),
-                  ],
+    return BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {},
+        builder: (context, snapshot) {
+          return Scaffold(
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(Dimens.defaultMargin),
+                child: PrimaryButton(
+                  isLoading: snapshot is ResetPasswordLoading,
+                  onTap: () {
+                    if (_formKey.currentState!.validate()) {
+                      if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
+                        Toast.showError('Passwords do not match');
+                        return;
+                      }
+
+                      context.read<AuthBloc>().add(ResetPasswordEvent(
+                          email: widget.email, password: _passwordCTRL.text));
+                    }
+                  },
+                  text: 'Reset Password',
                 ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
+              ),
+            ),
+            body: Form(
+              key: _formKey,
+              child: BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is ResetPasswordError) {
+                    Toast.showError(state.error);
+                    return;
+                  }
+                  if (state is ResetPasswordSuccess) {
+                    NavigatorHelper.to(const LoginView());
+                  }
+                  // TODO: implement listener
+                },
+                builder: (context, state) {
+                  return ListView(
+                    children: [
+                      StyledBody(
+                        children: [
+                          Dimens.space(3),
+                          Text(
+                            'Set a New Password',
+                            style: Typo.heading4
+                                .copyWith(color: AppColors.neutral600),
+                          ),
+                          Dimens.space(1),
+                          Text('Create a strong password for your account',
+                              style: Typo.mediumBody
+                                  .copyWith(color: AppColors.neutral500)),
+                          Dimens.space(5),
+                          TextInputField(
+                            prefixIcon: Iconsax.lock,
+                            label: 'New Password',
+                            controller: _passwordCTRL,
+                            inputType: TextFieldType.password,
+                            showPasswordStrengthIndicator: true,
+                            placeHolder: 'Enter your password',
+                          ),
+                          Dimens.space(1),
+                          TextInputField(
+                            prefixIcon: Iconsax.lock,
+                            controller: _repeatPasswordCTRL,
+                            label: 'Repeat Password',
+                            showPasswordStrengthIndicator: true,
+                            inputType: TextFieldType.password,
+                            placeHolder: 'Enter your password',
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          );
+        });
   }
 }

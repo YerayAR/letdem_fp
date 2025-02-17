@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +11,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/services/location/location.service.dart';
 
 enum PublishSpaceType {
   free,
@@ -53,90 +54,101 @@ class PublishSpaceScreen extends StatefulWidget {
 }
 
 class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
-  File? selectedSpace;
+  File? selectedSpacePicture;
   PublishSpaceType selectedType = PublishSpaceType.free;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(Dimens.defaultMargin),
-          child: PrimaryButton(
-            onTap: () {},
-            text: 'Continue',
-          ),
-        ),
-      ),
-      appBar: AppBar(
-        title: const Text('Publish Space'),
-      ),
-      body: StyledBody(
-        children: [
-          TakePictureWidget(
-            file: selectedSpace,
-            onImageSelected: (File file) {
-              setState(() {
-                selectedSpace = file;
-              });
-            },
-          ),
-          Dimens.space(2),
-          const PublishingLocationWidget(),
-          Dimens.space(2),
-          Row(
-            spacing: 10,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: PublishSpaceType.values
-                .map((e) => Flexible(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedType = e;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          height: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            border: selectedType == e
-                                ? Border.all(color: AppColors.primary200)
-                                : Border.all(color: AppColors.neutral50),
-                          ),
-                          child: Center(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                getSpaceTypeIcon(e),
-                                width: 30,
-                                height: 30,
-                              ),
-                              Dimens.space(1),
-                              Text(
-                                getSpaceTypeText(e),
-                                style: Typo.smallBody.copyWith(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+    return FutureBuilder<String?>(
+        future: MapboxService.getPlaceFromLatLng(),
+        builder: (context, snapshot) {
+          return Scaffold(
+              bottomNavigationBar: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(Dimens.defaultMargin),
+                  child: PrimaryButton(
+                    onTap: () {},
+                    isDisabled:
+                        snapshot.data == null || selectedSpacePicture == null,
+                    text: 'Continue',
+                  ),
+                ),
+              ),
+              appBar: AppBar(
+                title: const Text('Publish Space'),
+              ),
+              body: StyledBody(
+                children: [
+                  TakePictureWidget(
+                    file: selectedSpacePicture,
+                    onImageSelected: (File file) {
+                      setState(() {
+                        selectedSpacePicture = file;
+                      });
+                    },
+                  ),
+                  Dimens.space(2),
+                  PublishingLocationWidget(
+                    position: snapshot.data,
+                  ),
+                  Dimens.space(2),
+                  Row(
+                    spacing: 10,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: PublishSpaceType.values
+                        .map((e) => Flexible(
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedType = e;
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: selectedType == e
+                                        ? Border.all(
+                                            color: AppColors.primary200)
+                                        : Border.all(
+                                            color: AppColors.neutral50),
+                                  ),
+                                  child: Center(
+                                      child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        getSpaceTypeIcon(e),
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                      Dimens.space(1),
+                                      Text(
+                                        getSpaceTypeText(e),
+                                        style: Typo.smallBody.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  )),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
-                            ],
-                          )),
-                        ),
-                      ),
-                    ))
-                .toList(),
-          ),
-        ],
-      ),
-    );
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ));
+        });
   }
 }
 
 class PublishingLocationWidget extends StatelessWidget {
-  const PublishingLocationWidget({super.key});
+  final String? position;
+  const PublishingLocationWidget({super.key, this.position});
 
   @override
   Widget build(BuildContext context) {
@@ -159,21 +171,32 @@ class PublishingLocationWidget extends StatelessWidget {
               ),
             ),
             Dimens.space(2),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("Location",
-                    style: Typo.smallBody.copyWith(
-                      color: AppColors.neutral600,
-                      fontSize: 14,
-                    )),
-                Text(
-                  "Street39, Avenida de Niceto Alcalá",
-                  style: Typo.largeBody.copyWith(
-                    fontWeight: FontWeight.w500,
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text("Location",
+                      style: Typo.smallBody.copyWith(
+                        color: AppColors.neutral600,
+                        fontSize: 14,
+                      )),
+                  SizedBox(
+                    child: position == null
+                        ? Text(
+                            "Fetching location...",
+                            style: Typo.largeBody.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )
+                        : Text(
+                            position!,
+                            style: Typo.largeBody.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

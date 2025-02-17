@@ -52,6 +52,16 @@ class FindForgotPasswordAccountEvent extends AuthEvent {
   List<Object?> get props => [email];
 }
 
+class ResetPasswordEvent extends AuthEvent {
+  final String email;
+  final String password;
+
+  const ResetPasswordEvent({required this.email, required this.password});
+
+  @override
+  List<Object?> get props => [email, password];
+}
+
 class ResendForgotPasswordVerificationCodeEvent extends AuthEvent {
   final String email;
 

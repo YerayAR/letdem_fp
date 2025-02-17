@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
+import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
@@ -23,6 +24,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendForgotPasswordVerificationCodeEvent>(
         _onResendForgotPasswordVerificationCode);
     on<ValidateResetPasswordEvent>(_onValidateResetPassword);
+    on<ResetPasswordEvent>(_onResetPassword);
+  }
+
+  Future<void> _onResetPassword(
+      ResetPasswordEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(ResetPasswordLoading());
+      await authRepository.resetPassword(
+          ResetPasswordDTO(email: event.email, password: event.password));
+
+      emit(ResetPasswordSuccess());
+    } on ApiError catch (err) {
+      emit(ResetPasswordError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const ResetPasswordError(error: 'Unable to Reset Password'));
+    }
   }
 
   Future<void> _onValidateResetPassword(
