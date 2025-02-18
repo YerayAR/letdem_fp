@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/services/mapbox_search/models/cache.dart';
+import 'package:letdem/services/mapbox_search/models/model.dart';
 
 part 'search_location_event.dart';
 part 'search_location_state.dart';
@@ -14,6 +16,29 @@ class SearchLocationBloc
     on<GetLocationListEvent>(_getLocationList);
     on<CreateLocationEvent>(_createLocation);
     on<DeleteLocationEvent>(_deleteLocation);
+    on<DeleteRecentLocationEvent>(_deleteRecentLocation);
+  }
+
+  void _deleteRecentLocation(
+    DeleteRecentLocationEvent event,
+    Emitter<SearchLocationState> emit,
+  ) async {
+    if (state is SearchLocationLoaded) {
+      final currentState = state as SearchLocationLoaded;
+      emit(currentState.copyWith(isLocationCreating: true));
+
+      try {
+        await DatabaseHelper().deletePlace(event.place.mapboxId);
+        emit(currentState.copyWith(
+          recentPlaces: currentState.recentPlaces
+              .where((element) => element != event.place)
+              .toList(),
+          isLocationCreating: false,
+        ));
+      } catch (e) {
+        emit(SearchLocationError(message: e.toString()));
+      }
+    }
   }
 
   void _deleteLocation(
@@ -73,7 +98,9 @@ class SearchLocationBloc
     emit(SearchLocationLoading());
     try {
       final locations = await searchLocationRepository.getLocationList();
-      emit(SearchLocationLoaded(locations: locations));
+      final recentPlaces = await DatabaseHelper().getPlaces();
+      emit(SearchLocationLoaded(
+          locations: locations, recentPlaces: recentPlaces));
     } catch (e, st) {
       print(st);
       emit(SearchLocationError(message: e.toString()));

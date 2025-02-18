@@ -37,6 +37,7 @@ class ProfileView extends StatelessWidget {
               // TODO: implement listener
             },
             builder: (context, state) {
+              print(state);
               if (state is UserLoaded) {
                 return Expanded(
                   child: ListView(children: <Widget>[
@@ -53,7 +54,7 @@ class ProfileView extends StatelessWidget {
                                       state.user.firstName.isEmpty &&
                                               state.user.lastName.isEmpty
                                           ? ""
-                                              "Not Provided"
+                                              "Name not provided"
                                           : "${state.user.firstName} ${state.user.lastName}",
                                       style: Typo.largeBody.copyWith(
                                         fontWeight: FontWeight.w700,

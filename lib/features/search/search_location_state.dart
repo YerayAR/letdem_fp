@@ -16,25 +16,30 @@ final class SearchLocationLoading extends SearchLocationState {
 
 final class SearchLocationLoaded extends SearchLocationState {
   final List<LetDemLocation> locations;
+
+  final List<MapBoxPlace> recentPlaces;
   final bool isLocationCreating;
 
   const SearchLocationLoaded({
     required this.locations,
+    required this.recentPlaces,
     this.isLocationCreating = false,
   });
 
   SearchLocationLoaded copyWith({
     List<LetDemLocation>? locations,
+    List<MapBoxPlace>? recentPlaces,
     bool? isLocationCreating,
   }) {
     return SearchLocationLoaded(
+      recentPlaces: recentPlaces ?? this.recentPlaces,
       locations: locations ?? this.locations,
       isLocationCreating: isLocationCreating ?? this.isLocationCreating,
     );
   }
 
   @override
-  List<Object> get props => [locations];
+  List<Object> get props => [locations, isLocationCreating, recentPlaces];
 }
 
 final class SearchLocationError extends SearchLocationState {

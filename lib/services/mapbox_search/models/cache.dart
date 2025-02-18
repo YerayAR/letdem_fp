@@ -4,7 +4,6 @@ import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
@@ -17,6 +16,16 @@ class DatabaseHelper {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
+  }
+
+  Future deleteAllPlaces() async {
+    final db = await database;
+    await db.delete('places');
+  }
+
+  Future deletePlace(String id) async {
+    final db = await database;
+    await db.delete('places', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<Database> _initDatabase() async {

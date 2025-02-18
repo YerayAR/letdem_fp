@@ -12,6 +12,15 @@ final class GetLocationListEvent extends SearchLocationEvent {
   List<Object?> get props => [];
 }
 
+final class DeleteRecentLocationEvent extends SearchLocationEvent {
+  final MapBoxPlace place;
+
+  const DeleteRecentLocationEvent({required this.place});
+
+  @override
+  List<Object?> get props => [place];
+}
+
 final class DeleteLocationEvent extends SearchLocationEvent {
   final LetDemLocationType locationType;
 

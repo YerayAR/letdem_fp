@@ -47,7 +47,8 @@ String getSpaceTypeIcon(PublishSpaceType type) {
 }
 
 class PublishSpaceScreen extends StatefulWidget {
-  const PublishSpaceScreen({super.key});
+  final File file;
+  const PublishSpaceScreen({super.key, required this.file});
 
   @override
   State<PublishSpaceScreen> createState() => _PublishSpaceScreenState();
@@ -56,6 +57,12 @@ class PublishSpaceScreen extends StatefulWidget {
 class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
   File? selectedSpacePicture;
   PublishSpaceType selectedType = PublishSpaceType.free;
+
+  @override
+  void initState() {
+    selectedSpacePicture = widget.file;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

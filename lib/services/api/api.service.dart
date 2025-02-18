@@ -208,9 +208,11 @@ ${response.data}
           status: RequestStatus.success,
           data: response.data == null
               ? {}
-              : (response.data is List)
-                  ? {'data': response.data}
-                  : response.data,
+              : response.data is String
+                  ? {}
+                  : (response.data is List)
+                      ? {'data': response.data}
+                      : response.data,
         );
       }
 

@@ -25,7 +25,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
   late TextEditingController _passwordCTRL;
   late TextEditingController _repeatPasswordCTRL;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {

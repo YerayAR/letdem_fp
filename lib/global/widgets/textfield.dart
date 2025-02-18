@@ -132,7 +132,7 @@ class TextInputFieldState extends State<TextInputField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter${widget.placeHolder.toLowerCase().replaceAll("enter", "")}';
                 }
                 if (widget.inputType == TextFieldType.email &&
                     !value.isValidEmail()) {
@@ -179,6 +179,10 @@ class TextInputFieldState extends State<TextInputField> {
                   hintText: widget.placeHolder,
                   hintStyle: Typo.largeBody.copyWith(
                     color: AppColors.neutral300,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  errorStyle: Typo.smallBody.copyWith(
+                    color: Colors.redAccent,
                     fontWeight: FontWeight.w500,
                   ),
                   focusedErrorBorder: !widget.enableBorder

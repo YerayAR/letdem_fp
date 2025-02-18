@@ -101,8 +101,8 @@ class RegisteredCarWidget extends StatelessWidget {
             top: 10,
             child: SvgPicture.asset(
               AppAssets.car,
-              width: 160,
-              height: 160,
+              width: MediaQuery.of(context).size.width * 0.3,
+              height: MediaQuery.of(context).size.width * 0.3,
             ),
           ),
         ],

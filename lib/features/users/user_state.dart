@@ -24,11 +24,19 @@ class UserLoading extends UserState {
 class UserLoaded extends UserState {
   final LetDemUser user;
 
-  const UserLoaded({required this.user});
+  final bool isLocationPermissionGranted;
+
+  const UserLoaded({
+    required this.user,
+    required this.isLocationPermissionGranted,
+  });
 
   @override
   // TODO: implement props
-  List<Object?> get props => [user];
+  List<Object?> get props => [
+        user,
+        isLocationPermissionGranted,
+      ];
 }
 
 class UserError extends UserState {

@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/extenstions/location.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
+import 'package:letdem/services/res/navigator.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -28,7 +30,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         ),
       );
 
-      emit(UserLoaded(user: await userRepository.getUser()));
+      bool isLocationPermissionGranted = await NavigatorHelper
+          .navigatorKey.currentState!.context.hasLocationPermission;
+
+      emit(UserLoaded(
+        user: await userRepository.getUser(),
+        isLocationPermissionGranted: isLocationPermissionGranted,
+      ));
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
     } catch (err) {
@@ -48,8 +56,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoading());
 
       LetDemUser user = await userRepository.getUser();
+      bool isLocationPermissionGranted = await NavigatorHelper
+          .navigatorKey.currentState!.context.hasLocationPermission;
 
-      emit(UserLoaded(user: user));
+      emit(UserLoaded(
+        user: await userRepository.getUser(),
+        isLocationPermissionGranted: isLocationPermissionGranted,
+      ));
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
     } catch (err) {

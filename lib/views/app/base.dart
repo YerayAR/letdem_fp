@@ -30,30 +30,41 @@ class _BaseViewState extends State<BaseView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primary400,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon:
-                Icon(_selectedIndex == 0 ? IconlyBold.home : IconlyLight.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(_selectedIndex == 1
-                ? IconlyBold.activity
-                : IconlyLight.activity),
-            label: 'Activities',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-                _selectedIndex == 2 ? IconlyBold.profile : IconlyLight.profile),
-            label: 'Profile',
-          ),
-        ],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      // body: _pages[_selectedIndex],
+      bottomNavigationBar: Theme(
+        data: ThemeData(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          selectedItemColor: AppColors.primary400,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(
+                  _selectedIndex == 0 ? IconlyBold.home : IconlyLight.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(_selectedIndex == 1
+                  ? IconlyBold.activity
+                  : IconlyLight.activity),
+              label: 'Activities',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(_selectedIndex == 2
+                  ? IconlyBold.profile
+                  : IconlyLight.profile),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

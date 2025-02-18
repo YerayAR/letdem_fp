@@ -14,9 +14,9 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/app/base.dart';
 import 'package:letdem/views/auth/views/forgot_password/request_forgot_password.view.dart';
 import 'package:letdem/views/auth/views/onboard/register.view.dart';
+import 'package:letdem/views/welcome/views/splash.view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -68,7 +68,7 @@ class _LoginViewState extends State<LoginView> {
             Toast.showError(state.error);
           }
           if (state is LoginSuccess) {
-            NavigatorHelper.replaceAll(BaseView());
+            NavigatorHelper.replaceAll(SplashView());
           }
           // TODO: implement listener
         },
