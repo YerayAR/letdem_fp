@@ -138,11 +138,15 @@ class SavedAddressComponent extends StatelessWidget {
                                                     AppPopup.showBottomSheet(
                                                         context,
                                                         AddLocationBottomSheet(
-                                                      onLocationSelected:
-                                                          (MapBoxPlace place) {
-                                                        onPlaceSelected(place);
-                                                      },
-                                                    ));
+                                                          title:
+                                                              "${toBeginningOfSentenceCase(locationType.name)} Location",
+                                                          onLocationSelected:
+                                                              (MapBoxPlace
+                                                                  place) {
+                                                            onPlaceSelected(
+                                                                place);
+                                                          },
+                                                        ));
                                                   },
                                                   child: Text(
                                                     "Set ${toBeginningOfSentenceCase(locationType.name)} Location",

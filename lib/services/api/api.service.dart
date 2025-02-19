@@ -10,7 +10,9 @@ import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/services/api/sub/base.dart';
+import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/auth/views/login.view.dart';
 
 class ApiService extends BaseApiService {
   static final Dio _dio = Dio(
@@ -196,13 +198,11 @@ ${response.data}
             status: ErrorStatus.unauthorized,
           );
         } else {
-          // NavigatorHelper.replaceAll(const LoginScreen());
+          NavigatorHelper.replaceAll(const LoginView());
         }
       }
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201 ||
-          response.statusCode == 204) {
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
         return ApiResponse(
           success: true,
           status: RequestStatus.success,

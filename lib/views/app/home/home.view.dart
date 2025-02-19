@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:iconly/iconly.dart';
@@ -159,8 +160,19 @@ class _HomeViewState extends State<HomeView>
                                 child: PrimaryButton(
                                   onTap: () async {
                                     // open camera
-
                                     ImagePicker imagePicker = ImagePicker();
+
+                                    if (kDebugMode) {
+                                      XFile? f = await imagePicker.pickImage(
+                                          source: ImageSource.gallery);
+
+                                      // get asset folder path
+
+                                      NavigatorHelper.to(PublishSpaceScreen(
+                                        file: File(f!.path),
+                                      ));
+                                      return;
+                                    }
 
                                     final XFile? image = await imagePicker
                                         .pickImage(source: ImageSource.camera);

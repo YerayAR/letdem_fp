@@ -118,9 +118,11 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                     borderRadius: BorderRadius.circular(15),
                                     border: selectedType == e
                                         ? Border.all(
-                                            color: AppColors.primary200)
+                                            color: AppColors.primary200,
+                                            width: 2)
                                         : Border.all(
-                                            color: AppColors.neutral50),
+                                            color: AppColors.neutral50,
+                                            width: 2),
                                   ),
                                   child: Center(
                                       child: Column(

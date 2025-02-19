@@ -31,7 +31,7 @@ class _SplashViewState extends State<SplashView> {
       body: BlocConsumer<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserLoaded) {
-            NavigatorHelper.to(const BaseView());
+            NavigatorHelper.replaceAll(const BaseView());
           }
           if (state is UserError) {
             if (state.apiError != null) {

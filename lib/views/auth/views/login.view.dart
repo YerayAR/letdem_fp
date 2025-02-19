@@ -88,12 +88,18 @@ class _LoginViewState extends State<LoginView> {
                           text: 'LOGIN TO YOUR ACCOUNT',
                           color: AppColors.secondary600,
                         ),
-                        IconButton(
-                          icon: const Icon(Iconsax.close_circle5),
-                          color: AppColors.neutral100,
-                          onPressed: () {
-                            NavigatorHelper.pop();
-                          },
+                        SizedBox(
+                          // check if a screen behind is exist
+
+                          child: Navigator.canPop(context)
+                              ? IconButton(
+                                  icon: const Icon(Iconsax.close_circle5),
+                                  color: AppColors.neutral100,
+                                  onPressed: () {
+                                    NavigatorHelper.pop();
+                                  },
+                                )
+                              : null,
                         ),
                       ],
                     ),
@@ -119,8 +125,8 @@ class _LoginViewState extends State<LoginView> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                NavigatorHelper.pop();
-                                NavigatorHelper.to(const RegisterView());
+                                NavigatorHelper.replaceAll(
+                                    const RegisterView());
                               },
                           ),
                         ],

@@ -16,8 +16,10 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
 
 class AddLocationBottomSheet extends StatefulWidget {
+  final String title;
   final Function(MapBoxPlace) onLocationSelected;
-  const AddLocationBottomSheet({super.key, required this.onLocationSelected});
+  const AddLocationBottomSheet(
+      {super.key, required this.onLocationSelected, required this.title});
 
   @override
   State<AddLocationBottomSheet> createState() => _AddLocationBottomSheetState();
@@ -87,7 +89,7 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
                   },
                 ),
                 Text(
-                  "Home Address",
+                  widget.title,
                   style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],

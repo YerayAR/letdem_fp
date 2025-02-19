@@ -129,8 +129,7 @@ class _RegisterViewState extends State<RegisterView> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                NavigatorHelper.pop();
-                                NavigatorHelper.to(const LoginView());
+                                NavigatorHelper.replaceAll(const LoginView());
                                 // NavigatorHelper.to(RegisterView());
                               },
                           ),
@@ -169,6 +168,23 @@ class _RegisterViewState extends State<RegisterView> {
                         if (_formKey.currentState!.validate()) {
                           if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
                             Toast.showError('Passwords do not match');
+                            return;
+                          }
+                          if (_passwordCTRL.text.length < 8) {
+                            Toast.showError(
+                                'Password must be at least 8 characters');
+                            return;
+                          }
+                          if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
+                              .hasMatch(_repeatPasswordCTRL.text)) {
+                            Toast.showError(
+                                'Password must contain at least one special character');
+                            return;
+                          }
+                          if (RegExp(r'[0-9]')
+                              .hasMatch(_repeatPasswordCTRL.text)) {
+                            Toast.showError(
+                                'Password must contain at least one number');
                             return;
                           }
                           context.read<AuthBloc>().add(RegisterEvent(

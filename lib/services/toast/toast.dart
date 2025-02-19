@@ -7,19 +7,19 @@ import 'package:letdem/constants/ui/typo.dart';
 class Toast {
   static void showError(String message) {
     FlashyFlushbar(
-      messageStyle: Typo.mediumBody.copyWith(color: Colors.black),
+      messageStyle: Typo.mediumBody.copyWith(color: Colors.white),
       leadingWidget: Icon(
         Icons.error_outline,
-        color: AppColors.red500,
+        color: Colors.white,
         size: 24,
       ),
       message: message,
-      duration: const Duration(milliseconds: 5000),
-      backgroundColor: Colors.white,
+      animationDuration: const Duration(milliseconds: 500),
+      backgroundColor: AppColors.red500,
       trailingWidget: IconButton(
         icon: Icon(
           Icons.close,
-          color: AppColors.red500,
+          color: Colors.white,
           size: 24,
         ),
         onPressed: () {

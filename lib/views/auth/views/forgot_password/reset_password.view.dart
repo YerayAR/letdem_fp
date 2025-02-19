@@ -61,6 +61,22 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                         Toast.showError('Passwords do not match');
                         return;
                       }
+                      if (_passwordCTRL.text.length < 8) {
+                        Toast.showError(
+                            'Password must be at least 8 characters');
+                        return;
+                      }
+                      if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
+                          .hasMatch(_repeatPasswordCTRL.text)) {
+                        Toast.showError(
+                            'Password must contain at least one special character');
+                        return;
+                      }
+                      if (RegExp(r'[0-9]').hasMatch(_repeatPasswordCTRL.text)) {
+                        Toast.showError(
+                            'Password must contain at least one number');
+                        return;
+                      }
 
                       context.read<AuthBloc>().add(ResetPasswordEvent(
                           email: widget.email, password: _passwordCTRL.text));

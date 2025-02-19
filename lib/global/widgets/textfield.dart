@@ -218,20 +218,26 @@ class TextInputFieldState extends State<TextInputField> {
                                   .primary400), // Border color when focused
                         ),
                   suffixIcon: widget.inputType == TextFieldType.password
-                      ? IconButton(
-                          icon: Icon(
-                            isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            size: 18,
-                            color: AppColors.neutral300,
-                            // color: AppColors.gray,
+                      ? InkWell(
+                          splashColor:
+                              Colors.transparent, // Remove ripple effect
+                          highlightColor:
+                              Colors.transparent, // Remove highlight effect
+                          child: GestureDetector(
+                            child: Icon(
+                              isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              size: 18,
+                              color: AppColors.neutral300,
+                              // color: AppColors.gray,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                isPasswordVisible = !isPasswordVisible;
+                              });
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              isPasswordVisible = !isPasswordVisible;
-                            });
-                          },
                         )
                       : null)),
           Column(
