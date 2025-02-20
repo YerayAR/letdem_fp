@@ -39,14 +39,14 @@ class ActivityRepository extends IActivityRepository {
 
   @override
   Future publishSpace(PublishSpaceDTO dto) async {
-    return ApiService.sendRequest(
+    return await ApiService.sendRequest(
       endpoint: EndPoints.publishSpace.copyWithDTO(dto),
     );
   }
 
   @override
-  Future publishRoadEvent(PublishRoadEventDTO dto) {
-    return ApiService.sendRequest(
+  Future publishRoadEvent(PublishRoadEventDTO dto) async {
+    return await ApiService.sendRequest(
       endpoint: EndPoints.publishRoadEvent.copyWithDTO(dto),
     );
   }

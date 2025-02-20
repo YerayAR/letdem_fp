@@ -148,7 +148,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       ),
                       Dimens.space(2),
                       PublishingLocationWidget(
-                        position: snapshot.data?.locationName,
+                        position: snapshot.data?.shortLocationName,
                       ),
                       Dimens.space(2),
                       Row(

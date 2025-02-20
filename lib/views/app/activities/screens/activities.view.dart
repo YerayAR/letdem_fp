@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart'; // Ensure these imports are correct
 import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dart';
+import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
 import 'package:letdem/views/app/activities/widgets/no_contribution.widget.dart';
 import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
@@ -46,30 +48,69 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                 icon: Iconsax.notification5,
               ),
 
-              const ProfileSection(
-                child: [
-                  RegisteredCarWidget(),
-                ],
+              BlocConsumer<CarBloc, CarState>(
+                listener: (context, state) {
+                  // TODO: implement listener
+                },
+                builder: (context, state) {
+                  if (state is CarLoaded) {
+                    return ProfileSection(
+                      child: [
+                        state.car != null
+                            ? RegisteredCarWidget(
+                                car: state.car!,
+                              )
+                            : const NoCarRegisteredWidget(),
+                      ],
+                    );
+                  }
+                  return const ProfileSection(
+                    child: [
+                      NoCarRegisteredWidget(),
+                    ],
+                  );
+                },
               ),
               // AccountSection(
               //   child: [
               Expanded(
                 child: ProfileSection(
+                  padding:
+                      state is ActivitiesLoaded && state.activities.isNotEmpty
+                          ? const EdgeInsets.only(top: 20)
+                          : const EdgeInsets.symmetric(vertical: 20),
                   title: "Contributions",
-                  callToAction: "See all",
+                  callToAction:
+                      state is ActivitiesLoaded && state.activities.isNotEmpty
+                          ? "See all"
+                          : null,
                   child: [
                     Expanded(
                       child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.only(
+                          padding: EdgeInsets.only(
                             top: 25,
-                            bottom: 25,
+                            bottom: state is ActivitiesLoaded &&
+                                    state.activities.isNotEmpty
+                                ? 0
+                                : 25,
                             left: 25,
                             right: 25,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: state is ActivitiesLoaded &&
+                                    state.activities.isNotEmpty
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  )
+                                : const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                    bottomLeft: Radius.circular(20),
+                                    bottomRight: Radius.circular(20),
+                                  ),
                           ),
                           child: state is ActivitiesLoaded
                               ? Center(

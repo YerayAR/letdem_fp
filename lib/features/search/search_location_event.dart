@@ -31,6 +31,14 @@ final class DeleteLocationEvent extends SearchLocationEvent {
   List<Object?> get props => [locationType];
 }
 
+final class ClearRecentLocationEvent extends SearchLocationEvent {
+  const ClearRecentLocationEvent();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
 final class CreateLocationEvent extends SearchLocationEvent {
   final LetDemLocationType locationType;
   final String name;

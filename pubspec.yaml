@@ -83,6 +83,7 @@ flutter:
   assets:
     - assets/branding/
     - assets/icon/
+    - assets/icon/car_tags/
     - assets/res/
 #    - .env
 

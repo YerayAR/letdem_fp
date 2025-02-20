@@ -339,7 +339,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                     ),
                     Dimens.space(4),
                     Row(
-                      spacing: 20,
+                      spacing: 15,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: EventTypes.values
                           .map(
@@ -355,7 +355,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10),
-                                    height: 90,
+                                    height: 93,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(15),
                                       border: selectedType == e

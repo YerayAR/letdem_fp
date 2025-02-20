@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
@@ -31,6 +32,7 @@ class _SplashViewState extends State<SplashView> {
       body: BlocConsumer<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserLoaded) {
+            context.read<CarBloc>().add(GetCarEvent());
             NavigatorHelper.replaceAll(const BaseView());
           }
           if (state is UserError) {
@@ -39,7 +41,7 @@ class _SplashViewState extends State<SplashView> {
               if (state.apiError!.status == ErrorStatus.unauthorized) {
                 // Toast.showError("The session has expired. Please login again.");
                 NavigatorHelper.popAll();
-                NavigatorHelper.to(const WelcomeView());
+                NavigatorHelper.replaceAll(const WelcomeView());
                 return;
               }
             }

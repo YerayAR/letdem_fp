@@ -9,9 +9,12 @@ class CurrentLocationPayload {
   final double longitude;
   final String? locationName;
 
+  final String? shortLocationName;
+
   CurrentLocationPayload({
     required this.latitude,
     required this.longitude,
+    required this.shortLocationName,
     this.locationName,
   });
 
@@ -24,6 +27,7 @@ class CurrentLocationPayload {
 
   factory CurrentLocationPayload.fromMap(Map<String, dynamic> map) {
     return CurrentLocationPayload(
+      shortLocationName: '',
       latitude: map['latitude'],
       longitude: map['longitude'],
     );
@@ -55,6 +59,7 @@ class MapboxService {
           CurrentLocationPayload currentLocationPayload =
               CurrentLocationPayload(
             latitude: position.latitude,
+            shortLocationName: data['features'][0]['text'],
             longitude: position.longitude,
             locationName: data['features'][0]['place_name'],
           );

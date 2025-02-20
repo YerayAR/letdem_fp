@@ -290,40 +290,47 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                             )),
                                   Dimens.space(2),
                                   Row(
-                                    children: [
-                                      Text(
-                                        'Recent',
-                                        style: Typo.mediumBody.copyWith(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const Spacer(),
-                                      GestureDetector(
-                                        onTap: () {
-                                          DatabaseHelper().deleteAllPlaces();
-                                        },
-                                        child: Text(
-                                          'Clear all',
-                                          style: Typo.mediumBody.copyWith(
-                                            color: AppColors.primary400,
-                                            fontWeight: FontWeight.w500,
-                                            decoration:
-                                                TextDecoration.underline,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    children: state.recentPlaces.isEmpty
+                                        ? []
+                                        : [
+                                            Text(
+                                              'Recent',
+                                              style: Typo.mediumBody.copyWith(
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            const Spacer(),
+                                            SizedBox(
+                                              child: state.recentPlaces.isEmpty
+                                                  ? const SizedBox()
+                                                  : GestureDetector(
+                                                      onTap: () {
+                                                        context
+                                                            .read<
+                                                                SearchLocationBloc>()
+                                                            .add(
+                                                                const ClearRecentLocationEvent());
+                                                      },
+                                                      child: Text(
+                                                        'Clear all',
+                                                        style: Typo.mediumBody
+                                                            .copyWith(
+                                                          color: AppColors
+                                                              .primary400,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                        ),
+                                                      ),
+                                                    ),
+                                            ),
+                                          ],
                                   ),
                                   Dimens.space(2),
                                   Column(
                                     children: state.recentPlaces.isEmpty
-                                        ? [
-                                            Dimens.space(8),
-                                            Text(
-                                              'No recent places',
-                                              style: Typo.mediumBody.copyWith(
-                                                  color: AppColors.neutral400),
-                                            ),
-                                          ]
+                                        ? []
                                         : state.recentPlaces.map((e) {
                                             return SavedAddressComponent(
                                               place: e,

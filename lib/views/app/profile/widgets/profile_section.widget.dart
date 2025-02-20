@@ -7,14 +7,21 @@ class ProfileSection extends StatelessWidget {
   final List<Widget> child;
   final String? title;
 
+  final EdgeInsetsGeometry? padding;
+
   final String? callToAction;
-  const ProfileSection(
-      {super.key, required this.child, this.title, this.callToAction});
+  const ProfileSection({
+    super.key,
+    required this.child,
+    this.title,
+    this.callToAction,
+    this.padding,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

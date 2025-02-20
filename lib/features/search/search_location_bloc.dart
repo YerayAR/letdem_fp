@@ -17,6 +17,27 @@ class SearchLocationBloc
     on<CreateLocationEvent>(_createLocation);
     on<DeleteLocationEvent>(_deleteLocation);
     on<DeleteRecentLocationEvent>(_deleteRecentLocation);
+    on<ClearRecentLocationEvent>(_clearRecentLocation);
+  }
+
+  void _clearRecentLocation(
+    ClearRecentLocationEvent event,
+    Emitter<SearchLocationState> emit,
+  ) async {
+    if (state is SearchLocationLoaded) {
+      final currentState = state as SearchLocationLoaded;
+      emit(currentState.copyWith(isLocationCreating: true));
+
+      try {
+        await DatabaseHelper().clearAll();
+        emit(currentState.copyWith(
+          recentPlaces: [],
+          isLocationCreating: false,
+        ));
+      } catch (e) {
+        emit(SearchLocationError(message: e.toString()));
+      }
+    }
   }
 
   void _deleteRecentLocation(

@@ -4,6 +4,7 @@ import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/car/repository/car.repository.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
@@ -11,8 +12,7 @@ import 'package:letdem/services/api/models/endpoint.dart';
 enum Environment { STG, PROD, DEV }
 
 class EndPoints {
-  static String baseURL =
-      "http://letdemstagingalb-901145735.eu-central-1.elb.amazonaws.com/v1";
+  static String baseURL = "https://api-staging.letdem.org/v1";
 
   static bool showApiLogs = true;
 
@@ -110,5 +110,19 @@ class EndPoints {
   static Endpoint<PublishRoadEventDTO> publishRoadEvent = Endpoint(
     url: "/events",
     method: HTTPMethod.POST,
+  );
+
+  static Endpoint getCar = Endpoint(
+    url: "/users/me/car",
+    method: HTTPMethod.GET,
+  );
+
+  static Endpoint<CreateCartDTO> registerCar = Endpoint(
+    url: "/users/me/car",
+    method: HTTPMethod.POST,
+  );
+  static Endpoint<CreateCartDTO> updateCar = Endpoint(
+    url: "/users/me/car",
+    method: HTTPMethod.PUT,
   );
 }

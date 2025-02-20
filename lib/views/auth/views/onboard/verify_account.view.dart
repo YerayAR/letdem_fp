@@ -31,7 +31,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
   OtpFieldController otpbox = OtpFieldController();
   String? otp;
   Timer? _timer;
-  int _secondsRemaining = 60;
+  int _secondsRemaining = 30;
   bool _isResendEnabled = false;
 
   @override
@@ -48,7 +48,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
 
   void _startTimer() {
     setState(() {
-      _secondsRemaining = 60;
+      _secondsRemaining = 30;
       _isResendEnabled = false;
     });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {

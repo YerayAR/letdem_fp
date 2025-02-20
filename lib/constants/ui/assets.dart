@@ -17,4 +17,12 @@ class AppAssets {
 
   static String closeRoad = 'assets/icon/closed_road.svg';
   static String accident = 'assets/icon/accident.svg';
+
+//   car tag types
+
+  static String carTagZero = 'assets/icon/car_tags/zero.svg';
+  static String carTagEco = 'assets/icon/car_tags/eco.svg';
+  static String carTagC = 'assets/icon/car_tags/c.svg';
+  static String carTagB = 'assets/icon/car_tags/b.svg';
+  static String carTagNone = 'assets/icon/car_tags/none.svg';
 }

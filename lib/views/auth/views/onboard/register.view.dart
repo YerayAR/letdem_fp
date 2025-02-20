@@ -29,7 +29,7 @@ class _RegisterViewState extends State<RegisterView> {
   late TextEditingController _passwordCTRL;
   late TextEditingController _repeatPasswordCTRL;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -103,12 +103,12 @@ class _RegisterViewState extends State<RegisterView> {
 
                           child: Navigator.canPop(context)
                               ? IconButton(
-                            icon: const Icon(Iconsax.close_circle5),
-                            color: AppColors.neutral100,
-                            onPressed: () {
-                              NavigatorHelper.pop();
-                            },
-                          )
+                                  icon: const Icon(Iconsax.close_circle5),
+                                  color: AppColors.neutral100,
+                                  onPressed: () {
+                                    NavigatorHelper.pop();
+                                  },
+                                )
                               : null,
                         ),
                       ],
