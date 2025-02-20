@@ -13,6 +13,18 @@ class AppAssets {
   static String green = 'assets/icon/green.svg';
   static String blue = 'assets/icon/blue.svg';
 
+  static String freeMapMarker = 'assets/icon/map_pin_free.png';
+  static String disabledMapMarker = 'assets/icon/map_pin_disabled.png';
+  static String greenMapMarker = 'assets/icon/map_pin_green.png';
+  static String blueMapMarker = 'assets/icon/map_pin_blue.png';
+
+  static String accidentMapMarker = 'assets/icon/map_pin_crash.png';
+  static String closedRoadMapMarker = 'assets/icon/map_pin_accident.png';
+
+  static String currentLocationMapMarker =
+      'assets/icon/curent_location_pin.png';
+  static String policeMapMarker = 'assets/icon/map_pin_police.png';
+
   static String police = 'assets/icon/police.svg';
 
   static String closeRoad = 'assets/icon/closed_road.svg';

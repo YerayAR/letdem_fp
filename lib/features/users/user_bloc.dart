@@ -65,7 +65,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       ));
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
-    } catch (err) {
+    } catch (err, strack) {
+      print(strack);
       emit(const UserError(error: "Unable to load user"));
     }
   }

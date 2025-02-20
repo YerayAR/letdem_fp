@@ -125,4 +125,8 @@ class EndPoints {
     url: "/users/me/car",
     method: HTTPMethod.PUT,
   );
+  static Endpoint getNearby = Endpoint(
+    url: "/maps/nearby",
+    method: HTTPMethod.GET,
+  );
 }

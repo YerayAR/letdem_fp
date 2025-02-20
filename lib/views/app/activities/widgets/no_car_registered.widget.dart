@@ -62,7 +62,7 @@ class NoCarRegisteredWidget extends StatelessWidget {
 }
 
 CarTagType fromJsonToTag(String tagType) {
-  switch (tagType) {
+  switch (tagType.toLowerCase()) {
     case 'zero':
       return CarTagType.zero;
     case 'eco':

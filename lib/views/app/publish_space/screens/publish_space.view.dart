@@ -11,9 +11,11 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
@@ -36,6 +38,21 @@ String getSpaceTypeText(PublishSpaceType type) {
       return 'Disabled';
     case PublishSpaceType.greenZone:
       return 'Green Zone';
+  }
+}
+
+PublishSpaceType getEnumFromText(String text) {
+  switch (text) {
+    case 'FREE':
+      return PublishSpaceType.free;
+    case 'BLUE':
+      return PublishSpaceType.blueZone;
+    case 'DISABLED':
+      return PublishSpaceType.disabled;
+    case 'GREEN':
+      return PublishSpaceType.greenZone;
+    default:
+      return PublishSpaceType.greenZone;
   }
 }
 
@@ -91,6 +108,16 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
           return BlocConsumer<ActivitiesBloc, ActivitiesState>(
             listener: (context, state) {
               if (state is ActivitiesPublished) {
+                context.read<MapBloc>().add(GetNearbyPlaces(
+                      queryParams: MapQueryParams(
+                        currentPoint:
+                            "${snapshot.data!.latitude},${snapshot.data!.longitude}",
+                        radius: 8000,
+                        drivingMode: false,
+                        options: ['spaces', 'events'],
+                      ),
+                    ));
+
                 AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(

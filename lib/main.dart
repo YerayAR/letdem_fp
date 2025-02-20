@@ -10,6 +10,8 @@ import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
+import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/features/map/repository/map.repository.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
@@ -45,9 +47,17 @@ void main() async {
         RepositoryProvider(
           create: (_) => CarRepository(),
         ),
+        RepositoryProvider(
+          create: (_) => MapRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(
+            create: (context) => MapBloc(
+              mapRepository: context.read<MapRepository>(),
+            ),
+          ),
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),

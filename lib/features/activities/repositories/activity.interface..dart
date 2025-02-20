@@ -124,7 +124,7 @@ class PublishSpaceDTO extends DTO {
   @override
   Map<String, dynamic> toMap() {
     return {
-      "type": "FREE",
+      "type": type,
       "image": image,
       "location": {
         "street_name": streetName,
