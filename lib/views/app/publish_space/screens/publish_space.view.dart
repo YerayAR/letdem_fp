@@ -11,10 +11,13 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/location/location.service.dart';
+import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 enum PublishSpaceType {
   free,
@@ -88,8 +91,18 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
           return BlocConsumer<ActivitiesBloc, ActivitiesState>(
             listener: (context, state) {
               if (state is ActivitiesPublished) {
-                Toast.show("Space published successfully");
-                Navigator.pop(context);
+                AppPopup.showDialogSheet(
+                  context,
+                  SuccessDialog(
+                    title: "Space Published Successfully",
+                    subtext:
+                        "Your space have been published successfully, people can now have access to use space.",
+                    onProceed: () {
+                      NavigatorHelper.pop();
+                      NavigatorHelper.pop();
+                    },
+                  ),
+                );
               }
               if (state is ActivitiesError) {
                 Toast.showError(state.error);

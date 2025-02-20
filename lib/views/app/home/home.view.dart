@@ -104,6 +104,14 @@ class _HomeViewState extends State<HomeView>
             child: Stack(
               children: [
                 mapbox.MapWidget(
+                  onMapCreated: (controller) {
+                    mapboxController = controller;
+
+                    mapboxController.scaleBar
+                        .updateSettings(mapbox.ScaleBarSettings(
+                      enabled: false,
+                    )); // hide the scale bar
+                  },
                   styleUri: mapbox.MapboxStyles.OUTDOORS,
                   cameraOptions: _cameraPosition,
                 ),

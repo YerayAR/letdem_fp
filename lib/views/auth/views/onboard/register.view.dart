@@ -98,12 +98,18 @@ class _RegisterViewState extends State<RegisterView> {
                           text: 'CREATE NEW ACCOUNT',
                           color: AppColors.secondary600,
                         ),
-                        IconButton(
-                          icon: const Icon(Iconsax.close_circle5),
-                          color: AppColors.neutral100,
-                          onPressed: () {
-                            NavigatorHelper.pop();
-                          },
+                        SizedBox(
+                          // check if a screen behind is exist
+
+                          child: Navigator.canPop(context)
+                              ? IconButton(
+                            icon: const Icon(Iconsax.close_circle5),
+                            color: AppColors.neutral100,
+                            onPressed: () {
+                              NavigatorHelper.pop();
+                            },
+                          )
+                              : null,
                         ),
                       ],
                     ),
