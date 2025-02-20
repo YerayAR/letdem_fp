@@ -9,6 +9,7 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
@@ -73,7 +74,18 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
             Toast.showError(state.error);
           }
           if (state is OTPVerificationSuccess) {
-            NavigatorHelper.replaceAll(const BasicInfoView());
+            AppPopup.showDialogSheet(
+              context,
+              SuccessDialog(
+                title: "Verification Success",
+                subtext:
+                    "Your account email has been verified successfully. You can proceed to the app.",
+                isLoading: state is OTPVerificationLoading,
+                onProceed: () {
+                  NavigatorHelper.replaceAll(const BasicInfoView());
+                },
+              ),
+            );
           }
 
           // TODO: implement listener
@@ -295,6 +307,59 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
           );
         },
       ),
+    );
+  }
+}
+
+class SuccessDialog extends StatelessWidget {
+  final String title;
+  final String subtext;
+  final VoidCallback? onProceed;
+  final bool isLoading;
+
+  const SuccessDialog({
+    Key? key,
+    required this.title,
+    required this.subtext,
+    this.onProceed,
+    this.isLoading = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        CircleAvatar(
+          radius: 45,
+          backgroundColor: AppColors.green50,
+          child: Icon(
+            Icons.done,
+            size: 45,
+            color: AppColors.green600,
+          ),
+        ),
+        Dimens.space(3),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: Typo.heading4.copyWith(color: AppColors.neutral600),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            subtext,
+            textAlign: TextAlign.center,
+            style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
+          ),
+        ),
+        Dimens.space(5),
+        PrimaryButton(
+          isLoading: isLoading,
+          onTap: onProceed,
+          text: 'Proceed',
+        ),
+      ],
     );
   }
 }

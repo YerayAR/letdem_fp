@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
@@ -9,9 +10,11 @@ import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/location/location.service.dart';
+import 'package:letdem/services/toast/toast.dart';
 
 enum PublishSpaceType {
   free,
@@ -30,6 +33,19 @@ String getSpaceTypeText(PublishSpaceType type) {
       return 'Disabled';
     case PublishSpaceType.greenZone:
       return 'Green Zone';
+  }
+}
+
+String getEnumText(PublishSpaceType type) {
+  switch (type) {
+    case PublishSpaceType.free:
+      return 'FREE';
+    case PublishSpaceType.blueZone:
+      return 'BLUE';
+    case PublishSpaceType.disabled:
+      return 'DISABLED';
+    case PublishSpaceType.greenZone:
+      return 'GREEN';
   }
 }
 
@@ -66,91 +82,117 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
+    return FutureBuilder<CurrentLocationPayload?>(
         future: MapboxService.getPlaceFromLatLng(),
         builder: (context, snapshot) {
-          return Scaffold(
-              bottomNavigationBar: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.all(Dimens.defaultMargin),
-                  child: PrimaryButton(
-                    onTap: () {},
-                    isDisabled:
-                        snapshot.data == null || selectedSpacePicture == null,
-                    text: 'Continue',
+          return BlocConsumer<ActivitiesBloc, ActivitiesState>(
+            listener: (context, state) {
+              if (state is ActivitiesPublished) {
+                Toast.show("Space published successfully");
+                Navigator.pop(context);
+              }
+              if (state is ActivitiesError) {
+                Toast.showError(state.error);
+              }
+              // TODO: implement listener
+            },
+            builder: (context, state) {
+              return Scaffold(
+                  bottomNavigationBar: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(Dimens.defaultMargin),
+                      child: PrimaryButton(
+                        isLoading: state is ActivitiesLoading,
+                        onTap: () {
+                          BlocProvider.of<ActivitiesBloc>(context).add(
+                            PublishSpaceEvent(
+                              type: getEnumText(selectedType),
+                              image: selectedSpacePicture!,
+                              locationName: snapshot.data!.locationName!,
+                              latitude: snapshot.data!.latitude,
+                              longitude: snapshot.data!.longitude,
+                            ),
+                          );
+                        },
+                        isDisabled: snapshot.data == null ||
+                            selectedSpacePicture == null,
+                        text: 'Continue',
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              appBar: AppBar(
-                title: const Text('Publish Space'),
-              ),
-              body: StyledBody(
-                children: [
-                  TakePictureWidget(
-                    file: selectedSpacePicture,
-                    onImageSelected: (File file) {
-                      setState(() {
-                        selectedSpacePicture = file;
-                      });
-                    },
+                  appBar: AppBar(
+                    title: const Text('Publish Space'),
                   ),
-                  Dimens.space(2),
-                  PublishingLocationWidget(
-                    position: snapshot.data,
-                  ),
-                  Dimens.space(2),
-                  Row(
-                    spacing: 10,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: PublishSpaceType.values
-                        .map((e) => Flexible(
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedType = e;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  height: 90,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    border: selectedType == e
-                                        ? Border.all(
-                                            color: AppColors.primary200,
-                                            width: 2)
-                                        : Border.all(
-                                            color: AppColors.neutral50,
-                                            width: 2),
+                  body: StyledBody(
+                    children: [
+                      TakePictureWidget(
+                        file: selectedSpacePicture,
+                        onImageSelected: (File file) {
+                          setState(() {
+                            selectedSpacePicture = file;
+                          });
+                        },
+                      ),
+                      Dimens.space(2),
+                      PublishingLocationWidget(
+                        position: snapshot.data?.locationName,
+                      ),
+                      Dimens.space(2),
+                      Row(
+                        spacing: 10,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: PublishSpaceType.values
+                            .map((e) => Flexible(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedType = e;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      height: 90,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        border: selectedType == e
+                                            ? Border.all(
+                                                color: AppColors.primary200,
+                                                width: 2)
+                                            : Border.all(
+                                                color: AppColors.neutral50,
+                                                width: 2),
+                                      ),
+                                      child: Center(
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SvgPicture.asset(
+                                            getSpaceTypeIcon(e),
+                                            width: 30,
+                                            height: 30,
+                                          ),
+                                          Dimens.space(1),
+                                          Text(
+                                            getSpaceTypeText(e),
+                                            style: Typo.smallBody.copyWith(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      )),
+                                    ),
                                   ),
-                                  child: Center(
-                                      child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SvgPicture.asset(
-                                        getSpaceTypeIcon(e),
-                                        width: 30,
-                                        height: 30,
-                                      ),
-                                      Dimens.space(1),
-                                      Text(
-                                        getSpaceTypeText(e),
-                                        style: Typo.smallBody.copyWith(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  )),
-                                ),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                ],
-              ));
+                                ))
+                            .toList(),
+                      ),
+                    ],
+                  ));
+            },
+          );
         });
   }
 }
@@ -251,18 +293,21 @@ class _TakePictureWidgetState extends State<TakePictureWidget> {
           color: AppColors.neutral50,
           borderRadius: BorderRadius.circular(25),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(IconlyBold.camera, size: 30, color: AppColors.neutral400),
-            Dimens.space(1),
-            const Text(
-              "Click to open camera",
-              style: Typo.largeBody,
-            ),
-          ],
-        ),
+        child: widget.file != null
+            ? null
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(IconlyBold.camera,
+                      size: 30, color: AppColors.neutral400),
+                  Dimens.space(1),
+                  const Text(
+                    "Click to open camera",
+                    style: Typo.largeBody,
+                  ),
+                ],
+              ),
       ),
     );
   }

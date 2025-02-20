@@ -26,9 +26,6 @@ class ImageCompressor {
         throw Exception("Failed to decode image.");
       }
 
-      image =
-          img.copyResize(image, width: 800); // Resize to 800px width (optional)
-
       List<int> compressedBytes = img.encodeJpg(image, quality: quality);
 
       String base64String = base64Encode(compressedBytes);

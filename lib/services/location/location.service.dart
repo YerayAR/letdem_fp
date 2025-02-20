@@ -4,8 +4,39 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
 
+class CurrentLocationPayload {
+  final double latitude;
+  final double longitude;
+  final String? locationName;
+
+  CurrentLocationPayload({
+    required this.latitude,
+    required this.longitude,
+    this.locationName,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+  }
+
+  factory CurrentLocationPayload.fromMap(Map<String, dynamic> map) {
+    return CurrentLocationPayload(
+      latitude: map['latitude'],
+      longitude: map['longitude'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory CurrentLocationPayload.fromJson(String source) =>
+      CurrentLocationPayload.fromMap(json.decode(source));
+}
+
 class MapboxService {
-  static Future<String?> getPlaceFromLatLng() async {
+  static Future<CurrentLocationPayload?> getPlaceFromLatLng() async {
     // use geolocator to get current location
 
     var position = await Geolocator.getCurrentPosition();
@@ -21,15 +52,23 @@ class MapboxService {
         final data = json.decode(response.body);
         print(data);
         if (data['features'].isNotEmpty) {
-          return data['features'][0]['place_name']; // Returns formatted address
+          CurrentLocationPayload currentLocationPayload =
+              CurrentLocationPayload(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            locationName: data['features'][0]['place_name'],
+          );
+          return currentLocationPayload;
+          // return data['features'][0]['place_name']; // Returns formatted address
         } else {
-          return 'Unknown location';
+          return null;
         }
       } else {
-        return 'Error: ${response.statusCode}';
+        return null;
       }
     } catch (e) {
-      return 'Failed to get location';
+      print(e);
+      return null;
     }
   }
 }

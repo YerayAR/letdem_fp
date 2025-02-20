@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/features/activities/repositories/activity.interface..dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
+import 'package:letdem/services/api/models/error.dart';
+import 'package:letdem/services/image/compressor.dart';
 
 part 'activities_event.dart';
 part 'activities_state.dart';
@@ -10,8 +15,64 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   ActivitiesBloc({
     required this.activityRepository,
   }) : super(ActivitiesInitial()) {
-    on<ActivitiesEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+    on<PublishSpaceEvent>(_onPublishSpace);
+    on<GetActivitiesEvent>(_onGetActivities);
+    on<PublishRoadEventEvent>(_onPublishRoadEvent);
+  }
+
+  Future<void> _onPublishRoadEvent(
+      PublishRoadEventEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+      await activityRepository.publishRoadEvent(
+        PublishRoadEventDTO(
+          type: event.type,
+          streetName: event.locationName,
+          latitude: event.latitude,
+          longitude: event.longitude,
+        ),
+      );
+      emit(ActivitiesPublished());
+    } on ApiError catch (err) {
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      emit(const ActivitiesError(error: "Unable to publish road event"));
+    }
+  }
+
+  Future<void> _onGetActivities(
+      GetActivitiesEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+      var activities = await activityRepository.getActivities();
+      emit(ActivitiesLoaded(activities: activities.results));
+    } on ApiError catch (err) {
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      emit(const ActivitiesError(error: "Unable to load activities"));
+    }
+  }
+
+  Future<void> _onPublishSpace(
+      PublishSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+
+      var base64 = await ImageCompressor.compressImageToBase64(event.image);
+      await activityRepository.publishSpace(
+        PublishSpaceDTO(
+          type: event.type,
+          image: base64,
+          streetName: event.locationName,
+          latitude: event.latitude,
+          longitude: event.longitude,
+        ),
+      );
+      emit(ActivitiesPublished());
+    } on ApiError catch (err) {
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      emit(const ActivitiesError(error: "Unable to publish space"));
+    }
   }
 }

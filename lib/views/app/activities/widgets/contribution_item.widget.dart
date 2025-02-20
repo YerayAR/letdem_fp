@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/activities/repositories/activity.interface..dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/views/app/activities/screens/activities.view.dart';
 
 class ContributionItem extends StatelessWidget {
   final ContributionType type;
 
+  final Activity activity;
+
   final bool showDivider;
-  const ContributionItem(
-      {super.key, required this.type, this.showDivider = true});
+  const ContributionItem({
+    super.key,
+    required this.type,
+    this.showDivider = true,
+    required this.activity,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +52,9 @@ class ContributionItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Space Published",
+                          type == ContributionType.space
+                              ? "Space Published"
+                              : "Event Published",
                           style: Typo.largeBody.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -54,8 +64,12 @@ class ContributionItem extends StatelessWidget {
                           spacing: 5,
                           children: [
                             Text(
-                              "12 Jan. 2025",
+                              DateFormat("dd MMM. yyyy").format(
+                                (activity.created),
+                              ),
+                              // "12 Jan. 2025",
                               style: Typo.mediumBody.copyWith(
+                                fontSize: 14,
                                 color: AppColors.neutral400,
                               ),
                             ),
@@ -64,8 +78,11 @@ class ContributionItem extends StatelessWidget {
                               backgroundColor: AppColors.neutral200,
                             ),
                             Text(
-                              "12:00 PM",
+                              DateFormat("hh:mm a").format(
+                                (activity.created),
+                              ),
                               style: Typo.mediumBody.copyWith(
+                                fontSize: 14,
                                 color: AppColors.neutral400,
                               ),
                             ),
@@ -76,7 +93,7 @@ class ContributionItem extends StatelessWidget {
               ),
               DecoratedChip(
                 backgroundColor: AppColors.secondary50,
-                text: '+2 Pts',
+                text: '+${activity.points} Pts',
                 textStyle: Typo.smallBody.copyWith(
                   color: AppColors.secondary600,
                   fontSize: 11,

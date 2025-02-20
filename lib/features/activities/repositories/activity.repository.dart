@@ -1,4 +1,7 @@
 import 'package:letdem/features/activities/repositories/activity.interface..dart';
+import 'package:letdem/services/api/api.service.dart';
+import 'package:letdem/services/api/endpoints.dart';
+import 'package:letdem/services/api/models/response.model.dart';
 
 class ActivityRepository extends IActivityRepository {
   @override
@@ -14,9 +17,12 @@ class ActivityRepository extends IActivityRepository {
   }
 
   @override
-  Future<List<Activity>> getActivities() {
-    // TODO: implement getActivities
-    throw UnimplementedError();
+  Future<ActivityResponse> getActivities() async {
+    ApiResponse response = await ApiService.sendRequest(
+      endpoint: EndPoints.getContributions,
+    );
+    return ActivityResponse.fromJson(response.data);
+    // return response.data.map((e) => Activity.fromMap(e)).toList();
   }
 
   @override
@@ -29,5 +35,19 @@ class ActivityRepository extends IActivityRepository {
   Future<void> updateActivity(Activity activity) {
     // TODO: implement updateActivity
     throw UnimplementedError();
+  }
+
+  @override
+  Future publishSpace(PublishSpaceDTO dto) async {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.publishSpace.copyWithDTO(dto),
+    );
+  }
+
+  @override
+  Future publishRoadEvent(PublishRoadEventDTO dto) {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.publishRoadEvent.copyWithDTO(dto),
+    );
   }
 }

@@ -56,7 +56,9 @@ class Toast {
 
   static void show(String message) {
     FlashyFlushbar(
-      messageStyle: Typo.mediumBody,
+      messageStyle: Typo.mediumBody.copyWith(
+        color: Colors.black,
+      ),
       leadingWidget: const Icon(
         Iconsax.tick_circle,
         color: Colors.green,

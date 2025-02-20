@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/views/app/activities/screens/activities.view.dart';
 import 'package:letdem/views/app/profile/profile.view.dart';
 
@@ -25,6 +27,15 @@ class _BaseViewState extends State<BaseView> {
     setState(() {
       _selectedIndex = index;
     });
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        context.read<ActivitiesBloc>().add(GetActivitiesEvent());
+      case 2:
+        break;
+      default:
+    }
   }
 
   @override

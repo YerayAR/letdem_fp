@@ -12,4 +12,9 @@ class AppAssets {
   static String disabled = 'assets/icon/disabled.svg';
   static String green = 'assets/icon/green.svg';
   static String blue = 'assets/icon/blue.svg';
+
+  static String police = 'assets/icon/police.svg';
+
+  static String closeRoad = 'assets/icon/closed_road.svg';
+  static String accident = 'assets/icon/accident.svg';
 }

@@ -1,3 +1,4 @@
+import 'package:letdem/features/activities/repositories/activity.interface..dart';
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
@@ -81,6 +82,11 @@ class EndPoints {
     method: HTTPMethod.POST,
   );
 
+  static Endpoint<PublishSpaceDTO> publishSpace = Endpoint(
+    url: "/spaces/free",
+    method: HTTPMethod.POST,
+  );
+
   static Endpoint<PostLetDemoLocationDTO> addHomeLocation = Endpoint(
     url: "/users/me/addresses/home",
     method: HTTPMethod.POST,
@@ -94,5 +100,15 @@ class EndPoints {
   static Endpoint deleteHomeLocation = Endpoint(
     url: "/users/me/addresses/home",
     method: HTTPMethod.DELETE,
+  );
+  // /v1/users/me/contributions?page_size=15&page=1
+  static Endpoint getContributions = Endpoint(
+    url: "/users/me/contributions?page_size=25&page=1",
+    method: HTTPMethod.GET,
+  );
+
+  static Endpoint<PublishRoadEventDTO> publishRoadEvent = Endpoint(
+    url: "/events",
+    method: HTTPMethod.POST,
   );
 }
