@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.letdem.letdemapp</string>
+	<string>com.example.letdem</string>
 	<key>PROJECT_ID</key>
 	<string>letdem-d28a8</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1030587373633:ios:8e5bc6296facc018840ec0</string>
+	<string>1:1030587373633:ios:3ed93ceee79922da840ec0</string>
 </dict>
 </plist>

@@ -144,19 +144,19 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       child: PrimaryButton(
                         isLoading: state is ActivitiesLoading,
                         onTap: () {
-                          BlocProvider.of<ActivitiesBloc>(context).add(
-                            PublishSpaceEvent(
-                              type: getEnumText(selectedType),
-                              image: selectedSpacePicture!,
-                              locationName: snapshot.data!.locationName!,
-                              latitude: snapshot.data!.latitude,
-                              longitude: snapshot.data!.longitude,
-                            ),
-                          );
+                          (context).read<ActivitiesBloc>().add(
+                                PublishSpaceEvent(
+                                  type: getEnumText(selectedType),
+                                  image: selectedSpacePicture!,
+                                  locationName: snapshot.data!.locationName!,
+                                  latitude: snapshot.data!.latitude,
+                                  longitude: snapshot.data!.longitude,
+                                ),
+                              );
                         },
                         isDisabled: snapshot.data == null ||
                             selectedSpacePicture == null,
-                        text: 'Continue',
+                        text: 'Publish',
                       ),
                     ),
                   ),
@@ -175,7 +175,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       ),
                       Dimens.space(2),
                       PublishingLocationWidget(
-                        position: snapshot.data?.shortLocationName,
+                        position: snapshot.data?.locationName,
                       ),
                       Dimens.space(2),
                       Row(

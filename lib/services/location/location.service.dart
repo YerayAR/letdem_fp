@@ -61,7 +61,7 @@ class MapboxService {
             latitude: position.latitude,
             shortLocationName: data['features'][0]['text'],
             longitude: position.longitude,
-            locationName: data['features'][0]['place_name'],
+            locationName: data['features'][0]['place_name'].split(',')[0],
           );
           return currentLocationPayload;
           // return data['features'][0]['place_name']; // Returns formatted address

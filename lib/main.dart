@@ -1,6 +1,6 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
@@ -20,15 +20,16 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
-import 'firebase_options.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // block orientation
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   runApp(
     MultiRepositoryProvider(
       providers: [
@@ -85,7 +86,15 @@ void main() async {
             ),
           ),
         ],
-        child: const LetDemApp(),
+        child: LayoutBuilder(builder: (context, constraints) {
+          double maxWidth =
+              constraints.maxWidth > 600 ? 600 : constraints.maxWidth;
+
+          return SizedBox(
+              width: maxWidth,
+              child: Container(
+                  alignment: Alignment.center, child: const LetDemApp()));
+        }),
       ),
     ),
   );

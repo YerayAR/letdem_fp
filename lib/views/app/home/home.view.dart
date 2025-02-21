@@ -353,7 +353,15 @@ class _HomeViewState extends State<HomeView>
                                 mapboxController.scaleBar.updateSettings(
                                   mapbox.ScaleBarSettings(enabled: false),
                                 );
+                                mapboxController.compass.updateSettings(
+                                  mapbox.CompassSettings(enabled: false),
+                                );
 
+                                await mapboxController!
+                                    .setBounds(mapbox.CameraBoundsOptions(
+                                  maxZoom: 18,
+                                  minZoom: 12,
+                                ));
                                 pointAnnotationManager = await mapboxController
                                     .annotations
                                     .createPointAnnotationManager();

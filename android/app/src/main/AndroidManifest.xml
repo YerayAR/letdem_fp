@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.letdem">
+          package="com.letdem.letdemapp">
 
     <!-- 🌍 Internet & Network Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>

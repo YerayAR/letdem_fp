@@ -103,7 +103,7 @@ class EndPoints {
   );
   // /v1/users/me/contributions?page_size=15&page=1
   static Endpoint getContributions = Endpoint(
-    url: "/users/me/contributions?page_size=25&page=1",
+    url: "/users/me/contributions?page_size=5&page=1",
     method: HTTPMethod.GET,
   );
 

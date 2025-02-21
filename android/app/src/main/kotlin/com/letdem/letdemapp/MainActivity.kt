@@ -1,4 +1,4 @@
-package com.example.letdem
+package com.letdem.letdemapp
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -53,9 +53,9 @@ class RegisteredCarWidget extends StatelessWidget {
                 Dimens.space(1),
 
                 Row(
-                  spacing: 8,
+                  spacing: 11,
                   children: <Widget>[
-                    Text("Plate Number: ${car.registrationNumber}",
+                    Text("${car.registrationNumber}",
                         style: Typo.largeBody.copyWith(
                           color: AppColors.neutral500,
                           fontWeight: FontWeight.w500,
@@ -66,7 +66,7 @@ class RegisteredCarWidget extends StatelessWidget {
                     ),
                     SvgPicture.asset(
                       geTagTypeIcon(car.tagType),
-                      width: 20,
+                      width: 25,
                     )
                   ],
                 ),
