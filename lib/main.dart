@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,9 +21,15 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // block orientation
   SystemChrome.setPreferredOrientations([
@@ -52,50 +59,38 @@ void main() async {
           create: (_) => MapRepository(),
         ),
       ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => MapBloc(
-              mapRepository: context.read<MapRepository>(),
-            ),
+      child: MultiBlocProvider(providers: [
+        BlocProvider(
+          create: (context) => MapBloc(
+            mapRepository: context.read<MapRepository>(),
           ),
-          BlocProvider<AuthBloc>(
-            create: (context) => AuthBloc(
-              authRepository: context.read<AuthRepository>(),
-            ),
+        ),
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(
+            authRepository: context.read<AuthRepository>(),
           ),
-          BlocProvider(
-            create: (context) => SearchLocationBloc(
-              searchLocationRepository:
-                  context.read<SearchLocationRepository>(),
-            ),
+        ),
+        BlocProvider(
+          create: (context) => SearchLocationBloc(
+            searchLocationRepository: context.read<SearchLocationRepository>(),
           ),
-          BlocProvider<UserBloc>(
-            create: (context) => UserBloc(
-              userRepository: context.read<UserRepository>(),
-            ),
+        ),
+        BlocProvider<UserBloc>(
+          create: (context) => UserBloc(
+            userRepository: context.read<UserRepository>(),
           ),
-          BlocProvider<ActivitiesBloc>(
-            create: (context) => ActivitiesBloc(
-              activityRepository: context.read<ActivityRepository>(),
-            ),
+        ),
+        BlocProvider<ActivitiesBloc>(
+          create: (context) => ActivitiesBloc(
+            activityRepository: context.read<ActivityRepository>(),
           ),
-          BlocProvider(
-            create: (context) => CarBloc(
-              carRepository: context.read<CarRepository>(),
-            ),
+        ),
+        BlocProvider(
+          create: (context) => CarBloc(
+            carRepository: context.read<CarRepository>(),
           ),
-        ],
-        child: LayoutBuilder(builder: (context, constraints) {
-          double maxWidth =
-              constraints.maxWidth > 600 ? 600 : constraints.maxWidth;
-
-          return SizedBox(
-              width: maxWidth,
-              child: Container(
-                  alignment: Alignment.center, child: const LetDemApp()));
-        }),
-      ),
+        ),
+      ], child: LetDemApp()),
     ),
   );
 }

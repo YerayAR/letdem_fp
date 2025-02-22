@@ -16,6 +16,16 @@
 	<string>6.0</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.1030587373633-kcgh55gq0gtnsqd4gnr6tobfq1i8usve</string>
+            </array>
+        </dict>
+    </array>
+
 	<key>CFBundleName</key>
 	<string>letdem</string>
 	<key>CFBundlePackageType</key>

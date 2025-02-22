@@ -17,6 +17,35 @@ class RequestPermissionView extends StatefulWidget {
 }
 
 class _RequestPermissionViewState extends State<RequestPermissionView> {
+  bool _isDeniedForever = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermission();
+  }
+
+  Future<void> _checkPermission() async {
+    var status = await Geolocator.checkPermission();
+    if (status == LocationPermission.always ||
+        status == LocationPermission.whileInUse) {
+      NavigatorHelper.replaceAll(const BaseView());
+      return;
+    } else if (status == LocationPermission.deniedForever) {
+      setState(() => _isDeniedForever = true);
+    }
+  }
+
+  Future<void> _requestPermission() async {
+    var status = await Geolocator.requestPermission();
+    if (status == LocationPermission.always ||
+        status == LocationPermission.whileInUse) {
+      NavigatorHelper.replaceAll(const BaseView());
+    } else if (status == LocationPermission.deniedForever) {
+      setState(() => _isDeniedForever = true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,18 +70,16 @@ class _RequestPermissionViewState extends State<RequestPermissionView> {
           ),
           Dimens.space(1),
           Text(
-            "Kindly enable geolocation to enable the app to automatically track your location, this process must be completed to be able use the app.",
+            "Kindly enable geolocation to allow the app to track your location automatically. This process must be completed to use the app.",
             textAlign: TextAlign.center,
             style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
           ),
           Dimens.space(15),
           PrimaryButton(
-            onTap: () {
-              Geolocator.requestPermission();
-              NavigatorHelper.popAll();
-              NavigatorHelper.replaceAll(const BaseView());
-            },
-            text: 'Enable Geolocation',
+            onTap: _isDeniedForever
+                ? () => Geolocator.openLocationSettings()
+                : _requestPermission,
+            text: _isDeniedForever ? 'Open Settings' : 'Enable Geolocation',
           ),
           Dimens.space(1),
           PrimaryButton(

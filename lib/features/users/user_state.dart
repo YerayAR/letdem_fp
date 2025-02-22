@@ -23,19 +23,35 @@ class UserLoading extends UserState {
 
 class UserLoaded extends UserState {
   final LetDemUser user;
+  final int points;
 
   final bool isLocationPermissionGranted;
 
   const UserLoaded({
     required this.user,
     required this.isLocationPermissionGranted,
+    required this.points,
   });
+
+  UserLoaded copyWith({
+    LetDemUser? user,
+    bool? isLocationPermissionGranted,
+    int? points,
+  }) {
+    return UserLoaded(
+      user: user ?? this.user,
+      isLocationPermissionGranted:
+          isLocationPermissionGranted ?? this.isLocationPermissionGranted,
+      points: points ?? this.points,
+    );
+  }
 
   @override
   // TODO: implement props
   List<Object?> get props => [
         user,
         isLocationPermissionGranted,
+        points,
       ];
 }
 

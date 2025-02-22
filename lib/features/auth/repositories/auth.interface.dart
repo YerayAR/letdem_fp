@@ -4,9 +4,27 @@ import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
+import 'package:letdem/services/api/models/endpoint.dart';
+
+class TokenDTO extends DTO {
+  final String token;
+
+  TokenDTO({required this.token});
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'token': token,
+    };
+  }
+}
 
 abstract class AuthInterface {
   Future<Tokens> login(LoginDTO loginDTO);
+  Future<Tokens> googleLogin(TokenDTO dto);
+
+  Future googleSignup(TokenDTO registerDTO);
+
   Future register(RegisterDTO registerDTO);
 
   Future verifyEmailEvent(VerifyEmailDTO dto);

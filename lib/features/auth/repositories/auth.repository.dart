@@ -54,4 +54,20 @@ class AuthRepository extends AuthInterface {
     return ApiService.sendRequest(
         endpoint: EndPoints.resetForgotPasswordEndpoint.copyWithDTO(dto));
   }
+
+  @override
+  Future<Tokens> googleLogin(TokenDTO dto) async {
+    ApiResponse res = await ApiService.sendRequest(
+        endpoint: EndPoints.socialLogin.copyWithDTO(dto));
+
+    return Tokens(accessToken: res.data['token']);
+  }
+
+  @override
+  Future<Tokens> googleSignup(TokenDTO dto) async {
+    ApiResponse res = await ApiService.sendRequest(
+        endpoint: EndPoints.socialSignup.copyWithDTO(dto));
+
+    return Tokens(accessToken: res.data['token']);
+  }
 }

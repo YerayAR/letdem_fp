@@ -103,7 +103,7 @@ class _HomeViewState extends State<HomeView>
               coordinates:
                   mapbox.Position(position.longitude, position.latitude),
             ),
-            zoom: 13,
+            zoom: 15,
             bearing: 0,
             pitch: 0,
           );
@@ -323,13 +323,12 @@ class _HomeViewState extends State<HomeView>
                       ),
                       Dimens.space(4),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
+                        width: MediaQuery.of(context).size.width * 0.6,
                         child: PrimaryButton(
                           onTap: () async {
-                            print("Getting location");
-                            _getCurrentLocation();
+                            await geolocator.Geolocator.openLocationSettings();
                           },
-                          text: 'Retry',
+                          text: 'Open System Settings',
                         ),
                       ),
                     ],

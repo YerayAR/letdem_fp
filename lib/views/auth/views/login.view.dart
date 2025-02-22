@@ -53,7 +53,9 @@ class _LoginViewState extends State<LoginView> {
           padding: EdgeInsets.all(Dimens.defaultMargin),
           child: PrimaryButton(
             outline: true,
-            onTap: () {},
+            onTap: () {
+              context.read<AuthBloc>().add(GoogleLoginEvent());
+            },
             color: Colors.white,
             widgetImage: SvgPicture.asset(AppAssets.google),
             textColor: const Color(0xFF344054),

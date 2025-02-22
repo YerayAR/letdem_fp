@@ -21,6 +21,16 @@ class EditBasicInfoEvent extends UserEvent {
   List<Object?> get props => [firstName, lastName];
 }
 
+class IncreaseUserPointEvent extends UserEvent {
+  final int points;
+
+  const IncreaseUserPointEvent({required this.points});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [points];
+}
+
 class UserLoggedOutEvent extends UserEvent {
   @override
   // TODO: implement props

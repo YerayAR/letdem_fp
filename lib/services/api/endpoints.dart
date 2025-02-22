@@ -4,6 +4,7 @@ import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
@@ -112,6 +113,16 @@ class EndPoints {
     method: HTTPMethod.POST,
   );
 
+  static Endpoint<TokenDTO> socialLogin = Endpoint(
+    url: "/auth/social-login",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+  static Endpoint<TokenDTO> socialSignup = Endpoint(
+    url: "/auth/social-signup",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
   static Endpoint getCar = Endpoint(
     url: "/users/me/car",
     method: HTTPMethod.GET,

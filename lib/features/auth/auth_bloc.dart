@@ -5,9 +5,11 @@ import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
+import 'package:letdem/services/google/google.service.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -25,6 +27,44 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _onResendForgotPasswordVerificationCode);
     on<ValidateResetPasswordEvent>(_onValidateResetPassword);
     on<ResetPasswordEvent>(_onResetPassword);
+    on<GoogleLoginEvent>(_onGoogleLoginEvent);
+    on<GoogleRegisterEvent>(_onGoogleRegisterEvent);
+  }
+
+  Future<void> _onGoogleRegisterEvent(
+      GoogleRegisterEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(RegisterLoading());
+      var at = await GoogleAuthService.signInWithGoogle();
+      final Tokens tokens =
+          await authRepository.googleSignup(TokenDTO(token: at!));
+
+      await tokens.write();
+      emit(OTPVerificationSuccess());
+    } on ApiError catch (err) {
+      emit(RegisterError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const RegisterError(error: 'Unable to Register'));
+    }
+  }
+
+  Future<void> _onGoogleLoginEvent(
+      GoogleLoginEvent event, Emitter<AuthState> emit) async {
+    try {
+      emit(LoginLoading());
+      var at = await GoogleAuthService.signInWithGoogle();
+      final Tokens tokens =
+          await authRepository.googleLogin(TokenDTO(token: at!));
+
+      await tokens.write();
+      emit(LoginSuccess());
+    } on ApiError catch (err) {
+      emit(LoginError(error: err.message));
+    } catch (err, sr) {
+      print(sr);
+      emit(const LoginError(error: 'Unable to Login'));
+    }
   }
 
   Future<void> _onResetPassword(

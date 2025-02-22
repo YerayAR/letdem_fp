@@ -15,6 +15,7 @@ import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
+import 'package:letdem/views/auth/views/onboard/basic_info.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 class RegisterView extends StatefulWidget {
@@ -56,7 +57,9 @@ class _RegisterViewState extends State<RegisterView> {
           padding: EdgeInsets.all(Dimens.defaultMargin),
           child: PrimaryButton(
             outline: true,
-            onTap: () {},
+            onTap: () {
+              context.read<AuthBloc>().add(const GoogleRegisterEvent());
+            },
             color: Colors.white,
             widgetImage: SvgPicture.asset(AppAssets.google),
             textColor: const Color(0xFF344054),
@@ -71,6 +74,10 @@ class _RegisterViewState extends State<RegisterView> {
           listener: (context, state) {
             if (state is RegisterError) {
               Toast.showError(state.error);
+              return;
+            }
+            if (state is OTPVerificationSuccess) {
+              NavigatorHelper.to(const BasicInfoView());
               return;
             }
             if (state is ResendVerificationCodeError) {

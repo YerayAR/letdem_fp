@@ -32,7 +32,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
           longitude: event.longitude,
         ),
       );
-      emit(ActivitiesPublished());
+      emit(ActivitiesPublished(
+        totalPointsEarned: 10,
+      ));
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {
@@ -68,7 +70,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
           longitude: event.longitude,
         ),
       );
-      emit(ActivitiesPublished());
+      emit(ActivitiesPublished(totalPointsEarned: 0));
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {

@@ -16,6 +16,23 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<FetchUserInfoEvent>(_onFetchUserInfo);
     on<UserLoggedOutEvent>(_onUserLoggedOut);
     on<EditBasicInfoEvent>(_onEditBasicInfo);
+    on<IncreaseUserPointEvent>(_onIncreaseUserPoint);
+  }
+
+  Future<void> _onIncreaseUserPoint(
+      IncreaseUserPointEvent event, Emitter<UserState> emit) async {
+    try {
+      if (state is UserLoaded) {
+        UserLoaded userLoaded = state as UserLoaded;
+        emit(userLoaded.copyWith(
+          points: userLoaded.points + event.points,
+        ));
+      }
+    } on ApiError catch (err) {
+      emit(UserError(error: err.message, apiError: err));
+    } catch (err) {
+      emit(const UserError(error: "Unable to load user"));
+    }
   }
 
   Future<void> _onEditBasicInfo(
@@ -33,8 +50,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       bool isLocationPermissionGranted = await NavigatorHelper
           .navigatorKey.currentState!.context.hasLocationPermission;
 
+      var user = await userRepository.getUser();
+
       emit(UserLoaded(
-        user: await userRepository.getUser(),
+        user: user,
+        points: user.totalPoints,
         isLocationPermissionGranted: isLocationPermissionGranted,
       ));
     } on ApiError catch (err) {
@@ -58,9 +78,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       LetDemUser user = await userRepository.getUser();
       bool isLocationPermissionGranted = await NavigatorHelper
           .navigatorKey.currentState!.context.hasLocationPermission;
-
       emit(UserLoaded(
-        user: await userRepository.getUser(),
+        points: user.totalPoints,
+        user: user,
         isLocationPermissionGranted: isLocationPermissionGranted,
       ));
     } on ApiError catch (err) {
