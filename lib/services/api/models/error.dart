@@ -7,7 +7,7 @@ enum ErrorStatus {
   forbidden, // 403
   notFound, // 404
   internalServerError, // 500
-  socketError, // 403
+  socketError, 
 
   timeout, // 403
 
