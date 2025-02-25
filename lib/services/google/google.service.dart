@@ -6,6 +6,10 @@ class GoogleAuthService {
 
   static Future<String?> signInWithGoogle() async {
     try {
+      // logout user
+
+      await FirebaseAuth.instance.signOut();
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null; // User canceled sign-in
 

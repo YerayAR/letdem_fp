@@ -31,10 +31,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // block orientation
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
   ]);
 
   runApp(
