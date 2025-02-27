@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
-import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
@@ -12,9 +11,9 @@ import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
+import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
-import 'package:shimmer/shimmer.dart';
 
 import '../../../constants/ui/colors.dart';
 
@@ -203,13 +202,13 @@ class _HomeViewState extends State<HomeView>
         position.longitude,
       );
       // run a code and reset the current position to the new position if the distance is greater than 100 meters
-      if (distanceInMeters > 400) {
+      if (distanceInMeters > 600) {
         _currentPosition =
             mapbox.Position(position.longitude, position.latitude);
         context.read<MapBloc>().add(GetNearbyPlaces(
               queryParams: MapQueryParams(
                 currentPoint: "${position.latitude},${position.longitude}",
-                radius: 8000,
+                radius: 600,
                 drivingMode: false,
                 options: ['spaces', 'events'],
               ),
@@ -217,17 +216,20 @@ class _HomeViewState extends State<HomeView>
       }
 
       debugPrint("Distance in meters: $distanceInMeters");
-      mapboxController.setCamera(
-        mapbox.CameraOptions(
-          center: mapbox.Point(
-            coordinates: mapbox.Position(
-              position.longitude,
-              position.latitude,
+      // only update the camera position if the distance is greater than 100 meters
+      if (distanceInMeters > 100) {
+        mapboxController.setCamera(
+          mapbox.CameraOptions(
+            center: mapbox.Point(
+              coordinates: mapbox.Position(
+                position.longitude,
+                position.latitude,
+              ),
             ),
+            zoom: 15,
           ),
-          zoom: 15,
-        ),
-      );
+        );
+      }
     });
   }
 
@@ -259,10 +261,12 @@ class _HomeViewState extends State<HomeView>
                             mapbox.LocationComponentSettings(
                               enabled: true,
                               pulsingEnabled: true,
-
                               puckBearingEnabled: true,
                               pulsingMaxRadius: 40,
-                              // pulsingColor: 0xffD899FF,
+                              showAccuracyRing: true,
+                              accuracyRingBorderColor: 0xffD899FF,
+                              accuracyRingColor: 0xffD899FF,
+                              pulsingColor: 0xffD899FF,
                             ),
                           );
 
@@ -329,98 +333,4 @@ class _HomeViewState extends State<HomeView>
 
   @override
   bool get wantKeepAlive => true;
-}
-
-class HomePageShimmer extends StatelessWidget {
-  const HomePageShimmer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: AppColors.neutral50,
-        ),
-        Positioned(
-          bottom: 0,
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.all(Dimens.defaultMargin),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 1,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Dimens.space(1),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(45),
-                  child: SizedBox(
-                    height: 60.0,
-                    child: Shimmer.fromColors(
-                      baseColor: Colors.grey[200]!.withOpacity(0.2),
-                      highlightColor: Colors.grey[50]!,
-                      child: Container(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                Dimens.space(6),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(45),
-                        child: SizedBox(
-                          height: 60.0,
-                          child: Shimmer.fromColors(
-                            baseColor: Colors.grey[200]!.withOpacity(0.2),
-                            highlightColor: Colors.grey[50]!,
-                            child: Container(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Dimens.space(1),
-                    Flexible(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(45),
-                        child: SizedBox(
-                          height: 60.0,
-                          child: Shimmer.fromColors(
-                            baseColor: Colors.grey[200]!.withOpacity(0.2),
-                            highlightColor: Colors.grey[50]!,
-                            child: Container(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
