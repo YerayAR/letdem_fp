@@ -4,8 +4,9 @@ import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/features/car/repository/car.repository.dart';
+import 'package:letdem/enums/CarTagType.dart';
 import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/models/car/car.model.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
 
@@ -55,7 +56,7 @@ class RegisteredCarWidget extends StatelessWidget {
                 Row(
                   spacing: 11,
                   children: <Widget>[
-                    Text("${car.registrationNumber}",
+                    Text(car.registrationNumber,
                         style: Typo.largeBody.copyWith(
                           color: AppColors.neutral500,
                           fontWeight: FontWeight.w500,

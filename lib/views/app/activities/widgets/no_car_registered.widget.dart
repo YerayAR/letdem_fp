@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/enums/CarTagType.dart';
 import 'package:letdem/features/car/car_bloc.dart';
-import 'package:letdem/features/car/repository/car.repository.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/models/car/car.model.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
@@ -41,7 +41,7 @@ class NoCarRegisteredWidget extends StatelessWidget {
               Dimens.space(2),
               InkWell(
                 onTap: () {
-                  NavigatorHelper.to(RegisterCarView());
+                  NavigatorHelper.to(const RegisterCarView());
                 },
                 child: Center(
                     child: Text(
@@ -75,29 +75,6 @@ CarTagType fromJsonToTag(String tagType) {
       return CarTagType.none;
     default:
       return CarTagType.zero;
-  }
-}
-
-enum CarTagType {
-  zero,
-  eco,
-  c,
-  b,
-  none,
-}
-
-String geTagTypeIcon(CarTagType type) {
-  switch (type) {
-    case CarTagType.zero:
-      return AppAssets.carTagZero;
-    case CarTagType.eco:
-      return AppAssets.carTagEco;
-    case CarTagType.c:
-      return AppAssets.carTagC;
-    case CarTagType.b:
-      return AppAssets.carTagB;
-    case CarTagType.none:
-      return AppAssets.carTagNone;
   }
 }
 

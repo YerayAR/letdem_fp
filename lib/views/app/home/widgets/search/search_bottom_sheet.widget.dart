@@ -7,9 +7,10 @@ import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/models/location/local_location.model.dart';
 import 'package:letdem/services/mapbox_search/models/cache.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
@@ -119,7 +120,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
             BlocBuilder<SearchLocationBloc, SearchLocationState>(
               builder: (context, state) {
                 if (state is SearchLocationLoading) {
-                  return Column(
+                  return const Column(
                     spacing: 15,
                     children: [
                       LocationBarShimmer(),

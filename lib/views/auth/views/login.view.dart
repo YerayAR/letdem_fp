@@ -29,7 +29,7 @@ class _LoginViewState extends State<LoginView> {
   late TextEditingController _emailCTRL;
   late TextEditingController _passwordCTRL;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -54,7 +54,7 @@ class _LoginViewState extends State<LoginView> {
           child: PrimaryButton(
             outline: true,
             onTap: () {
-              context.read<AuthBloc>().add(GoogleLoginEvent());
+              context.read<AuthBloc>().add(const GoogleLoginEvent());
             },
             color: Colors.white,
             widgetImage: SvgPicture.asset(AppAssets.google),
@@ -70,7 +70,7 @@ class _LoginViewState extends State<LoginView> {
             Toast.showError(state.error);
           }
           if (state is LoginSuccess) {
-            NavigatorHelper.replaceAll(SplashView());
+            NavigatorHelper.replaceAll(const SplashView());
           }
           // TODO: implement listener
         },
@@ -180,7 +180,7 @@ class _LoginViewState extends State<LoginView> {
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   NavigatorHelper.to(
-                                      RequestForgotPasswordView());
+                                      const RequestForgotPasswordView());
                                 },
                             ),
                           ],

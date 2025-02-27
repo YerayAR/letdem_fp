@@ -1,4 +1,4 @@
-import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
 class PostLetDemoLocationDTO extends DTO {

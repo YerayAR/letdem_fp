@@ -1,3 +1,4 @@
+import 'package:letdem/features/map/repository/map.interface.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/api/api.service.dart';
@@ -43,10 +44,4 @@ class MapRepository extends IMapRepository {
     );
     return MapNearbyPayload.fromJson(response.data);
   }
-}
-
-abstract class IMapRepository {
-  Future<MapNearbyPayload> getNearbyPlaces({
-    required MapQueryParams queryParams,
-  });
 }

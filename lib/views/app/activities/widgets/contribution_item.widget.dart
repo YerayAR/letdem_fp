@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/features/activities/repositories/activity.interface..dart';
 import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/views/app/activities/screens/activities.view.dart';
 
 class ContributionItem extends StatelessWidget {
@@ -94,7 +94,7 @@ class ContributionItem extends StatelessWidget {
               DecoratedChip(
                 backgroundColor: AppColors.secondary50,
                 text: '+${activity.points} Pts',
-                padding: EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
                 textStyle: Typo.smallBody.copyWith(
                   color: AppColors.secondary600,
                   fontSize: 11,

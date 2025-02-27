@@ -6,8 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/models/location/local_location.model.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/views/app/home/widgets/search/add_location.widget.dart';
 

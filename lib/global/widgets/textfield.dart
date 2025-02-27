@@ -255,7 +255,7 @@ class TextInputFieldState extends State<TextInputField> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: passwordValid.keys.map((key) {

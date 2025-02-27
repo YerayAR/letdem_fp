@@ -8,7 +8,7 @@ class Toast {
   static void showError(String message) {
     FlashyFlushbar(
       messageStyle: Typo.mediumBody.copyWith(color: Colors.white),
-      leadingWidget: Icon(
+      leadingWidget: const Icon(
         Icons.error_outline,
         color: Colors.white,
         size: 24,
@@ -17,7 +17,7 @@ class Toast {
       animationDuration: const Duration(milliseconds: 500),
       backgroundColor: AppColors.red500,
       trailingWidget: IconButton(
-        icon: Icon(
+        icon: const Icon(
           Icons.close,
           color: Colors.white,
           size: 24,

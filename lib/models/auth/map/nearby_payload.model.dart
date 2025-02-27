@@ -1,4 +1,4 @@
-import 'package:letdem/views/app/home/home.view.dart';
+import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class MapNearbyPayload {

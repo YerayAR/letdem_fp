@@ -281,7 +281,7 @@ class Street extends Equatable {
   List<Object?> get props => [name];
 }
 
-final samplePlace = MapBoxPlace(
+const samplePlace = MapBoxPlace(
   name: "Tower Bridge",
   mapboxId: "abc123",
   featureType: "landmark",

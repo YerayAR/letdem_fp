@@ -27,5 +27,5 @@ class AppColors {
   static Color green50 = const Color(0xffE9FBF2);
   static Color green600 = const Color(0xff1BA864);
 
-  static var green500 = Color(0xff22D27D);
+  static var green500 = const Color(0xff22D27D);
 }

@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:letdem/features/activities/repositories/activity.interface..dart';
+import 'package:letdem/features/activities/dto/publish_event.dto.dart';
+import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
+import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/image/compressor.dart';
 

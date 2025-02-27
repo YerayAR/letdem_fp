@@ -32,7 +32,7 @@ class ProfileView extends StatelessWidget {
             listener: (context, state) {
               if (state is UserLoggedOutState) {
                 NavigatorHelper.popAll();
-                NavigatorHelper.replaceAll(LoginView());
+                NavigatorHelper.replaceAll(const LoginView());
               }
               // TODO: implement listener
             },

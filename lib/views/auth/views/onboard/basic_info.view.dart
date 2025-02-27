@@ -14,7 +14,7 @@ import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/auth/views/permissions/request_permission.view.dart';
 
 class BasicInfoView extends StatefulWidget {
-  const BasicInfoView({Key? key}) : super(key: key);
+  const BasicInfoView({super.key});
 
   @override
   State<BasicInfoView> createState() => _BasicInfoViewState();
@@ -31,7 +31,7 @@ class _BasicInfoViewState extends State<BasicInfoView> {
     super.initState();
   }
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {

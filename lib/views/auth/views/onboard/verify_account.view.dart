@@ -318,12 +318,12 @@ class SuccessDialog extends StatelessWidget {
   final bool isLoading;
 
   const SuccessDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtext,
     this.onProceed,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

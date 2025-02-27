@@ -88,7 +88,7 @@ void main() async {
             carRepository: context.read<CarRepository>(),
           ),
         ),
-      ], child: LetDemApp()),
+      ], child: const LetDemApp()),
     ),
   );
 }

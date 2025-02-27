@@ -28,6 +28,7 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  @override
   void initState() {
     _emailCTRL = TextEditingController();
     _passwordCTRL = TextEditingController();
@@ -93,8 +94,8 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton(
-                              icon: Icon(IconlyLight.arrow_left),
-                              color: Color(0xff445D6F),
+                              icon: const Icon(IconlyLight.arrow_left),
+                              color: const Color(0xff445D6F),
                               onPressed: () {
                                 NavigatorHelper.pop();
                               },
