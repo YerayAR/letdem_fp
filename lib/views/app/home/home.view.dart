@@ -168,7 +168,7 @@ class _HomeViewState extends State<HomeView>
           geometry: mapbox.Point(
               coordinates: mapbox.Position(
                   element.location.point.lng, element.location.point.lat)),
-          iconSize: 1.7,
+          iconSize: 1.3,
           image: _assetsProvider.getImageForType(element.type),
         ),
       );
@@ -180,7 +180,7 @@ class _HomeViewState extends State<HomeView>
           geometry: mapbox.Point(
               coordinates: mapbox.Position(
                   element.location.point.lng, element.location.point.lat)),
-          iconSize: 1.5,
+          iconSize: 1.3,
           image: _assetsProvider.getEventIcon(element.type),
         ),
       );
@@ -202,7 +202,7 @@ class _HomeViewState extends State<HomeView>
         position.longitude,
       );
       // run a code and reset the current position to the new position if the distance is greater than 100 meters
-      if (distanceInMeters > 600) {
+      if (distanceInMeters > 300) {
         _currentPosition =
             mapbox.Position(position.longitude, position.latitude);
         context.read<MapBloc>().add(GetNearbyPlaces(
@@ -215,7 +215,6 @@ class _HomeViewState extends State<HomeView>
             ));
       }
 
-      debugPrint("Distance in meters: $distanceInMeters");
       // only update the camera position if the distance is greater than 100 meters
       if (distanceInMeters > 100) {
         mapboxController.setCamera(
