@@ -5,6 +5,7 @@ import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -76,8 +77,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoading());
 
       LetDemUser user = await userRepository.getUser();
+
+      await OneSignal.Notifications.requestPermission(true);
+      await OneSignal.login(user.id);
+
       bool isLocationPermissionGranted = await NavigatorHelper
           .navigatorKey.currentState!.context.hasLocationPermission;
+
       emit(UserLoaded(
         points: user.totalPoints,
         user: user,

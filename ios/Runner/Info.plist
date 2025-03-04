@@ -14,40 +14,44 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-    <key>ITSAppUsesNonExemptEncryption</key>
-    <false/>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>com.googleusercontent.apps.1030587373633-kcgh55gq0gtnsqd4gnr6tobfq1i8usve</string>
-            </array>
-        </dict>
-    </array>
-
 	<key>CFBundleName</key>
 	<string>letdem</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app requires access to your photo library to allow users to upload parking-related images, such as parking spots and receipts.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>This app requires access to your camera to scan parking tickets, capture parking spots, and take profile photos.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>This app requires access to your microphone to enable voice search for finding nearby parking spots.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1030587373633-kcgh55gq0gtnsqd4gnr6tobfq1i8usve</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to your camera to scan parking tickets, capture parking spots, and take profile photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to help you find nearby parking lots quickly and conveniently.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires access to your microphone to enable voice search for finding nearby parking spots.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to allow users to upload parking-related images, such as parking spots and receipts.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

@@ -1,3 +1,4 @@
+import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
@@ -41,6 +42,7 @@ abstract class IUserRepository {
 }
 
 class LetDemUser {
+  final String id;
   final String email;
   final String firstName;
   final String lastName;
@@ -48,22 +50,30 @@ class LetDemUser {
   final int totalPoints;
   final int notificationsCount;
 
+  final List<Activity> contributions;
+
   LetDemUser({
+    required this.id,
     required this.email,
     required this.firstName,
     required this.lastName,
     required this.isSocial,
     required this.totalPoints,
     required this.notificationsCount,
+    required this.contributions,
   });
 
   factory LetDemUser.fromJSON(Map<String, dynamic> json) {
     return LetDemUser(
+      id: json['id'],
       email: json['email'] ?? '',
       firstName: json['first_name'] ?? '',
       lastName: json['last_name'] ?? '',
       isSocial: json['is_social'] ?? false,
       totalPoints: json['total_points'] ?? 0,
+      contributions: (json['contributions'] as List)
+          .map((e) => Activity.fromJson(e))
+          .toList(),
       notificationsCount: json['notifications_count'] ?? 0,
     );
   }

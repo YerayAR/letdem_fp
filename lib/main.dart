@@ -1,11 +1,12 @@
-import 'dart:convert';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
+import 'package:here_sdk/core.dart';
+import 'package:here_sdk/core.engine.dart';
+import 'package:here_sdk/core.errors.dart';
+import 'package:here_sdk/mapview.dart';
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
@@ -21,14 +22,35 @@ import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'firebase_options.dart';
 
+void _initializeHERESDK() async {
+  // Needs to be called before accessing SDKOptions to load necessary libraries.
+  SdkContext.init(IsolateOrigin.main);
+
+  // Set your credentials for the HERE SDK.
+  String accessKeyId = AppCredentials.hereAccessKeyId;
+  String accessKeySecret = AppCredentials.hereAccessKeySecret;
+  AuthenticationMode authenticationMode =
+      AuthenticationMode.withKeySecret(accessKeyId, accessKeySecret);
+  SDKOptions sdkOptions = SDKOptions.withAuthenticationMode(authenticationMode);
+
+  try {
+    await SDKNativeEngine.makeSharedInstance(sdkOptions);
+  } on InstantiationException {
+    throw Exception("Failed to initialize the HERE SDK.");
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _initializeHERESDK();
   MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
+
+  OneSignal.initialize(AppCredentials.oneSignalAppId);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -119,111 +141,67 @@ class LetDemApp extends StatelessWidget {
       navigatorKey: NavigatorHelper.navigatorKey,
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
-      home: SplashView(),
+      home: MyApp(),
     );
   }
 }
 
-class TrafficRouteLineExample extends StatefulWidget implements Example {
+class MyApp extends StatefulWidget {
   @override
-  final Widget leading = const Icon(Icons.directions);
-  @override
-  final String title = 'Dynamic Route with Traffic';
-  @override
-  final String subtitle = "Shows a dynamic route based on user selection.";
-
-  @override
-  State createState() => TrafficRouteLineExampleState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
-  late MapboxMap mapboxMap;
-  static const String mapboxToken =
-      "YOUR_MAPBOX_ACCESS_TOKEN"; // Replace with your Mapbox token
-  final startPoint = Position(-118.2437, 34.0522); // Los Angeles, CA
-  final endPoint = Position(-122.4194, 37.7749); // San Francisco, CA
-
-  _onMapCreated(MapboxMap mapboxMap) async {
-    this.mapboxMap = mapboxMap;
-  }
-
-  _onStyleLoadedCallback(StyleLoadedEventData data) async {
-    await _fetchAndDisplayRoute();
-  }
-
-  /// Fetch Route from Mapbox API
-  Future<void> _fetchAndDisplayRoute() async {
-    final url =
-        "https://api.mapbox.com/directions/v5/mapbox/driving/${startPoint.lng},${startPoint.lat};${endPoint.lng},${endPoint.lat}?geometries=geojson&access_token=${AppCredentials.mapBoxAccessToken}";
-
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final routeData = jsonDecode(response.body);
-      final routeCoordinates =
-          routeData["routes"][0]["geometry"]["coordinates"] as List;
-
-      final geoJson = {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "geometry": {"type": "LineString", "coordinates": routeCoordinates}
-          }
-        ]
-      };
-
-      await mapboxMap.style.addSource(GeoJsonSource(
-        id: "route-source",
-        data: jsonEncode(geoJson),
-      ));
-
-      await _addRouteLine();
-    } else {
-      print("Error fetching route: ${response.body}");
-    }
-  }
-
-  _addRouteLine() async {
-    await mapboxMap.style.addLayer(LineLayer(
-      id: "route-layer",
-      sourceId: "route-source",
-      lineBorderColor: Colors.black.value,
-      lineWidthExpression: [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        4.0,
-        6.0,
-        16.0,
-        9.0
-      ],
-      lineColorExpression: ['rgb', 255, 0, 0], // Red color for the route
-    ));
-  }
+class _MyAppState extends State<MyApp> {
+  late final AppLifecycleListener _appLifecycleListener;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: _fetchAndDisplayRoute,
-        child: const Icon(Icons.refresh),
-      ),
-      body: MapWidget(
-        key: const ValueKey("mapWidget"),
-        cameraOptions: CameraOptions(
-          center: Point(coordinates: startPoint),
-          zoom: 6.0,
-        ),
-        textureView: true,
-        onMapCreated: _onMapCreated,
-        onStyleLoadedListener: _onStyleLoadedCallback,
-      ),
+    return MaterialApp(
+      title: 'HERE SDK for Flutter - Hello Map!',
+      home: HereMap(onMapCreated: _onMapCreated),
     );
   }
-}
 
-abstract interface class Example extends Widget {
-  Widget get leading;
-  String get title;
-  String? get subtitle;
+  void _onMapCreated(HereMapController hereMapController) {
+    // The camera can be configured before or after a scene is loaded.
+    const double distanceToEarthInMeters = 8000;
+    MapMeasure mapMeasureZoom =
+        MapMeasure(MapMeasureKind.distanceInMeters, distanceToEarthInMeters);
+    hereMapController.camera.lookAtPointWithMeasure(
+        GeoCoordinates(52.530932, 13.384915), mapMeasureZoom);
+
+    // Load the map scene using a map scheme to render the map with.
+    hereMapController.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
+        (error) {
+      if (error != null) {
+        print('Map scene not loaded. MapError: ${error.toString()}');
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _appLifecycleListener = AppLifecycleListener(
+      onDetach: () =>
+          // Sometimes Flutter may not reliably call dispose(),
+          // therefore it is recommended to dispose the HERE SDK
+          // also when the AppLifecycleListener is detached.
+          // See more details: https://github.com/flutter/flutter/issues/40940
+          {print('AppLifecycleListener detached.'), _disposeHERESDK()},
+    );
+  }
+
+  @override
+  void dispose() {
+    _disposeHERESDK();
+    super.dispose();
+  }
+
+  void _disposeHERESDK() async {
+    // Free HERE SDK resources before the application shuts down.
+    await SDKNativeEngine.sharedInstance?.dispose();
+    SdkContext.release();
+    _appLifecycleListener.dispose();
+  }
 }
