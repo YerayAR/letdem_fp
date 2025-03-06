@@ -28,7 +28,9 @@ class MapAssetsProvider {
 
   Future<Uint8List> _loadImage(String path) async {
     ByteData byteData = await rootBundle.load(path);
-    return byteData.buffer.asUint8List();
+    return Uint8List.view(byteData.buffer);
+
+    // return byteData.buffer.asUint8List();
   }
 
   Uint8List getImageForType(PublishSpaceType type) {
@@ -41,6 +43,17 @@ class MapAssetsProvider {
         return blueMarker;
       case PublishSpaceType.disabled:
         return disasterMarker;
+    }
+  }
+
+  String getAssetEvent(EventTypes type) {
+    switch (type) {
+      case EventTypes.accident:
+        return AppAssets.accident;
+      case EventTypes.police:
+        return AppAssets.policeMapMarker;
+      case EventTypes.closeRoad:
+        return AppAssets.closedRoadMapMarker;
     }
   }
 

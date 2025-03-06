@@ -1,21 +1,33 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
-import 'package:letdem/enums/EventTypes.dart';
+import 'package:here_sdk/core.dart';
+import 'package:here_sdk/gestures.dart';
+import 'package:here_sdk/mapview.dart';
+import 'package:iconly/iconly.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/constants/ui/typo.dart';
+// Import your necessary models and services
 import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
+// Import your widgets
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 
-import '../../../constants/ui/colors.dart';
+import '../../../enums/EventTypes.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -26,23 +38,33 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView>
     with AutomaticKeepAliveClientMixin {
-  mapbox.Position? _currentPosition;
+  // Map controller
+  HereMapController? _mapController;
+
+  // Current location
+  GeoCoordinates? _currentPosition;
+
+  // Location and assets loading states
   bool isLocationLoading = false;
-  late mapbox.CameraOptions _cameraPosition;
-  late mapbox.MapboxMap mapboxController;
-  mapbox.PointAnnotationManager? pointAnnotationManager;
+  bool isLoadingAssets = true;
+  bool hasNoPermission = false;
+
+  // Services and providers
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+
+  // Marker tracking
+  MapMarker? _currentLocationMarker;
+  Map<MapMarker, Space> _spaceMarkers = {};
+  Map<MapMarker, Event> _eventMarkers = {};
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
     _loadAssets();
-    setupPositionTracking();
+    _getCurrentLocation();
   }
 
-  bool isLoadingAssets = true;
-
+  // Load map assets
   Future<void> _loadAssets() async {
     await _assetsProvider.loadAssets();
     setState(() {
@@ -50,13 +72,13 @@ class _HomeViewState extends State<HomeView>
     });
   }
 
-  bool hasNoPermission = false;
-
+  // Get current location
   Future<void> _getCurrentLocation() async {
     try {
       setState(() {
         isLocationLoading = true;
       });
+
       bool serviceEnabled =
           await geolocator.Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -65,6 +87,7 @@ class _HomeViewState extends State<HomeView>
 
       geolocator.LocationPermission permission =
           await geolocator.Geolocator.checkPermission();
+
       if (permission == geolocator.LocationPermission.denied ||
           permission == geolocator.LocationPermission.deniedForever) {
         setState(() {
@@ -82,18 +105,8 @@ class _HomeViewState extends State<HomeView>
 
         setState(() {
           isLocationLoading = false;
-
           _currentPosition =
-              mapbox.Position(position.longitude, position.latitude);
-          _cameraPosition = mapbox.CameraOptions(
-            center: mapbox.Point(
-              coordinates:
-                  mapbox.Position(position.longitude, position.latitude),
-            ),
-            zoom: 15,
-            bearing: 0,
-            pitch: 0,
-          );
+              GeoCoordinates(position.latitude, position.longitude);
         });
 
         if (_currentPosition != null) {
@@ -115,219 +128,377 @@ class _HomeViewState extends State<HomeView>
     }
   }
 
-  @override
-  void dispose() {
-    _currentPosition = null;
-    _positionStreamSubscription?.cancel();
+  // Add map markers for spaces and events
+  void _addMapMarkers(List<Space> spaces, List<Event> events) {
+    // Clear existing markers
+    _spaceMarkers.clear();
+    _eventMarkers.clear();
 
-    super.dispose();
-  }
+    // Add space markers
+    for (var space in spaces) {
+      try {
+        Uint8List imageData = _assetsProvider.getImageForType(space.type);
 
-  Uint8List getEventIcon(
-    EventTypes type,
-    Uint8List policeMapMarkerImageData,
-    Uint8List closedRoadMapMarkerImageData,
-    Uint8List accidentMapMarkerImageData,
-  ) {
-    switch (type) {
-      case EventTypes.accident:
-        return accidentMapMarkerImageData;
-      case EventTypes.police:
-        return policeMapMarkerImageData;
-      case EventTypes.closeRoad:
-        return closedRoadMapMarkerImageData;
-    }
-  }
+        MapImage mapImage =
+            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
 
-  Uint8List getImageData(
-    PublishSpaceType type,
-    Uint8List freeMarkerImageData,
-    Uint8List greenMarkerImageData,
-    Uint8List blueMapMarkerImageData,
-    Uint8List disasterMapMarkerImageData,
-  ) {
-    switch (type) {
-      case PublishSpaceType.free:
-        return freeMarkerImageData;
-      case PublishSpaceType.greenZone:
-        return greenMarkerImageData;
-      case PublishSpaceType.blueZone:
-        return blueMapMarkerImageData;
-      case PublishSpaceType.disabled:
-        return disasterMapMarkerImageData;
-    }
-  }
-
-  void _addAnnotations(
-    List<Space> spaces,
-    List<Event> events,
-  ) {
-    for (var element in spaces) {
-      pointAnnotationManager?.create(
-        mapbox.PointAnnotationOptions(
-          geometry: mapbox.Point(
-              coordinates: mapbox.Position(
-                  element.location.point.lng, element.location.point.lat)),
-          iconSize: 1.3,
-          image: _assetsProvider.getImageForType(element.type),
-        ),
-      );
-    }
-
-    for (var element in events) {
-      pointAnnotationManager?.create(
-        mapbox.PointAnnotationOptions(
-          geometry: mapbox.Point(
-              coordinates: mapbox.Position(
-                  element.location.point.lng, element.location.point.lat)),
-          iconSize: 1.3,
-          image: _assetsProvider.getEventIcon(element.type),
-        ),
-      );
-    }
-  }
-
-  StreamSubscription? _positionStreamSubscription;
-
-  setupPositionTracking() async {
-    _positionStreamSubscription?.cancel();
-    _positionStreamSubscription =
-        geolocator.Geolocator.getPositionStream().listen((position) {
-      //     calculate distance between two points
-
-      double distanceInMeters = geolocator.Geolocator.distanceBetween(
-        _currentPosition!.lat.toDouble(),
-        _currentPosition!.lng.toDouble(),
-        position.latitude,
-        position.longitude,
-      );
-      // run a code and reset the current position to the new position if the distance is greater than 100 meters
-      if (distanceInMeters > 300) {
-        _currentPosition =
-            mapbox.Position(position.longitude, position.latitude);
-        context.read<MapBloc>().add(GetNearbyPlaces(
-              queryParams: MapQueryParams(
-                currentPoint: "${position.latitude},${position.longitude}",
-                radius: 600,
-                drivingMode: false,
-                options: ['spaces', 'events'],
-              ),
-            ));
-      }
-
-      // only update the camera position if the distance is greater than 100 meters
-      if (distanceInMeters > 100) {
-        mapboxController.setCamera(
-          mapbox.CameraOptions(
-            center: mapbox.Point(
-              coordinates: mapbox.Position(
-                position.longitude,
-                position.latitude,
-              ),
-            ),
-            zoom: 15,
-          ),
+        final marker = MapMarker(
+          GeoCoordinates(space.location.point.lat, space.location.point.lng),
+          mapImage,
         );
+
+        _mapController?.mapScene.addMapMarker(marker);
+        _spaceMarkers[marker] = space;
+      } catch (e) {
+        print("Error adding space marker: $e");
+      }
+    }
+
+    // Add event markers
+    for (var event in events) {
+      try {
+        Uint8List imageData = _assetsProvider.getEventIcon(event.type);
+
+        MapImage mapImage =
+            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
+
+        final marker = MapMarker(
+          GeoCoordinates(event.location.point.lat, event.location.point.lng),
+          mapImage,
+        );
+
+        _mapController?.mapScene.addMapMarker(marker);
+        _eventMarkers[marker] = event;
+      } catch (e) {
+        print("Error adding event marker: $e");
+      }
+    }
+  }
+
+  void _setTapGestureHandler() {
+    _mapController!.gestures.tapListener = TapListener((Point2D touchPoint) {
+      _pickMapMarker(touchPoint);
+    });
+  }
+
+  void _pickMapMarker(Point2D touchPoint) {
+    Point2D originInPixels = Point2D(touchPoint.x, touchPoint.y);
+    Size2D sizeInPixels = Size2D(1, 1);
+    Rectangle2D rectangle = Rectangle2D(originInPixels, sizeInPixels);
+
+    List<MapSceneMapPickFilterContentType> contentTypesToPickFrom = [
+      MapSceneMapPickFilterContentType.mapItems
+    ];
+
+    MapSceneMapPickFilter filter =
+        MapSceneMapPickFilter(contentTypesToPickFrom);
+    _mapController!.pick(filter, rectangle, (pickMapItemsResult) {
+      if (pickMapItemsResult == null) return;
+
+      PickMapItemsResult? mapItemsResult = pickMapItemsResult.mapItems;
+
+      if (mapItemsResult != null) {
+        List<MapMarker>? mapMarkerList = mapItemsResult.markers;
+
+        if (mapMarkerList.isNotEmpty) {
+          MapMarker topmostMapMarker = mapMarkerList.first;
+
+          // Check if the marker is a space or event
+          if (_spaceMarkers.containsKey(topmostMapMarker)) {
+            Space space = _spaceMarkers[topmostMapMarker]!;
+            showSpacePopup(space: space);
+          } else if (_eventMarkers.containsKey(topmostMapMarker)) {
+            Event event = _eventMarkers[topmostMapMarker]!;
+            showEventPopup(
+              event: event,
+            );
+          }
+        }
       }
     });
+  }
+
+  showEventPopup({
+    required Event event,
+  }) {
+    AppPopup.showDialogSheet(
+      context,
+      Padding(
+        padding: EdgeInsets.all(0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: [
+                Image(
+                  image: AssetImage(
+                    _assetsProvider.getAssetEvent(event.type),
+                  ),
+                  height: 40,
+                ),
+                Dimens.space(1),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          getEventMessage(event.type),
+                          style: Typo.largeBody.copyWith(
+                              fontWeight: FontWeight.w700, fontSize: 18),
+                        ),
+                        Dimens.space(2),
+                        DecoratedChip(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                          text: '${geolocator.Geolocator.distanceBetween(
+                            _currentPosition!.latitude,
+                            _currentPosition!.longitude,
+                            event.location.point.lat,
+                            event.location.point.lng,
+                          ).floor()}m away',
+                          textStyle: Typo.smallBody.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.green600,
+                          ),
+                          icon: Iconsax.clock,
+                          color: AppColors.green500,
+                        )
+                      ],
+                    ),
+                    Text(
+                      event.location.streetName,
+                      style: Typo.largeBody.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.neutral600),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Dimens.space(4),
+            Row(
+              children: <Widget>[
+                Flexible(
+                  child: PrimaryButton(
+                    text: 'Got it, Thank you',
+                  ),
+                ),
+                Dimens.space(0.5),
+                Flexible(
+                  child: PrimaryButton(
+                    outline: true,
+                    text: 'Feedback',
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  showSpacePopup({
+    required Space space,
+  }) {
+    AppPopup.showDialogSheet(
+      context,
+      Padding(
+        padding: EdgeInsets.all(0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(13),
+                      child: Image(
+                        image: NetworkImage(
+                            "https://media.istockphoto.com/id/494465392/photo/empty-car-parking-lot.jpg?s=612x612&w=0&k=20&c=gaMTnWX1EnU-wUUl7uzDp7e5f6Gy9uHd9vFeNeFm6OI="),
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Dimens.space(2),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                getSpaceTypeIcon(space.type),
+                                width: 20,
+                                height: 20,
+                              ),
+                              Dimens.space(1),
+                              Text(
+                                getSpaceAvailabilityMessage(space.type),
+                                style: Typo.largeBody
+                                    .copyWith(fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            space.location.streetName,
+                            style: Typo.largeBody.copyWith(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.neutral600),
+                          ),
+                          Dimens.space(1),
+                          DecoratedChip(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            text: '${geolocator.Geolocator.distanceBetween(
+                              _currentPosition!.latitude,
+                              _currentPosition!.longitude,
+                              space.location.point.lat,
+                              space.location.point.lng,
+                            ).floor()}m away',
+                            textStyle: Typo.smallBody.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.green600,
+                            ),
+                            icon: Iconsax.clock,
+                            color: AppColors.green500,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Dimens.space(2),
+                PrimaryButton(
+                  icon: IconlyBold.location,
+                  text: 'Navigate to Space',
+                  onTap: () {
+                    // Handle navigation action here
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showMarkerPopup({
+    required String title,
+    required String type,
+    required String details,
+    required var location,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Type: $type'),
+              const SizedBox(height: 8),
+              Text('Details: $details'),
+              const SizedBox(height: 8),
+              Text(
+                'Location: Lat ${location.point.lat}, Lng ${location.point.lng}',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('More Details'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Map creation handler
+  void _onMapCreated(HereMapController hereMapController) {
+    _mapController = hereMapController;
+
+    const double distanceToEarthInMeters = 8000;
+    MapMeasure mapMeasureZoom =
+        MapMeasure(MapMeasureKind.distanceInMeters, distanceToEarthInMeters);
+
+    GeoCoordinates targetCoordinates =
+        _currentPosition ?? GeoCoordinates(37.3318, -122.0312);
+
+    hereMapController.camera
+        .lookAtPointWithMeasure(targetCoordinates, mapMeasureZoom);
+
+    _setTapGestureHandler();
+
+    hereMapController.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
+        (error) {
+      if (error != null) {
+        print('Map scene not loaded. MapError: ${error.toString()}');
+      } else {}
+    });
+
+    // Add markers from current state if available
+    final state = context.read<MapBloc>().state;
+    if (state is MapLoaded) {
+      _addMapMarkers(state.payload.spaces, state.payload.events);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return isLocationLoading
+
+    return isLocationLoading || isLoadingAssets
         ? const HomePageShimmer()
         : hasNoPermission
             ? const NoMapPermissionSection()
             : BlocConsumer<MapBloc, MapState>(
-                listener: (context, state) {},
+                listener: (context, state) {
+                  if (state is MapLoaded && _mapController != null) {
+                    _addMapMarkers(state.payload.spaces, state.payload.events);
+                  }
+                },
                 builder: (context, state) {
                   return Stack(
                     alignment: Alignment.topCenter,
                     children: [
-                      mapbox.MapWidget(
-                        key: UniqueKey(),
-                        onMapCreated: (controller) async {
-                          mapboxController = controller;
-
-                          mapboxController.scaleBar.updateSettings(
-                            mapbox.ScaleBarSettings(enabled: false),
-                          );
-                          mapboxController.compass.updateSettings(
-                            mapbox.CompassSettings(enabled: false),
-                          );
-                          mapboxController.location.updateSettings(
-                            mapbox.LocationComponentSettings(
-                              enabled: true,
-                              pulsingEnabled: true,
-                              puckBearingEnabled: true,
-                              pulsingMaxRadius: 40,
-                              showAccuracyRing: true,
-                              accuracyRingBorderColor: 0xffD899FF,
-                              accuracyRingColor: 0xffD899FF,
-                              pulsingColor: 0xffD899FF,
-                            ),
-                          );
-
-                          await mapboxController
-                              .setBounds(mapbox.CameraBoundsOptions(
-                            maxZoom: 18,
-                            minZoom: 12,
-                          ));
-                          pointAnnotationManager = await mapboxController
-                              .annotations
-                              .createPointAnnotationManager();
-
-                          if (mounted && state is MapLoaded) {
-                            _addAnnotations(
-                              (state).payload.spaces,
-                              (state).payload.events,
-                            );
-                          }
-                        },
-                        styleUri: mapbox.MapboxStyles.MAPBOX_STREETS,
-                        cameraOptions: _cameraPosition,
-                      ),
+                      _currentPosition != null
+                          ? HereMap(
+                              key: UniqueKey(),
+                              onMapCreated: _onMapCreated,
+                            )
+                          : const CircularProgressIndicator(),
                       const HomeMapBottomSection(),
-                      // Show a nice chip to show the user's current location
-                      Positioned(
-                        top: 70,
-                        child: state is MapLoading
-                            ? GestureDetector(
-                                child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(1000),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 1,
-                                          blurRadius: 7,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      spacing: 10,
-                                      children: [
-                                        Text(
-                                          "Fetching Nearby Spaces",
-                                          style: TextStyle(
-                                            color: AppColors.primary500,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    )),
-                              )
-                            : const SizedBox(),
-                      ),
                     ],
                   );
                 },
               );
+  }
+
+  @override
+  void dispose() {
+    _mapController = null;
+    super.dispose();
   }
 
   @override

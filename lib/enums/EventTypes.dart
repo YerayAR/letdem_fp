@@ -7,6 +7,19 @@ enum EventTypes {
   accident
 }
 
+String getEventMessage(EventTypes eventType) {
+  switch (eventType) {
+    case EventTypes.police:
+      return 'Police ahead';
+    case EventTypes.closeRoad:
+      return 'Road closed ahead';
+    case EventTypes.accident:
+      return 'Accident ahead';
+    default:
+      return 'Unknown event ahead';
+  }
+}
+
 String eventTypeToString(EventTypes type) {
   switch (type) {
     case EventTypes.police:

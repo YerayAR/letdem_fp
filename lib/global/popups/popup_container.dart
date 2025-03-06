@@ -23,8 +23,8 @@ class PopupContainer extends StatelessWidget {
             padding: bottomSheet
                 ? const EdgeInsets.all(0)
                 : EdgeInsets.all(smallPadding
-                    ? Dimens.defaultMargin / 20
-                    : Dimens.defaultMargin),
+                    ? Dimens.defaultMargin / 15
+                    : Dimens.defaultMargin - 10),
             child: Container(
               padding: bottomSheet
                   ? EdgeInsets.symmetric(

@@ -22,6 +22,7 @@ import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
@@ -141,7 +142,7 @@ class LetDemApp extends StatelessWidget {
       navigatorKey: NavigatorHelper.navigatorKey,
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
-      home: MyApp(),
+      home: SplashView(),
     );
   }
 }

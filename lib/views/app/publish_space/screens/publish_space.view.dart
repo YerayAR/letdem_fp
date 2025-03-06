@@ -41,6 +41,19 @@ String getSpaceTypeText(PublishSpaceType type) {
   }
 }
 
+String getSpaceAvailabilityMessage(PublishSpaceType spaceType) {
+  switch (spaceType) {
+    case PublishSpaceType.free:
+      return 'Free Parking Space';
+    case PublishSpaceType.blueZone:
+      return 'Blue Zone Parking Space';
+    case PublishSpaceType.disabled:
+      return 'Disabled Parking Space';
+    case PublishSpaceType.greenZone:
+      return 'Green Zone Parking Space';
+  }
+}
+
 PublishSpaceType getEnumFromText(String text) {
   switch (text) {
     case 'FREE':
