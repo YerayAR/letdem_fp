@@ -18,6 +18,9 @@ import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart'
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
 
+import 'screens/preferences/preferences.view.dart';
+import 'screens/scheduled_notifications/scheduled_notifications.view.dart';
+
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
 
@@ -131,7 +134,10 @@ class ProfileView extends StatelessWidget {
                             SettingsRow(
                               icon: IconlyLight.time_circle,
                               text: 'Scheduled Notifications',
-                              onTap: () {},
+                              onTap: () {
+                                NavigatorHelper.to(
+                                    ScheduledNotificationsView());
+                              },
                             ),
                             SettingsRow(
                               icon: Iconsax.card,
@@ -166,7 +172,9 @@ class ProfileView extends StatelessWidget {
                               SettingsRow(
                                 icon: IconlyLight.filter,
                                 text: 'Preferences',
-                                onTap: () {},
+                                onTap: () {
+                                  NavigatorHelper.to(PreferencesView());
+                                },
                               ),
                               SettingsRow(
                                 icon: IconlyLight.lock,

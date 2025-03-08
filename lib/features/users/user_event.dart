@@ -22,6 +22,18 @@ class ChangePasswordEvent extends UserEvent {
   List<Object?> get props => [oldPassword, newPassword];
 }
 
+class UpdatePreferencesEvent extends UserEvent {
+  final bool isDarkMode;
+  final bool isNotificationEnabled;
+
+  const UpdatePreferencesEvent(
+      {required this.isDarkMode, required this.isNotificationEnabled});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+}
+
 class EditBasicInfoEvent extends UserEvent {
   final String firstName;
   final String lastName;

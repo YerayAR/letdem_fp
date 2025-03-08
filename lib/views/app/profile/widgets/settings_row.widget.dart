@@ -9,13 +9,16 @@ class SettingsRow extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showDivider;
 
+  final Widget? widget;
+
   final IconData? icon;
   const SettingsRow(
       {super.key,
       required this.text,
       this.onTap,
       this.showDivider = true,
-      this.icon});
+      this.icon,
+      this.widget});
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +49,12 @@ class SettingsRow extends StatelessWidget {
                     ),
                   ],
                 ),
-                Icon(
-                  Iconsax.arrow_right_3,
-                  color: AppColors.neutral300,
+                SizedBox(
+                  child: widget ??
+                      Icon(
+                        Iconsax.arrow_right_3,
+                        color: AppColors.neutral300,
+                      ),
                 ),
               ],
             ),
