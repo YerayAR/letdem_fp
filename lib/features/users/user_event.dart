@@ -10,6 +10,18 @@ class FetchUserInfoEvent extends UserEvent {
   List<Object?> get props => [];
 }
 
+class ChangePasswordEvent extends UserEvent {
+  final String oldPassword;
+  final String newPassword;
+
+  const ChangePasswordEvent(
+      {required this.oldPassword, required this.newPassword});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [oldPassword, newPassword];
+}
+
 class EditBasicInfoEvent extends UserEvent {
   final String firstName;
   final String lastName;
@@ -29,6 +41,11 @@ class IncreaseUserPointEvent extends UserEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [points];
+}
+
+class DeleteAccountEvent extends UserEvent {
+  @override
+  List<Object?> get props => [];
 }
 
 class UserLoggedOutEvent extends UserEvent {

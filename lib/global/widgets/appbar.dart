@@ -6,7 +6,10 @@ class StyledAppBar extends StatelessWidget {
   final String title;
   final IconData icon;
 
-  const StyledAppBar({super.key, required this.title, required this.icon});
+  final VoidCallback? onTap;
+
+  const StyledAppBar(
+      {super.key, required this.title, required this.icon, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +21,15 @@ class StyledAppBar extends StatelessWidget {
             title,
             style: Typo.heading4,
           ),
-          CircleAvatar(
-            radius: 23,
-            backgroundColor: AppColors.neutral50,
-            child: Icon(
-              icon,
-              color: AppColors.neutral500,
+          GestureDetector(
+            onTap: onTap,
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: AppColors.neutral50,
+              child: Icon(
+                icon,
+                color: AppColors.neutral500,
+              ),
             ),
           ),
         ],

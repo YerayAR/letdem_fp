@@ -10,6 +10,9 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/app/activities/screens/view_all.view.dart';
+import 'package:letdem/views/app/notifications/views/notification.view.dart';
+import 'package:letdem/views/app/profile/screens/security/security.view.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
@@ -24,7 +27,10 @@ class ProfileView extends StatelessWidget {
       color: const Color(0xffF5F5F5),
       child: StyledBody(
         children: [
-          const StyledAppBar(
+          StyledAppBar(
+            onTap: () {
+              NavigatorHelper.to(NotificationsView());
+            },
             title: 'Profile',
             icon: Iconsax.notification5,
           ),
@@ -34,10 +40,12 @@ class ProfileView extends StatelessWidget {
                 NavigatorHelper.popAll();
                 NavigatorHelper.replaceAll(const LoginView());
               }
+              if (state is UserInfoChanged) {
+                context.read<UserBloc>().add(FetchUserInfoEvent());
+              }
               // TODO: implement listener
             },
             builder: (context, state) {
-              print(state);
               if (state is UserLoaded) {
                 return Expanded(
                   child: ListView(children: <Widget>[
@@ -109,22 +117,31 @@ class ProfileView extends StatelessWidget {
                       ],
                     ),
                     ProfileSection(
-                      title: "Account Settings",
                       child: [
                         SettingsContainer(
                             child: Column(
                           children: [
                             SettingsRow(
-                              text: 'Basic Information',
-                              onTap: () {},
-                            ),
-                            SettingsRow(
-                              text: 'Change Password',
-                              onTap: () {},
-                            ),
-                            SettingsRow(
-                              showDivider: false,
+                              icon: IconlyLight.star,
                               text: 'Contributions',
+                              onTap: () {
+                                NavigatorHelper.to(ViewAllView());
+                              },
+                            ),
+                            SettingsRow(
+                              icon: IconlyLight.time_circle,
+                              text: 'Scheduled Notifications',
+                              onTap: () {},
+                            ),
+                            SettingsRow(
+                              icon: Iconsax.card,
+                              text: 'Payment methods',
+                              onTap: () {},
+                            ),
+                            SettingsRow(
+                              icon: IconlyLight.wallet,
+                              text: 'Wallet',
+                              showDivider: false,
                               onTap: () {},
                             ),
                           ],
@@ -132,35 +149,32 @@ class ProfileView extends StatelessWidget {
                       ],
                     ),
                     ProfileSection(
-                      title: "Other Settings",
                       child: [
                         SettingsContainer(
                           child: Column(
                             children: [
                               SettingsRow(
+                                icon: IconlyLight.user,
+                                text: 'Basic Information',
+                                onTap: () {},
+                              ),
+                              SettingsRow(
+                                icon: IconlyLight.notification,
                                 text: 'Notifications',
                                 onTap: () {},
                               ),
                               SettingsRow(
+                                icon: IconlyLight.filter,
                                 text: 'Preferences',
                                 onTap: () {},
                               ),
                               SettingsRow(
-                                text: 'About us',
-                                onTap: () {},
-                              ),
-                              SettingsRow(
-                                text: 'Privacy Policy',
-                                onTap: () {},
-                              ),
-                              SettingsRow(
-                                text: 'Terms of use',
-                                onTap: () {},
-                              ),
-                              SettingsRow(
+                                icon: IconlyLight.lock,
+                                text: 'Security',
                                 showDivider: false,
-                                text: 'Help',
-                                onTap: () {},
+                                onTap: () {
+                                  NavigatorHelper.to(SecurityView());
+                                },
                               ),
                             ],
                           ),

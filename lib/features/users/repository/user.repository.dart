@@ -1,3 +1,4 @@
+import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
@@ -32,12 +33,37 @@ class UserRepository extends IUserRepository {
       endpoint: EndPoints.updateUserProfileEndpoint.copyWithDTO(dto),
     );
   }
+
+  @override
+  Future changePassword(String oldPassword, String newPassword) async {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.changePassword.copyWithDTO(
+        ChangePasswordDTO(
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        ),
+      ),
+    );
+  }
+
+  @override
+  deleteAccount() async {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.deleteAccountEndpoint,
+    );
+  }
 }
 
 abstract class IUserRepository {
   Future<void> createUser();
   Future<void> deleteUser();
+
+  Future deleteAccount();
+
   Future<LetDemUser> getUser();
+
+  Future changePassword(String oldPassword, String newPassword);
+
   Future<void> updateUser(EditBasicInfoDTO dto);
 }
 

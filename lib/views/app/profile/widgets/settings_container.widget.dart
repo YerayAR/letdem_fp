@@ -14,7 +14,7 @@ class SettingsContainer extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
-          vertical: 25,
+          vertical: 20,
           horizontal: 25,
         ),
         decoration: BoxDecoration(

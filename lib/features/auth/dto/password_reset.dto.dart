@@ -17,3 +17,21 @@ class ResetPasswordDTO extends DTO {
     };
   }
 }
+
+class ChangePasswordDTO extends DTO {
+  final String oldPassword;
+  final String newPassword;
+
+  ChangePasswordDTO({
+    required this.oldPassword,
+    required this.newPassword,
+  });
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'current_password': oldPassword,
+      'new_password': newPassword,
+    };
+  }
+}

@@ -7,6 +7,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
@@ -54,6 +55,8 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                         options: ['spaces', 'events'],
                       ),
                     ));
+                context.read<UserBloc>().add(FetchUserInfoEvent());
+
                 Navigator.of(context).pop();
                 AppPopup.showDialogSheet(
                   context,

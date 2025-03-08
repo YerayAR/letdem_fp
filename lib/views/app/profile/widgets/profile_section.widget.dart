@@ -7,6 +7,8 @@ class ProfileSection extends StatelessWidget {
   final List<Widget> child;
   final String? title;
 
+  final void Function()? onCallToAction;
+
   final EdgeInsetsGeometry? padding;
 
   final String? callToAction;
@@ -16,6 +18,7 @@ class ProfileSection extends StatelessWidget {
     this.title,
     this.callToAction,
     this.padding,
+    this.onCallToAction,
   });
 
   @override
@@ -37,12 +40,15 @@ class ProfileSection extends StatelessWidget {
                           Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
                     ),
                     if (callToAction != null)
-                      Text(
-                        callToAction!,
-                        style: Typo.mediumBody.copyWith(
-                          color: AppColors.primary400,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
+                      GestureDetector(
+                        onTap: onCallToAction,
+                        child: Text(
+                          callToAction!,
+                          style: Typo.mediumBody.copyWith(
+                            color: AppColors.primary400,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                   ],

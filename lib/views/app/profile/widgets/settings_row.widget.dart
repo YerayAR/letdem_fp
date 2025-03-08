@@ -8,8 +8,14 @@ class SettingsRow extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
   final bool showDivider;
+
+  final IconData? icon;
   const SettingsRow(
-      {super.key, required this.text, this.onTap, this.showDivider = true});
+      {super.key,
+      required this.text,
+      this.onTap,
+      this.showDivider = true,
+      this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +24,27 @@ class SettingsRow extends StatelessWidget {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  text,
-                  style: Typo.mediumBody.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.neutral600,
-                  ),
+                Row(
+                  spacing: 12,
+                  children: [
+                    if (icon != null)
+                      Icon(
+                        icon,
+                        color: AppColors.neutral600,
+                      ),
+                    Text(
+                      text,
+                      style: Typo.mediumBody.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.neutral600,
+                      ),
+                    ),
+                  ],
                 ),
                 Icon(
                   Iconsax.arrow_right_3,

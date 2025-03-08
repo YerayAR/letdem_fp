@@ -221,10 +221,10 @@ class _HomeViewState extends State<HomeView>
   showEventPopup({
     required Event event,
   }) {
-    AppPopup.showDialogSheet(
+    AppPopup.showBottomSheet(
       context,
       Padding(
-        padding: EdgeInsets.all(0),
+        padding: EdgeInsets.all(Dimens.defaultMargin + 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -286,10 +286,13 @@ class _HomeViewState extends State<HomeView>
                     text: 'Got it, Thank you',
                   ),
                 ),
-                Dimens.space(0.5),
+                Dimens.space(1),
                 Flexible(
                   child: PrimaryButton(
                     outline: true,
+                    background: AppColors.primary50,
+                    borderColor: Colors.transparent,
+                    color: AppColors.primary500,
                     text: 'Feedback',
                   ),
                 )
@@ -304,10 +307,10 @@ class _HomeViewState extends State<HomeView>
   showSpacePopup({
     required Space space,
   }) {
-    AppPopup.showDialogSheet(
+    AppPopup.showBottomSheet(
       context,
       Padding(
-        padding: EdgeInsets.all(0),
+        padding: EdgeInsets.all(Dimens.defaultMargin + 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -319,8 +322,7 @@ class _HomeViewState extends State<HomeView>
                     ClipRRect(
                       borderRadius: BorderRadius.circular(13),
                       child: Image(
-                        image: NetworkImage(
-                            "https://media.istockphoto.com/id/494465392/photo/empty-car-parking-lot.jpg?s=612x612&w=0&k=20&c=gaMTnWX1EnU-wUUl7uzDp7e5f6Gy9uHd9vFeNeFm6OI="),
+                        image: NetworkImage(space.image),
                         height: 100,
                         width: 100,
                         fit: BoxFit.cover,

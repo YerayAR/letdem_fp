@@ -5,6 +5,7 @@ import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 part 'user_event.dart';
@@ -18,6 +19,54 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<UserLoggedOutEvent>(_onUserLoggedOut);
     on<EditBasicInfoEvent>(_onEditBasicInfo);
     on<IncreaseUserPointEvent>(_onIncreaseUserPoint);
+    on<ChangePasswordEvent>(_onChangePassword);
+    on<DeleteAccountEvent>(_onDeleteAccount);
+  }
+
+  Future<void> _onDeleteAccount(
+      DeleteAccountEvent event, Emitter<UserState> emit) async {
+    try {
+      emit(UserLoading());
+      await userRepository.deleteAccount();
+      await Tokens.delete();
+      emit(UserLoggedOutState());
+    } on ApiError catch (err) {
+      emit(UserError(error: err.message, apiError: err));
+    } catch (err) {
+      emit(const UserError(error: "Unable to delete account"));
+    }
+  }
+
+  Future<void> _onChangePassword(
+      ChangePasswordEvent event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      UserLoaded userLoaded = state as UserLoaded;
+
+      try {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: true,
+        ));
+        await userRepository.changePassword(
+          event.oldPassword,
+          event.newPassword,
+        );
+
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        emit(UserInfoChanged());
+      } on ApiError catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError(err.message);
+      } catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError("Unable to change password");
+      }
+    }
   }
 
   Future<void> _onIncreaseUserPoint(

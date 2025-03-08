@@ -317,9 +317,12 @@ class SuccessDialog extends StatelessWidget {
   final VoidCallback? onProceed;
   final bool isLoading;
 
+  final String? buttonText;
+
   const SuccessDialog({
     super.key,
     required this.title,
+    this.buttonText,
     required this.subtext,
     this.onProceed,
     this.isLoading = false,
@@ -357,7 +360,7 @@ class SuccessDialog extends StatelessWidget {
         PrimaryButton(
           isLoading: isLoading,
           onTap: onProceed,
-          text: 'Proceed',
+          text: buttonText ?? 'Proceed',
         ),
       ],
     );

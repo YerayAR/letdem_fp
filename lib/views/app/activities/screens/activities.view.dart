@@ -6,10 +6,13 @@ import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart'; // Ensure these imports are correct
+import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/app/activities/screens/view_all.view.dart';
 import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dart';
 import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
 import 'package:letdem/views/app/activities/widgets/no_contribution.widget.dart';
 import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
+import 'package:letdem/views/app/notifications/views/notification.view.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 
 enum ContributionType {
@@ -42,8 +45,11 @@ class _ActivitiesViewState extends State<ActivitiesView> {
           return StyledBody(
             isBottomPadding: false,
             children: [
-              const StyledAppBar(
+              StyledAppBar(
                 title: 'Activities',
+                onTap: () {
+                  NavigatorHelper.to(NotificationsView());
+                },
                 icon: Iconsax.notification5,
               ),
 
@@ -74,6 +80,9 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               //   child: [
               Expanded(
                 child: ProfileSection(
+                  onCallToAction: () {
+                    NavigatorHelper.to(ViewAllView());
+                  },
                   padding:
                       state is ActivitiesLoaded && state.activities.isNotEmpty
                           ? const EdgeInsets.only(top: 20)
@@ -109,14 +118,16 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                                   ),
                           ),
                           child: Center(
-                            child: context.userProfile!.contributions.isEmpty
+                            child: context.userProfile != null &&
+                                    context.userProfile!.contributions.isEmpty
                                 ? const NoContributionsWidget()
                                 : ListView(
                                     // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     // crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      for (var activity
-                                          in context.userProfile!.contributions)
+                                      for (var activity in context
+                                              .userProfile?.contributions ??
+                                          [])
                                         ContributionItem(
                                           showDivider: context
                                                   .userProfile!.contributions

@@ -12,6 +12,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
@@ -130,6 +131,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                         options: ['spaces', 'events'],
                       ),
                     ));
+
+                context.read<UserBloc>().add(FetchUserInfoEvent());
 
                 AppPopup.showDialogSheet(
                   context,

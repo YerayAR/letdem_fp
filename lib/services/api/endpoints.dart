@@ -141,4 +141,17 @@ class EndPoints {
     url: "/maps/nearby",
     method: HTTPMethod.GET,
   );
+
+//   reset password
+  static Endpoint<ChangePasswordDTO> changePassword = Endpoint(
+    url: "/users/me/change-password",
+    method: HTTPMethod.PUT,
+    isProtected: true,
+  );
+
+  static Endpoint deleteAccountEndpoint = Endpoint(
+    url: "/users/me/delete-account",
+    method: HTTPMethod.DELETE,
+    isProtected: true,
+  );
 }

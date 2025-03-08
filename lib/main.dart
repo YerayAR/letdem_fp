@@ -127,7 +127,9 @@ class LetDemApp extends StatelessWidget {
     return MaterialApp(
       builder: FlashyFlushbarProvider.init(),
       theme: ThemeData(
+
         appBarTheme: AppBarTheme(
+
           backgroundColor: Colors.white,
           titleTextStyle: TextStyle(
             color: AppColors.neutral600,
@@ -136,7 +138,7 @@ class LetDemApp extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: AppColors.scaffoldColor,
         fontFamily: 'DMSans',
       ),
       navigatorKey: NavigatorHelper.navigatorKey,
