@@ -167,7 +167,9 @@ class ProfileView extends StatelessWidget {
                               SettingsRow(
                                 icon: IconlyLight.notification,
                                 text: 'Notifications',
-                                onTap: () {},
+                                onTap: () {
+                                  NavigatorHelper.to(NotificationsView());
+                                },
                               ),
                               SettingsRow(
                                 icon: IconlyLight.filter,

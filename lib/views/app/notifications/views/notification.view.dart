@@ -45,6 +45,7 @@ class _NotificationsViewState extends State<NotificationsView> {
             icon: Iconsax.notification5,
           ),
           FilterTabs<NotificationType>(
+            isExapnded: true,
             values: NotificationType.values,
             getName: (type) => type.name,
             initialValue: viewAllType,

@@ -252,9 +252,12 @@ class FilterTabs<T extends Enum> extends StatefulWidget {
   /// Animation duration
   final Duration animationDuration;
 
+  final bool isExapnded;
+
   const FilterTabs({
     super.key,
     required this.values,
+    this.isExapnded = false,
     required this.getName,
     required this.initialValue,
     required this.onSelected,
@@ -291,7 +294,7 @@ class _FilterTabsState<T extends Enum> extends State<FilterTabs<T>> {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
         color: widget.backgroundColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(1000),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -303,8 +306,9 @@ class _FilterTabsState<T extends Enum> extends State<FilterTabs<T>> {
   Widget _buildTabItem(T value) {
     final isSelected = _selectedValue == value;
 
-    return Expanded(
-      child: GestureDetector(
+    if (widget.isExapnded) {
+      return Expanded(
+          child: GestureDetector(
         onTap: () => _onTabSelected(value),
         child: AnimatedContainer(
           duration: widget.animationDuration,
@@ -326,6 +330,33 @@ class _FilterTabsState<T extends Enum> extends State<FilterTabs<T>> {
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
+            ),
+          ),
+        ),
+      ));
+    }
+
+    return GestureDetector(
+      onTap: () => _onTabSelected(value),
+      child: AnimatedContainer(
+        duration: widget.animationDuration,
+        decoration: BoxDecoration(
+          color: isSelected ? widget.selectedColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 11,
+          horizontal: 25,
+        ),
+        child: Center(
+          child: Text(
+            widget.getName(value),
+            style: TextStyle(
+              color: isSelected
+                  ? widget.selectedTextColor
+                  : widget.unselectedTextColor,
+              fontSize: 14,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
           ),
         ),

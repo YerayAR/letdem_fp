@@ -21,6 +21,38 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<IncreaseUserPointEvent>(_onIncreaseUserPoint);
     on<ChangePasswordEvent>(_onChangePassword);
     on<DeleteAccountEvent>(_onDeleteAccount);
+    on<UpdatePreferencesEvent>(_onUpdatePreferences);
+  }
+
+  Future<void> _onUpdatePreferences(
+      UpdatePreferencesEvent event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      UserLoaded userLoaded = state as UserLoaded;
+
+      try {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: true,
+        ));
+        await userRepository.updatePreferencesEndpoint(
+          PreferencesDTO(preferences: event.preferences),
+        );
+
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        emit(const UserInfoChanged());
+      } on ApiError catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError(err.message);
+      } catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError("Unable to update preferences");
+      }
+    }
   }
 
   Future<void> _onDeleteAccount(

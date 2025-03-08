@@ -154,4 +154,9 @@ class EndPoints {
     method: HTTPMethod.DELETE,
     isProtected: true,
   );
+
+  static Endpoint<PreferencesDTO> updatePreferencesEndpoint = Endpoint(
+    url: "/users/me/preferences",
+    method: HTTPMethod.PUT,
+  );
 }

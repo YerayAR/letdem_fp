@@ -4,6 +4,7 @@ import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
+import 'package:letdem/views/app/profile/screens/preferences/preferences.view.dart';
 
 class UserRepository extends IUserRepository {
   @override
@@ -52,11 +53,20 @@ class UserRepository extends IUserRepository {
       endpoint: EndPoints.deleteAccountEndpoint,
     );
   }
+
+  @override
+  Future updatePreferencesEndpoint(PreferencesDTO dto) {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.updatePreferencesEndpoint.copyWithDTO(dto),
+    );
+  }
 }
 
 abstract class IUserRepository {
   Future<void> createUser();
   Future<void> deleteUser();
+
+  Future updatePreferencesEndpoint(PreferencesDTO dto);
 
   Future deleteAccount();
 
@@ -78,9 +88,12 @@ class LetDemUser {
 
   final List<Activity> contributions;
 
+  final UserPreferences preferences;
+
   LetDemUser({
     required this.id,
     required this.email,
+    required this.preferences,
     required this.firstName,
     required this.lastName,
     required this.isSocial,
@@ -94,6 +107,18 @@ class LetDemUser {
       id: json['id'],
       email: json['email'] ?? '',
       firstName: json['first_name'] ?? '',
+      preferences: UserPreferences(
+        isProhibitedZoneAlert: json['alerts_preferences']
+            ['prohibited_zone_alert'],
+        isSpeedLimitAlert: json['alerts_preferences']['speed_limit_alert'],
+        isFatigueAlert: json['alerts_preferences']['fatigue_alert'],
+        isPoliceAlert: json['alerts_preferences']['police_alert'],
+        isAvailableSpaces: json['alerts_preferences']['available_spaces'],
+        isRadarAlerts: json['alerts_preferences']['radar_alert'],
+        isCameraAlerts: json['alerts_preferences']['camera_alert'],
+        isAccidentAlert: json['alerts_preferences']['accident_alert'],
+        isRoadClosedAlert: json['alerts_preferences']['road_closed_alert'],
+      ),
       lastName: json['last_name'] ?? '',
       isSocial: json['is_social'] ?? false,
       totalPoints: json['total_points'] ?? 0,
@@ -130,6 +155,25 @@ class EditBasicInfoDTO extends DTO {
     return {
       'first_name': firstName,
       'last_name': lastName,
+    };
+  }
+}
+
+class PreferencesDTO extends DTO {
+  final List<Map<String, bool>> preferences;
+
+  PreferencesDTO({
+    required this.preferences,
+  });
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'alerts': {
+        for (var preference in preferences) ...{
+          preference.keys.first: preference.values.first,
+        }
+      }
     };
   }
 }
