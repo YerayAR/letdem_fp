@@ -13,7 +13,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-// Import your necessary models and services
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
@@ -22,7 +21,6 @@ import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
-// Import your widgets
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
@@ -40,21 +38,16 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView>
     with AutomaticKeepAliveClientMixin {
-  // Map controller
   HereMapController? _mapController;
 
-  // Current location
   GeoCoordinates? _currentPosition;
 
-  // Location and assets loading states
   bool isLocationLoading = false;
   bool isLoadingAssets = true;
   bool hasNoPermission = false;
 
-  // Services and providers
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
-  // Marker tracking
   MapMarker? _currentLocationMarker;
   Map<MapMarker, Space> _spaceMarkers = {};
   Map<MapMarker, Event> _eventMarkers = {};
@@ -66,7 +59,6 @@ class _HomeViewState extends State<HomeView>
     _getCurrentLocation();
   }
 
-  // Load map assets
   Future<void> _loadAssets() async {
     await _assetsProvider.loadAssets();
     setState(() {
@@ -74,7 +66,6 @@ class _HomeViewState extends State<HomeView>
     });
   }
 
-  // Get current location
   Future<void> _getCurrentLocation() async {
     try {
       setState(() {
@@ -130,13 +121,10 @@ class _HomeViewState extends State<HomeView>
     }
   }
 
-  // Add map markers for spaces and events
   void _addMapMarkers(List<Space> spaces, List<Event> events) {
-    // Clear existing markers
     _spaceMarkers.clear();
     _eventMarkers.clear();
 
-    // Add space markers
     for (var space in spaces) {
       try {
         Uint8List imageData = _assetsProvider.getImageForType(space.type);
@@ -156,7 +144,6 @@ class _HomeViewState extends State<HomeView>
       }
     }
 
-    // Add event markers
     for (var event in events) {
       try {
         Uint8List imageData = _assetsProvider.getEventIcon(event.type);
@@ -205,7 +192,6 @@ class _HomeViewState extends State<HomeView>
         if (mapMarkerList.isNotEmpty) {
           MapMarker topmostMapMarker = mapMarkerList.first;
 
-          // Check if the marker is a space or event
           if (_spaceMarkers.containsKey(topmostMapMarker)) {
             Space space = _spaceMarkers[topmostMapMarker]!;
             showSpacePopup(space: space);
@@ -387,7 +373,6 @@ class _HomeViewState extends State<HomeView>
                     NavigatorHelper.to(TrafficRouteLineExample(
                         lat: space.location.point.lat,
                         lng: space.location.point.lng));
-                    // Handle navigation action here
                   },
                 ),
               ],
@@ -441,7 +426,6 @@ class _HomeViewState extends State<HomeView>
     );
   }
 
-  // Map creation handler
   void _onMapCreated(HereMapController hereMapController) {
     _mapController = hereMapController;
 
@@ -464,7 +448,6 @@ class _HomeViewState extends State<HomeView>
       } else {}
     });
 
-    // Add markers from current state if available
     final state = context.read<MapBloc>().state;
     if (state is MapLoaded) {
       _addMapMarkers(state.payload.spaces, state.payload.events);

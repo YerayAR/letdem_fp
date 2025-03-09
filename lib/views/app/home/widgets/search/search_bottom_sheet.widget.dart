@@ -349,7 +349,20 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                               locationType:
                                                   LetDemLocationType.other,
                                               onPlaceSelected:
-                                                  (MapBoxPlace p) {},
+                                                  (MapBoxPlace p) async {
+                                                MapboxService.getLatLng(
+                                                        p.fullAddress)
+                                                    .then((value) {
+                                                  print(value!.latitude);
+                                                  print(value.longitude);
+                                                  NavigatorHelper.to(
+                                                    TrafficRouteLineExample(
+                                                      lat: value.latitude,
+                                                      lng: value.longitude,
+                                                    ),
+                                                  );
+                                                });
+                                              },
                                               onMapBoxPlaceDeleted:
                                                   (MapBoxPlace place) {
                                                 context

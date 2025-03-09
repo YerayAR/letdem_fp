@@ -97,35 +97,61 @@ class _PreferencesViewState extends State<PreferencesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StyledBody(
+      body: ListView(
         children: [
-          StyledAppBar(
-            title: 'Preferences',
-            onTap: () {
-              NavigatorHelper.pop();
-            },
-            icon: Icons.close,
-          ),
-          Dimens.space(3),
-          SettingsContainer(
-            child: Column(
-              children: preferences.map((preference) {
-                return SettingsRow(
-                  showDivider:
-                      preferences.indexOf(preference) != preferences.length - 1,
-                  widget: ToggleSwitch(
-                    value: preference['value'],
-                    onChanged: (value) {
-                      setState(() {
-                        preference['value'] = value;
-                      });
-                      submit();
-                    },
+          StyledBody(
+            children: [
+              StyledAppBar(
+                title: 'Preferences',
+                onTap: () {
+                  NavigatorHelper.pop();
+                },
+                icon: Icons.close,
+              ),
+              Dimens.space(3),
+              SettingsContainer(
+                title: 'Notifications',
+                child: Column(children: [
+                  SettingsRow(
+                    widget: ToggleSwitch(
+                      value: true,
+                      onChanged: (value) {},
+                    ),
+                    text: 'Alerts',
                   ),
-                  text: preference['title'],
-                );
-              }).toList(),
-            ),
+                  SettingsRow(
+                    showDivider: false,
+                    widget: ToggleSwitch(
+                      value: true,
+                      onChanged: (value) {},
+                    ),
+                    text: 'Push Notifications',
+                  ),
+                ]),
+              ),
+              Dimens.space(5),
+              SettingsContainer(
+                title: 'Alerts',
+                child: Column(
+                  children: preferences.map((preference) {
+                    return SettingsRow(
+                      showDivider: preferences.indexOf(preference) !=
+                          preferences.length - 1,
+                      widget: ToggleSwitch(
+                        value: preference['value'],
+                        onChanged: (value) {
+                          setState(() {
+                            preference['value'] = value;
+                          });
+                          submit();
+                        },
+                      ),
+                      text: preference['title'],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
           ),
         ],
       ),
