@@ -6,9 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class NoContributionsWidget extends StatelessWidget {
@@ -56,20 +54,6 @@ class NoContributionsWidget extends StatelessWidget {
           ),
         ),
         Dimens.space(1),
-        GestureDetector(
-          onTap: () {
-            AppPopup.showBottomSheet(context, const AddEventBottomSheet());
-          },
-          child: Center(
-              child: Text(
-            "Publish an event",
-            style: Typo.mediumBody.copyWith(
-              color: AppColors.primary400,
-              fontWeight: FontWeight.w500,
-              decoration: TextDecoration.underline,
-            ),
-          )),
-        ),
         const Spacer(),
       ],
     );

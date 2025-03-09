@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
@@ -195,14 +196,15 @@ class ProfileView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              IconlyBold.logout,
-                              color: AppColors.red500,
+                              CupertinoIcons.power,
+                              color: AppColors.primary500,
+                              size: 23,
                             ),
                             Dimens.space(1),
                             Text(
                               'Log out',
                               style: Typo.largeBody.copyWith(
-                                color: AppColors.red500,
+                                color: AppColors.primary500,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
