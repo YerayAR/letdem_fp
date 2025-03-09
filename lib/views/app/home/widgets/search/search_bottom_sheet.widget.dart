@@ -10,10 +10,13 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/main.dart';
 import 'package:letdem/models/location/local_location.model.dart';
+import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/mapbox_search/models/cache.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
+import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -141,8 +144,16 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                         onLetDemLocationDeleted:
                                             (LetDemLocation location) {},
                                         place: e,
-                                        onPlaceSelected: (MapBoxPlace p) {
+                                        onPlaceSelected: (MapBoxPlace p) async {
                                           DatabaseHelper().savePlace(p);
+
+                                          var c = await MapboxService.getLatLng(
+                                              p.fullAddress);
+                                          NavigatorHelper.to(
+                                              TrafficRouteLineExample(
+                                            lat: c!.latitude,
+                                            lng: c.longitude,
+                                          ));
                                         },
                                       ))
                                   .toList()

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/services/res/navigator.dart';
@@ -42,8 +43,9 @@ class _NotificationsViewState extends State<NotificationsView> {
             onTap: () {
               NavigatorHelper.pop();
             },
-            icon: Iconsax.notification5,
+            icon: Icons.close,
           ),
+          Dimens.space(3),
           FilterTabs<NotificationType>(
             isExapnded: true,
             values: NotificationType.values,

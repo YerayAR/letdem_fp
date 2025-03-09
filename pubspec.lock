@@ -695,6 +695,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.1"
+  mapbox_polyline_points:
+    dependency: "direct main"
+    description:
+      name: mapbox_polyline_points
+      sha256: "7b31496394fbd38658eaefc73517d222fe4f786d686ea5e62f634c225996d524"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
   mapbox_search:
     dependency: "direct main"
     description:

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
@@ -31,18 +32,22 @@ class SecurityView extends StatelessWidget {
           ),
           ProfileSection(
             child: [
-              SettingsContainer(
-                child: Column(
-                  children: [
-                    SettingsRow(
-                      text: 'Change Password',
-                      onTap: () {
-                        NavigatorHelper.to(ChangePasswordView());
-                      },
-                      showDivider: false,
-                    ),
-                  ],
-                ),
+              SizedBox(
+                child: context.userProfile!.isSocial
+                    ? null
+                    : SettingsContainer(
+                        child: Column(
+                          children: [
+                            SettingsRow(
+                              text: 'Change Password',
+                              onTap: () {
+                                NavigatorHelper.to(ChangePasswordView());
+                              },
+                              showDivider: false,
+                            ),
+                          ],
+                        ),
+                      ),
               ),
               Dimens.space(2),
               BlocConsumer<UserBloc, UserState>(

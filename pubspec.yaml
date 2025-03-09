@@ -62,6 +62,7 @@ dependencies:
   onesignal_flutter: ^5.3.0
   here_sdk:
     path: plugins/here_sdk
+  mapbox_polyline_points: ^0.0.6
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -159,4 +159,16 @@ class EndPoints {
     url: "/users/me/preferences",
     method: HTTPMethod.PUT,
   );
+
+  static Endpoint getScheduleNotification = Endpoint(
+    url: "/users/me/scheduled-notifications?page_size=3&page=1",
+    method: HTTPMethod.GET,
+  );
+
+  static Endpoint deleteScheduleNotification(String id) {
+    return Endpoint(
+      url: "/users/me/scheduled-notifications/$id",
+      method: HTTPMethod.DELETE,
+    );
+  }
 }

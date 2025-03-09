@@ -21,6 +21,7 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
+import 'package:letdem/services/res/navigator.dart';
 // Import your widgets
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
@@ -28,6 +29,7 @@ import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.wi
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 import '../../../enums/EventTypes.dart';
+import '../../../main.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -382,6 +384,9 @@ class _HomeViewState extends State<HomeView>
                   icon: IconlyBold.location,
                   text: 'Navigate to Space',
                   onTap: () {
+                    NavigatorHelper.to(TrafficRouteLineExample(
+                        lat: space.location.point.lat,
+                        lng: space.location.point.lng));
                     // Handle navigation action here
                   },
                 ),

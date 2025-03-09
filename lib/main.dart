@@ -1,14 +1,21 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/core.engine.dart';
 import 'package:here_sdk/core.errors.dart';
 import 'package:here_sdk/mapview.dart';
+// http
+import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
@@ -17,12 +24,21 @@ import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
+import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
+import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/models/auth/map/map_options.model.dart';
+import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
+import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
+import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:letdem/views/welcome/views/splash.view.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
@@ -82,11 +98,20 @@ void main() async {
         RepositoryProvider(
           create: (_) => MapRepository(),
         ),
+        RepositoryProvider(
+          create: (_) => ScheduleNotificationsRepository(),
+        ),
       ],
       child: MultiBlocProvider(providers: [
         BlocProvider(
           create: (context) => MapBloc(
             mapRepository: context.read<MapRepository>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => ScheduleNotificationsBloc(
+            scheduleNotificationsRepository:
+                context.read<ScheduleNotificationsRepository>(),
           ),
         ),
         BlocProvider<AuthBloc>(
@@ -125,27 +150,24 @@ class LetDemApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      builder: FlashyFlushbarProvider.init(),
-      theme: ThemeData(
-
-        appBarTheme: AppBarTheme(
-
-          backgroundColor: Colors.white,
-          titleTextStyle: TextStyle(
-            color: AppColors.neutral600,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
+        builder: FlashyFlushbarProvider.init(),
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.white,
+            titleTextStyle: TextStyle(
+              color: AppColors.neutral600,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
+          scaffoldBackgroundColor: AppColors.scaffoldColor,
+          fontFamily: 'DMSans',
         ),
-        scaffoldBackgroundColor: AppColors.scaffoldColor,
-        fontFamily: 'DMSans',
-      ),
-      navigatorKey: NavigatorHelper.navigatorKey,
-      debugShowCheckedModeBanner: false,
-      debugShowMaterialGrid: false,
-      home: SplashView(),
-    );
+        navigatorKey: NavigatorHelper.navigatorKey,
+        debugShowCheckedModeBanner: false,
+        debugShowMaterialGrid: false,
+        home: SplashView());
   }
 }
 
@@ -206,5 +228,616 @@ class _MyAppState extends State<MyApp> {
     await SDKNativeEngine.sharedInstance?.dispose();
     SdkContext.release();
     _appLifecycleListener.dispose();
+  }
+}
+
+class PolyMapView extends StatefulWidget {
+  const PolyMapView({super.key});
+
+  @override
+  State<PolyMapView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<PolyMapView>
+    with AutomaticKeepAliveClientMixin {
+  mapbox.Position? _currentPosition;
+  bool isLocationLoading = false;
+  late mapbox.CameraOptions _cameraPosition;
+  late mapbox.MapboxMap mapboxController;
+  mapbox.PointAnnotationManager? pointAnnotationManager;
+  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+    _loadAssets();
+    setupPositionTracking();
+  }
+
+  bool isLoadingAssets = true;
+
+  Future<void> _loadAssets() async {
+    await _assetsProvider.loadAssets();
+    setState(() {
+      isLoadingAssets = false;
+    });
+  }
+
+  bool hasNoPermission = false;
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      setState(() {
+        isLocationLoading = true;
+      });
+      bool serviceEnabled =
+          await geolocator.Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await geolocator.Geolocator.requestPermission();
+      }
+
+      geolocator.LocationPermission permission =
+          await geolocator.Geolocator.checkPermission();
+      if (permission == geolocator.LocationPermission.denied ||
+          permission == geolocator.LocationPermission.deniedForever) {
+        setState(() {
+          hasNoPermission = true;
+          isLocationLoading = false;
+        });
+        permission = await geolocator.Geolocator.requestPermission();
+      }
+
+      if (permission == geolocator.LocationPermission.whileInUse ||
+          permission == geolocator.LocationPermission.always) {
+        var position = await geolocator.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocator.LocationAccuracy.high,
+        );
+
+        setState(() {
+          isLocationLoading = false;
+
+          _currentPosition =
+              mapbox.Position(position.longitude, position.latitude);
+          _cameraPosition = mapbox.CameraOptions(
+            center: mapbox.Point(
+              coordinates:
+                  mapbox.Position(position.longitude, position.latitude),
+            ),
+            zoom: 15,
+            bearing: 0,
+            pitch: 0,
+          );
+        });
+
+        if (_currentPosition != null) {
+          context.read<MapBloc>().add(GetNearbyPlaces(
+                queryParams: MapQueryParams(
+                  currentPoint: "${position.latitude},${position.longitude}",
+                  radius: 8000,
+                  drivingMode: false,
+                  options: ['spaces', 'events'],
+                ),
+              ));
+        }
+      }
+    } catch (e) {
+      setState(() {
+        isLocationLoading = false;
+      });
+      debugPrint("Error getting location: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _currentPosition = null;
+    _positionStreamSubscription?.cancel();
+
+    super.dispose();
+  }
+
+  Uint8List getEventIcon(
+    EventTypes type,
+    Uint8List policeMapMarkerImageData,
+    Uint8List closedRoadMapMarkerImageData,
+    Uint8List accidentMapMarkerImageData,
+  ) {
+    switch (type) {
+      case EventTypes.accident:
+        return accidentMapMarkerImageData;
+      case EventTypes.police:
+        return policeMapMarkerImageData;
+      case EventTypes.closeRoad:
+        return closedRoadMapMarkerImageData;
+    }
+  }
+
+  Uint8List getImageData(
+    PublishSpaceType type,
+    Uint8List freeMarkerImageData,
+    Uint8List greenMarkerImageData,
+    Uint8List blueMapMarkerImageData,
+    Uint8List disasterMapMarkerImageData,
+  ) {
+    switch (type) {
+      case PublishSpaceType.free:
+        return freeMarkerImageData;
+      case PublishSpaceType.greenZone:
+        return greenMarkerImageData;
+      case PublishSpaceType.blueZone:
+        return blueMapMarkerImageData;
+      case PublishSpaceType.disabled:
+        return disasterMapMarkerImageData;
+    }
+  }
+
+  void _addAnnotations(
+    List<Space> spaces,
+    List<Event> events,
+  ) {
+    for (var element in spaces) {
+      pointAnnotationManager?.create(
+        mapbox.PointAnnotationOptions(
+          geometry: mapbox.Point(
+              coordinates: mapbox.Position(
+                  element.location.point.lng, element.location.point.lat)),
+          iconSize: 1.3,
+          image: _assetsProvider.getImageForType(element.type),
+        ),
+      );
+    }
+
+    for (var element in events) {
+      pointAnnotationManager?.create(
+        mapbox.PointAnnotationOptions(
+          geometry: mapbox.Point(
+              coordinates: mapbox.Position(
+                  element.location.point.lng, element.location.point.lat)),
+          iconSize: 1.3,
+          image: _assetsProvider.getEventIcon(element.type),
+        ),
+      );
+    }
+  }
+
+  StreamSubscription? _positionStreamSubscription;
+
+  setupPositionTracking() async {
+    _positionStreamSubscription?.cancel();
+    _positionStreamSubscription =
+        geolocator.Geolocator.getPositionStream().listen((position) {
+      //     calculate distance between two points
+
+      double distanceInMeters = geolocator.Geolocator.distanceBetween(
+        _currentPosition!.lat.toDouble(),
+        _currentPosition!.lng.toDouble(),
+        position.latitude,
+        position.longitude,
+      );
+      // run a code and reset the current position to the new position if the distance is greater than 100 meters
+      if (distanceInMeters > 300) {
+        _currentPosition =
+            mapbox.Position(position.longitude, position.latitude);
+        context.read<MapBloc>().add(GetNearbyPlaces(
+              queryParams: MapQueryParams(
+                currentPoint: "${position.latitude},${position.longitude}",
+                radius: 600,
+                drivingMode: false,
+                options: ['spaces', 'events'],
+              ),
+            ));
+      }
+
+      // only update the camera position if the distance is greater than 100 meters
+      if (distanceInMeters > 100) {
+        mapboxController.setCamera(
+          mapbox.CameraOptions(
+            center: mapbox.Point(
+              coordinates: mapbox.Position(
+                position.longitude,
+                position.latitude,
+              ),
+            ),
+            zoom: 15,
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return isLocationLoading
+        ? const HomePageShimmer()
+        : hasNoPermission
+            ? const NoMapPermissionSection()
+            : BlocConsumer<MapBloc, MapState>(
+                listener: (context, state) {},
+                builder: (context, state) {
+                  return Stack(
+                    alignment: Alignment.topCenter,
+                    children: [
+                      mapbox.MapWidget(
+                        key: UniqueKey(),
+                        onMapCreated: (controller) async {
+                          mapboxController = controller;
+
+                          mapboxController.scaleBar.updateSettings(
+                            mapbox.ScaleBarSettings(enabled: false),
+                          );
+                          mapboxController.compass.updateSettings(
+                            mapbox.CompassSettings(enabled: false),
+                          );
+                          mapboxController.location.updateSettings(
+                            mapbox.LocationComponentSettings(
+                              enabled: true,
+                              pulsingEnabled: true,
+                              puckBearingEnabled: true,
+                              pulsingMaxRadius: 40,
+                              showAccuracyRing: true,
+                              accuracyRingBorderColor: 0xffD899FF,
+                              accuracyRingColor: 0xffD899FF,
+                              pulsingColor: 0xffD899FF,
+                            ),
+                          );
+
+                          await mapboxController
+                              .setBounds(mapbox.CameraBoundsOptions(
+                            maxZoom: 18,
+                            minZoom: 12,
+                          ));
+                          pointAnnotationManager = await mapboxController
+                              .annotations
+                              .createPointAnnotationManager();
+
+                          if (mounted && state is MapLoaded) {
+                            _addAnnotations(
+                              (state).payload.spaces,
+                              (state).payload.events,
+                            );
+                          }
+                        },
+                        styleUri: mapbox.MapboxStyles.MAPBOX_STREETS,
+                        cameraOptions: _cameraPosition,
+                      ),
+                    ],
+                  );
+                },
+              );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+// class TrafficRouteLineExample extends StatefulWidget {
+//   const TrafficRouteLineExample({super.key});
+//
+//   @override
+//   State<TrafficRouteLineExample> createState() =>
+//       TrafficRouteLineExampleState();
+// }
+//
+// class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
+//   late MapboxMap mapboxMap;
+//   final _sfAirport = mapbox.Point(
+//       coordinates: mapbox.Position(-122.39470445734368, 37.7080221537549));
+//   final _sfDowntown = mapbox.Position(-122.41941, 37.77493);
+//   bool _isRouteLoaded = false;
+//
+//   _onMapCreated(MapboxMap mapboxMap) async {
+//     this.mapboxMap = mapboxMap;
+//   }
+//
+//   _onStyleLoadedCallback(StyleLoadedEventData data) async {
+//     await _addRouteSource();
+//     await _addRouteLine();
+//     await _fetchRouteData();
+//   }
+//
+//   Future<void> _addRouteSource() async {
+//     await mapboxMap.style.addSource(GeoJsonSource(
+//       id: "line",
+//       data: json.encode({"type": "FeatureCollection", "features": []}),
+//     ));
+//   }
+//
+//   Future<void> _fetchRouteData() async {
+//     try {
+//       final coordinates =
+//           "${_sfAirport.coordinates.lng},${_sfAirport.coordinates.lat};" +
+//               "${_sfDowntown.lng},${_sfDowntown.lat}";
+//
+//       final url =
+//           'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates' +
+//               '?alternatives=true' +
+//               '&geometries=geojson' +
+//               '&overview=full' +
+//               '&steps=false' +
+//               '&access_token=${AppCredentials.mapBoxAccessToken}';
+//
+//       final response = await http.get(Uri.parse(url));
+//
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//
+//         final route = data['routes'][0];
+//         final geometry = route['geometry'];
+//
+//         final geoJson = {
+//           "type": "Feature",
+//           "properties": {"route-color": "rgb(51, 102, 255)"},
+//           "geometry": geometry
+//         };
+//
+//         // Use the correct method to update the GeoJSON source
+//         await mapboxMap.style.updateGeoJSONSourceFeatures(
+//           "line",
+//           json.encode({
+//             "type": "FeatureCollection",
+//             "features": [geoJson]
+//           }),
+//           [
+//             Feature(id: "line", geometry: LineString.fromJson(geometry)),
+//           ],
+//         );
+//
+//         setState(() {
+//           _isRouteLoaded = true;
+//         });
+//       } else {
+//         print('Failed to load route data: ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print('Error fetching route data: $e');
+//     }
+//   }
+//
+//   Future<void> _addRouteLine() async {
+//     await mapboxMap.style.addLayer(LineLayer(
+//       id: "line-layer",
+//       sourceId: "line",
+//       lineColor: Colors.blue.value,
+//       lineWidthExpression: [
+//         'interpolate',
+//         ['exponential', 1.5],
+//         ['zoom'],
+//         4.0,
+//         2.0,
+//         10.0,
+//         4.0,
+//         13.0,
+//         6.0,
+//         16.0,
+//         8.0,
+//         19.0,
+//         10.0,
+//         22.0,
+//         14.0,
+//       ],
+//       lineBorderColor: Colors.black.value,
+//       lineBorderWidthExpression: [
+//         'interpolate',
+//         ['exponential', 1.5],
+//         ['zoom'],
+//         9.0,
+//         1.0,
+//         16.0,
+//         3.0,
+//       ],
+//     ));
+//   }
+//
+//   // Fix the traffic layer logic
+//   Future<void> _addTrafficLayer() async {
+//     try {
+//       // Check if the traffic layer already exists
+//
+//       // If the layer exists, we can toggle its visibility instead of adding it again
+//
+//       // Otherwise, add the traffic layer
+//       await mapboxMap.style.addLayer(LineLayer(
+//         id: "traffic",
+//         sourceId: "mapbox", // Changed from "composite" to "mapbox"
+//         sourceLayer: "road_traffic", // Changed from "traffic" to "road_traffic"
+//         lineWidth: 5.0,
+//         lineColorExpression: [
+//           'match',
+//           ['get', 'congestion'],
+//           'low',
+//           'rgb(65, 244, 65)',
+//           'moderate',
+//           'rgb(244, 209, 65)',
+//           'heavy',
+//           'rgb(244, 130, 65)',
+//           'severe',
+//           'rgb(244, 65, 65)',
+//           'rgb(65, 65, 244)', // Default color
+//         ],
+//       ));
+//     } catch (e) {
+//       print('Error adding traffic layer: $e');
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       floatingActionButton: Padding(
+//         padding: const EdgeInsets.all(12.0),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.end,
+//           children: <Widget>[
+//             FloatingActionButton(
+//               heroTag: "refreshRoute",
+//               onPressed: _fetchRouteData,
+//               child: const Icon(Icons.refresh),
+//               tooltip: "Refresh route data",
+//             ),
+//             const SizedBox(height: 10),
+//             FloatingActionButton(
+//               heroTag: "toggleTraffic",
+//               onPressed: _addTrafficLayer,
+//               child: const Icon(Icons.traffic),
+//               tooltip: "Show traffic data",
+//             ),
+//           ],
+//         ),
+//       ),
+//       body: MapWidget(
+//         key: const ValueKey("mapWidget"),
+//         cameraOptions: CameraOptions(
+//           center: _sfAirport,
+//           zoom: 11.0,
+//         ),
+//         textureView: true,
+//         onMapCreated: _onMapCreated,
+//         onStyleLoadedListener: _onStyleLoadedCallback,
+//       ),
+//     );
+//   }
+// }
+
+class TrafficRouteLineExample extends StatefulWidget {
+  final double lat;
+  final double lng;
+
+  const TrafficRouteLineExample(
+      {super.key, required this.lat, required this.lng});
+
+  @override
+  State createState() => TrafficRouteLineExampleState();
+}
+
+class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
+  late MapboxMap mapboxMap;
+
+  Future _fetchRouteData() async {
+    try {
+      var currentLocation = await geolocator.Geolocator.getCurrentPosition();
+      final coordinates =
+          "${currentLocation.longitude},${currentLocation.latitude};" +
+              "${widget.lng},${widget.lat}";
+
+      final url =
+          'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates' +
+              '?alternatives=true' +
+              '&geometries=geojson' +
+              '&overview=full' +
+              '&steps=false' +
+              '&access_token=${AppCredentials.mapBoxAccessToken}';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        final route = data['routes'][0];
+        final geometry = route['geometry'];
+
+        final geoJson = {
+          "type": "Feature",
+          "properties": {"route-color": "rgb(51, 102, 255)"},
+          "geometry": geometry
+        };
+
+        return geoJson;
+      } else {
+        print('Failed to load route data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching route data: $e');
+    }
+  }
+
+  _onMapCreated(MapboxMap mapboxMap) async {
+    this.mapboxMap = mapboxMap;
+  }
+
+  _onStyleLoadedCallback(StyleLoadedEventData data) async {
+    var geoJson = await _fetchRouteData();
+    // Add the GeoJSON source to the map from api
+
+    await mapboxMap.style
+        .addSource(GeoJsonSource(id: "line", data: json.encode(geoJson)));
+    await _addRouteLine();
+  }
+
+  bool _isRouteLoaded = false;
+
+  _addRouteLine() async {
+    await mapboxMap.style.addLayer(LineLayer(
+      id: "line-layer",
+      sourceId: "line",
+      lineBorderColor: Colors.black.value,
+      // Defines a line-width, line-border-width and line-color at different zoom extents
+      // by interpolating exponentially between stops.
+      // Doc: https://docs.mapbox.com/style-spec/reference/expressions/
+      lineWidthExpression: [
+        'interpolate',
+        ['exponential', 1.5],
+        ['zoom'],
+        4.0,
+        6.0,
+        10.0,
+        7.0,
+        13.0,
+        9.0,
+        16.0,
+        3.0,
+        19.0,
+        7.0,
+        22.0,
+        21.0,
+      ],
+      lineBorderWidthExpression: [
+        'interpolate',
+        ['exponential', 1.5],
+        ['zoom'],
+        9.0,
+        1.0,
+        16.0,
+        3.0,
+      ],
+      lineColorExpression: [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        8.0,
+        'rgb(51, 102, 255)',
+        11.0,
+        [
+          'coalesce',
+          ['get', 'route-color'],
+          'rgb(51, 102, 255)'
+        ],
+      ],
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        floatingActionButton: const Padding(
+          padding: EdgeInsets.all(12.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              SizedBox(height: 10),
+            ],
+          ),
+        ),
+        body: MapWidget(
+            key: UniqueKey(),
+            cameraOptions: CameraOptions(
+                center: mapbox.Point(
+                  coordinates: mapbox.Position(widget.lng, widget.lat),
+                ),
+                zoom: 14.0),
+            textureView: true,
+            onMapCreated: _onMapCreated,
+            onStyleLoadedListener: _onStyleLoadedCallback));
   }
 }

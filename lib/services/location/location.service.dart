@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
+import 'package:letdem/models/map/coordinate.model.dart';
 
 class CurrentLocationPayload {
   final double latitude;
@@ -75,5 +76,31 @@ class MapboxService {
       print(e);
       return null;
     }
+  }
+
+  static Future<CoordinatesData?> getLatLng(String mapboxId) async {
+    // https://api.mapbox.com/search/geocode/v6/forward?q=heath&proximity=ip&access_token=pk.eyJ1IjoidmhlbXNhcmEiLCJhIjoiY203cDZnaGltMGdndDJrcXlwdTY3ODY2biJ9.3C6sly2ynJCEVLb3t5uAjA
+
+    final url =
+        'https://api.mapbox.com/search/geocode/v6/forward?q=$mapboxId&proximity=ip&access_token=${AppCredentials.mapBoxAccessToken}';
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        print(data);
+        if (data['features'] != null && data['features'].isNotEmpty) {
+          final lat = data['features'][0]['geometry']['coordinates'][1];
+          final lng = data['features'][0]['geometry']['coordinates'][0];
+
+          return CoordinatesData(latitude: lat, longitude: lng);
+        } else {
+          print('Failed to load data: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    return null;
   }
 }

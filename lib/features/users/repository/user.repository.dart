@@ -84,6 +84,7 @@ class LetDemUser {
   final String lastName;
   final bool isSocial;
   final int totalPoints;
+
   final int notificationsCount;
 
   final List<Activity> contributions;

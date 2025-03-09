@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
@@ -16,8 +19,23 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 
-class ScheduledNotificationsView extends StatelessWidget {
+class ScheduledNotificationsView extends StatefulWidget {
   const ScheduledNotificationsView({super.key});
+
+  @override
+  State<ScheduledNotificationsView> createState() =>
+      _ScheduledNotificationsViewState();
+}
+
+class _ScheduledNotificationsViewState
+    extends State<ScheduledNotificationsView> {
+  @override
+  void initState() {
+    context
+        .read<ScheduleNotificationsBloc>()
+        .add(FetchScheduledNotificationsEvent());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +49,35 @@ class ScheduledNotificationsView extends StatelessWidget {
           icon: Icons.close,
         ),
         Dimens.space(3),
-        Expanded(
-          child: false
-              ? const EmptyNotificationView()
-              : ListView(children: const <Widget>[
-                  ScheduleNotificationItem(),
-                  ScheduleNotificationItem(),
-                  ScheduleNotificationItem(),
-                ]),
+        BlocConsumer<ScheduleNotificationsBloc, ScheduleNotificationsState>(
+          listener: (context, state) {
+            // TODO: implement listener
+          },
+          builder: (context, state) {
+            if (state is ScheduleNotificationsError) {
+              return const EmptyNotificationView();
+            }
+
+            if (state is ScheduleNotificationsLoading) {
+              return const Expanded(
+                child: Center(
+                  child: CupertinoActivityIndicator(),
+                ),
+              );
+            }
+            if (state is ScheduleNotificationsLoaded) {
+              return Expanded(
+                child: ListView(
+                  children: state.scheduledNotifications
+                      .map((e) => ScheduleNotificationItem(
+                            notification: e,
+                          ))
+                      .toList(),
+                ),
+              );
+            }
+            return SizedBox();
+          },
         )
       ]),
     );
@@ -46,7 +85,8 @@ class ScheduledNotificationsView extends StatelessWidget {
 }
 
 class ScheduleNotificationItem extends StatelessWidget {
-  const ScheduleNotificationItem({super.key});
+  final ScheduledNotification notification;
+  const ScheduleNotificationItem({super.key, required this.notification});
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +202,9 @@ class ScheduleNotificationItem extends StatelessWidget {
                                 onTap: () {
                                   AppPopup.showBottomSheet(
                                     context,
-                                    const RescheduleNotificationCard(),
+                                    RescheduleNotificationCard(
+                                      notification: notification,
+                                    ),
                                   );
                                 },
                               ),
@@ -194,6 +236,9 @@ class ScheduleNotificationItem extends StatelessWidget {
                                   ],
                                 ),
                                 onTap: () {
+                                  context.read<ScheduleNotificationsBloc>().add(
+                                      DeleteScheduledNotificationEvent(
+                                          notification.id));
                                   NavigatorHelper.pop();
                                 },
                               ),
@@ -221,7 +266,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                     children: [
                       TextSpan(text: "You have a reminder for a space at "),
                       TextSpan(
-                        text: "Street39, Avenida de Niceto",
+                        text: notification.location.streetName,
                         style: Typo.mediumBody.copyWith(
                           color: AppColors.neutral500,
                           fontWeight: FontWeight.bold,
@@ -238,7 +283,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'From 12:00 PM to 2:00 PM', // Fixed typo 'T' to 'to'
+                      'From ${notification.startsAt.hour}:${notification.startsAt.minute} to ${notification.endsAt.hour}:${notification.endsAt.minute}',
                       style: Typo.mediumBody.copyWith(
                         color: AppColors.neutral500,
                       ),
@@ -267,7 +312,8 @@ class ScheduleNotificationItem extends StatelessWidget {
 }
 
 class RescheduleNotificationCard extends StatefulWidget {
-  const RescheduleNotificationCard({Key? key}) : super(key: key);
+  final ScheduledNotification notification;
+  const RescheduleNotificationCard({super.key, required this.notification});
 
   @override
   State<RescheduleNotificationCard> createState() => _NavigationInfoCardState();
@@ -275,7 +321,39 @@ class RescheduleNotificationCard extends StatefulWidget {
 
 class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
   bool notifyAvailableSpace = false;
-  double radius = 172;
+  double radius = 100;
+
+  bool isLocationAvailable = false;
+
+  double distance = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    getDistance();
+  }
+
+  void getDistance() async {
+    // Check if location services are enabled
+    setState(() {
+      isLocationAvailable = false;
+    });
+
+    var currentLocation = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best);
+
+    // Get distance between two points
+    distance = Geolocator.distanceBetween(
+        widget.notification.location.point.lat,
+        widget.notification.location.point.lng,
+        currentLocation.latitude,
+        currentLocation.longitude);
+    print('Distance: $distance');
+
+    setState(() {
+      isLocationAvailable = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -295,162 +373,174 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Time and distance row
-          Row(
-            children: [
-              const Text(
-                "12 mins (23km)",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        children: isLocationAvailable
+            ? [
+                SizedBox(
+                  height: 100,
+                  child: Center(
+                    child: CupertinoActivityIndicator(),
+                  ),
                 ),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  const Text(
-                    "Traffic Level",
-                    style: TextStyle(
-                      fontSize: 14,
+              ]
+            : [
+                // Time and distance row
+                Row(
+                  children: [
+                    Text(
+                      // Format distance to miles to kilometers
+
+                      "00 mins ${(distance / 1000).toStringAsFixed(1)} km",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  DecoratedChip(
-                    text: "Moderate",
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary500,
+                    const Spacer(),
+                    Row(
+                      children: [
+                        const Text(
+                          "Traffic Level",
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        DecoratedChip(
+                          text: "Moderate",
+                          textStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary500,
+                          ),
+                          color: AppColors.primary500,
+                        ),
+                      ],
                     ),
-                    color: AppColors.primary500,
+                  ],
+                ),
+                const SizedBox(height: 22),
+
+                // Location
+                Row(
+                  children: [
+                    Icon(IconlyLight.location, color: Colors.grey),
+                    SizedBox(width: 8),
+                    Text(
+                      widget.notification.location.streetName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Arrival time
+                Row(
+                  children: [
+                    Icon(IconlyLight.time_circle, color: Colors.grey),
+                    SizedBox(width: 8),
+                    Text(
+                      "To Arrive in by 12:38pm",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                Divider(color: Colors.grey.withOpacity(0.2)),
+                const SizedBox(height: 16),
+
+                // Notification toggle
+                Row(
+                  children: [
+                    const Icon(IconlyLight.notification, color: Colors.grey),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        "Notify me of available space in this area",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    ToggleSwitch(
+                      value: notifyAvailableSpace,
+                      onChanged: (value) {
+                        setState(() {
+                          notifyAvailableSpace = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Time selection buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    PlatformTimePickerButton(
+                        initialTime: "12:00 PM", onTimeSelected: (time) {}),
+                    const SizedBox(width: 16),
+                    PlatformTimePickerButton(
+                        initialTime: "2:00 PM", onTimeSelected: (time) {}),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Radius slider
+                Row(
+                  children: [
+                    const Text(
+                      "Radius (Meters)",
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                    Spacer(),
+                    Text(
+                      radius.toStringAsFixed(0),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: Colors.purple,
+                    inactiveTrackColor: Colors.purple.withOpacity(0.2),
+                    thumbColor: Colors.white,
+                    overlayColor: Colors.purple.withOpacity(0.2),
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 8),
                   ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 22),
-
-          // Location
-          Row(
-            children: [
-              Icon(IconlyLight.location, color: Colors.grey),
-              SizedBox(width: 8),
-              Text(
-                "Street39, Avenida de Niceto Alcalá",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Arrival time
-          Row(
-            children: [
-              Icon(IconlyLight.time_circle, color: Colors.grey),
-              SizedBox(width: 8),
-              Text(
-                "To Arrive in by 12:38pm",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          Divider(color: Colors.grey.withOpacity(0.2)),
-          const SizedBox(height: 16),
-
-          // Notification toggle
-          Row(
-            children: [
-              const Icon(IconlyLight.notification, color: Colors.grey),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  "Notify me of available space in this area",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                  child: Slider(
+                    value: radius,
+                    min: 100,
+                    max: 9000,
+                    onChanged: (value) {
+                      setState(() {
+                        radius = value;
+                      });
+                    },
                   ),
                 ),
-              ),
-              ToggleSwitch(
-                value: notifyAvailableSpace,
-                onChanged: (value) {
-                  setState(() {
-                    notifyAvailableSpace = value;
-                  });
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-          // Time selection buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              PlatformTimePickerButton(
-                  initialTime: "12:00 PM", onTimeSelected: (time) {}),
-              const SizedBox(width: 16),
-              PlatformTimePickerButton(
-                  initialTime: "2:00 PM", onTimeSelected: (time) {}),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Radius slider
-          const Row(
-            children: [
-              Text(
-                "Radius (Meters)",
-                style: TextStyle(
-                  fontSize: 14,
+                // Reschedule button
+                PrimaryButton(
+                  text: 'Reschedule',
                 ),
-              ),
-              Spacer(),
-              Text(
-                "172",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Colors.purple,
-              inactiveTrackColor: Colors.purple.withOpacity(0.2),
-              thumbColor: Colors.white,
-              overlayColor: Colors.purple.withOpacity(0.2),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-            ),
-            child: Slider(
-              value: radius,
-              min: 0,
-              max: 500,
-              onChanged: (value) {
-                setState(() {
-                  radius = value;
-                });
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Reschedule button
-          PrimaryButton(
-            text: 'Reschedule',
-          ),
-        ],
+              ],
       ),
     );
   }
