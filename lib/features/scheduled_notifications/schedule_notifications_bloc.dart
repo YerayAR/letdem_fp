@@ -1,8 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
+import 'package:letdem/models/map/coordinate.model.dart';
+import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/toast/toast.dart';
-
-import 'repository/schedule_notifications.repository.dart';
 
 part 'schedule_notifications_event.dart';
 part 'schedule_notifications_state.dart';
@@ -15,14 +16,67 @@ class ScheduleNotificationsBloc
   }) : super(ScheduleNotificationsInitial()) {
     on<FetchScheduledNotificationsEvent>(_onFetchScheduledNotifications);
     on<DeleteScheduledNotificationEvent>(_onDeleteScheduledNotification);
+    on<CreateScheduledNotificationEvent>(_onCreateScheduledNotification);
+  }
+
+  Future<void> _onCreateScheduledNotification(
+      CreateScheduledNotificationEvent event,
+      Emitter<ScheduleNotificationsState> emit) async {
+    emit(ScheduleNotificationsLoading());
+    try {
+      print('event.location.point: ${event.location.point}');
+      // start at 1:00 PM
+      print('event.startsAt: ${event.startsAt}');
+      // end at 2:00 PM
+
+      print('event.endsAt: ${event.endsAt}');
+
+      ScheduledNotification? scheduledNotification;
+
+      if (event.isUpdate) {
+        scheduledNotification =
+            await scheduleNotificationsRepository.updateScheduleNotification(
+                event.eventID!,
+                CreateScheduledNotificationDTO(
+                    startsAt: event.startsAt,
+                    endsAt: event.endsAt,
+                    location: LocationData(
+                      point: event.location.point,
+                      streetName: event.location.streetName,
+                    ),
+                    radius: event.radius));
+      } else {
+        await scheduleNotificationsRepository
+            .createScheduleNotification(CreateScheduledNotificationDTO(
+                startsAt: event.startsAt,
+                endsAt: event.endsAt,
+                location: LocationData(
+                  point: event.location.point,
+                  streetName: event.location.streetName,
+                ),
+                radius: event.radius));
+      }
+      if (event.isUpdate) {
+        final scheduledNotifications =
+            await scheduleNotificationsRepository.getScheduleNotification();
+
+        emit(ScheduleNotificationsLoaded(scheduledNotifications));
+      } else {
+        emit(const ScheduleNotificationCreated());
+      }
+    } on ApiError catch (err) {
+      Toast.showError(err.message);
+    } catch (e) {
+      Toast.showError('Failed to create scheduled notification');
+    }
   }
 
   Future<void> _onDeleteScheduledNotification(
       DeleteScheduledNotificationEvent event,
       Emitter<ScheduleNotificationsState> emit) async {
-    emit(ScheduleNotificationsLoading());
     if (state is ScheduleNotificationsLoaded) {
       final currentState = state as ScheduleNotificationsLoaded;
+      emit(ScheduleNotificationsLoading());
       try {
         await scheduleNotificationsRepository
             .deleteScheduleNotification(event.id);

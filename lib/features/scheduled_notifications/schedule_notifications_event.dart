@@ -19,3 +19,26 @@ class DeleteScheduledNotificationEvent extends ScheduleNotificationsEvent {
   @override
   List<Object> get props => [id];
 }
+
+class CreateScheduledNotificationEvent extends ScheduleNotificationsEvent {
+  final DateTime startsAt;
+  final DateTime endsAt;
+
+  final String? eventID;
+  final bool isUpdate;
+  final LocationData location;
+
+  final double radius;
+
+  const CreateScheduledNotificationEvent({
+    required this.startsAt,
+    required this.endsAt,
+    this.isUpdate = false,
+    this.eventID,
+    required this.radius,
+    required this.location,
+  });
+
+  @override
+  List<Object> get props => [startsAt, endsAt, location, isUpdate];
+}

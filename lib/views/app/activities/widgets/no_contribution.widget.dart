@@ -45,7 +45,7 @@ class NoContributionsWidget extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      PublishSpaceScreen(file: File(pickedFile!.path)),
+                      PublishSpaceScreen(file: File(pickedFile.path)),
                 ),
               );
             },

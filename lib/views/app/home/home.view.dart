@@ -49,8 +49,8 @@ class _HomeViewState extends State<HomeView>
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
   MapMarker? _currentLocationMarker;
-  Map<MapMarker, Space> _spaceMarkers = {};
-  Map<MapMarker, Event> _eventMarkers = {};
+  final Map<MapMarker, Space> _spaceMarkers = {};
+  final Map<MapMarker, Event> _eventMarkers = {};
 
   @override
   void initState() {
@@ -238,8 +238,8 @@ class _HomeViewState extends State<HomeView>
                         ),
                         Dimens.space(2),
                         DecoratedChip(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 5),
                           text: '${geolocator.Geolocator.distanceBetween(
                             _currentPosition!.latitude,
                             _currentPosition!.longitude,
@@ -269,7 +269,7 @@ class _HomeViewState extends State<HomeView>
             Dimens.space(4),
             Row(
               children: <Widget>[
-                Flexible(
+                const Flexible(
                   child: PrimaryButton(
                     text: 'Got it, Thank you',
                   ),
@@ -345,7 +345,7 @@ class _HomeViewState extends State<HomeView>
                           ),
                           Dimens.space(1),
                           DecoratedChip(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 5),
                             text: '${geolocator.Geolocator.distanceBetween(
                               _currentPosition!.latitude,
@@ -371,6 +371,8 @@ class _HomeViewState extends State<HomeView>
                   text: 'Navigate to Space',
                   onTap: () {
                     NavigatorHelper.to(TrafficRouteLineExample(
+                        hideToggle: true,
+                        streetName: space.location.streetName,
                         lat: space.location.point.lat,
                         lng: space.location.point.lng));
                   },

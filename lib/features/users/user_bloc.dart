@@ -86,7 +86,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(userLoaded.copyWith(
           isUpdateLoading: false,
         ));
-        emit(UserInfoChanged());
+        emit(const UserInfoChanged());
       } on ApiError catch (err) {
         emit(userLoaded.copyWith(
           isUpdateLoading: false,
@@ -161,6 +161,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       await OneSignal.Notifications.requestPermission(true);
       await OneSignal.login(user.id);
+
+      final deviceState = OneSignal.User.pushSubscription.id;
+
+      if (deviceState != null) {
+        print("Device State");
+        print(deviceState);
+      }
 
       bool isLocationPermissionGranted = await NavigatorHelper
           .navigatorKey.currentState!.context.hasLocationPermission;

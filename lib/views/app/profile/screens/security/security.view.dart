@@ -41,7 +41,7 @@ class SecurityView extends StatelessWidget {
                             SettingsRow(
                               text: 'Change Password',
                               onTap: () {
-                                NavigatorHelper.to(ChangePasswordView());
+                                NavigatorHelper.to(const ChangePasswordView());
                               },
                               showDivider: false,
                             ),

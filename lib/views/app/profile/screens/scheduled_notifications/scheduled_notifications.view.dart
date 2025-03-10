@@ -16,8 +16,8 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 
 class ScheduledNotificationsView extends StatefulWidget {
   const ScheduledNotificationsView({super.key});
@@ -33,7 +33,7 @@ class _ScheduledNotificationsViewState
   void initState() {
     context
         .read<ScheduleNotificationsBloc>()
-        .add(FetchScheduledNotificationsEvent());
+        .add(const FetchScheduledNotificationsEvent());
     super.initState();
   }
 
@@ -67,16 +67,18 @@ class _ScheduledNotificationsViewState
             }
             if (state is ScheduleNotificationsLoaded) {
               return Expanded(
-                child: ListView(
-                  children: state.scheduledNotifications
-                      .map((e) => ScheduleNotificationItem(
-                            notification: e,
-                          ))
-                      .toList(),
-                ),
+                child: state.scheduledNotifications.isEmpty
+                    ? const EmptyScheduleNotificationView()
+                    : ListView(
+                        children: state.scheduledNotifications
+                            .map((e) => ScheduleNotificationItem(
+                                  notification: e,
+                                ))
+                            .toList(),
+                      ),
               );
             }
-            return SizedBox();
+            return const SizedBox();
           },
         )
       ]),
@@ -162,7 +164,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                                         fontSize: 20,
                                       ),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     GestureDetector(
                                       onTap: () {
                                         NavigatorHelper.pop();
@@ -264,7 +266,8 @@ class ScheduleNotificationItem extends StatelessWidget {
                       color: AppColors.neutral500,
                     ),
                     children: [
-                      TextSpan(text: "You have a reminder for a space at "),
+                      const TextSpan(
+                          text: "You have a reminder for a space at "),
                       TextSpan(
                         text: notification.location.streetName,
                         style: Typo.mediumBody.copyWith(
@@ -276,7 +279,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: 8), // More vertical spacing
+                const SizedBox(height: 8), // More vertical spacing
 
                 // Time text
                 Row(
@@ -289,16 +292,20 @@ class ScheduleNotificationItem extends StatelessWidget {
                       ),
                     ),
                     DecoratedChip(
-                      text: 'Active',
+                      text: notification.isExpired ? 'Expired' : 'Active',
                       padding: const EdgeInsets.symmetric(
                         horizontal: 15,
                         vertical: 6,
                       ),
                       textStyle: Typo.smallBody.copyWith(
-                        color: AppColors.green600,
+                        color: notification.isExpired
+                            ? AppColors.secondary600
+                            : AppColors.green600,
                         fontWeight: FontWeight.bold,
                       ),
-                      color: AppColors.green600,
+                      color: notification.isExpired
+                          ? AppColors.secondary500
+                          : AppColors.green500,
                     ),
                   ],
                 ),
@@ -321,7 +328,7 @@ class RescheduleNotificationCard extends StatefulWidget {
 
 class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
   bool notifyAvailableSpace = false;
-  double radius = 100;
+  late double radius;
 
   bool isLocationAvailable = false;
 
@@ -330,8 +337,25 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
   @override
   void initState() {
     super.initState();
+    radius =
+        widget.notification.radius < 100 ? 100 : widget.notification.radius;
+
+    _startsAt = widget.notification.startsAt;
+    _endsAt = widget.notification.endsAt;
+    _selectedStartTime = TimeOfDay(
+        hour: widget.notification.startsAt.hour,
+        minute: widget.notification.startsAt.minute);
+    _selectedEndTime = TimeOfDay(
+        hour: widget.notification.endsAt.hour,
+        minute: widget.notification.endsAt.minute);
     getDistance();
   }
+
+  late DateTime _startsAt;
+  late DateTime _endsAt;
+
+  late TimeOfDay _selectedStartTime;
+  late TimeOfDay _selectedEndTime;
 
   void getDistance() async {
     // Check if location services are enabled
@@ -344,8 +368,8 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
 
     // Get distance between two points
     distance = Geolocator.distanceBetween(
-        widget.notification.location.point.lat,
-        widget.notification.location.point.lng,
+        widget.notification.location.point.latitude,
+        widget.notification.location.point.longitude,
         currentLocation.latitude,
         currentLocation.longitude);
     print('Distance: $distance');
@@ -357,207 +381,282 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return BlocConsumer<ScheduleNotificationsBloc, ScheduleNotificationsState>(
+      listener: (context, state) {
+        if (state is ScheduleNotificationCreated) {
+          Toast.show('Notification rescheduled successfully');
+          context
+              .read<ScheduleNotificationsBloc>()
+              .add(const FetchScheduledNotificationsEvent());
+          NavigatorHelper.pop();
+        }
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: isLocationAvailable
-            ? [
-                SizedBox(
-                  height: 100,
-                  child: Center(
-                    child: CupertinoActivityIndicator(),
-                  ),
-                ),
-              ]
-            : [
-                // Time and distance row
-                Row(
-                  children: [
-                    Text(
-                      // Format distance to miles to kilometers
-
-                      "00 mins ${(distance / 1000).toStringAsFixed(1)} km",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: isLocationAvailable
+                ? [
+                    const SizedBox(
+                      height: 100,
+                      child: Center(
+                        child: CupertinoActivityIndicator(),
                       ),
                     ),
-                    const Spacer(),
+                  ]
+                : [
+                    // Time and distance row
+                    Row(
+                      children: [
+                        Text(
+                          // Format distance to miles to kilometers
+
+                          "00 mins ${(distance / 1000).toStringAsFixed(1)} km",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            const Text(
+                              "Traffic Level",
+                              style: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            DecoratedChip(
+                              text: "Moderate",
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary500,
+                              ),
+                              color: AppColors.primary500,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+
+                    // Location
+                    Row(
+                      children: [
+                        const Icon(IconlyLight.location, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            widget.notification.location.streetName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Arrival time
+                    const Row(
+                      children: [
+                        Icon(IconlyLight.time_circle, color: Colors.grey),
+                        SizedBox(width: 8),
+                        Text(
+                          "To Arrive in by 12:38pm",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    Divider(color: Colors.grey.withOpacity(0.2)),
+                    const SizedBox(height: 16),
+
+                    // Time selection buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PlatformTimePickerButton(
+                            initialTime: _selectedStartTime,
+                            onTimeSelected: (time) {
+                              setState(() {
+                                _selectedStartTime = time;
+                              });
+                            }),
+                        const SizedBox(width: 16),
+                        PlatformTimePickerButton(
+                            initialTime: _selectedEndTime,
+                            onTimeSelected: (time) {
+                              setState(() {
+                                _selectedEndTime = time;
+                              });
+                            }),
+                      ],
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PlatformDatePickerButton(
+                            initialDate: widget.notification.startsAt,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _startsAt = date;
+                              });
+                            }),
+                        const SizedBox(width: 16),
+                        PlatformDatePickerButton(
+                            initialDate: widget.notification.endsAt,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _endsAt = date;
+                              });
+                            }),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Radius slider
                     Row(
                       children: [
                         const Text(
-                          "Traffic Level",
+                          "Radius (Meters)",
                           style: TextStyle(
                             fontSize: 14,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        DecoratedChip(
-                          text: "Moderate",
-                          textStyle: TextStyle(
+                        const Spacer(),
+                        Text(
+                          radius.toStringAsFixed(0),
+                          style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary500,
+                            fontWeight: FontWeight.bold,
                           ),
-                          color: AppColors.primary500,
                         ),
                       ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 22),
-
-                // Location
-                Row(
-                  children: [
-                    Icon(IconlyLight.location, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text(
-                      widget.notification.location.streetName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(height: 8),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Colors.purple,
+                        inactiveTrackColor: Colors.purple.withOpacity(0.2),
+                        thumbColor: Colors.white,
+                        overlayColor: Colors.purple.withOpacity(0.2),
+                        thumbShape:
+                            const RoundSliderThumbShape(enabledThumbRadius: 8),
+                      ),
+                      child: Slider(
+                        value: radius,
+                        min: 100,
+                        max: 9000,
+                        onChanged: (value) {
+                          setState(() {
+                            radius = value;
+                          });
+                        },
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
-                // Arrival time
-                Row(
-                  children: [
-                    Icon(IconlyLight.time_circle, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text(
-                      "To Arrive in by 12:38pm",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                    // Reschedule button
+                    PrimaryButton(
+                      onTap: () {
+                        // check if the the end time is greater than the start time
 
-                Divider(color: Colors.grey.withOpacity(0.2)),
-                const SizedBox(height: 16),
+                        DateTime start = DateTime(
+                          _startsAt.year,
+                          _startsAt.month,
+                          _startsAt.day,
+                          _selectedStartTime.hour,
+                          _selectedStartTime.minute,
+                        );
 
-                // Notification toggle
-                Row(
-                  children: [
-                    const Icon(IconlyLight.notification, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    const Expanded(
-                      child: Text(
-                        "Notify me of available space in this area",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    ToggleSwitch(
-                      value: notifyAvailableSpace,
-                      onChanged: (value) {
-                        setState(() {
-                          notifyAvailableSpace = value;
-                        });
+                        DateTime end = DateTime(
+                          _endsAt.year,
+                          _endsAt.month,
+                          _endsAt.day,
+                          _selectedEndTime.hour,
+                          _selectedEndTime.minute,
+                        );
+
+                        if (end.isBefore(start)) {
+                          Toast.show('End time cannot be before start time');
+                          return;
+                        }
+
+                        // check if the start or end time is in the past
+                        if (start.isBefore(DateTime.now())) {
+                          Toast.show('Start time cannot be in the past');
+                          return;
+                        }
+                        if (end.isBefore(DateTime.now())) {
+                          Toast.show('End time cannot be in the past');
+                          return;
+                        }
+
+                        if (radius < 100) {
+                          Toast.show('Radius cannot be less than 100 meters');
+                          return;
+                        }
+
+                        context.read<ScheduleNotificationsBloc>().add(
+                              CreateScheduledNotificationEvent(
+                                startsAt: start,
+                                endsAt: end,
+                                isUpdate: true,
+                                eventID: widget.notification.id,
+                                location: widget.notification.location,
+                                radius: radius,
+                              ),
+                            );
+                        NavigatorHelper.pop();
                       },
+                      isLoading: state is ScheduleNotificationsLoading,
+                      text: 'Reschedule',
                     ),
+                    Dimens.space(2)
                   ],
-                ),
-                const SizedBox(height: 24),
-
-                // Time selection buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    PlatformTimePickerButton(
-                        initialTime: "12:00 PM", onTimeSelected: (time) {}),
-                    const SizedBox(width: 16),
-                    PlatformTimePickerButton(
-                        initialTime: "2:00 PM", onTimeSelected: (time) {}),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Radius slider
-                Row(
-                  children: [
-                    const Text(
-                      "Radius (Meters)",
-                      style: TextStyle(
-                        fontSize: 14,
-                      ),
-                    ),
-                    Spacer(),
-                    Text(
-                      radius.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: Colors.purple,
-                    inactiveTrackColor: Colors.purple.withOpacity(0.2),
-                    thumbColor: Colors.white,
-                    overlayColor: Colors.purple.withOpacity(0.2),
-                    thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 8),
-                  ),
-                  child: Slider(
-                    value: radius,
-                    min: 100,
-                    max: 9000,
-                    onChanged: (value) {
-                      setState(() {
-                        radius = value;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Reschedule button
-                PrimaryButton(
-                  text: 'Reschedule',
-                ),
-              ],
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 // Platform-aware Time Picker that uses different UI for iOS and Android
 class PlatformTimePickerButton extends StatefulWidget {
-  final String initialTime;
+  final TimeOfDay initialTime;
   final Function(TimeOfDay) onTimeSelected;
   final bool isSelected;
 
   const PlatformTimePickerButton({
-    Key? key,
+    super.key,
     required this.initialTime,
     required this.onTimeSelected,
     this.isSelected = false,
-  }) : super(key: key);
+  });
 
   @override
   State<PlatformTimePickerButton> createState() =>
@@ -565,26 +664,13 @@ class PlatformTimePickerButton extends StatefulWidget {
 }
 
 class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
-  late String displayTime;
   late TimeOfDay selectedTime;
 
   @override
   void initState() {
     super.initState();
-    displayTime = widget.initialTime;
-    // Convert string time to TimeOfDay - assuming format like "09:30 AM"
-    final List<String> parts = widget.initialTime.split(' ');
-    final List<String> timeParts = parts[0].split(':');
-    int hour = int.parse(timeParts[0]);
-    final int minute = int.parse(timeParts[1]);
 
-    if (parts.length > 1 && parts[1] == 'PM' && hour < 12) {
-      hour += 12;
-    } else if (parts.length > 1 && parts[1] == 'AM' && hour == 12) {
-      hour = 0;
-    }
-
-    selectedTime = TimeOfDay(hour: hour, minute: minute);
+    selectedTime = widget.initialTime;
   }
 
   // Android Material style time picker
@@ -615,7 +701,6 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
       setState(() {
         selectedTime = pickedTime;
         // Format the time based on user's locale or specific format
-        displayTime = _formatTimeOfDay(pickedTime);
       });
       widget.onTimeSelected(pickedTime);
     }
@@ -674,7 +759,6 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
                           hour: newDateTime.hour,
                           minute: newDateTime.minute,
                         );
-                        displayTime = _formatTimeOfDay(selectedTime);
                       });
                     },
                     use24hFormat: false, // Set to true for 24h format
@@ -728,7 +812,7 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
           color: Colors.black54,
         ),
         label: Text(
-          displayTime,
+          _formatTimeOfDay(selectedTime),
           style: TextStyle(
             color: widget.isSelected ? Colors.purple : Colors.black,
             fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
@@ -754,85 +838,185 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
   }
 }
 
-// Example usage in a screen
-class TimePickerDemoScreen extends StatefulWidget {
-  const TimePickerDemoScreen({Key? key}) : super(key: key);
+class PlatformDatePickerButton extends StatefulWidget {
+  final DateTime initialDate;
+  final Function(DateTime) onDateSelected;
+  final bool isSelected;
+
+  const PlatformDatePickerButton({
+    super.key,
+    required this.initialDate,
+    required this.onDateSelected,
+    this.isSelected = false,
+  });
 
   @override
-  State<TimePickerDemoScreen> createState() => _TimePickerDemoScreenState();
+  State<PlatformDatePickerButton> createState() =>
+      _PlatformDatePickerButtonState();
 }
 
-class _TimePickerDemoScreenState extends State<TimePickerDemoScreen> {
-  TimeOfDay _selectedStartTime = const TimeOfDay(hour: 9, minute: 0);
-  TimeOfDay _selectedEndTime = const TimeOfDay(hour: 17, minute: 0);
+class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
+  late DateTime selectedDate;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Time Picker Demo'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Select Time Range:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+  void initState() {
+    super.initState();
+    selectedDate = widget.initialDate;
+  }
+
+  // Android Material style date picker
+  Future<void> _showMaterialDatePicker(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.purple, // Header background color
+              onPrimary: Colors.white, // Header text color
+              onSurface: Colors.black, // Body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.purple, // Button text color
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null && pickedDate != selectedDate) {
+      setState(() {
+        selectedDate = pickedDate;
+      });
+      widget.onDateSelected(pickedDate);
+    }
+  }
+
+  // iOS Cupertino style date picker
+  void _showCupertinoDatePicker(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 280,
+          padding: const EdgeInsets.only(top: 6.0),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: SafeArea(
+            top: false,
+            child: Column(
               children: [
-                PlatformTimePickerButton(
-                  initialTime: '9:00 AM',
-                  isSelected: true,
-                  onTimeSelected: (TimeOfDay time) {
-                    setState(() {
-                      _selectedStartTime = time;
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CupertinoButton(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    CupertinoButton(
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(color: CupertinoColors.activeBlue),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        widget.onDateSelected(selectedDate);
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                PlatformTimePickerButton(
-                  initialTime: '5:00 PM',
-                  onTimeSelected: (TimeOfDay time) {
-                    setState(() {
-                      _selectedEndTime = time;
-                    });
-                  },
+                Expanded(
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.date,
+                    initialDateTime: selectedDate,
+                    minimumDate: DateTime(2000),
+                    maximumDate: DateTime(2100),
+                    onDateTimeChanged: (DateTime newDateTime) {
+                      setState(() {
+                        selectedDate = newDateTime;
+                      });
+                    },
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            // For demo purposes - show selected time range
-            Text(
-              'Selected range: ${_formatTimeOfDay(_selectedStartTime)} - ${_formatTimeOfDay(_selectedEndTime)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  // Helper method to format TimeOfDay
-  String _formatTimeOfDay(TimeOfDay time) {
-    final now = DateTime.now();
-    final dateTime =
-        DateTime(now.year, now.month, now.day, time.hour, time.minute);
+  // Format date as "MMM dd, yyyy"
+  String _formatDate(DateTime date) {
+    return '${_getMonthName(date.month)} ${date.day}, ${date.year}';
+  }
 
-    final String formattedTime = dateTime.hour > 12
-        ? '${dateTime.hour - 12}:${dateTime.minute.toString().padLeft(2, '0')} PM'
-        : dateTime.hour == 12
-            ? '12:${dateTime.minute.toString().padLeft(2, '0')} PM'
-            : dateTime.hour == 0
-                ? '12:${dateTime.minute.toString().padLeft(2, '0')} AM'
-                : '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} AM';
+  String _getMonthName(int month) {
+    const List<String> months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return months[month - 1];
+  }
 
-    return formattedTime;
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: OutlinedButton.icon(
+        onPressed: () {
+          if (Platform.isIOS) {
+            _showCupertinoDatePicker(context);
+          } else {
+            _showMaterialDatePicker(context);
+          }
+        },
+        icon: const Icon(
+          IconlyLight.calendar,
+          color: Colors.black54,
+        ),
+        label: Text(
+          _formatDate(selectedDate),
+          style: TextStyle(
+            color: widget.isSelected ? Colors.purple : Colors.black,
+            fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          side: BorderSide(
+            color: widget.isSelected
+                ? Colors.purple
+                : Colors.grey.withOpacity(0.4),
+            width: widget.isSelected ? 2.0 : 1.0,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          backgroundColor: widget.isSelected
+              ? Colors.purple.withOpacity(0.05)
+              : Colors.transparent,
+        ),
+      ),
+    );
   }
 }

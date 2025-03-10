@@ -144,6 +144,15 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                         onLetDemLocationDeleted:
                                             (LetDemLocation location) {},
                                         place: e,
+                                        onApiPlaceSelected: (LetDemLocation p) {
+                                          NavigatorHelper.to(
+                                              TrafficRouteLineExample(
+                                            streetName: p.name,
+                                            hideToggle: false,
+                                            lat: p.coordinates.latitude,
+                                            lng: p.coordinates.longitude,
+                                          ));
+                                        },
                                         onPlaceSelected: (MapBoxPlace p) async {
                                           DatabaseHelper().savePlace(p);
 
@@ -151,6 +160,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                               p.fullAddress);
                                           NavigatorHelper.to(
                                               TrafficRouteLineExample(
+                                            streetName: p.fullAddress,
+                                            hideToggle: false,
                                             lat: c!.latitude,
                                             lng: c.longitude,
                                           ));
@@ -172,6 +183,18 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                                   locationType:
                                                       LetDemLocationType.home,
                                                   showDivider: false,
+                                                  onApiPlaceSelected:
+                                                      (LetDemLocation p) {
+                                                    NavigatorHelper.to(
+                                                        TrafficRouteLineExample(
+                                                      streetName: p.name,
+                                                      hideToggle: false,
+                                                      lat: p
+                                                          .coordinates.latitude,
+                                                      lng: p.coordinates
+                                                          .longitude,
+                                                    ));
+                                                  },
                                                   onPlaceSelected:
                                                       (MapBoxPlace p) {
                                                     context
@@ -205,6 +228,18 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                                   .map(
                                                 (e) {
                                                   return SavedAddressComponent(
+                                                    onApiPlaceSelected:
+                                                        (LetDemLocation p) {
+                                                      NavigatorHelper.to(
+                                                          TrafficRouteLineExample(
+                                                        streetName: p.name,
+                                                        hideToggle: false,
+                                                        lat: p.coordinates
+                                                            .latitude,
+                                                        lng: p.coordinates
+                                                            .longitude,
+                                                      ));
+                                                    },
                                                     onMapBoxPlaceDeleted:
                                                         (MapBoxPlace place) {},
                                                     onLetDemLocationDeleted:
@@ -357,8 +392,10 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                                                   print(value.longitude);
                                                   NavigatorHelper.to(
                                                     TrafficRouteLineExample(
+                                                      hideToggle: false,
                                                       lat: value.latitude,
                                                       lng: value.longitude,
+                                                      streetName: p.fullAddress,
                                                     ),
                                                   );
                                                 });

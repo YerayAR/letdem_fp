@@ -48,7 +48,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               StyledAppBar(
                 title: 'Activities',
                 onTap: () {
-                  NavigatorHelper.to(NotificationsView());
+                  NavigatorHelper.to(const NotificationsView());
                 },
                 icon: Iconsax.notification5,
               ),
@@ -81,7 +81,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               Expanded(
                 child: ProfileSection(
                   onCallToAction: () {
-                    NavigatorHelper.to(ViewAllView());
+                    NavigatorHelper.to(const ViewAllView());
                   },
                   padding:
                       state is ActivitiesLoaded && state.activities.isNotEmpty

@@ -59,7 +59,7 @@ class ToggleSwitch extends StatelessWidget {
       child: CupertinoSwitch(
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.primary500,
+        activeTrackColor: AppColors.primary500,
       ),
     );
   }

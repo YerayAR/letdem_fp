@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +14,10 @@ import 'package:here_sdk/core.errors.dart';
 import 'package:here_sdk/mapview.dart';
 // http
 import 'package:http/http.dart' as http;
+import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
@@ -30,13 +33,21 @@ import 'package:letdem/features/search/repository/search_location.repository.dar
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/models/map/coordinate.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
+import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
+import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -167,11 +178,13 @@ class LetDemApp extends StatelessWidget {
         navigatorKey: NavigatorHelper.navigatorKey,
         debugShowCheckedModeBanner: false,
         debugShowMaterialGrid: false,
-        home: SplashView());
+        home: const SplashView());
   }
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -704,8 +717,16 @@ class TrafficRouteLineExample extends StatefulWidget {
   final double lat;
   final double lng;
 
+  final String streetName;
+
+  final bool hideToggle;
+
   const TrafficRouteLineExample(
-      {super.key, required this.lat, required this.lng});
+      {super.key,
+      required this.lat,
+      required this.lng,
+      required this.hideToggle,
+      required this.streetName});
 
   @override
   State createState() => TrafficRouteLineExampleState();
@@ -718,16 +739,11 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
     try {
       var currentLocation = await geolocator.Geolocator.getCurrentPosition();
       final coordinates =
-          "${currentLocation.longitude},${currentLocation.latitude};" +
-              "${widget.lng},${widget.lat}";
+          "${currentLocation.longitude},${currentLocation.latitude};"
+          "${widget.lng},${widget.lat}";
 
       final url =
-          'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates' +
-              '?alternatives=true' +
-              '&geometries=geojson' +
-              '&overview=full' +
-              '&steps=false' +
-              '&access_token=${AppCredentials.mapBoxAccessToken}';
+          'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${AppCredentials.mapBoxAccessToken}';
 
       final response = await http.get(Uri.parse(url));
 
@@ -765,7 +781,7 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
     await _addRouteLine();
   }
 
-  bool _isRouteLoaded = false;
+  final bool _isRouteLoaded = false;
 
   _addRouteLine() async {
     await mapboxMap.style.addLayer(LineLayer(
@@ -820,6 +836,26 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          actions: [
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  size: 20,
+                ),
+                onPressed: () {
+                  NavigatorHelper.pop();
+                },
+              ),
+            ),
+            Dimens.space(2),
+          ],
+        ),
         floatingActionButton: const Padding(
           padding: EdgeInsets.all(12.0),
           child: Column(
@@ -829,15 +865,412 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
             ],
           ),
         ),
-        body: MapWidget(
-            key: UniqueKey(),
-            cameraOptions: CameraOptions(
-                center: mapbox.Point(
-                  coordinates: mapbox.Position(widget.lng, widget.lat),
-                ),
-                zoom: 14.0),
-            textureView: true,
-            onMapCreated: _onMapCreated,
-            onStyleLoadedListener: _onStyleLoadedCallback));
+        body: Stack(
+          children: [
+            MapWidget(
+                key: UniqueKey(),
+                cameraOptions: CameraOptions(
+                    center: mapbox.Point(
+                      coordinates: mapbox.Position(widget.lng, widget.lat),
+                    ),
+                    zoom: 12.0),
+                textureView: true,
+                onMapCreated: _onMapCreated,
+                onStyleLoadedListener: _onStyleLoadedCallback),
+            Positioned(
+                left: 0,
+                bottom: 0,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: NavigateNotificationCard(
+                    hideToggle: widget.hideToggle,
+                    notification: ScheduledNotification(
+                        id: "1",
+                        startsAt: DateTime.now(),
+                        endsAt: DateTime.now(),
+                        isExpired: false,
+                        location: LocationData(
+                          streetName: widget.streetName,
+                          point: CoordinatesData(
+                            longitude: widget.lng,
+                            latitude: widget.lat,
+                          ),
+                        )),
+                  ),
+                )),
+          ],
+        ));
+  }
+}
+
+class NavigateNotificationCard extends StatefulWidget {
+  final ScheduledNotification notification;
+
+  final bool hideToggle;
+  const NavigateNotificationCard(
+      {super.key, required this.notification, required this.hideToggle});
+
+  @override
+  State<NavigateNotificationCard> createState() =>
+      _NavigateNotificationCardState();
+}
+
+class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
+  bool notifyAvailableSpace = false;
+  double radius = 100;
+
+  bool isLocationAvailable = false;
+
+  double distance = 0.0;
+
+  TimeOfDay _fromTime = TimeOfDay.now();
+  final TimeOfDay _toTime = TimeOfDay.now();
+
+  DateTime _fromDate = DateTime.now();
+  DateTime _toDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    getDistance();
+  }
+
+  void getDistance() async {
+    // Check if location services are enabled
+    setState(() {
+      isLocationAvailable = false;
+    });
+
+    var currentLocation = await geolocator.Geolocator.getCurrentPosition(
+        desiredAccuracy: geolocator.LocationAccuracy.best);
+
+    // Get distance between two points
+    distance = geolocator.Geolocator.distanceBetween(
+        widget.notification.location.point.latitude,
+        widget.notification.location.point.longitude,
+        currentLocation.latitude,
+        currentLocation.longitude);
+    print('Distance: $distance');
+
+    setState(() {
+      isLocationAvailable = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ScheduleNotificationsBloc, ScheduleNotificationsState>(
+      listener: (context, state) {
+        if (state is ScheduleNotificationCreated) {
+          AppPopup.showDialogSheet(
+            context,
+            SuccessDialog(
+              title: "Notification Scheduled",
+              subtext:
+                  "You will be notified when a space is available in this area",
+              onProceed: () {
+                Navigator.pop(context);
+              },
+            ),
+          );
+        }
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: isLocationAvailable
+                ? [
+                    const SizedBox(
+                      height: 100,
+                      child: Center(
+                        child: CupertinoActivityIndicator(),
+                      ),
+                    ),
+                  ]
+                : [
+                    // Time and distance row
+                    Row(
+                      children: [
+                        Text(
+                          // Format distance to miles to kilometers
+
+                          "00 mins ${(distance / 1000).toStringAsFixed(1)} km",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            const Text(
+                              "Traffic Level",
+                              style: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            DecoratedChip(
+                              text: "Moderate",
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary500,
+                              ),
+                              color: AppColors.primary500,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+
+                    // Location
+                    Row(
+                      children: [
+                        const Icon(IconlyLight.location, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            widget.notification.location.streetName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Arrival time
+                    const Row(
+                      children: [
+                        Icon(IconlyLight.time_circle, color: Colors.grey),
+                        SizedBox(width: 8),
+                        Text(
+                          "To Arrive in by 12:38pm",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    Divider(color: Colors.grey.withOpacity(0.2)),
+                    SizedBox(height: 16),
+
+                    // Notification toggle
+                    Row(
+                      children: widget.hideToggle
+                          ? []
+                          : [
+                              const Icon(IconlyLight.notification,
+                                  color: Colors.grey),
+                              const SizedBox(width: 8),
+                              const Expanded(
+                                child: Text(
+                                  "Notify me of available space in this area",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              ToggleSwitch(
+                                value: notifyAvailableSpace,
+                                onChanged: (value) {
+                                  setState(() {
+                                    notifyAvailableSpace = value;
+                                  });
+                                },
+                              ),
+                            ],
+                    ),
+                    SizedBox(height: widget.hideToggle ? 0 : 16),
+
+                    // Time selection buttons
+                    Column(
+                      children: !notifyAvailableSpace
+                          ? []
+                          : [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  PlatformTimePickerButton(
+                                      initialTime: _fromTime,
+                                      onTimeSelected: (time) {
+                                        setState(() {
+                                          _fromTime = time;
+                                        });
+                                      }),
+                                  const SizedBox(width: 16),
+                                  PlatformTimePickerButton(
+                                      initialTime: _toTime,
+                                      onTimeSelected: (time) {
+                                        setState(() {
+                                          _fromTime = time;
+                                        });
+                                      }),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  PlatformDatePickerButton(
+                                      initialDate: _fromDate,
+                                      onDateSelected: (date) {
+                                        setState(() {
+                                          _fromDate = date;
+                                        });
+                                      }),
+                                  const SizedBox(width: 16),
+                                  PlatformDatePickerButton(
+                                      initialDate: _toDate,
+                                      onDateSelected: (date) {
+                                        setState(() {
+                                          _toDate = date;
+                                        });
+                                      }),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Radius slider
+                              Row(
+                                children: [
+                                  const Text(
+                                    "Radius (Meters)",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    radius.toStringAsFixed(0),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  activeTrackColor: Colors.purple,
+                                  inactiveTrackColor:
+                                      Colors.purple.withOpacity(0.2),
+                                  thumbColor: Colors.white,
+                                  overlayColor: Colors.purple.withOpacity(0.2),
+                                  thumbShape: const RoundSliderThumbShape(
+                                      enabledThumbRadius: 8),
+                                ),
+                                child: Slider(
+                                  value: radius,
+                                  min: 100,
+                                  max: 9000,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      radius = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Reschedule button
+                    PrimaryButton(
+                      isLoading: state is ScheduleNotificationsLoading,
+                      onTap: () {
+                        if (notifyAvailableSpace) {
+                          DateTime start = DateTime(
+                            _fromDate.year,
+                            _fromDate.month,
+                            _fromDate.day,
+                            _fromTime.hour,
+                            _fromTime.minute,
+                          );
+
+                          DateTime end = DateTime(
+                            _toDate.year,
+                            _toDate.month,
+                            _toDate.day,
+                            _toTime.hour,
+                            _toTime.minute,
+                          );
+
+                          if (end.isBefore(start)) {
+                            Toast.show('End time cannot be before start time');
+                            return;
+                          }
+
+                          // check if the start or end time is in the past
+                          if (start.isBefore(DateTime.now())) {
+                            Toast.show('Start time cannot be in the past');
+                            return;
+                          }
+                          if (end.isBefore(DateTime.now())) {
+                            Toast.show('End time cannot be in the past');
+                            return;
+                          }
+
+                          if (radius < 100) {
+                            Toast.show('Radius cannot be less than 100 meters');
+                            return;
+                          }
+
+                          context
+                              .read<ScheduleNotificationsBloc>()
+                              .add(CreateScheduledNotificationEvent(
+                                startsAt: DateTime(
+                                  _fromDate.year,
+                                  _fromDate.month,
+                                  _fromDate.day,
+                                  _fromTime.hour,
+                                  _fromTime.minute,
+                                ),
+                                endsAt: DateTime(
+                                  _toDate.year,
+                                  _toDate.month,
+                                  _toDate.day,
+                                  _toTime.hour,
+                                  _toTime.minute,
+                                ),
+                                radius: radius.toDouble(),
+                                location: widget.notification.location,
+                              ));
+                        }
+                        // Schedule notification
+                        // Navigator.pop(context);
+                      },
+                      icon: !notifyAvailableSpace ? IconlyBold.location : null,
+                      text: notifyAvailableSpace ? "Save" : "Start Route",
+                    ),
+                    Dimens.space(2)
+                  ],
+          ),
+        );
+      },
+    );
   }
 }

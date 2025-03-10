@@ -23,6 +23,13 @@ class ScheduleNotificationsLoaded extends ScheduleNotificationsState {
   List<Object> get props => [scheduledNotifications];
 }
 
+class ScheduleNotificationCreated extends ScheduleNotificationsState {
+  const ScheduleNotificationCreated();
+
+  @override
+  List<Object> get props => [];
+}
+
 class ScheduleNotificationsError extends ScheduleNotificationsState {
   final String message;
 
@@ -37,57 +44,44 @@ class ScheduledNotification {
   final DateTime startsAt;
   final DateTime endsAt;
   final bool isExpired;
-  final Location location;
+
+  final double radius;
+  final LocationData location;
 
   ScheduledNotification({
     required this.id,
     required this.startsAt,
     required this.endsAt,
     required this.isExpired,
+    this.radius = 0,
     required this.location,
   });
 
   factory ScheduledNotification.fromJson(Map<String, dynamic> json) {
     return ScheduledNotification(
       id: json['id'],
+      radius: json['radius'],
       startsAt: DateTime.parse(json['starts_at']).toUtc(),
       endsAt: DateTime.parse(json['ends_at']).toUtc(),
       isExpired: json['is_expired'],
-      location: Location.fromJson(json['location']),
+      location: LocationData.fromJson(json['location']),
     );
   }
 }
 
-class Location {
+class LocationData {
   final String streetName;
-  final Point point;
+  final CoordinatesData point;
 
-  Location({
+  LocationData({
     required this.streetName,
     required this.point,
   });
 
-  factory Location.fromJson(Map<String, dynamic> json) {
-    return Location(
+  factory LocationData.fromJson(Map<String, dynamic> json) {
+    return LocationData(
       streetName: json['street_name'],
-      point: Point.fromJson(json['point']),
-    );
-  }
-}
-
-class Point {
-  final double lng;
-  final double lat;
-
-  Point({
-    required this.lng,
-    required this.lat,
-  });
-
-  factory Point.fromJson(Map<String, dynamic> json) {
-    return Point(
-      lng: json['lng'],
-      lat: json['lat'],
+      point: CoordinatesData.fromMap(json['point']),
     );
   }
 }

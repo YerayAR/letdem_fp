@@ -33,7 +33,7 @@ class ProfileView extends StatelessWidget {
         children: [
           StyledAppBar(
             onTap: () {
-              NavigatorHelper.to(NotificationsView());
+              NavigatorHelper.to(const NotificationsView());
             },
             title: 'Profile',
             icon: Iconsax.notification5,
@@ -129,7 +129,7 @@ class ProfileView extends StatelessWidget {
                               icon: IconlyLight.star,
                               text: 'Contributions',
                               onTap: () {
-                                NavigatorHelper.to(ViewAllView());
+                                NavigatorHelper.to(const ViewAllView());
                               },
                             ),
                             SettingsRow(
@@ -137,7 +137,7 @@ class ProfileView extends StatelessWidget {
                               text: 'Scheduled Notifications',
                               onTap: () {
                                 NavigatorHelper.to(
-                                    ScheduledNotificationsView());
+                                    const ScheduledNotificationsView());
                               },
                             ),
                             SettingsRow(
@@ -169,7 +169,7 @@ class ProfileView extends StatelessWidget {
                                 icon: IconlyLight.filter,
                                 text: 'Preferences',
                                 onTap: () {
-                                  NavigatorHelper.to(PreferencesView());
+                                  NavigatorHelper.to(const PreferencesView());
                                 },
                               ),
                               SettingsRow(
@@ -177,7 +177,7 @@ class ProfileView extends StatelessWidget {
                                 text: 'Security',
                                 showDivider: false,
                                 onTap: () {
-                                  NavigatorHelper.to(SecurityView());
+                                  NavigatorHelper.to(const SecurityView());
                                 },
                               ),
                             ],

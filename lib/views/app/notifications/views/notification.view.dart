@@ -60,7 +60,7 @@ class _NotificationsViewState extends State<NotificationsView> {
             selectedColor: AppColors.primary400,
             unselectedTextColor: AppColors.neutral500,
           ),
-          Expanded(
+          const Expanded(
             child: EmptyNotificationView(),
           ),
         ],
@@ -88,7 +88,7 @@ class EmptyNotificationView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
+          const Text(
             'No Notifications Yet',
             style: TextStyle(
               fontSize: 18,
@@ -98,6 +98,47 @@ class EmptyNotificationView extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             'Your app notifications will appear here\nwhenever there is a new activity',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.neutral400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EmptyScheduleNotificationView extends StatelessWidget {
+  const EmptyScheduleNotificationView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Iconsax.notification5,
+              size: 40,
+              color: AppColors.primary500,
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'No Scheduled Notifications Yet',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Your app scheduled notifications will appear\nhere whenever you set this reminder',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

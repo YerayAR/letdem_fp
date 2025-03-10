@@ -7,6 +7,7 @@ import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/features/car/dto/create_car.dto.dart';
+import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
@@ -165,10 +166,25 @@ class EndPoints {
     method: HTTPMethod.GET,
   );
 
+  static Endpoint<CreateScheduledNotificationDTO> createScheduleNotification =
+      Endpoint(
+    url: "/users/me/scheduled-notifications",
+    method: HTTPMethod.POST,
+  );
+
   static Endpoint deleteScheduleNotification(String id) {
     return Endpoint(
       url: "/users/me/scheduled-notifications/$id",
       method: HTTPMethod.DELETE,
+    );
+  }
+//   users/me/scheduled-notifications/e0739c1015dc4135b80c42a7a8485995
+
+  static Endpoint<CreateScheduledNotificationDTO> updateScheduleNotification(
+      String id) {
+    return Endpoint(
+      url: "/users/me/scheduled-notifications/$id",
+      method: HTTPMethod.PUT,
     );
   }
 }

@@ -13,7 +13,9 @@ class AuthRepository extends AuthInterface {
   @override
   Future<Tokens> login(LoginDTO loginDTO) async {
     ApiResponse response = await ApiService.sendRequest(
-        endpoint: EndPoints.loginEndpoint.copyWithDTO(loginDTO));
+      endpoint: EndPoints.loginEndpoint.copyWithDTO(loginDTO),
+    );
+
     return Tokens(accessToken: response.data['token']);
   }
 

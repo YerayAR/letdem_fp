@@ -20,6 +20,8 @@ class SavedAddressComponent extends StatelessWidget {
 
   final Function(MapBoxPlace) onPlaceSelected;
 
+  final Function(LetDemLocation place)? onApiPlaceSelected;
+
   final MapBoxPlace? place;
 
   final Function(MapBoxPlace place) onMapBoxPlaceDeleted;
@@ -35,7 +37,8 @@ class SavedAddressComponent extends StatelessWidget {
       required this.onLetDemLocationDeleted,
       this.locationType = LetDemLocationType.other,
       this.place,
-      required this.onPlaceSelected});
+      required this.onPlaceSelected,
+      this.onApiPlaceSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +46,10 @@ class SavedAddressComponent extends StatelessWidget {
         ? const SizedBox()
         : GestureDetector(
             onTap: () {
+              if (apiPlace != null && onApiPlaceSelected != null) {
+                onApiPlaceSelected!(apiPlace!)!;
+              }
+
               if (place != null) {
                 onPlaceSelected(place!);
               }
