@@ -370,10 +370,11 @@ class _HomeViewState extends State<HomeView>
                   text: 'Navigate to Space',
                   onTap: () {
                     NavigatorHelper.to(TrafficRouteLineExample(
-                        hideToggle: true,
-                        streetName: space.location.streetName,
-                        lat: space.location.point.lat,
-                        lng: space.location.point.lng));
+                      hideToggle: true,
+                      streetName: space.location.streetName,
+                      lat: space.location.point.lat,
+                      lng: space.location.point.lng,
+                    ));
                   },
                 ),
               ],

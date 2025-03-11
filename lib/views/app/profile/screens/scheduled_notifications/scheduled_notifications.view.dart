@@ -289,7 +289,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'From ${notification.startsAt.hour}:${notification.startsAt.minute} to ${notification.endsAt.hour}:${notification.endsAt.minute}',
+                      '${DateFormat('MMM d HH:mm').format(notification.startsAt)} - ${DateFormat('MMM d HH:mm').format(notification.endsAt)}',
                       style: Typo.mediumBody.copyWith(
                         color: AppColors.neutral500,
                       ),
@@ -477,12 +477,12 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                     const SizedBox(height: 16),
 
                     // Arrival time
-                    const Row(
+                    Row(
                       children: [
                         Icon(IconlyLight.time_circle, color: Colors.grey),
                         SizedBox(width: 8),
                         Text(
-                          "To Arrive in by 12:38pm",
+                          "To Arrive in by ${DateFormat('hh:mm a').format(routeInfo!.arrivingAt.toLocal())}",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -603,23 +603,7 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                           _selectedEndTime.minute,
                         );
 
-                        if (end.isBefore(start)) {
-                          Toast.show('End time cannot be before start time');
-                          return;
-                        }
-
-                        // check if the start or end time is in the past
-                        if (start.isBefore(DateTime.now())) {
-                          Toast.show('Start time cannot be in the past');
-                          return;
-                        }
-                        if (end.isBefore(DateTime.now())) {
-                          Toast.show('End time cannot be in the past');
-                          return;
-                        }
-
-                        if (radius < 100) {
-                          Toast.show('Radius cannot be less than 100 meters');
+                        if (!validateDateTime(start, end)) {
                           return;
                         }
 
@@ -785,14 +769,9 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
       time.minute,
     );
 
-    // Format time based on preference (12h or 24h)
-    final String formattedTime = dateTime.hour > 12
-        ? '${dateTime.hour - 12}:${dateTime.minute.toString().padLeft(2, '0')} PM'
-        : dateTime.hour == 12
-            ? '12:${dateTime.minute.toString().padLeft(2, '0')} PM'
-            : dateTime.hour == 0
-                ? '12:${dateTime.minute.toString().padLeft(2, '0')} AM'
-                : '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} AM';
+    // Format time in 24-hour format
+    final String formattedTime =
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
 
     return formattedTime;
   }

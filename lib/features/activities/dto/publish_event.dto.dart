@@ -1,4 +1,5 @@
 import 'package:letdem/services/api/models/endpoint.dart';
+import 'package:letdem/services/api/models/error.dart';
 
 class PublishRoadEventDTO extends DTO {
   final String? type;
@@ -15,6 +16,19 @@ class PublishRoadEventDTO extends DTO {
 
   @override
   Map<String, dynamic> toMap() {
+    // check for invalid latitude and longitude
+
+    if (latitude < -90 || latitude > 90) {
+      throw ApiError(
+        message: "Invalid latitude",
+      );
+    }
+    if (longitude < -180 || longitude > 180) {
+      throw ApiError(
+        message: "Invalid longitude",
+      );
+    }
+
     return {
       "type": type,
       "location": {

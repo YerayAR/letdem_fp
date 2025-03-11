@@ -116,6 +116,14 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
 
   _onMapCreated(MapboxMap mapboxMap) async {
     this.mapboxMap = mapboxMap;
+
+    // hide the compass
+
+    mapboxMap.compass.updateSettings(CompassSettings(visibility: false));
+
+    mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
+      enabled: false,
+    ));
     pointAnnotationManager =
         await mapboxMap.annotations.createPointAnnotationManager();
 
@@ -323,6 +331,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
   bool notifyAvailableSpace = false;
   double radius = 100;
 
+  bool isNotificationScheduled = false;
+
   bool isLocationAvailable = false;
 
   double distance = 0.0;
@@ -355,7 +365,6 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       widget.notification.location.point.latitude,
       widget.notification.location.point.longitude,
     );
-    print('Distance: $distance');
 
     setState(() {
       isLocationAvailable = false;
@@ -367,6 +376,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     return BlocConsumer<ScheduleNotificationsBloc, ScheduleNotificationsState>(
       listener: (context, state) {
         if (state is ScheduleNotificationCreated) {
+          setState(() {
+            isNotificationScheduled = true;
+          });
           AppPopup.showDialogSheet(
             context,
             SuccessDialog(
@@ -472,7 +484,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                         Icon(IconlyLight.time_circle, color: Colors.grey),
                         SizedBox(width: 8),
                         Text(
-                          "To Arrive in by ${DateFormat('hh:mm a').format(widget.routeInfo!.arrivingAt)}",
+                          "To Arrive in by ${DateFormat('hh:mm a').format(widget.routeInfo!.arrivingAt.toLocal())}",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -486,126 +498,135 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                     SizedBox(height: 16),
 
                     // Notification toggle
-                    Row(
-                      children: widget.hideToggle
-                          ? []
-                          : [
-                              const Icon(IconlyLight.notification,
-                                  color: Colors.grey),
-                              const SizedBox(width: 8),
-                              const Expanded(
-                                child: Text(
-                                  "Notify me of available space in this area",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              ToggleSwitch(
-                                value: notifyAvailableSpace,
-                                onChanged: (value) {
-                                  setState(() {
-                                    notifyAvailableSpace = value;
-                                  });
-                                },
-                              ),
-                            ],
-                    ),
-                    SizedBox(height: widget.hideToggle ? 0 : 16),
-
-                    // Time selection buttons
                     Column(
-                      children: !notifyAvailableSpace
+                      children: isNotificationScheduled
                           ? []
                           : [
                               Row(
-                                children: [
-                                  PlatformDatePickerButton(
-                                      initialDate: _fromDate,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _fromDate = date;
-                                        });
-                                      }),
-                                  const SizedBox(width: 16),
-                                  PlatformDatePickerButton(
-                                      initialDate: _toDate,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _toDate = date;
-                                        });
-                                      }),
-                                ],
+                                children: widget.hideToggle
+                                    ? []
+                                    : [
+                                        const Icon(IconlyLight.notification,
+                                            color: Colors.grey),
+                                        const SizedBox(width: 8),
+                                        const Expanded(
+                                          child: Text(
+                                            "Notify me of available space in this area",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        ToggleSwitch(
+                                          value: notifyAvailableSpace,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              notifyAvailableSpace = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
                               ),
+                              SizedBox(height: widget.hideToggle ? 0 : 16),
 
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  PlatformTimePickerButton(
-                                      initialTime: _fromTime,
-                                      onTimeSelected: (time) {
-                                        setState(() {
-                                          _fromTime = time;
-                                        });
-                                      }),
-                                  const SizedBox(width: 16),
-                                  PlatformTimePickerButton(
-                                      initialTime: _toTime,
-                                      onTimeSelected: (time) {
-                                        setState(() {
-                                          _toTime = time;
-                                        });
-                                      }),
-                                ],
+                              // Time selection buttons
+                              Column(
+                                children: !notifyAvailableSpace
+                                    ? []
+                                    : [
+                                        Row(
+                                          children: [
+                                            PlatformDatePickerButton(
+                                                initialDate: _fromDate,
+                                                onDateSelected: (date) {
+                                                  setState(() {
+                                                    _fromDate = date;
+                                                  });
+                                                }),
+                                            const SizedBox(width: 16),
+                                            PlatformDatePickerButton(
+                                                initialDate: _toDate,
+                                                onDateSelected: (date) {
+                                                  setState(() {
+                                                    _toDate = date;
+                                                  });
+                                                }),
+                                          ],
+                                        ),
+
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            PlatformTimePickerButton(
+                                                initialTime: _fromTime,
+                                                onTimeSelected: (time) {
+                                                  setState(() {
+                                                    _fromTime = time;
+                                                  });
+                                                }),
+                                            const SizedBox(width: 16),
+                                            PlatformTimePickerButton(
+                                                initialTime: _toTime,
+                                                onTimeSelected: (time) {
+                                                  setState(() {
+                                                    _toTime = time;
+                                                  });
+                                                }),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 24),
+
+                                        // Radius slider
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              "Radius (Meters)",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              radius.toStringAsFixed(0),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        SliderTheme(
+                                          data:
+                                              SliderTheme.of(context).copyWith(
+                                            activeTrackColor: Colors.purple,
+                                            inactiveTrackColor:
+                                                Colors.purple.withOpacity(0.2),
+                                            thumbColor: Colors.white,
+                                            overlayColor:
+                                                Colors.purple.withOpacity(0.2),
+                                            thumbShape:
+                                                const RoundSliderThumbShape(
+                                                    enabledThumbRadius: 8),
+                                          ),
+                                          child: Slider(
+                                            value: radius,
+                                            min: 100,
+                                            max: 9000,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                radius = value;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
                               ),
                               const SizedBox(height: 24),
-
-                              // Radius slider
-                              Row(
-                                children: [
-                                  const Text(
-                                    "Radius (Meters)",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    radius.toStringAsFixed(0),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              SliderTheme(
-                                data: SliderTheme.of(context).copyWith(
-                                  activeTrackColor: Colors.purple,
-                                  inactiveTrackColor:
-                                      Colors.purple.withOpacity(0.2),
-                                  thumbColor: Colors.white,
-                                  overlayColor: Colors.purple.withOpacity(0.2),
-                                  thumbShape: const RoundSliderThumbShape(
-                                      enabledThumbRadius: 8),
-                                ),
-                                child: Slider(
-                                  value: radius,
-                                  min: 100,
-                                  max: 9000,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      radius = value;
-                                    });
-                                  },
-                                ),
-                              ),
                             ],
                     ),
-                    const SizedBox(height: 24),
 
                     // Reschedule button
                     PrimaryButton(
@@ -628,31 +649,12 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                             _toTime.minute,
                           );
 
-                          print('Start: $start');
-                          print('End: $end');
-
-                          if (end.isBefore(start)) {
-                            Toast.show('End time cannot be before start time');
-                            return;
-                          }
-
-                          // check if the start or end time is in the past
-                          if (start.isBefore(DateTime.now())) {
-                            Toast.show('Start time cannot be in the past');
-                            return;
-                          }
-                          if (end.isBefore(DateTime.now())) {
-                            Toast.show('End time cannot be in the past');
-                            return;
-                          }
-                          // then can select upto 5 days from current date
-
-                          if (end.difference(DateTime.now()).inDays > 5) {
-                            Toast.show('You can only schedule up to 5 days');
+                          if (!validateDateTime(start, end)) {
                             return;
                           }
                           if (radius < 100) {
-                            Toast.show('Radius cannot be less than 100 meters');
+                            Toast.showError(
+                                'Radius cannot be less than 100 meters');
                             return;
                           }
 
@@ -680,8 +682,12 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                         // Schedule notification
                         // Navigator.pop(context);
                       },
-                      icon: !notifyAvailableSpace ? IconlyBold.location : null,
-                      text: notifyAvailableSpace ? "Save" : "Start Route",
+                      icon: !notifyAvailableSpace || isNotificationScheduled
+                          ? IconlyBold.location
+                          : null,
+                      text: notifyAvailableSpace && !isNotificationScheduled
+                          ? "Save"
+                          : "Start Route",
                     ),
                     Dimens.space(2)
                   ],
@@ -708,4 +714,33 @@ parseHours(int min) {
   } else {
     return "${(min / 60).toStringAsFixed(0)} hrs";
   }
+}
+
+bool validateDateTime(DateTime? start, DateTime? end) {
+  DateTime now = DateTime.now();
+
+  if (start == null || end == null) {
+    Toast.showError('Start and end times are required');
+    return false;
+  }
+
+  if (start.isAfter(end) || start.isAtSameMomentAs(end)) {
+    Toast.showError('Start time should be before end time');
+    return false;
+  }
+
+  if (start.isBefore(now) || end.isBefore(now)) {
+    Toast.showError(
+        'Start and end times should be greater than the current time');
+    return false;
+  }
+
+  // Ensure difference is not greater than 5 days (including milliseconds rounding)
+  if (end.difference(start).inMilliseconds >
+      const Duration(days: 5).inMilliseconds) {
+    Toast.showError('You can only schedule up to 5 days');
+    return false;
+  }
+
+  return true;
 }

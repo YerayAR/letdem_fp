@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/base.dart';
 import 'package:letdem/views/welcome/views/welcome.view.dart';
 
@@ -45,7 +47,42 @@ class _SplashViewState extends State<SplashView> {
                 return;
               }
             }
-            Toast.showError(state.error);
+            AppPopup.showBottomSheet(
+              context,
+              Padding(
+                padding: EdgeInsets.all(Dimens.defaultMargin),
+                child: Column(
+                  children: [
+                    Icon(
+                      Iconsax.cloud_connection,
+                      color: AppColors.red500,
+                      size: 50,
+                    ),
+                    Dimens.space(2),
+                    Text("Something went wrong",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 23,
+                        )),
+                    Text(
+                      'We were unable to process your request. Please try again later. The error is: ${state.apiError != null ? state.apiError!.message : state.error}',
+                      style: TextStyle(
+                        color: AppColors.neutral400,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Dimens.space(3),
+                    PrimaryButton(
+                      onTap: () {
+                        context.read<UserBloc>().add(FetchUserInfoEvent());
+                      },
+                      text: "Retry",
+                    )
+                  ],
+                ),
+              ),
+            );
           }
           // TODO: implement listener
         },
@@ -67,32 +104,32 @@ class _SplashViewState extends State<SplashView> {
                   ],
                 ),
               ),
-              SizedBox(
-                  child: state is UserError
-                      ? Container(
-                          margin: EdgeInsets.only(
-                            top: Dimens.defaultMargin,
-                            left: Dimens.defaultMargin,
-                            right: Dimens.defaultMargin,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.red500.withOpacity(0.06),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            vertical: Dimens.defaultMargin / 2,
-                            horizontal: Dimens.defaultMargin,
-                          ),
-                          child: Text(
-                            'We were unable to process your request. Please try again later. The error is: ${state.apiError != null ? state.apiError!.message : state.error}',
-                            style: TextStyle(
-                              color: AppColors.red500,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      : null),
+              // SizedBox(
+              //     child: state is UserError
+              //         ? Container(
+              //             margin: EdgeInsets.only(
+              //               top: Dimens.defaultMargin,
+              //               left: Dimens.defaultMargin,
+              //               right: Dimens.defaultMargin,
+              //             ),
+              //             decoration: BoxDecoration(
+              //               color: AppColors.red500.withOpacity(0.06),
+              //               borderRadius: BorderRadius.circular(10),
+              //             ),
+              //             padding: EdgeInsets.symmetric(
+              //               vertical: Dimens.defaultMargin / 2,
+              //               horizontal: Dimens.defaultMargin,
+              //             ),
+              //             child: Text(
+              //               'We were unable to process your request. Please try again later. The error is: ${state.apiError != null ? state.apiError!.message : state.error}',
+              //               style: TextStyle(
+              //                 color: AppColors.red500,
+              //                 fontWeight: FontWeight.w500,
+              //               ),
+              //               textAlign: TextAlign.center,
+              //             ),
+              //           )
+              //         : null),
             ],
           );
         },
