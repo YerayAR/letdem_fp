@@ -43,6 +43,18 @@ class EditBasicInfoEvent extends UserEvent {
   List<Object?> get props => [firstName, lastName];
 }
 
+class UpdateNotificationPreferencesEvent extends UserEvent {
+  final bool pushNotifications;
+  final bool emailNotifications;
+
+  const UpdateNotificationPreferencesEvent(
+      {required this.pushNotifications, required this.emailNotifications});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [pushNotifications, emailNotifications];
+}
+
 class IncreaseUserPointEvent extends UserEvent {
   final int points;
 

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
+import 'package:letdem/extenstions/location.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 
 class MapboxSearchApiService {
@@ -19,11 +21,14 @@ class MapboxSearchApiService {
       "https://api.mapbox.com/search/searchbox/v1/suggest";
   static const String _contentType = "application/json";
 
-  Future<List<MapBoxPlace>> getLocationResults(String query) async {
+  Future<List<MapBoxPlace>> getLocationResults(
+      String query, BuildContext context) async {
     try {
+      var country = await context.getUserCountry();
+
       final String url =
           "$_baseUrl?q=$query&access_token=${AppCredentials.mapBoxAccessToken}"
-          "&session_token=${DateTime.now().millisecondsSinceEpoch}&limit=7";
+          "&session_token=${DateTime.now().millisecondsSinceEpoch}&country=${country?.toLowerCase()}&limit=10";
 
       final response = await http.get(Uri.parse(url), headers: {
         "Content-Type": _contentType,

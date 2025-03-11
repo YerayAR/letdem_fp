@@ -63,6 +63,7 @@ dependencies:
   here_sdk:
     path: plugins/here_sdk
   mapbox_polyline_points: ^0.0.6
+  geocoding: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -17,6 +17,18 @@ class PreferencesView extends StatefulWidget {
 }
 
 class _PreferencesViewState extends State<PreferencesView> {
+  List<Map<String, dynamic>> notificationPreferences = [
+    {
+      'title': 'Email Notifications',
+      'key': 'email',
+      'value': true,
+    },
+    {
+      'title': 'Push Notifications',
+      'key': 'push',
+      'value': true,
+    },
+  ];
   List<Map<String, dynamic>> preferences = [
     {
       'key': 'available_spaces',
@@ -70,88 +82,111 @@ class _PreferencesViewState extends State<PreferencesView> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final preferences = context.userProfile?.preferences;
-      if (preferences != null) {
+      final notifications = context.userProfile?.notificationPreferences;
+      if (preferences != null && notifications != null) {
         setState(() {
           this.preferences = this.preferences.map((preference) {
-            final value = preferences.getPreference(preference['key']) ?? false;
+            final value = preferences.getPreference(preference['key']);
             return {
               ...preference,
               'value': value,
             };
           }).toList();
+
+          notificationPreferences[0] = {
+            ...notificationPreferences[0],
+            'value': notifications.emailNotifications,
+          };
+          notificationPreferences[1] = {
+            ...notificationPreferences[1],
+            'value': notifications.pushNotifications,
+          };
         });
       }
     });
   }
 
-  submit() {
-    context.read<UserBloc>().add(UpdatePreferencesEvent(
-            preferences: preferences.map((preference) {
-          return {
-            preference['key'].toString(): preference['value'] as bool,
-          };
-        }).toList()));
+  submit(bool isNotification) {
+    if (isNotification) {
+      context.read<UserBloc>().add(
+            UpdateNotificationPreferencesEvent(
+                pushNotifications: notificationPreferences[1]['value'] as bool,
+                emailNotifications:
+                    notificationPreferences[0]['value'] as bool),
+          );
+    } else {
+      context.read<UserBloc>().add(UpdatePreferencesEvent(
+              preferences: preferences.map((preference) {
+            return {
+              preference['key'].toString(): preference['value'] as bool,
+            };
+          }).toList()));
+    }
     // Save preferences to the server
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
+      body: StyledBody(
         children: [
-          StyledBody(
-            children: [
-              StyledAppBar(
-                title: 'Preferences',
-                onTap: () {
-                  NavigatorHelper.pop();
-                },
-                icon: Icons.close,
-              ),
-              Dimens.space(3),
-              SettingsContainer(
-                title: 'Notifications',
-                child: Column(children: [
-                  SettingsRow(
-                    widget: ToggleSwitch(
-                      value: true,
-                      onChanged: (value) {},
-                    ),
-                    text: 'Alerts',
+          StyledAppBar(
+            title: 'Preferences',
+            onTap: () {
+              NavigatorHelper.pop();
+            },
+            icon: Icons.close,
+          ),
+          Dimens.space(3),
+          Expanded(
+            child: ListView(
+              children: [
+                SettingsContainer(
+                  title: 'Notifications',
+                  child: Column(
+                    children: notificationPreferences.map((preference) {
+                      return SettingsRow(
+                        showDivider:
+                            notificationPreferences.indexOf(preference) !=
+                                notificationPreferences.length - 1,
+                        widget: ToggleSwitch(
+                          value: preference['value'],
+                          onChanged: (value) {
+                            setState(() {
+                              preference['value'] = value;
+                            });
+                            submit(true);
+                          },
+                        ),
+                        text: preference['title'],
+                      );
+                    }).toList(),
                   ),
-                  SettingsRow(
-                    showDivider: false,
-                    widget: ToggleSwitch(
-                      value: true,
-                      onChanged: (value) {},
-                    ),
-                    text: 'Push Notifications',
-                  ),
-                ]),
-              ),
-              Dimens.space(5),
-              SettingsContainer(
-                title: 'Alerts',
-                child: Column(
-                  children: preferences.map((preference) {
-                    return SettingsRow(
-                      showDivider: preferences.indexOf(preference) !=
-                          preferences.length - 1,
-                      widget: ToggleSwitch(
-                        value: preference['value'],
-                        onChanged: (value) {
-                          setState(() {
-                            preference['value'] = value;
-                          });
-                          submit();
-                        },
-                      ),
-                      text: preference['title'],
-                    );
-                  }).toList(),
                 ),
-              ),
-            ],
+                Dimens.space(5),
+                SettingsContainer(
+                  title: 'Alerts',
+                  child: Column(
+                    children: preferences.map((preference) {
+                      return SettingsRow(
+                        showDivider: preferences.indexOf(preference) !=
+                            preferences.length - 1,
+                        widget: ToggleSwitch(
+                          value: preference['value'],
+                          onChanged: (value) {
+                            setState(() {
+                              preference['value'] = value;
+                            });
+                            submit(false);
+                          },
+                        ),
+                        text: preference['title'],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

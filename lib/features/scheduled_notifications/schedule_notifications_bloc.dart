@@ -65,8 +65,13 @@ class ScheduleNotificationsBloc
         emit(const ScheduleNotificationCreated());
       }
     } on ApiError catch (err) {
+      emit(const ScheduleNotificationsError(
+          'Failed to create scheduled notification'));
       Toast.showError(err.message);
     } catch (e) {
+      emit(const ScheduleNotificationsError(
+          'Failed to create scheduled notification'));
+
       Toast.showError('Failed to create scheduled notification');
     }
   }

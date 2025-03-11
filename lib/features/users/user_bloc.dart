@@ -22,6 +22,46 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<ChangePasswordEvent>(_onChangePassword);
     on<DeleteAccountEvent>(_onDeleteAccount);
     on<UpdatePreferencesEvent>(_onUpdatePreferences);
+    on<UpdateNotificationPreferencesEvent>(_onUpdateNotificationPreferences);
+  }
+
+  Future<void> _onUpdateNotificationPreferences(
+      UpdateNotificationPreferencesEvent event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      UserLoaded userLoaded = state as UserLoaded;
+
+      try {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: true,
+        ));
+        await userRepository.updateNotificationPreferences(PreferencesDTO(
+          preferences: [],
+          notificationsPreferences: [
+            {
+              'push': event.pushNotifications,
+            },
+            {
+              'email': event.emailNotifications,
+            },
+          ],
+        ));
+
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        emit(const UserInfoChanged());
+      } on ApiError catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError(err.message);
+      } catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError("Unable to update notification preferences");
+      }
+    }
   }
 
   Future<void> _onUpdatePreferences(
@@ -34,7 +74,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           isUpdateLoading: true,
         ));
         await userRepository.updatePreferencesEndpoint(
-          PreferencesDTO(preferences: event.preferences),
+          PreferencesDTO(
+              preferences: event.preferences, notificationsPreferences: []),
         );
 
         emit(userLoaded.copyWith(

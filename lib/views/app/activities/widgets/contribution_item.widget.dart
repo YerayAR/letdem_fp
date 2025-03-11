@@ -75,7 +75,7 @@ class ContributionItem extends StatelessWidget {
                             children: [
                               Text(
                                 DateFormat("dd MMM. yyyy").format(
-                                  (activity.created),
+                                  (activity.created.toLocal()),
                                 ),
                                 // "12 Jan. 2025",
                                 style: Typo.mediumBody.copyWith(

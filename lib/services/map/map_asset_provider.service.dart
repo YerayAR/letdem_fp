@@ -7,10 +7,13 @@ class MapAssetsProvider {
   late Uint8List freeMarker, greenMarker, blueMarker, disasterMarker;
 
   late Uint8List currentLocationMarker;
+
+  late Uint8List destinationMarker;
   late Uint8List accidentMarker, closedRoadMarker, policeMarker;
 
   Future<void> loadAssets() async {
     freeMarker = await _loadImage(AppAssets.freeMapMarker);
+    destinationMarker = await _loadImage(AppAssets.destinationMapMarker);
     greenMarker = await _loadImage(AppAssets.greenMapMarker);
     blueMarker = await _loadImage(AppAssets.blueMapMarker);
     disasterMarker = await _loadImage(AppAssets.disabledMapMarker);

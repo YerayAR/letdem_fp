@@ -60,6 +60,13 @@ class UserRepository extends IUserRepository {
       endpoint: EndPoints.updatePreferencesEndpoint.copyWithDTO(dto),
     );
   }
+
+  @override
+  Future updateNotificationPreferences(PreferencesDTO preferences) async {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.updatePreferencesEndpoint.copyWithDTO(preferences),
+    );
+  }
 }
 
 abstract class IUserRepository {
@@ -69,6 +76,8 @@ abstract class IUserRepository {
   Future updatePreferencesEndpoint(PreferencesDTO dto);
 
   Future deleteAccount();
+
+  Future updateNotificationPreferences(PreferencesDTO preferences);
 
   Future<LetDemUser> getUser();
 
@@ -91,10 +100,13 @@ class LetDemUser {
 
   final UserPreferences preferences;
 
+  final NotificationPreferences notificationPreferences;
+
   LetDemUser({
     required this.id,
     required this.email,
     required this.preferences,
+    required this.notificationPreferences,
     required this.firstName,
     required this.lastName,
     required this.isSocial,
@@ -106,6 +118,8 @@ class LetDemUser {
   factory LetDemUser.fromJSON(Map<String, dynamic> json) {
     return LetDemUser(
       id: json['id'],
+      notificationPreferences:
+          NotificationPreferences.fromJSON(json['notifications_preferences']),
       email: json['email'] ?? '',
       firstName: json['first_name'] ?? '',
       preferences: UserPreferences(
@@ -162,9 +176,11 @@ class EditBasicInfoDTO extends DTO {
 
 class PreferencesDTO extends DTO {
   final List<Map<String, bool>> preferences;
+  final List<Map<String, bool>> notificationsPreferences;
 
   PreferencesDTO({
     required this.preferences,
+    required this.notificationsPreferences,
   });
 
   @override
@@ -174,7 +190,40 @@ class PreferencesDTO extends DTO {
         for (var preference in preferences) ...{
           preference.keys.first: preference.values.first,
         }
-      }
+      },
+      'notifications': {
+        for (var preference in notificationsPreferences) ...{
+          preference.keys.first: preference.values.first,
+        }
+      },
     };
+  }
+}
+
+class NotificationPreferences {
+  final bool pushNotifications;
+  final bool emailNotifications;
+
+  NotificationPreferences({
+    required this.pushNotifications,
+    required this.emailNotifications,
+  });
+
+  factory NotificationPreferences.fromJSON(Map<String, dynamic> json) {
+    return NotificationPreferences(
+      pushNotifications: json['push'],
+      emailNotifications: json['email'],
+    );
+  }
+
+  toJSON() {
+    return {
+      'push': pushNotifications,
+      'email': emailNotifications,
+    };
+  }
+
+  bool getPreference(String preferenceKey) {
+    return toJSON()[preferenceKey];
   }
 }

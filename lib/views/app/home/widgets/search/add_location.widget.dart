@@ -48,7 +48,8 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
         setState(() {
           isSearching = true;
         });
-        var results = await MapboxSearchApiService().getLocationResults(query);
+        var results =
+            await MapboxSearchApiService().getLocationResults(query, context);
         print(results.first.toJson());
         setState(() {
           _searchResults = results;

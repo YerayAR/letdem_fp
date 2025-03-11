@@ -187,4 +187,10 @@ class EndPoints {
       method: HTTPMethod.PUT,
     );
   }
+  // {{BASE_URI}}/v1/maps/routes?current-point=40.2811896,-3.7873749&destination-address=Sol, Pasaje de la Caja de Ahorros, 28013 Madrid, Spain
+
+  static Endpoint getRoute = Endpoint(
+    url: "/maps/routes",
+    method: HTTPMethod.GET,
+  );
 }

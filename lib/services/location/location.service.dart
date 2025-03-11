@@ -4,6 +4,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
+import 'package:letdem/services/api/api.service.dart';
+import 'package:letdem/services/api/endpoints.dart';
+import 'package:letdem/services/api/models/endpoint.dart';
+import 'package:letdem/services/api/models/response.model.dart';
 
 class CurrentLocationPayload {
   final double latitude;
@@ -78,7 +82,28 @@ class MapboxService {
     }
   }
 
+  static Future<RouteInfo> getRoutes({
+    required double currentPointLatitude,
+    required double currentPointLongitude,
+    required String destination,
+  }) async {
+    List<QParam> params = [];
+
+    params.add(QParam(
+        key: 'current-point',
+        value: '$currentPointLatitude,$currentPointLongitude'));
+    params.add(QParam(key: 'destination-address', value: destination));
+
+    EndPoints.getRoute.setParams(params);
+
+    ApiResponse response =
+        await ApiService.sendRequest(endpoint: EndPoints.getRoute);
+
+    return RouteInfo.fromMap(response.data['routes'][0]);
+  }
+
   static Future<CoordinatesData?> getLatLng(String mapboxId) async {
+    print('mapboxId: $mapboxId');
     // https://api.mapbox.com/search/geocode/v6/forward?q=heath&proximity=ip&access_token=pk.eyJ1IjoidmhlbXNhcmEiLCJhIjoiY203cDZnaGltMGdndDJrcXlwdTY3ODY2biJ9.3C6sly2ynJCEVLb3t5uAjA
 
     final url =
@@ -102,5 +127,29 @@ class MapboxService {
       print('Error: $e');
     }
     return null;
+  }
+}
+
+class RouteInfo {
+  final String tafficLevel;
+  final double distance;
+
+  final int duration;
+
+  final DateTime arrivingAt;
+
+  RouteInfo(
+      {required this.tafficLevel,
+      required this.distance,
+      required this.duration,
+      required this.arrivingAt});
+
+  factory RouteInfo.fromMap(Map<String, dynamic> map) {
+    return RouteInfo(
+      tafficLevel: map['traffic_level'],
+      distance: double.parse(map['distance'].toString()),
+      duration: int.parse(map['duration'].toString()),
+      arrivingAt: DateTime.parse(map['arriving_at']),
+    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -15,8 +16,10 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
 
 class ScheduledNotificationsView extends StatefulWidget {
@@ -332,8 +335,6 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
 
   bool isLocationAvailable = false;
 
-  double distance = 0.0;
-
   @override
   void initState() {
     super.initState();
@@ -357,24 +358,24 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
 
+  RouteInfo? routeInfo;
+
   void getDistance() async {
     // Check if location services are enabled
     setState(() {
-      isLocationAvailable = false;
+      isLocationAvailable = true;
     });
 
     var currentLocation = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
 
-    // Get distance between two points
-    distance = Geolocator.distanceBetween(
-        widget.notification.location.point.latitude,
-        widget.notification.location.point.longitude,
-        currentLocation.latitude,
-        currentLocation.longitude);
-    print('Distance: $distance');
+    var routeInfoData = await MapboxService.getRoutes(
+        currentPointLatitude: currentLocation.latitude,
+        currentPointLongitude: currentLocation.longitude,
+        destination: widget.notification.location.streetName);
 
     setState(() {
+      routeInfo = routeInfoData;
       isLocationAvailable = false;
     });
   }
@@ -425,7 +426,7 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                         Text(
                           // Format distance to miles to kilometers
 
-                          "00 mins ${(distance / 1000).toStringAsFixed(1)} km",
+                          "${parseHours(routeInfo!.duration)} (${parseMeters(routeInfo!.distance)})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -442,7 +443,8 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                             ),
                             const SizedBox(width: 8),
                             DecoratedChip(
-                              text: "Moderate",
+                              text: toBeginningOfSentenceCase(
+                                  routeInfo!.tafficLevel),
                               textStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -894,7 +896,6 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
       setState(() {
         selectedDate = pickedDate;
       });
-      widget.onDateSelected(pickedDate);
     }
   }
 
@@ -995,7 +996,7 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
           color: Colors.black54,
         ),
         label: Text(
-          _formatDate(selectedDate),
+          _formatDate(widget.initialDate),
           style: TextStyle(
             color: widget.isSelected ? Colors.purple : Colors.black,
             fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,

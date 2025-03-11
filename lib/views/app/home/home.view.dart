@@ -13,6 +13,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
@@ -24,10 +25,8 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
+import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
-
-import '../../../enums/EventTypes.dart';
-import '../../../main.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});

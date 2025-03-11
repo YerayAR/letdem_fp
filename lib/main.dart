@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
@@ -12,8 +11,6 @@ import 'package:here_sdk/core.dart';
 import 'package:here_sdk/core.engine.dart';
 import 'package:here_sdk/core.errors.dart';
 import 'package:here_sdk/mapview.dart';
-// http
-import 'package:http/http.dart' as http;
 import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
@@ -38,11 +35,9 @@ import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
-import 'package:letdem/models/map/coordinate.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
@@ -54,6 +49,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'firebase_options.dart';
+import 'views/app/home/widgets/home/no_connection.widget.dart';
 
 void _initializeHERESDK() async {
   // Needs to be called before accessing SDKOptions to load necessary libraries.
@@ -164,7 +160,7 @@ class LetDemApp extends StatelessWidget {
         builder: FlashyFlushbarProvider.init(),
         theme: ThemeData(
           appBarTheme: AppBarTheme(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.scaffoldColor,
             titleTextStyle: TextStyle(
               color: AppColors.neutral600,
               fontSize: 17,
@@ -523,384 +519,6 @@ class _HomeViewState extends State<PolyMapView>
 
   @override
   bool get wantKeepAlive => true;
-}
-
-// class TrafficRouteLineExample extends StatefulWidget {
-//   const TrafficRouteLineExample({super.key});
-//
-//   @override
-//   State<TrafficRouteLineExample> createState() =>
-//       TrafficRouteLineExampleState();
-// }
-//
-// class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
-//   late MapboxMap mapboxMap;
-//   final _sfAirport = mapbox.Point(
-//       coordinates: mapbox.Position(-122.39470445734368, 37.7080221537549));
-//   final _sfDowntown = mapbox.Position(-122.41941, 37.77493);
-//   bool _isRouteLoaded = false;
-//
-//   _onMapCreated(MapboxMap mapboxMap) async {
-//     this.mapboxMap = mapboxMap;
-//   }
-//
-//   _onStyleLoadedCallback(StyleLoadedEventData data) async {
-//     await _addRouteSource();
-//     await _addRouteLine();
-//     await _fetchRouteData();
-//   }
-//
-//   Future<void> _addRouteSource() async {
-//     await mapboxMap.style.addSource(GeoJsonSource(
-//       id: "line",
-//       data: json.encode({"type": "FeatureCollection", "features": []}),
-//     ));
-//   }
-//
-//   Future<void> _fetchRouteData() async {
-//     try {
-//       final coordinates =
-//           "${_sfAirport.coordinates.lng},${_sfAirport.coordinates.lat};" +
-//               "${_sfDowntown.lng},${_sfDowntown.lat}";
-//
-//       final url =
-//           'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates' +
-//               '?alternatives=true' +
-//               '&geometries=geojson' +
-//               '&overview=full' +
-//               '&steps=false' +
-//               '&access_token=${AppCredentials.mapBoxAccessToken}';
-//
-//       final response = await http.get(Uri.parse(url));
-//
-//       if (response.statusCode == 200) {
-//         final data = json.decode(response.body);
-//
-//         final route = data['routes'][0];
-//         final geometry = route['geometry'];
-//
-//         final geoJson = {
-//           "type": "Feature",
-//           "properties": {"route-color": "rgb(51, 102, 255)"},
-//           "geometry": geometry
-//         };
-//
-//         // Use the correct method to update the GeoJSON source
-//         await mapboxMap.style.updateGeoJSONSourceFeatures(
-//           "line",
-//           json.encode({
-//             "type": "FeatureCollection",
-//             "features": [geoJson]
-//           }),
-//           [
-//             Feature(id: "line", geometry: LineString.fromJson(geometry)),
-//           ],
-//         );
-//
-//         setState(() {
-//           _isRouteLoaded = true;
-//         });
-//       } else {
-//         print('Failed to load route data: ${response.statusCode}');
-//       }
-//     } catch (e) {
-//       print('Error fetching route data: $e');
-//     }
-//   }
-//
-//   Future<void> _addRouteLine() async {
-//     await mapboxMap.style.addLayer(LineLayer(
-//       id: "line-layer",
-//       sourceId: "line",
-//       lineColor: Colors.blue.value,
-//       lineWidthExpression: [
-//         'interpolate',
-//         ['exponential', 1.5],
-//         ['zoom'],
-//         4.0,
-//         2.0,
-//         10.0,
-//         4.0,
-//         13.0,
-//         6.0,
-//         16.0,
-//         8.0,
-//         19.0,
-//         10.0,
-//         22.0,
-//         14.0,
-//       ],
-//       lineBorderColor: Colors.black.value,
-//       lineBorderWidthExpression: [
-//         'interpolate',
-//         ['exponential', 1.5],
-//         ['zoom'],
-//         9.0,
-//         1.0,
-//         16.0,
-//         3.0,
-//       ],
-//     ));
-//   }
-//
-//   // Fix the traffic layer logic
-//   Future<void> _addTrafficLayer() async {
-//     try {
-//       // Check if the traffic layer already exists
-//
-//       // If the layer exists, we can toggle its visibility instead of adding it again
-//
-//       // Otherwise, add the traffic layer
-//       await mapboxMap.style.addLayer(LineLayer(
-//         id: "traffic",
-//         sourceId: "mapbox", // Changed from "composite" to "mapbox"
-//         sourceLayer: "road_traffic", // Changed from "traffic" to "road_traffic"
-//         lineWidth: 5.0,
-//         lineColorExpression: [
-//           'match',
-//           ['get', 'congestion'],
-//           'low',
-//           'rgb(65, 244, 65)',
-//           'moderate',
-//           'rgb(244, 209, 65)',
-//           'heavy',
-//           'rgb(244, 130, 65)',
-//           'severe',
-//           'rgb(244, 65, 65)',
-//           'rgb(65, 65, 244)', // Default color
-//         ],
-//       ));
-//     } catch (e) {
-//       print('Error adding traffic layer: $e');
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       floatingActionButton: Padding(
-//         padding: const EdgeInsets.all(12.0),
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.end,
-//           children: <Widget>[
-//             FloatingActionButton(
-//               heroTag: "refreshRoute",
-//               onPressed: _fetchRouteData,
-//               child: const Icon(Icons.refresh),
-//               tooltip: "Refresh route data",
-//             ),
-//             const SizedBox(height: 10),
-//             FloatingActionButton(
-//               heroTag: "toggleTraffic",
-//               onPressed: _addTrafficLayer,
-//               child: const Icon(Icons.traffic),
-//               tooltip: "Show traffic data",
-//             ),
-//           ],
-//         ),
-//       ),
-//       body: MapWidget(
-//         key: const ValueKey("mapWidget"),
-//         cameraOptions: CameraOptions(
-//           center: _sfAirport,
-//           zoom: 11.0,
-//         ),
-//         textureView: true,
-//         onMapCreated: _onMapCreated,
-//         onStyleLoadedListener: _onStyleLoadedCallback,
-//       ),
-//     );
-//   }
-// }
-
-class TrafficRouteLineExample extends StatefulWidget {
-  final double lat;
-  final double lng;
-
-  final String streetName;
-
-  final bool hideToggle;
-
-  const TrafficRouteLineExample(
-      {super.key,
-      required this.lat,
-      required this.lng,
-      required this.hideToggle,
-      required this.streetName});
-
-  @override
-  State createState() => TrafficRouteLineExampleState();
-}
-
-class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
-  late MapboxMap mapboxMap;
-
-  Future _fetchRouteData() async {
-    try {
-      var currentLocation = await geolocator.Geolocator.getCurrentPosition();
-      final coordinates =
-          "${currentLocation.longitude},${currentLocation.latitude};"
-          "${widget.lng},${widget.lat}";
-
-      final url =
-          'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${AppCredentials.mapBoxAccessToken}';
-
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        final route = data['routes'][0];
-        final geometry = route['geometry'];
-
-        final geoJson = {
-          "type": "Feature",
-          "properties": {"route-color": "rgb(51, 102, 255)"},
-          "geometry": geometry
-        };
-
-        return geoJson;
-      } else {
-        print('Failed to load route data: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching route data: $e');
-    }
-  }
-
-  _onMapCreated(MapboxMap mapboxMap) async {
-    this.mapboxMap = mapboxMap;
-  }
-
-  _onStyleLoadedCallback(StyleLoadedEventData data) async {
-    var geoJson = await _fetchRouteData();
-    // Add the GeoJSON source to the map from api
-
-    await mapboxMap.style
-        .addSource(GeoJsonSource(id: "line", data: json.encode(geoJson)));
-    await _addRouteLine();
-  }
-
-  final bool _isRouteLoaded = false;
-
-  _addRouteLine() async {
-    await mapboxMap.style.addLayer(LineLayer(
-      id: "line-layer",
-      sourceId: "line",
-      lineBorderColor: Colors.black.value,
-      // Defines a line-width, line-border-width and line-color at different zoom extents
-      // by interpolating exponentially between stops.
-      // Doc: https://docs.mapbox.com/style-spec/reference/expressions/
-      lineWidthExpression: [
-        'interpolate',
-        ['exponential', 1.5],
-        ['zoom'],
-        4.0,
-        6.0,
-        10.0,
-        7.0,
-        13.0,
-        9.0,
-        16.0,
-        3.0,
-        19.0,
-        7.0,
-        22.0,
-        21.0,
-      ],
-      lineBorderWidthExpression: [
-        'interpolate',
-        ['exponential', 1.5],
-        ['zoom'],
-        9.0,
-        1.0,
-        16.0,
-        3.0,
-      ],
-      lineColorExpression: [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        8.0,
-        'rgb(51, 102, 255)',
-        11.0,
-        [
-          'coalesce',
-          ['get', 'route-color'],
-          'rgb(51, 102, 255)'
-        ],
-      ],
-    ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          actions: [
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.close,
-                  size: 20,
-                ),
-                onPressed: () {
-                  NavigatorHelper.pop();
-                },
-              ),
-            ),
-            Dimens.space(2),
-          ],
-        ),
-        floatingActionButton: const Padding(
-          padding: EdgeInsets.all(12.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              SizedBox(height: 10),
-            ],
-          ),
-        ),
-        body: Stack(
-          children: [
-            MapWidget(
-                key: UniqueKey(),
-                cameraOptions: CameraOptions(
-                    center: mapbox.Point(
-                      coordinates: mapbox.Position(widget.lng, widget.lat),
-                    ),
-                    zoom: 12.0),
-                textureView: true,
-                onMapCreated: _onMapCreated,
-                onStyleLoadedListener: _onStyleLoadedCallback),
-            Positioned(
-                left: 0,
-                bottom: 0,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: NavigateNotificationCard(
-                    hideToggle: widget.hideToggle,
-                    notification: ScheduledNotification(
-                        id: "1",
-                        startsAt: DateTime.now(),
-                        endsAt: DateTime.now(),
-                        isExpired: false,
-                        location: LocationData(
-                          streetName: widget.streetName,
-                          point: CoordinatesData(
-                            longitude: widget.lng,
-                            latitude: widget.lat,
-                          ),
-                        )),
-                  ),
-                )),
-          ],
-        ));
-  }
 }
 
 class NavigateNotificationCard extends StatefulWidget {

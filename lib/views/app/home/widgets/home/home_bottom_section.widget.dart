@@ -57,7 +57,7 @@ class HomeMapBottomSection extends StatelessWidget {
                   label: null,
                   onChanged: (value) async {
                     MapboxSearchApiService()
-                        .getLocationResults(value)
+                        .getLocationResults(value, context)
                         .then((value) {
                       for (var element in value) {
                         debugPrint(element.fullAddress);
