@@ -120,6 +120,9 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
     // hide the compass
 
     mapboxMap.compass.updateSettings(CompassSettings(visibility: false));
+    mapboxMap.setBounds(CameraBoundsOptions(
+      minZoom: 9,
+    ));
 
     mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
       enabled: false,
@@ -365,6 +368,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       widget.notification.location.point.latitude,
       widget.notification.location.point.longitude,
     );
+    print('Distance: $distance');
 
     setState(() {
       isLocationAvailable = false;
@@ -427,7 +431,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                         Text(
                           // Format distance to miles to kilometers
 
-                          "${parseHours((widget.routeInfo!.duration).toInt())} (${parseMeters(widget.routeInfo!.distance)})",
+                          "${parseHours((widget.routeInfo!.duration))} (${parseMeters(widget.routeInfo!.distance)})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

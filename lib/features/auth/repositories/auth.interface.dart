@@ -5,6 +5,7 @@ import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class TokenDTO extends DTO {
   final String token;
@@ -13,9 +14,7 @@ class TokenDTO extends DTO {
 
   @override
   Map<String, dynamic> toMap() {
-    return {
-      'token': token,
-    };
+    return {'token': token, 'device_id': OneSignal.User.pushSubscription.id};
   }
 }
 

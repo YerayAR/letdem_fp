@@ -494,7 +494,27 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
 
                     Divider(color: Colors.grey.withOpacity(0.2)),
                     const SizedBox(height: 16),
-
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PlatformDatePickerButton(
+                            initialDate: widget.notification.startsAt,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _startsAt = date;
+                              });
+                            }),
+                        const SizedBox(width: 16),
+                        PlatformDatePickerButton(
+                            initialDate: widget.notification.endsAt,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _endsAt = date;
+                              });
+                            }),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                     // Time selection buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -512,27 +532,6 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                             onTimeSelected: (time) {
                               setState(() {
                                 _selectedEndTime = time;
-                              });
-                            }),
-                      ],
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        PlatformDatePickerButton(
-                            initialDate: widget.notification.startsAt,
-                            onDateSelected: (date) {
-                              setState(() {
-                                _startsAt = date;
-                              });
-                            }),
-                        const SizedBox(width: 16),
-                        PlatformDatePickerButton(
-                            initialDate: widget.notification.endsAt,
-                            onDateSelected: (date) {
-                              setState(() {
-                                _endsAt = date;
                               });
                             }),
                       ],

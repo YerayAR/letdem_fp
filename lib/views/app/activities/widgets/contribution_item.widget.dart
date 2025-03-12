@@ -89,7 +89,7 @@ class ContributionItem extends StatelessWidget {
                               ),
                               Text(
                                 DateFormat("hh:mm a").format(
-                                  (activity.created),
+                                  (activity.created.toLocal()),
                                 ),
                                 style: Typo.mediumBody.copyWith(
                                   fontSize: 14,
