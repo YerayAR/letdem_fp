@@ -88,7 +88,7 @@ class ContributionItem extends StatelessWidget {
                                 backgroundColor: AppColors.neutral200,
                               ),
                               Text(
-                                DateFormat("hh:mm a").format(
+                                DateFormat("HH:mm").format(
                                   (activity.created.toLocal()),
                                 ),
                                 style: Typo.mediumBody.copyWith(

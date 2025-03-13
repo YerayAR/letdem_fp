@@ -346,12 +346,13 @@ class _HomeViewState extends State<HomeView>
                           DecoratedChip(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 5),
-                            text: '${geolocator.Geolocator.distanceBetween(
+                            text:
+                                '${parseMeters(geolocator.Geolocator.distanceBetween(
                               _currentPosition!.latitude,
                               _currentPosition!.longitude,
                               space.location.point.lat,
                               space.location.point.lng,
-                            ).floor()}m away',
+                            ))} away',
                             textStyle: Typo.smallBody.copyWith(
                               fontWeight: FontWeight.w600,
                               color: AppColors.green600,

@@ -8,6 +8,7 @@ import 'package:letdem/features/activities/repositories/activity.repository.dart
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/image/compressor.dart';
+import 'package:letdem/services/location/location.service.dart';
 
 part 'activities_event.dart';
 part 'activities_state.dart';
@@ -26,12 +27,14 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       PublishRoadEventEvent event, Emitter<ActivitiesState> emit) async {
     try {
       emit(ActivitiesLoading());
+
+      var c = await MapboxService.getPlaceFromLatLng();
       await activityRepository.publishRoadEvent(
         PublishRoadEventDTO(
           type: event.type,
           streetName: event.locationName,
-          latitude: event.latitude,
-          longitude: event.longitude,
+          latitude: c!.latitude,
+          longitude: c!.longitude,
         ),
       );
       emit(ActivitiesPublished(

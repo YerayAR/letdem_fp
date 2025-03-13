@@ -83,10 +83,10 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                   onCallToAction: () {
                     NavigatorHelper.to(const ViewAllView());
                   },
-                  padding:
-                      state is ActivitiesLoaded && state.activities.isNotEmpty
-                          ? const EdgeInsets.only(top: 20)
-                          : const EdgeInsets.symmetric(vertical: 20),
+                  padding: context.userProfile != null &&
+                          context.userProfile!.contributions.isNotEmpty
+                      ? const EdgeInsets.only(top: 20)
+                      : const EdgeInsets.symmetric(vertical: 20),
                   title: "Contributions",
                   callToAction: "See all",
                   child: [
@@ -95,8 +95,8 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                           width: double.infinity,
                           padding: EdgeInsets.only(
                             top: 25,
-                            bottom: state is ActivitiesLoaded &&
-                                    state.activities.isNotEmpty
+                            bottom: context.userProfile != null &&
+                                    context.userProfile!.contributions.isEmpty
                                 ? 0
                                 : 25,
                             left: 25,
@@ -104,8 +104,8 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: state is ActivitiesLoaded &&
-                                    state.activities.isNotEmpty
+                            borderRadius: !(context.userProfile != null &&
+                                    context.userProfile!.contributions.isEmpty)
                                 ? const BorderRadius.only(
                                     topLeft: Radius.circular(20),
                                     topRight: Radius.circular(20),

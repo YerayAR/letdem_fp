@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +15,6 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
@@ -358,7 +356,7 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
 
-  RouteInfo? routeInfo;
+  // RouteInfo? routeInfo;
 
   void getDistance() async {
     // Check if location services are enabled
@@ -366,16 +364,16 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
       isLocationAvailable = true;
     });
 
-    var currentLocation = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best);
+    // var currentLocation = await Geolocator.getCurrentPosition(
+    //     desiredAccuracy: LocationAccuracy.best);
 
-    var routeInfoData = await MapboxService.getRoutes(
-        currentPointLatitude: currentLocation.latitude,
-        currentPointLongitude: currentLocation.longitude,
-        destination: widget.notification.location.streetName);
+    // var routeInfoData = await MapboxService.getRoutes(
+    //     currentPointLatitude: currentLocation.latitude,
+    //     currentPointLongitude: currentLocation.longitude,
+    //     destination: widget.notification.location.streetName);
 
     setState(() {
-      routeInfo = routeInfoData;
+      // routeInfo = routeInfoData;
       isLocationAvailable = false;
     });
   }
@@ -396,18 +394,18 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
       builder: (context, state) {
         return Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+          // decoration: BoxDecoration(
+          //   color: Colors.white,
+          //   borderRadius: BorderRadius.circular(16),
+          //   boxShadow: [
+          //     BoxShadow(
+          //       color: Colors.grey.withOpacity(0.1),
+          //       spreadRadius: 1,
+          //       blurRadius: 10,
+          //       offset: const Offset(0, 2),
+          //     ),
+          //   ],
+          // ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: isLocationAvailable
@@ -420,42 +418,46 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                     ),
                   ]
                 : [
+                    Text("Reschedule Notification",
+                        style: Typo.heading1.copyWith(
+                          fontSize: 20,
+                        )),
                     // Time and distance row
-                    Row(
-                      children: [
-                        Text(
-                          // Format distance to miles to kilometers
-
-                          "${parseHours(routeInfo!.duration)} (${parseMeters(routeInfo!.distance)})",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            const Text(
-                              "Traffic Level",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            DecoratedChip(
-                              text: toBeginningOfSentenceCase(
-                                  routeInfo!.tafficLevel),
-                              textStyle: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary500,
-                              ),
-                              color: AppColors.primary500,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Text(
+                    //       // Format distance to miles to kilometers
+                    //
+                    //       "${parseHours(routeInfo!.duration)} (${parseMeters(routeInfo!.distance)})",
+                    //       style: const TextStyle(
+                    //         fontSize: 18,
+                    //         fontWeight: FontWeight.bold,
+                    //       ),
+                    //     ),
+                    //     const Spacer(),
+                    //     Row(
+                    //       children: [
+                    //         const Text(
+                    //           "Traffic Level",
+                    //           style: TextStyle(
+                    //             fontSize: 14,
+                    //           ),
+                    //         ),
+                    //         const SizedBox(width: 8),
+                    //         DecoratedChip(
+                    //           text: toBeginningOfSentenceCase(
+                    //               routeInfo!.tafficLevel),
+                    //           textStyle: TextStyle(
+                    //             fontSize: 14,
+                    //             fontWeight: FontWeight.w600,
+                    //             color: AppColors.primary500,
+                    //           ),
+                    //           color: AppColors.primary500,
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ],
+                    // ),
                     const SizedBox(height: 22),
 
                     // Location
@@ -474,26 +476,29 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-
-                    // Arrival time
-                    Row(
-                      children: [
-                        Icon(IconlyLight.time_circle, color: Colors.grey),
-                        SizedBox(width: 8),
-                        Text(
-                          "To Arrive in by ${DateFormat('hh:mm a').format(routeInfo!.arrivingAt.toLocal())}",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                    // const SizedBox(height: 16),
+                    //
+                    // // Arrival time
+                    // Row(
+                    //   children: [
+                    //     Icon(IconlyLight.time_circle, color: Colors.grey),
+                    //     SizedBox(width: 8),
+                    //     Text(
+                    //       // 24 hour format
+                    //       "To be Arrived by ${DateFormat('HH:mm').format(routeInfo!.arrivingAt.toLocal())}",
+                    //       // "To Arrive in by ${DateFormat('hh:mm a').format(routeInfo!.arrivingAt.toLocal())}",
+                    //       style: TextStyle(
+                    //         fontSize: 16,
+                    //         fontWeight: FontWeight.w500,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     const SizedBox(height: 16),
 
                     Divider(color: Colors.grey.withOpacity(0.2)),
                     const SizedBox(height: 16),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -505,6 +510,12 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                               });
                             }),
                         const SizedBox(width: 16),
+                        const Icon(
+                          CupertinoIcons.arrow_right,
+                          color: Colors.grey,
+                          size: 17,
+                        ),
+                        const SizedBox(width: 16),
                         PlatformDatePickerButton(
                             initialDate: widget.notification.endsAt,
                             onDateSelected: (date) {
@@ -514,7 +525,7 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                             }),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     // Time selection buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -526,6 +537,12 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                                 _selectedStartTime = time;
                               });
                             }),
+                        const SizedBox(width: 16),
+                        const Icon(
+                          CupertinoIcons.arrow_right,
+                          color: Colors.grey,
+                          size: 17,
+                        ),
                         const SizedBox(width: 16),
                         PlatformTimePickerButton(
                             initialTime: _selectedEndTime,

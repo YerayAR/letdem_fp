@@ -488,7 +488,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                         Icon(IconlyLight.time_circle, color: Colors.grey),
                         SizedBox(width: 8),
                         Text(
-                          "To Arrive in by ${DateFormat('hh:mm a').format(widget.routeInfo!.arrivingAt.toLocal())}",
+                          "To be Arrived by ${DateFormat('HH:mm').format(widget.routeInfo!.arrivingAt.toLocal())}",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -549,6 +549,12 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                                                   });
                                                 }),
                                             const SizedBox(width: 16),
+                                            const Icon(
+                                              CupertinoIcons.arrow_right,
+                                              color: Colors.grey,
+                                              size: 17,
+                                            ),
+                                            const SizedBox(width: 16),
                                             PlatformDatePickerButton(
                                                 initialDate: _toDate,
                                                 onDateSelected: (date) {
@@ -570,6 +576,12 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                                                     _fromTime = time;
                                                   });
                                                 }),
+                                            const SizedBox(width: 16),
+                                            const Icon(
+                                              CupertinoIcons.arrow_right,
+                                              color: Colors.grey,
+                                              size: 17,
+                                            ),
                                             const SizedBox(width: 16),
                                             PlatformTimePickerButton(
                                                 initialTime: _toTime,
@@ -636,7 +648,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                     PrimaryButton(
                       isLoading: state is ScheduleNotificationsLoading,
                       onTap: () {
-                        if (notifyAvailableSpace) {
+                        if (notifyAvailableSpace && !isNotificationScheduled) {
                           DateTime start = DateTime(
                             _fromDate.year,
                             _fromDate.month,
