@@ -105,7 +105,13 @@ class SearchLocationBloc
           ),
         );
         emit(currentState.copyWith(
-          locations: [...currentState.locations, location],
+          locations: event.isUpdating
+              ? [
+                  ...currentState.locations
+                      .where((element) => element.type != event.locationType),
+                  location
+                ]
+              : [...currentState.locations, location],
           isLocationCreating: false,
         ));
       } catch (e) {

@@ -86,13 +86,25 @@ class MapboxService {
     required double currentPointLatitude,
     required double currentPointLongitude,
     required String destination,
+    double? destinationLatitude,
+    double? destinationLongitude,
   }) async {
     List<QParam> params = [];
 
-    params.add(QParam(
-        key: 'current-point',
-        value: '$currentPointLatitude,$currentPointLongitude'));
-    params.add(QParam(key: 'destination-address', value: destination));
+    if (destinationLatitude != null && destinationLongitude != null) {
+      params.add(QParam(
+        key: 'destination-point',
+        value: '$destinationLatitude,$destinationLongitude',
+      ));
+    } else {
+      params.add(QParam(key: 'destination-address', value: destination));
+    }
+
+    params.add(
+      QParam(
+          key: 'current-point',
+          value: '$currentPointLatitude,$currentPointLongitude'),
+    );
 
     EndPoints.getRoute.setParams(params);
 

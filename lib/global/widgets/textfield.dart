@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -28,6 +29,8 @@ class TextInputField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final bool isLoading;
 
+  final bool showDeleteIcon;
+
   const TextInputField({
     super.key,
     this.controller,
@@ -43,6 +46,7 @@ class TextInputField extends StatefulWidget {
     this.enableBorder = true,
     this.prefixIcon,
     this.isLoading = false,
+    this.showDeleteIcon = false,
   });
 
   @override
@@ -217,29 +221,52 @@ class TextInputFieldState extends State<TextInputField> {
                               color: AppColors
                                   .primary400), // Border color when focused
                         ),
-                  suffixIcon: widget.inputType == TextFieldType.password
-                      ? InkWell(
-                          splashColor:
-                              Colors.transparent, // Remove ripple effect
-                          highlightColor:
-                              Colors.transparent, // Remove highlight effect
-                          child: GestureDetector(
-                            child: Icon(
-                              isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              size: 18,
-                              color: AppColors.neutral300,
-                              // color: AppColors.gray,
-                            ),
-                            onTap: () {
-                              setState(() {
-                                isPasswordVisible = !isPasswordVisible;
-                              });
-                            },
-                          ),
-                        )
-                      : null)),
+                  suffixIcon: widget.showDeleteIcon
+                      ? widget.controller!.text.isNotEmpty
+                          ? InkWell(
+                              splashColor:
+                                  Colors.transparent, // Remove ripple effect
+                              highlightColor:
+                                  Colors.transparent, // Remove highlight effect
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 5),
+                                child: GestureDetector(
+                                  child: Icon(
+                                    Iconsax.close_circle5,
+                                    size: 22,
+                                    color: AppColors.neutral100,
+                                    // color: AppColors.gray,
+                                  ),
+                                  onTap: () {
+                                    widget.controller!.clear();
+                                  },
+                                ),
+                              ),
+                            )
+                          : null
+                      : widget.inputType == TextFieldType.password
+                          ? InkWell(
+                              splashColor:
+                                  Colors.transparent, // Remove ripple effect
+                              highlightColor:
+                                  Colors.transparent, // Remove highlight effect
+                              child: GestureDetector(
+                                child: Icon(
+                                  isPasswordVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  size: 18,
+                                  color: AppColors.neutral300,
+                                  // color: AppColors.gray,
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    isPasswordVisible = !isPasswordVisible;
+                                  });
+                                },
+                              ),
+                            )
+                          : null)),
           Column(
             children: widget.showPasswordStrengthIndicator &&
                     widget.controller != null &&

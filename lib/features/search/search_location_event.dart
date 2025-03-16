@@ -45,9 +45,12 @@ final class CreateLocationEvent extends SearchLocationEvent {
   final double latitude;
   final double longitude;
 
+  final bool isUpdating;
+
   const CreateLocationEvent({
     required this.locationType,
     required this.name,
+    required this.isUpdating,
     required this.latitude,
     required this.longitude,
   });

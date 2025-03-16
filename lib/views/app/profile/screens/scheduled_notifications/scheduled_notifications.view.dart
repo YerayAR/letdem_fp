@@ -560,7 +560,7 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                     Row(
                       children: [
                         const Text(
-                          "Radius (Meters)",
+                          "Receive notifications up to (meters)",
                           style: TextStyle(
                             fontSize: 14,
                           ),
@@ -747,6 +747,8 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
                 ),
                 Expanded(
                   child: CupertinoDatePicker(
+                    // set 24 hour format
+
                     mode: CupertinoDatePickerMode.time,
                     initialDateTime: DateTime(
                       DateTime.now().year,
@@ -763,7 +765,7 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
                         );
                       });
                     },
-                    use24hFormat: false, // Set to true for 24h format
+                    use24hFormat: true, // Set to true for 24h format
                   ),
                 ),
               ],

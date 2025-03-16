@@ -71,9 +71,12 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
     var currentLocationInfo = await geolocator.Geolocator.getCurrentPosition();
 
     routeInfo = await MapboxService.getRoutes(
-        currentPointLatitude: currentLocationInfo.latitude,
-        currentPointLongitude: currentLocationInfo.longitude,
-        destination: widget.streetName);
+      currentPointLatitude: currentLocationInfo.latitude,
+      currentPointLongitude: currentLocationInfo.longitude,
+      destinationLatitude: widget.lat,
+      destinationLongitude: widget.lng,
+      destination: widget.streetName,
+    );
 
     setState(() {
       currentLocation = currentLocationInfo;
@@ -119,7 +122,10 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
 
     // hide the compass
 
-    mapboxMap.compass.updateSettings(CompassSettings(visibility: false));
+    mapboxMap.compass.updateSettings(CompassSettings(
+      visibility: false,
+      opacity: 0
+    ));
     mapboxMap.setBounds(CameraBoundsOptions(
       minZoom: 9,
     ));
@@ -598,7 +604,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                                         Row(
                                           children: [
                                             const Text(
-                                              "Radius (Meters)",
+                                              "Receive notifications up to (meters)",
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),

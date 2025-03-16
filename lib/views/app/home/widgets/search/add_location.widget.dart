@@ -103,6 +103,7 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
               label: null,
               onChanged: _onSearchChanged,
               controller: _controller,
+              showDeleteIcon: true,
               prefixIcon: IconlyLight.search,
               placeHolder: 'Enter destination',
             ),

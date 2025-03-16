@@ -4,11 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/models/location/local_location.model.dart';
 import 'package:letdem/services/location/location.service.dart';
@@ -16,6 +18,8 @@ import 'package:letdem/services/mapbox_search/models/cache.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/app/home/widgets/search/add_location.widget.dart';
 import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:shimmer/shimmer.dart';
@@ -144,6 +148,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       label: null,
       onChanged: _onSearchChanged,
       controller: _controller,
+      showDeleteIcon: true,
       prefixIcon: IconlyLight.search,
       placeHolder: 'Enter destination',
     );
@@ -162,13 +167,32 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           SavedAddressComponent(
             locationType: locationType,
             showDivider: false,
+            onEditLocationTriggered: () {
+              Toast.show("editing");
+              // final place =
+              //     await AppPopup.showBottomSheet(
+              //   NavigatorHelper.navigatorKey!
+              //       .currentState!.context,
+              //   AddLocationBottomSheet(
+              //     title:
+              //     "${toBeginningOfSentenceCase(locationType.name)} Location",
+              //     onLocationSelected:
+              //         (MapBoxPlace place) {
+              //       print(place.toJson());
+              //       Navigator.pop(context, place);
+              //     },
+              //   ),
+              // );
+            },
             onApiPlaceSelected: _onLetDemLocationSelected,
             onPlaceSelected: (MapBoxPlace p) async {
+              Toast.show("This stupid thing triggered ");
               var val = '${p.name} ${p.placeFormatted} ';
               var latLng = await MapboxService.getLatLng(val);
 
               context.read<SearchLocationBloc>().add(
                     CreateLocationEvent(
+                      isUpdating: false,
                       locationType: locationType,
                       name: val,
                       latitude: latLng!.latitude,
@@ -190,6 +214,34 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                 locationType: locationType,
                 showDivider: true,
                 apiPlace: e,
+                onEditLocationTriggered: () async {
+                  MapBoxPlace? p = await AppPopup.showBottomSheet(
+                    NavigatorHelper.navigatorKey!.currentState!.context,
+                    AddLocationBottomSheet(
+                      title:
+                          "${toBeginningOfSentenceCase(locationType.name)} Location",
+                      onLocationSelected: (MapBoxPlace place) {
+                        print(place.toJson());
+                        Navigator.pop(context, place);
+                      },
+                    ),
+                  );
+
+                  if (p != null) {
+                    var val = '${p.name} ${p.placeFormatted} ';
+                    var latLng = await MapboxService.getLatLng(val);
+
+                    context.read<SearchLocationBloc>().add(
+                          CreateLocationEvent(
+                            isUpdating: true,
+                            locationType: locationType,
+                            name: val,
+                            latitude: latLng!.latitude,
+                            longitude: latLng.longitude,
+                          ),
+                        );
+                  }
+                },
                 onApiPlaceSelected: _onLetDemLocationSelected,
                 onPlaceSelected: (_) {},
                 onMapBoxPlaceDeleted: (_) {},
@@ -207,7 +259,6 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
 
   Widget _buildRecentLocationsSection(List<MapBoxPlace> recentPlaces) {
     if (recentPlaces.isEmpty) return const SizedBox();
-
     return Column(
       children: [
         Row(
