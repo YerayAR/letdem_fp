@@ -204,7 +204,7 @@ class SavedAddressComponent extends StatelessWidget {
                               onPressed: () {
                                 AppPopup.showBottomSheet(
                                     NavigatorHelper
-                                        .navigatorKey!.currentState!.context,
+                                        .navigatorKey.currentState!.context,
                                     LocationBottomSheet(
                                       type: locationType ==
                                               LetDemLocationType.other
@@ -258,12 +258,12 @@ class LocationBottomSheet extends StatelessWidget {
   final String type;
 
   const LocationBottomSheet({
-    Key? key,
+    super.key,
     required this.locationName,
     required this.onEdit,
     required this.type,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   /// Build CircleAvatar Icon Button
   Widget buildIconButton({

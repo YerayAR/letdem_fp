@@ -56,9 +56,15 @@ class DatabaseHelper {
 
   Future<List<MapBoxPlace>> getPlaces() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('places');
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'places',
+      limit: 5,
+    );
     return maps
         .map((map) => MapBoxPlace.fromJson(jsonDecode(map['data'])))
+        .toList()
+        .reversed
         .toList();
   }
 

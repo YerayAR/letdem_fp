@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
@@ -36,6 +37,18 @@ class ProfileView extends StatelessWidget {
               NavigatorHelper.to(const NotificationsView());
             },
             title: 'Profile',
+            suffix: context.userProfile!.notificationsCount == 0
+                ? null
+                : CircleAvatar(
+                    radius: 8,
+                    backgroundColor: AppColors.red500,
+                    child: Text(
+                      context.userProfile!.notificationsCount.toString(),
+                      style: Typo.smallBody.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
             icon: Iconsax.notification5,
           ),
           BlocConsumer<UserBloc, UserState>(

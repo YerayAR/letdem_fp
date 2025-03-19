@@ -59,7 +59,7 @@ class _SplashViewState extends State<SplashView> {
                       size: 50,
                     ),
                     Dimens.space(2),
-                    Text("Something went wrong",
+                    const Text("Something went wrong",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 23,

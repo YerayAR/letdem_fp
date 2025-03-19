@@ -26,7 +26,7 @@ final class ActivitiesLoaded extends ActivitiesState {
 final class ActivitiesPublished extends ActivitiesState {
   final int totalPointsEarned;
 
-  ActivitiesPublished({required this.totalPointsEarned});
+  const ActivitiesPublished({required this.totalPointsEarned});
   @override
   List<Object?> get props => [totalPointsEarned];
 }

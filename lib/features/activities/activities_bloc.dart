@@ -34,10 +34,10 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
           type: event.type,
           streetName: event.locationName,
           latitude: c!.latitude,
-          longitude: c!.longitude,
+          longitude: c.longitude,
         ),
       );
-      emit(ActivitiesPublished(
+      emit(const ActivitiesPublished(
         totalPointsEarned: 10,
       ));
     } on ApiError catch (err) {
@@ -75,7 +75,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
           longitude: event.longitude,
         ),
       );
-      emit(ActivitiesPublished(totalPointsEarned: 0));
+      emit(const ActivitiesPublished(totalPointsEarned: 0));
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {

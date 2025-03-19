@@ -319,6 +319,8 @@ class SuccessDialog extends StatelessWidget {
 
   final String? buttonText;
 
+  final IconData? icon;
+
   const SuccessDialog({
     super.key,
     required this.title,
@@ -326,6 +328,7 @@ class SuccessDialog extends StatelessWidget {
     required this.subtext,
     this.onProceed,
     this.isLoading = false,
+    this.icon,
   });
 
   @override
@@ -337,7 +340,7 @@ class SuccessDialog extends StatelessWidget {
           radius: 45,
           backgroundColor: AppColors.green50,
           child: Icon(
-            Icons.done,
+            icon ?? Icons.done,
             size: 45,
             color: AppColors.green600,
           ),

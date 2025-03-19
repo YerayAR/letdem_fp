@@ -24,6 +24,8 @@ import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
+import 'package:letdem/features/notifications/notifications_bloc.dart';
+import 'package:letdem/features/notifications/repository/notification.repository.dart';
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
@@ -108,6 +110,9 @@ void main() async {
         RepositoryProvider(
           create: (_) => ScheduleNotificationsRepository(),
         ),
+        RepositoryProvider(
+          create: (_) => NotificationRepository(),
+        ),
       ],
       child: MultiBlocProvider(providers: [
         BlocProvider(
@@ -119,6 +124,11 @@ void main() async {
           create: (context) => ScheduleNotificationsBloc(
             scheduleNotificationsRepository:
                 context.read<ScheduleNotificationsRepository>(),
+          ),
+        ),
+        BlocProvider<NotificationsBloc>(
+          create: (context) => NotificationsBloc(
+            notificationRepository: context.read<NotificationRepository>(),
           ),
         ),
         BlocProvider<AuthBloc>(
@@ -700,7 +710,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                     const SizedBox(height: 16),
 
                     Divider(color: Colors.grey.withOpacity(0.2)),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Notification toggle
                     Row(

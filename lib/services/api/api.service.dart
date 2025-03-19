@@ -153,7 +153,7 @@ class ApiService extends BaseApiService {
             endpoint.isProtected, endpoint.tokenKey),
       );
       if (EndPoints.showApiLogs) {
-        debugPrint("""
+        log("""
 ════════════════════════════════════════════════════════════════════════════════════════════════
       API REQUEST           🐶
 ════════════════════════════════════════════════════════════════════════════════════════════════
@@ -177,7 +177,7 @@ class ApiService extends BaseApiService {
       }
 
       if (EndPoints.showApiLogs) {
-        debugPrint("""
+        log("""
 ════════════════════════════════════════════════════════════════════════════════════════════════
       API RESPONSE    🐶
 ════════════════════════════════════════════════════════════════════════════════════════════════
@@ -260,7 +260,7 @@ ${response.data}
           message: "No internet connection", status: ErrorStatus.noInternet);
     }
     if (EndPoints.showApiLogs) {
-      debugPrint("""
+      log("""
 ════════════════════════════════════════════════════════════════════════════════════════════════
       API RESPONSE    🐶
 ════════════════════════════════════════════════════════════════════════════════════════════════

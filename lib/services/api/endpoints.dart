@@ -193,4 +193,16 @@ class EndPoints {
     url: "/maps/routes",
     method: HTTPMethod.GET,
   );
+
+  static var notifications = Endpoint(
+    url: "/users/me/notifications?read=false ",
+    method: HTTPMethod.GET,
+  );
+
+  static readNotification(String id) {
+    return Endpoint(
+      url: "users/me/notifications/$id/read",
+      method: HTTPMethod.PUT,
+    );
+  }
 }

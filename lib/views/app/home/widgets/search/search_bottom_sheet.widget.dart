@@ -18,7 +18,6 @@ import 'package:letdem/services/mapbox_search/models/cache.dart';
 import 'package:letdem/services/mapbox_search/models/model.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/search/add_location.widget.dart';
 import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
@@ -168,7 +167,6 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
             locationType: locationType,
             showDivider: false,
             onEditLocationTriggered: () {
-              Toast.show("editing");
               // final place =
               //     await AppPopup.showBottomSheet(
               //   NavigatorHelper.navigatorKey!
@@ -186,7 +184,6 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
             },
             onApiPlaceSelected: _onLetDemLocationSelected,
             onPlaceSelected: (MapBoxPlace p) async {
-              Toast.show("This stupid thing triggered ");
               var val = '${p.name} ${p.placeFormatted} ';
               var latLng = await MapboxService.getLatLng(val);
 
@@ -216,7 +213,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                 apiPlace: e,
                 onEditLocationTriggered: () async {
                   MapBoxPlace? p = await AppPopup.showBottomSheet(
-                    NavigatorHelper.navigatorKey!.currentState!.context,
+                    NavigatorHelper.navigatorKey.currentState!.context,
                     AddLocationBottomSheet(
                       title:
                           "${toBeginningOfSentenceCase(locationType.name)} Location",
@@ -308,8 +305,9 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
   }
 
   Widget _buildSearchResults() {
-    if (_searchResults.isEmpty || _controller.text.isEmpty)
+    if (_searchResults.isEmpty || _controller.text.isEmpty) {
       return const SizedBox();
+    }
 
     return Column(
       children: _searchResults

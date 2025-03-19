@@ -495,41 +495,25 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                     //   ],
                     // ),
                     const SizedBox(height: 16),
-
                     Divider(color: Colors.grey.withOpacity(0.2)),
                     const SizedBox(height: 16),
 
+                    Text(
+                      "Date & Time",
+                      style: Typo.mediumBody
+                          .copyWith(color: Colors.black, fontSize: 16),
+                    ),
+                    Dimens.space(3),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 15,
                       children: [
                         PlatformDatePickerButton(
-                            initialDate: widget.notification.startsAt,
+                            initialDate: _startsAt,
                             onDateSelected: (date) {
                               setState(() {
                                 _startsAt = date;
                               });
                             }),
-                        const SizedBox(width: 16),
-                        const Icon(
-                          CupertinoIcons.arrow_right,
-                          color: Colors.grey,
-                          size: 17,
-                        ),
-                        const SizedBox(width: 16),
-                        PlatformDatePickerButton(
-                            initialDate: widget.notification.endsAt,
-                            onDateSelected: (date) {
-                              setState(() {
-                                _endsAt = date;
-                              });
-                            }),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    // Time selection buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
                         PlatformTimePickerButton(
                             initialTime: _selectedStartTime,
                             onTimeSelected: (time) {
@@ -537,13 +521,21 @@ class _NavigationInfoCardState extends State<RescheduleNotificationCard> {
                                 _selectedStartTime = time;
                               });
                             }),
-                        const SizedBox(width: 16),
-                        const Icon(
-                          CupertinoIcons.arrow_right,
-                          color: Colors.grey,
-                          size: 17,
-                        ),
-                        const SizedBox(width: 16),
+                      ],
+                    ),
+                    Dimens.space(1),
+
+                    Row(
+                      spacing: 15,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PlatformDatePickerButton(
+                            initialDate: _endsAt,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _endsAt = date;
+                              });
+                            }),
                         PlatformTimePickerButton(
                             initialTime: _selectedEndTime,
                             onTimeSelected: (time) {
@@ -797,40 +789,51 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: OutlinedButton.icon(
-        onPressed: () {
-          // Use appropriate picker based on platform
-          if (Platform.isIOS) {
-            _showCupertinoTimePicker(context);
-          } else {
-            _showMaterialTimePicker(context);
-          }
-        },
-        icon: const Icon(
-          IconlyLight.time_circle,
-          color: Colors.black54,
-        ),
-        label: Text(
-          _formatTimeOfDay(selectedTime),
-          style: TextStyle(
-            color: widget.isSelected ? Colors.purple : Colors.black,
-            fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          side: BorderSide(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
             color: widget.isSelected
                 ? Colors.purple
                 : Colors.grey.withOpacity(0.4),
             width: widget.isSelected ? 2.0 : 1.0,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          backgroundColor: widget.isSelected
+          borderRadius: BorderRadius.circular(24),
+          color: widget.isSelected
               ? Colors.purple.withOpacity(0.05)
               : Colors.transparent,
+        ),
+        child: TextButton(
+          onPressed: () {
+            if (Platform.isIOS) {
+              _showCupertinoTimePicker(context);
+            } else {
+              _showMaterialTimePicker(context);
+            }
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _formatTimeOfDay(selectedTime),
+                style: TextStyle(
+                  color: widget.isSelected ? Colors.purple : Colors.black,
+                  fontWeight:
+                      widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              const Icon(
+                IconlyLight.time_circle,
+                size: 23,
+                color: Colors.black54,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -868,7 +871,7 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime(2000),
+      firstDate: DateTime.now(),
       lastDate: DateTime(2100),
       builder: (BuildContext context, Widget? child) {
         return Theme(
@@ -936,8 +939,11 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
                 Expanded(
                   child: CupertinoDatePicker(
                     mode: CupertinoDatePickerMode.date,
-                    initialDateTime: selectedDate,
-                    minimumDate: DateTime(2000),
+                    initialDateTime: selectedDate.isBefore(DateTime.now())
+                        ? DateTime.now()
+                        : selectedDate,
+                    minimumDate: DateTime(DateTime.now().year,
+                        DateTime.now().month, DateTime.now().day),
                     maximumDate: DateTime(2100),
                     onDateTimeChanged: (DateTime newDateTime) {
                       setState(() {
@@ -954,65 +960,55 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
     );
   }
 
-  // Format date as "MMM dd, yyyy"
-  String _formatDate(DateTime date) {
-    return '${_getMonthName(date.month)} ${date.day}, ${date.year}';
-  }
-
-  String _getMonthName(int month) {
-    const List<String> months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month - 1];
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: OutlinedButton.icon(
-        onPressed: () {
-          if (Platform.isIOS) {
-            _showCupertinoDatePicker(context);
-          } else {
-            _showMaterialDatePicker(context);
-          }
-        },
-        icon: const Icon(
-          IconlyLight.calendar,
-          color: Colors.black54,
-        ),
-        label: Text(
-          _formatDate(widget.initialDate),
-          style: TextStyle(
-            color: widget.isSelected ? Colors.purple : Colors.black,
-            fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          side: BorderSide(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
             color: widget.isSelected
                 ? Colors.purple
                 : Colors.grey.withOpacity(0.4),
             width: widget.isSelected ? 2.0 : 1.0,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          backgroundColor: widget.isSelected
+          borderRadius: BorderRadius.circular(24),
+          color: widget.isSelected
               ? Colors.purple.withOpacity(0.05)
               : Colors.transparent,
+        ),
+        child: TextButton(
+          onPressed: () {
+            if (Platform.isIOS) {
+              _showCupertinoDatePicker(context);
+            } else {
+              _showMaterialDatePicker(context);
+            }
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                // 11/2/2025
+                DateFormat('MM/dd/yyyy').format(selectedDate),
+                style: TextStyle(
+                  color: widget.isSelected ? Colors.purple : Colors.black,
+                  fontWeight:
+                      widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              const Icon(
+                IconlyLight.calendar,
+                color: Colors.black54,
+                size: 23,
+              ),
+            ],
+          ),
         ),
       ),
     );

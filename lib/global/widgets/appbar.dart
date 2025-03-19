@@ -8,8 +8,14 @@ class StyledAppBar extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  final Widget? suffix;
+
   const StyledAppBar(
-      {super.key, required this.title, required this.icon, this.onTap});
+      {super.key,
+      required this.title,
+      required this.icon,
+      this.onTap,
+      this.suffix});
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +27,26 @@ class StyledAppBar extends StatelessWidget {
             title,
             style: Typo.heading4,
           ),
-          GestureDetector(
-            onTap: onTap,
-            child: CircleAvatar(
-              radius: 21,
-              backgroundColor: AppColors.neutral50,
-              child: Icon(
-                icon,
-                color: AppColors.neutral500,
+          Stack(
+            children: [
+              GestureDetector(
+                onTap: onTap,
+                child: CircleAvatar(
+                  radius: 21,
+                  backgroundColor: AppColors.neutral50,
+                  child: Icon(
+                    icon,
+                    color: AppColors.neutral500,
+                  ),
+                ),
               ),
-            ),
+              if (suffix != null)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: suffix!,
+                ),
+            ],
           ),
         ],
       ),

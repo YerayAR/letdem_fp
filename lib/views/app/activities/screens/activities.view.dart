@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/car/car_bloc.dart';
@@ -46,6 +48,18 @@ class _ActivitiesViewState extends State<ActivitiesView> {
             isBottomPadding: false,
             children: [
               StyledAppBar(
+                suffix: context.userProfile!.notificationsCount == 0
+                    ? null
+                    : CircleAvatar(
+                        radius: 8,
+                        backgroundColor: AppColors.red500,
+                        child: Text(
+                          context.userProfile!.notificationsCount.toString(),
+                          style: Typo.smallBody.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )),
                 title: 'Activities',
                 onTap: () {
                   NavigatorHelper.to(const NotificationsView());
