@@ -9,8 +9,10 @@ import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
+import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/screens/view_all.view.dart';
+import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:shimmer/shimmer.dart';
 
 enum NotificationType {
@@ -69,7 +71,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 ),
               ),
               const TextSpan(
-                text: ' Received positive feedback',
+                text: ' has been occupied',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 14,
@@ -203,6 +205,8 @@ class _NotificationsViewState extends State<NotificationsView> {
             getName: (type) => type.name,
             initialValue: viewAllType,
             onSelected: (type) {
+              context.read<NotificationsBloc>().add(LoadNotificationsEvent(
+                  showUnread: type == NotificationType.unread));
               setState(() {
                 viewAllType = type;
               });
@@ -236,6 +240,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                       var notification = state.notifications.results[index];
                       return NotificationItem(
                         type: notification.type,
+                        notificationObject: notification.notificationObject,
                         title: formatedNotificationType(notification.type),
                         message: getDynamicTextFromType(
                             notification.type,
@@ -391,10 +396,13 @@ class NotificationItem extends StatelessWidget {
   final bool isRecent;
   final VoidCallback? onActionPressed;
 
+  final NotificationObject notificationObject;
+
   const NotificationItem({
     super.key,
     required this.title,
     required this.message,
+    required this.notificationObject,
     required this.timestamp,
     required this.type,
     this.actionLabel,
@@ -551,6 +559,30 @@ class NotificationItem extends StatelessWidget {
                       // Action button if available
                     ],
                   ),
+                  if (type == NotificationPayloadType.spaceNearby)
+                    Column(
+                      children: [
+                        Dimens.space(2),
+                        DecoratedChip(
+                          onTap: () {
+                            NavigatorHelper.to(TrafficRouteLineExample(
+                              lat: notificationObject.location.point.lat,
+                              lng: notificationObject.location.point.lng,
+                              hideToggle: false,
+                              streetName:
+                                  notificationObject.location.streetName,
+                            ));
+                          },
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
+                          text: 'View space ',
+                          backgroundColor: AppColors.primary300,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

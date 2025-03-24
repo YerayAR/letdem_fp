@@ -5,8 +5,11 @@ sealed class NotificationsEvent extends Equatable {
 }
 
 class LoadNotificationsEvent extends NotificationsEvent {
+  final bool showUnread;
+
+  LoadNotificationsEvent({this.showUnread = false});
   @override
-  List<Object> get props => [];
+  List<Object> get props => [showUnread];
 }
 
 class ReadNotificationEvent extends NotificationsEvent {

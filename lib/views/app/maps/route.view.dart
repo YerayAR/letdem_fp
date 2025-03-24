@@ -32,7 +32,7 @@ class TrafficRouteLineExample extends StatefulWidget {
   final double lat;
   final double lng;
 
-  final String streetName;
+  final String? streetName;
 
   final bool hideToggle;
 
@@ -70,6 +70,17 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
     await _assetsProvider.loadAssets();
 
     var currentLocationInfo = await geolocator.Geolocator.getCurrentPosition();
+
+    print("Current Location");
+    print(currentLocationInfo.latitude);
+    print(currentLocationInfo.longitude);
+
+    print("Destination Location");
+    print(widget.lat);
+    print(widget.lng);
+
+    print("Street Name");
+    print(widget.streetName);
 
     routeInfo = await MapboxService.getRoutes(
       currentPointLatitude: currentLocationInfo.latitude,
@@ -305,7 +316,7 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
                               endsAt: DateTime.now(),
                               isExpired: false,
                               location: LocationData(
-                                streetName: widget.streetName,
+                                streetName: widget.streetName ?? '',
                                 point: CoordinatesData(
                                   longitude: widget.lng,
                                   latitude: widget.lat,
@@ -503,7 +514,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                           // Arrival time
                           Row(
                             children: [
-                              const Icon(IconlyLight.time_circle, color: Colors.grey),
+                              const Icon(IconlyLight.time_circle,
+                                  color: Colors.grey),
                               const SizedBox(width: 8),
                               Text(
                                 "To Arrived by ${DateFormat('HH:mm').format(widget.routeInfo!.arrivingAt.toLocal())}",

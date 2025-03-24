@@ -121,9 +121,9 @@ enum NotificationPayloadType {
 String formatedNotificationType(NotificationPayloadType type) {
   switch (type) {
     case NotificationPayloadType.spaceReserved:
-      return 'Space Reserved';
+      return 'Paid Space Reserved';
     case NotificationPayloadType.spaceNearby:
-      return 'Space Nearby';
+      return 'New space published';
     case NotificationPayloadType.spaceOccupied:
       return 'Space Occupied';
     case NotificationPayloadType.disabled:

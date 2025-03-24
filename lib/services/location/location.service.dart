@@ -85,11 +85,14 @@ class MapboxService {
   static Future<RouteInfo> getRoutes({
     required double currentPointLatitude,
     required double currentPointLongitude,
-    required String destination,
+    String? destination,
     double? destinationLatitude,
     double? destinationLongitude,
   }) async {
     List<QParam> params = [];
+
+    assert(destination != null ||
+        (destinationLatitude != null && destinationLongitude != null));
 
     if (destinationLatitude != null && destinationLongitude != null) {
       params.add(QParam(
@@ -97,7 +100,7 @@ class MapboxService {
         value: '$destinationLatitude,$destinationLongitude',
       ));
     } else {
-      params.add(QParam(key: 'destination-address', value: destination));
+      params.add(QParam(key: 'destination-address', value: destination!));
     }
 
     params.add(

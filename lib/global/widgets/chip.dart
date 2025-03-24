@@ -13,12 +13,15 @@ class DecoratedChip extends StatelessWidget {
 
   final TextStyle? textStyle;
 
+  final VoidCallback? onTap;
+
   final EdgeInsetsGeometry? padding;
 
   const DecoratedChip({
     super.key,
     required this.text,
     this.padding,
+    this.onTap,
     required this.color,
     this.backgroundColor,
     this.textSize,
@@ -28,46 +31,49 @@ class DecoratedChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      child: Container(
-        padding: padding ??
-            EdgeInsets.symmetric(
-              horizontal: Dimens.baseSize * 2,
-              vertical: Dimens.baseSize,
-            ),
-        decoration: BoxDecoration(
-          color: backgroundColor ??
-              color.withOpacity(0.1), // Adjust the opacity as needed
-          borderRadius: BorderRadius.circular(1000),
-        ),
-        child: Center(
-          child: Row(
-            children: [
-              SizedBox(
-                child: icon == null
-                    ? null
-                    : Row(
-                        children: [
-                          Icon(
-                            icon,
-                            size: 14,
-                            color: color,
-                          ),
-                          Dimens.space(1)
-                        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: FittedBox(
+        child: Container(
+          padding: padding ??
+              EdgeInsets.symmetric(
+                horizontal: Dimens.baseSize * 2,
+                vertical: Dimens.baseSize,
+              ),
+          decoration: BoxDecoration(
+            color: backgroundColor ??
+                color.withOpacity(0.1), // Adjust the opacity as needed
+            borderRadius: BorderRadius.circular(1000),
+          ),
+          child: Center(
+            child: Row(
+              children: [
+                SizedBox(
+                  child: icon == null
+                      ? null
+                      : Row(
+                          children: [
+                            Icon(
+                              icon,
+                              size: 14,
+                              color: color,
+                            ),
+                            Dimens.space(1)
+                          ],
+                        ),
+                ),
+                Text(
+                  text,
+                  style: textStyle ??
+                      Typo.smallBody.copyWith(
+                        color: color,
+                        fontSize: textSize ?? 12,
+                        fontWeight: FontWeight.w700,
                       ),
-              ),
-              Text(
-                text,
-                style: textStyle ??
-                    Typo.smallBody.copyWith(
-                      color: color,
-                      fontSize: textSize ?? 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                overflow: TextOverflow.clip,
-              ),
-            ],
+                  overflow: TextOverflow.clip,
+                ),
+              ],
+            ),
           ),
         ),
       ),
