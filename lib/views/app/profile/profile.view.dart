@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
@@ -39,7 +40,7 @@ class ProfileView extends StatelessWidget {
             onTap: () {
               NavigatorHelper.to(const NotificationsView());
             },
-            title: 'Profile',
+            title: context.l10n.profile,
             suffix: context.userProfile!.notificationsCount == 0
                 ? null
                 : CircleAvatar(
@@ -143,14 +144,14 @@ class ProfileView extends StatelessWidget {
                           children: [
                             SettingsRow(
                               icon: IconlyLight.star,
-                              text: 'Contributions',
+                              text: context.l10n.contributions,
                               onTap: () {
                                 NavigatorHelper.to(const ViewAllView());
                               },
                             ),
                             SettingsRow(
                               icon: IconlyLight.time_circle,
-                              text: 'Scheduled Notifications',
+                              text: context.l10n.scheduledNotifications,
                               onTap: () {
                                 NavigatorHelper.to(
                                     const ScheduledNotificationsView());
@@ -158,12 +159,12 @@ class ProfileView extends StatelessWidget {
                             ),
                             SettingsRow(
                               icon: Iconsax.card,
-                              text: 'Payment methods',
+                              text: context.l10n.paymentMethods,
                               onTap: () {},
                             ),
                             SettingsRow(
                               icon: IconlyLight.wallet,
-                              text: 'Wallet',
+                              text: context.l10n.earnings,
                               showDivider: false,
                               onTap: () {},
                             ),
@@ -178,14 +179,14 @@ class ProfileView extends StatelessWidget {
                             children: [
                               SettingsRow(
                                 icon: IconlyLight.user,
-                                text: 'Basic Information',
+                                text: context.l10n.basicInformation,
                                 onTap: () {
                                   NavigatorHelper.to(EditBasicInfoView());
                                 },
                               ),
                               SettingsRow(
                                 icon: IconlyLight.filter,
-                                text: 'Preferences',
+                                text: context.l10n.preferences,
                                 onTap: () {
                                   NavigatorHelper.to(const PreferencesView());
                                 },
@@ -193,14 +194,14 @@ class ProfileView extends StatelessWidget {
                               // language
                               SettingsRow(
                                 icon: Iconsax.global,
-                                text: 'Language',
+                                text: "Language",
                                 onTap: () {
                                   NavigatorHelper.to(ChangeLanguageView());
                                 },
                               ),
                               SettingsRow(
                                 icon: IconlyLight.lock,
-                                text: 'Security',
+                                text: context.l10n.security,
                                 showDivider: false,
                                 onTap: () {
                                   NavigatorHelper.to(const SecurityView());
@@ -228,7 +229,7 @@ class ProfileView extends StatelessWidget {
                             ),
                             Dimens.space(1),
                             Text(
-                              'Log out',
+                              context.l10n.logout,
                               style: Typo.largeBody.copyWith(
                                 color: AppColors.primary500,
                                 fontWeight: FontWeight.w700,

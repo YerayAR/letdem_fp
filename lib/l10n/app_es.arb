@@ -1,0 +1,28 @@
+{
+  "@@locale": "es",
+  "enterDestination": "Ingresar destino",
+  "whatDoYouWantToDo": "¿Qué quieres hacer?",
+  "publishSpace": "Publicar espacio",
+  "publishEvent": "Publicar evento",
+  "home": "Inicio",
+  "activities": "Actividades",
+  "profile": "Perfil",
+  "contributions": "Contribuciones",
+  "scheduledNotifications": "Notificaciones programadas",
+  "paymentMethods": "Métodos de pago",
+  "earnings": "Ganancias",
+  "connectAccount": "Conectar cuenta",
+  "basicInformation": "Información básica",
+  "preferences": "Preferencias",
+  "security": "Seguridad",
+  "help": "Ayuda",
+  "aboutUs": "Sobre nosotros",
+  "privacyPolicy": "Política de privacidad",
+  "termsOfUse": "Términos de uso",
+  "logout": "Cerrar sesión",
+  "language": "Idioma",
+    "save": "Guardar",
+    "english": "Inglés",
+    "spanish": "Español"
+
+}

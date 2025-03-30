@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:here_sdk/core.engine.dart';
 import 'package:here_sdk/core.errors.dart';
 import 'package:letdem/constants/credentials.dart';
@@ -37,6 +38,7 @@ import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
@@ -49,6 +51,9 @@ import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'views/app/home/widgets/home/no_connection.widget.dart';
@@ -87,6 +92,11 @@ void main() async {
   };
   OneSignal.initialize(AppCredentials.oneSignalAppId);
 
+  //getting the language preference and assign in into the app, if none default is japanese
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  final String? languageCode = sharedPreferences.getString('locale');
+
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -96,76 +106,85 @@ void main() async {
   ]);
 
   runApp(
-    MultiRepositoryProvider(
+    MultiProvider(
       providers: [
-        RepositoryProvider<AuthRepository>(
-          create: (_) => AuthRepository(),
-        ),
-        RepositoryProvider<UserRepository>(
-          create: (_) => UserRepository(),
-        ),
-        RepositoryProvider<ActivityRepository>(
-          create: (_) => ActivityRepository(),
-        ),
-        RepositoryProvider(
-          create: (_) => SearchLocationRepository(),
-        ),
-        RepositoryProvider(
-          create: (_) => CarRepository(),
-        ),
-        RepositoryProvider(
-          create: (_) => MapRepository(),
-        ),
-        RepositoryProvider(
-          create: (_) => ScheduleNotificationsRepository(),
-        ),
-        RepositoryProvider(
-          create: (_) => NotificationRepository(),
+        ChangeNotifierProvider(
+          create: (_) => LocaleProvider(
+            defaultLocale: Locale(languageCode ?? "es"),
+          ),
         ),
       ],
-      child: MultiBlocProvider(providers: [
-        BlocProvider(
-          create: (context) => MapBloc(
-            mapRepository: context.read<MapRepository>(),
+      child: MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider<AuthRepository>(
+            create: (_) => AuthRepository(),
           ),
-        ),
-        BlocProvider(
-          create: (context) => ScheduleNotificationsBloc(
-            scheduleNotificationsRepository:
-                context.read<ScheduleNotificationsRepository>(),
+          RepositoryProvider<UserRepository>(
+            create: (_) => UserRepository(),
           ),
-        ),
-        BlocProvider<NotificationsBloc>(
-          create: (context) => NotificationsBloc(
-            notificationRepository: context.read<NotificationRepository>(),
+          RepositoryProvider<ActivityRepository>(
+            create: (_) => ActivityRepository(),
           ),
-        ),
-        BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(
-            authRepository: context.read<AuthRepository>(),
+          RepositoryProvider(
+            create: (_) => SearchLocationRepository(),
           ),
-        ),
-        BlocProvider(
-          create: (context) => SearchLocationBloc(
-            searchLocationRepository: context.read<SearchLocationRepository>(),
+          RepositoryProvider(
+            create: (_) => CarRepository(),
           ),
-        ),
-        BlocProvider<UserBloc>(
-          create: (context) => UserBloc(
-            userRepository: context.read<UserRepository>(),
+          RepositoryProvider(
+            create: (_) => MapRepository(),
           ),
-        ),
-        BlocProvider<ActivitiesBloc>(
-          create: (context) => ActivitiesBloc(
-            activityRepository: context.read<ActivityRepository>(),
+          RepositoryProvider(
+            create: (_) => ScheduleNotificationsRepository(),
           ),
-        ),
-        BlocProvider(
-          create: (context) => CarBloc(
-            carRepository: context.read<CarRepository>(),
+          RepositoryProvider(
+            create: (_) => NotificationRepository(),
           ),
-        ),
-      ], child: const LetDemApp()),
+        ],
+        child: MultiBlocProvider(providers: [
+          BlocProvider(
+            create: (context) => MapBloc(
+              mapRepository: context.read<MapRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => ScheduleNotificationsBloc(
+              scheduleNotificationsRepository:
+                  context.read<ScheduleNotificationsRepository>(),
+            ),
+          ),
+          BlocProvider<NotificationsBloc>(
+            create: (context) => NotificationsBloc(
+              notificationRepository: context.read<NotificationRepository>(),
+            ),
+          ),
+          BlocProvider<AuthBloc>(
+            create: (context) => AuthBloc(
+              authRepository: context.read<AuthRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => SearchLocationBloc(
+              searchLocationRepository: context.read<SearchLocationRepository>(),
+            ),
+          ),
+          BlocProvider<UserBloc>(
+            create: (context) => UserBloc(
+              userRepository: context.read<UserRepository>(),
+            ),
+          ),
+          BlocProvider<ActivitiesBloc>(
+            create: (context) => ActivitiesBloc(
+              activityRepository: context.read<ActivityRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => CarBloc(
+              carRepository: context.read<CarRepository>(),
+            ),
+          ),
+        ], child: const LetDemApp()),
+      ),
     ),
   );
 }
@@ -176,6 +195,18 @@ class LetDemApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: context.watch<LocaleProvider>().defaultLocale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate, // Add this line
+
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          Locale('en'), // English
+          Locale('es'), // Spanish
+        ],
         builder: FlashyFlushbarProvider.init(),
         theme: ThemeData(
           appBarTheme: AppBarTheme(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/views/app/activities/screens/activities.view.dart';
 import 'package:letdem/views/app/profile/profile.view.dart';
@@ -60,19 +61,19 @@ class _BaseViewState extends State<BaseView> {
             BottomNavigationBarItem(
               icon: Icon(
                   _selectedIndex == 0 ? IconlyBold.home : IconlyLight.home),
-              label: 'Home',
+              label: context.l10n.home,
             ),
             BottomNavigationBarItem(
               icon: Icon(_selectedIndex == 1
                   ? IconlyBold.activity
                   : IconlyLight.activity),
-              label: 'Activities',
+              label: context.l10n.activities,
             ),
             BottomNavigationBarItem(
               icon: Icon(_selectedIndex == 2
                   ? IconlyBold.profile
                   : IconlyLight.profile),
-              label: 'Profile',
+              label: context.l10n.profile,
             ),
           ],
         ),

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
@@ -65,13 +66,13 @@ class HomeMapBottomSection extends StatelessWidget {
                     });
                   },
                   prefixIcon: IconlyLight.search,
-                  placeHolder: 'Enter destination',
+                  placeHolder: context.l10n.enterDestination,
                 ),
               ),
             ),
             Dimens.space(2),
             Text(
-              "What do you want to do?",
+              context.l10n.whatDoYouWantToDo,
               style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),
             ),
             Dimens.space(2),
@@ -92,7 +93,7 @@ class HomeMapBottomSection extends StatelessWidget {
                       }
                     },
                     icon: Iconsax.location5,
-                    text: 'Publish Space',
+                    text: context.l10n.publishSpace,
                   ),
                 ),
                 Dimens.space(1),
@@ -107,7 +108,7 @@ class HomeMapBottomSection extends StatelessWidget {
                     },
                     icon: IconlyBold.star,
                     color: AppColors.primary500,
-                    text: 'Publish Event',
+                    text: context.l10n.publishEvent,
                   ),
                 ),
               ],

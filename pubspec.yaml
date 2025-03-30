@@ -64,6 +64,10 @@ dependencies:
     path: plugins/here_sdk
   mapbox_polyline_points: ^0.0.6
   geocoding: ^3.0.0
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.5.3
+  provider: ^6.1.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -81,7 +85,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  generate: true # Add this line
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

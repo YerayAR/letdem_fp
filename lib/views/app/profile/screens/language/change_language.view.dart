@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/l10n/locales.dart';
+import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
+import 'package:provider/provider.dart';
 
 class Language {
   final String name;
@@ -27,12 +31,6 @@ class ChangeLanguageView extends StatefulWidget {
 }
 
 class _ChangeLanguageViewState extends State<ChangeLanguageView> {
-  String _selectedLanguage = 'en'; // Default language
-
-  final List<Language> _languages = [
-    Language('English', 'en', '🇺🇸'),
-    Language('Español', 'es', '🇪🇸'),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +39,7 @@ class _ChangeLanguageViewState extends State<ChangeLanguageView> {
         padding:  EdgeInsets.all(Dimens.defaultMargin),
         child: SafeArea(
           child: PrimaryButton(
-            text: 'Save',
+            text: context.l10n.save,
             onTap: () {
               // Here you would update the app's language using your UserBloc
               NavigatorHelper.pop();
@@ -49,40 +47,41 @@ class _ChangeLanguageViewState extends State<ChangeLanguageView> {
           ),
         ),
       ),
-      body: StyledBody(
-        children: [
-          StyledAppBar(
-            title: 'Language',
-            onTap: () {
-              NavigatorHelper.pop();
-            },
-            icon: Icons.close,
-          ),
-          Dimens.space(3),
-          Expanded(
-            child: ListView(
-              children: [
-                Column(
-                    children: _languages.map((language) {
-                      return LanguageOption(
-                        flag: language.flag,
-                        name: language.name,
-                        isSelected: _selectedLanguage == language.code,
-                        onTap: () {
-                          setState(() {
-                            _selectedLanguage = language.code;
-                          });
-                          // Here you would update the app's language using your UserBloc
-                        },
-                      );
-                    }).toList(),
-                  ),
+      body: Consumer<LocaleProvider>(
+        builder: (context, snapshot , _) {
+          return StyledBody(
+            children: [
+              StyledAppBar(
+                title: context.l10n.language,
+                onTap: () {
+                  NavigatorHelper.pop();
+                },
+                icon: Icons.close,
+              ),
+              Dimens.space(3),
+              Expanded(
+                child: ListView(
+                  children: [
+                    Column(
+                        children: L10n.all.map((language) {
+                          return LanguageOption(
+                            flag: "",
+                            name: language ==  Locale('en') ? 'English' : 'Español',
+                            isSelected: snapshot.defaultLocale == language, onTap: () {
+                            context.read<LocaleProvider>().setLocale(language);
+                          },
+
+                          );
+                        }).toList(),
+                      ),
 
 
-              ],
-            ),
-          ),
-        ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
       ),
     );
   }
@@ -106,7 +105,8 @@ class LanguageOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
@@ -121,23 +121,10 @@ class LanguageOption extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.grey.withOpacity(0.1),
-                ),
-                child: Text(
-                  flag,
-                  style: const TextStyle(fontSize: 24),
-                ),
-              ),
-              const SizedBox(width: 16),
+
               Expanded(
                 child: Text(
                   name,
@@ -152,8 +139,8 @@ class LanguageOption extends StatelessWidget {
               ),
               if (isSelected)
                 Container(
-                  width: 28,
-                  height: 28,
+                  width: 25,
+                  height: 25,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
                     color: AppColors.primary500
@@ -161,7 +148,7 @@ class LanguageOption extends StatelessWidget {
                   child: const Icon(
                     Icons.check,
                     color: Colors.white,
-                    size: 18,
+                    size: 15,
                   ),
                 ),
             ],

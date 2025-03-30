@@ -158,7 +158,7 @@ class PrimaryButton extends StatelessWidget {
                     Text(
                       text,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight:
                             icon != null ? FontWeight.w700 : FontWeight.w600,
                         color: textColor ??
