@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/gestures.dart';
+import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
@@ -19,7 +20,7 @@ import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/models/auth/map/nearby_payload.model.dart' hide Location;
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
@@ -65,11 +66,40 @@ class _HomeViewState extends State<HomeView>
     });
   }
 
+  late LocationEngine _locationEngine;
+   LocationIndicator? _locationIndicator;
+
+
+  void _addMyLocationToMap(Location myLocation) {
+
+    // Set-up location indicator.
+    _locationIndicator = LocationIndicator();
+    // Enable a halo to indicate the horizontal accuracy.
+    _locationIndicator!.isAccuracyVisualized = false;
+    _locationIndicator!.locationIndicatorStyle = LocationIndicatorIndicatorStyle.navigation;
+    _locationIndicator!.updateLocation(myLocation);
+    _locationIndicator!.enable(_mapController!);
+    _locationIndicator!.setHaloColor(LocationIndicatorIndicatorStyle.navigation,  Colors.transparent);
+
+
+    // Point camera at given location.
+    MapMeasure mapMeasureZoom = MapMeasure(MapMeasureKind.distanceInMeters, 3);
+    _mapController!.camera.lookAtPointWithMeasure(
+      myLocation.coordinates,
+      mapMeasureZoom,
+    );
+
+
+  }
+
   Future<void> _getCurrentLocation() async {
     try {
       setState(() {
         isLocationLoading = true;
       });
+
+      _locationEngine = LocationEngine();
+
 
       bool serviceEnabled =
           await geolocator.Geolocator.isLocationServiceEnabled();
@@ -443,7 +473,7 @@ class _HomeViewState extends State<HomeView>
         .lookAtPointWithMeasure(targetCoordinates, mapMeasureZoom);
 
     _setTapGestureHandler();
-
+    _addMyLocationToMap(Location.withCoordinates(_currentPosition!));
     hereMapController.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
         (error) {
       if (error != null) {
@@ -477,6 +507,7 @@ class _HomeViewState extends State<HomeView>
                     children: [
                       _currentPosition != null
                           ? HereMap(
+
                               key: UniqueKey(),
                               onMapCreated: _onMapCreated,
                             )
