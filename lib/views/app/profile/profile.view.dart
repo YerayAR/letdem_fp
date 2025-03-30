@@ -14,11 +14,14 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/screens/view_all.view.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
+import 'package:letdem/views/app/profile/screens/edit/edit_basic_info.view.dart';
+import 'package:letdem/views/app/profile/screens/language/change_language.view.dart';
 import 'package:letdem/views/app/profile/screens/security/security.view.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
+import 'package:letdem/views/auth/views/onboard/basic_info.view.dart';
 
 import 'screens/preferences/preferences.view.dart';
 import 'screens/scheduled_notifications/scheduled_notifications.view.dart';
@@ -176,13 +179,23 @@ class ProfileView extends StatelessWidget {
                               SettingsRow(
                                 icon: IconlyLight.user,
                                 text: 'Basic Information',
-                                onTap: () {},
+                                onTap: () {
+                                  NavigatorHelper.to(EditBasicInfoView());
+                                },
                               ),
                               SettingsRow(
                                 icon: IconlyLight.filter,
                                 text: 'Preferences',
                                 onTap: () {
                                   NavigatorHelper.to(const PreferencesView());
+                                },
+                              ),
+                              // language
+                              SettingsRow(
+                                icon: Iconsax.global,
+                                text: 'Language',
+                                onTap: () {
+                                  NavigatorHelper.to(ChangeLanguageView());
                                 },
                               ),
                               SettingsRow(
