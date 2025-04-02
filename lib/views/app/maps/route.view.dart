@@ -22,6 +22,7 @@ import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
+import 'package:letdem/views/app/maps/navigate.view.dart';
 import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
@@ -733,6 +734,16 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                                       radius: radius.toDouble(),
                                       location: widget.notification.location,
                                     ));
+                              }else{
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => NavigationView(
+                                      destinationLat: widget.notification.location.point.latitude,
+                                      destinationLng: widget.notification.location.point.longitude,
+                                    ),
+                                  ),
+                                );
                               }
                               // Schedule notification
                               // Navigator.pop(context);
