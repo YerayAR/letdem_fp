@@ -205,4 +205,11 @@ class EndPoints {
       method: HTTPMethod.PUT,
     );
   }
+
+  static markNotificationAsRead(String id) {
+    return Endpoint(
+      url: "/users/me/notifications$id",
+      method: HTTPMethod.PUT,
+    );
+  }
 }

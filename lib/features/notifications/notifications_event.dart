@@ -4,6 +4,15 @@ sealed class NotificationsEvent extends Equatable {
   const NotificationsEvent();
 }
 
+
+class MarkNotificationAsReadEvent extends NotificationsEvent {
+  final String id;
+
+  const MarkNotificationAsReadEvent({required this.id});
+
+  @override
+  List<Object> get props => [id];
+}
 class LoadNotificationsEvent extends NotificationsEvent {
   final bool showUnread;
 

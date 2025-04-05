@@ -12,6 +12,18 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       : super(NotificationsInitial()) {
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<ReadNotificationEvent>(_onReadNotification);
+    on<MarkNotificationAsReadEvent>(_onMarkNotificationAsRead);
+  }
+
+  Future<void> _onMarkNotificationAsRead(
+      MarkNotificationAsReadEvent event, Emitter<NotificationsState> emit) async {
+    try {
+      await notificationRepository.markNotificationAsRead(event.id);
+    //   remove notification from the list
+
+    } catch (err) {
+      emit(NotificationsError(error: "Unable to mark notification as read"));
+    }
   }
 
   Future<void> _onReadNotification(
@@ -42,3 +54,4 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     }
   }
 }
+

@@ -253,6 +253,10 @@ class _NotificationsViewState extends State<NotificationsView> {
                         isRecent: false,
                         onActionPressed: () {
                           // Perform action here
+                        }, onRead: (String id) {
+                          context.read<NotificationsBloc>().add(
+                            MarkNotificationAsReadEvent(id: id),
+                          );
                         },
                       );
                     },
@@ -395,6 +399,7 @@ class NotificationItem extends StatelessWidget {
   final Color iconColor;
   final bool isRecent;
   final VoidCallback? onActionPressed;
+  final Function(String id) onRead;
 
   final NotificationObject notificationObject;
 
@@ -405,6 +410,7 @@ class NotificationItem extends StatelessWidget {
     required this.notificationObject,
     required this.timestamp,
     required this.type,
+    required this.onRead,
     this.actionLabel,
     this.amount,
     this.iconColor = Colors.purple,
@@ -470,123 +476,137 @@ class NotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 13),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+    return Dismissible(
+      key: Key(notificationObject.id),
+      background: Container(
+        color: Colors.blue,
+        child: const Icon(
+          Icons.done_all_rounded,
+          color: Colors.white,
+        ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon container
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      IconlyBold.notification,
-                      color: AppColors.neutral400,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: -3,
-                  bottom: -3,
-                  child: getSubIcon(type),
-                ),
-              ],
-            ),
+      onDismissed: (direction) {
+        // Remove the item from the data source.
+        onRead(notificationObject.id);
 
-            Dimens.space(2),
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon container
+              Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  // Title
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      shape: BoxShape.circle,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Message
-                  message,
-                  const SizedBox(height: 8),
-
-                  // Time and action row
-                  Row(
-                    children: [
-                      // Timestamp
-                      Text(
-                        _getFormattedTime(),
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
+                    child: Center(
+                      child: Icon(
+                        IconlyBold.notification,
+                        color: AppColors.neutral400,
+                        size: 20,
                       ),
-
-                      // Amount if available
-                      if (amount != null) ...[
-                        const Spacer(),
-                        Text(
-                          amount!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-
-                      // Push content to each side
-                      if (actionLabel != null) const Spacer(),
-
-                      // Action button if available
-                    ],
-                  ),
-                  if (type == NotificationPayloadType.spaceNearby)
-                    Column(
-                      children: [
-                        Dimens.space(2),
-                        DecoratedChip(
-                          onTap: () {
-                            NavigatorHelper.to(TrafficRouteLineExample(
-                              lat: notificationObject.location.point.lat,
-                              lng: notificationObject.location.point.lng,
-                              hideToggle: false,
-                              streetName:
-                                  notificationObject.location.streetName,
-                            ));
-                          },
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 7,
-                          ),
-                          text: 'View space ',
-                          backgroundColor: AppColors.primary300,
-                          color: Colors.white,
-                        ),
-                      ],
                     ),
+                  ),
+                  Positioned(
+                    right: -3,
+                    bottom: -3,
+                    child: getSubIcon(type),
+                  ),
                 ],
               ),
-            ),
-          ],
+
+              Dimens.space(2),
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Message
+                    message,
+                    const SizedBox(height: 8),
+
+                    // Time and action row
+                    Row(
+                      children: [
+                        // Timestamp
+                        Text(
+                          _getFormattedTime(),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+
+                        // Amount if available
+                        if (amount != null) ...[
+                          const Spacer(),
+                          Text(
+                            amount!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+
+                        // Push content to each side
+                        if (actionLabel != null) const Spacer(),
+
+                        // Action button if available
+                      ],
+                    ),
+                    if (type == NotificationPayloadType.spaceNearby)
+                      Column(
+                        children: [
+                          Dimens.space(2),
+                          DecoratedChip(
+                            onTap: () {
+                              NavigatorHelper.to(TrafficRouteLineExample(
+                                lat: notificationObject.location.point.lat,
+                                lng: notificationObject.location.point.lng,
+                                hideToggle: false,
+                                streetName:
+                                    notificationObject.location.streetName,
+                              ));
+                            },
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 7,
+                            ),
+                            text: 'View space ',
+                            backgroundColor: AppColors.primary300,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
