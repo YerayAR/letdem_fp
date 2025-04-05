@@ -416,53 +416,12 @@ class _HomeViewState extends State<HomeView>
     );
   }
 
-  void _showMarkerPopup({
-    required String title,
-    required String type,
-    required String details,
-    required var location,
-  }) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Type: $type'),
-              const SizedBox(height: 8),
-              Text('Details: $details'),
-              const SizedBox(height: 8),
-              Text(
-                'Location: Lat ${location.point.lat}, Lng ${location.point.lng}',
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('More Details'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   void _onMapCreated(HereMapController hereMapController) {
     _mapController = hereMapController;
 
-    const double distanceToEarthInMeters = 8000;
+    const double distanceToEarthInMeters = 14000;
     MapMeasure mapMeasureZoom =
         MapMeasure(MapMeasureKind.distanceInMeters, distanceToEarthInMeters);
 
