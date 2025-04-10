@@ -1,22 +1,21 @@
-
-
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:here_sdk/core.engine.dart';
-import 'package:here_sdk/core.errors.dart';
-import 'package:letdem/constants/credentials.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
+import 'package:here_sdk/core.engine.dart';
+import 'package:here_sdk/core.errors.dart';
 import 'package:iconly/iconly.dart';
+import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
@@ -36,27 +35,19 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/models/auth/map/map_options.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
-import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 import 'package:letdem/views/welcome/views/splash.view.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
-import 'views/app/home/widgets/home/no_connection.widget.dart';
 
 Future _initializeHERESDK() async {
   try {
@@ -95,7 +86,6 @@ void main() async {
   //getting the language preference and assign in into the app, if none default is japanese
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   final String? languageCode = sharedPreferences.getString('locale');
-
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -165,7 +155,8 @@ void main() async {
           ),
           BlocProvider(
             create: (context) => SearchLocationBloc(
-              searchLocationRepository: context.read<SearchLocationRepository>(),
+              searchLocationRepository:
+                  context.read<SearchLocationRepository>(),
             ),
           ),
           BlocProvider<UserBloc>(
@@ -195,7 +186,7 @@ class LetDemApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: context.watch<LocaleProvider>().defaultLocale,
+        locale: context.watch<LocaleProvider>().defaultLocale,
         localizationsDelegates: const [
           AppLocalizations.delegate, // Add this line
 
@@ -234,7 +225,6 @@ class LetDemApp extends StatelessWidget {
             child: SplashView()));
   }
 }
-
 
 class NavigateNotificationCard extends StatefulWidget {
   final ScheduledNotification notification;

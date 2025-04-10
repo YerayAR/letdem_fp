@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:here_sdk/core.dart' as HERE;
 import 'package:here_sdk/core.engine.dart';
@@ -11,11 +10,10 @@ import 'package:here_sdk/navigation.dart' as HERE;
 import 'package:here_sdk/routing.dart' as HERE;
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 
 class NavigationView extends StatefulWidget {
@@ -34,13 +32,15 @@ class NavigationView extends StatefulWidget {
 
 class _NavigationViewState extends State<NavigationView> {
   // Constants
-  static const double _initialZoomDistanceInMeters = 8000;
+  static const double _initialZoomDistanceInMeters =
+      500; // Lowered to get closer view
   static const double _mapPadding = 20;
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
   static const int _distanceTriggerThreshold =
-      250; // 50m threshold for triggering
+      50; // 50m threshold for triggering
+
   // Controllers and engines
   HereMapController? _hereMapController;
   late final AppLifecycleListener _lifecycleListener;
@@ -59,10 +59,13 @@ class _NavigationViewState extends State<NavigationView> {
   int _totalRouteDistance = 0;
   bool _isMuted = false;
   String _errorMessage = "";
+
+  // Distance tracking
   int _lastTriggerDistance = 0;
   double _lastLatitude = 0;
   double _lastLongitude = 0;
   int _distanceTraveled = 0;
+
   // Map of direction icons
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
@@ -136,7 +139,7 @@ class _NavigationViewState extends State<NavigationView> {
 
     _hereMapController!.mapScene.loadSceneForMapScheme(
       MapScheme.normalDay,
-      (error) {
+      (MapError? error) {
         if (error != null) {
           debugPrint('❌ Map scene not loaded. MapError: ${error.toString()}');
           setState(() {
@@ -147,13 +150,12 @@ class _NavigationViewState extends State<NavigationView> {
         }
 
         debugPrint('✅ Map scene loaded.');
+
+        // Enable camera tracking of position indicator
+
         MapMeasure mapMeasureZoom = MapMeasure(
             MapMeasureKind.distanceInMeters, _initialZoomDistanceInMeters);
 
-        _hereMapController!.camera.lookAtPointWithMeasure(
-            HERE.GeoCoordinates(52.520798, 13.409408), mapMeasureZoom);
-
-        _initLocationEngine();
         _startNavigation();
       },
     );
@@ -230,6 +232,10 @@ class _NavigationViewState extends State<NavigationView> {
         currentLocationGeo.longitude,
       );
 
+      // Initialize last known coordinates for distance tracking
+      _lastLatitude = currentLocationGeo.latitude;
+      _lastLongitude = currentLocationGeo.longitude;
+
       _calculateRoute(
         _currentLocation!,
         HERE.GeoCoordinates(destLat, destLng),
@@ -243,6 +249,30 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
+  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+
+  void _addMapMarkers(List<Space> spaces) {
+    for (var space in spaces) {
+      try {
+        Uint8List imageData = _assetsProvider.getImageForType(space.type);
+
+        MapImage mapImage =
+            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
+
+        final marker = MapMarker(
+          HERE.GeoCoordinates(
+              space.location.point.lat, space.location.point.lng),
+          mapImage,
+        );
+
+        _hereMapController?.mapScene.addMapMarker(marker);
+      } catch (e) {
+        print("Error adding space marker: $e");
+      }
+    }
+  }
+
+  // Track distance changes and trigger events every 50m
   void _checkDistanceTrigger(double latitude, double longitude) {
     // Calculate distance between last position and current position
     final distanceBetweenPoints = Geolocator.distanceBetween(
@@ -273,38 +303,55 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _showDistanceTriggerToast() {
+    Toast.show(
+      "You have traveled $_distanceTraveled meters",
+    );
+
     debugPrint('🚶 Distance trigger: $_distanceTraveled meters traveled');
-    context.read<MapBloc>().add(
-          GetNearbyPlaces(
-              queryParams: MapQueryParams(
-            currentPoint: "$_lastLatitude,$_lastLongitude",
-            radius: _distanceTriggerThreshold,
-            drivingMode: false,
-            options: ['events'],
-          )),
-        );
   }
 
-  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+  // Set up simulated or real location source
+  void _setupLocationSource(
+      HERE.LocationListener locationListener, HERE.Route route) {
+    debugPrint('🚀 Setting up location simulation for navigation...');
 
-  void _addMapMarkers(List<Event> spaces) {
-    for (var space in spaces) {
-      try {
-        Uint8List imageData = _assetsProvider.getEventIcon(space.type);
+    try {
+      // Create a location simulator for navigation testing
+      _locationSimulator = HERE.LocationSimulator.withRoute(
+          route, HERE.LocationSimulatorOptions());
 
-        MapImage mapImage =
-            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
+      // Add location listener to get position updates
+      _locationSimulator!.listener =
+          HERE.LocationListener((HERE.Location location) {
+        // Update current location
+        if (mounted) {
+          final coordinates = location.coordinates;
 
-        final marker = MapMarker(
-          HERE.GeoCoordinates(
-              space.location.point.lat, space.location.point.lng),
-          mapImage,
-        );
+          // Check distance trigger
+          _checkDistanceTrigger(coordinates.latitude, coordinates.longitude);
 
-        _hereMapController?.mapScene.addMapMarker(marker);
-      } catch (e) {
-        print("Error adding space marker: $e");
-      }
+          // Move camera to follow
+          if (_hereMapController != null) {
+            MapMeasure mapMeasure =
+                MapMeasure(MapMeasureKind.distanceInMeters, 100);
+            _hereMapController!.camera.lookAtPoint(coordinates);
+          }
+        }
+      });
+
+      // Start the simulation
+      _locationSimulator!.start();
+
+      // Set route for visual navigator
+      _visualNavigator!.route = route;
+
+      debugPrint('✅ Location simulator started successfully.');
+    } catch (e) {
+      debugPrint('❌ Failed to set up location simulation: $e');
+      setState(() {
+        _errorMessage = "Failed to start navigation simulation";
+        _isLoading = false;
+      });
     }
   }
 
@@ -420,64 +467,7 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     // Set route and start location simulation
-    _visualNavigator!.route = route;
     _setupLocationSource(_visualNavigator!, route);
-  }
-
-  void _setupLocationSource(
-      HERE.LocationListener locationListener, HERE.Route route) {
-    debugPrint('📍 Setting up navigation with visual map...');
-    try {
-      // Set the route for visualization first
-      _visualNavigator!.route = route;
-
-      // Create simulator options with realistic movement
-      final options = HERE.LocationSimulatorOptions()
-        ..speedFactor = 2.0; // Speed up a bit for testing
-
-      // Create the location simulator with our route
-      _locationSimulator = HERE.LocationSimulator.withRoute(route, options);
-
-      // Add our custom location listener to track 50m intervals
-      _locationSimulator!.listener =
-          HERE.LocationListener((HERE.Location location) {
-        final coordinates = location.coordinates;
-
-        // Check distance trigger for 50m intervals
-        _checkDistanceTrigger(coordinates.latitude, coordinates.longitude);
-
-        // Forward to visual navigator's listener to update the 3D navigation view
-        locationListener.onLocationUpdated(location);
-      });
-
-      // Set visual navigator to follow the route
-      _visualNavigator!.startRendering(_hereMapController!);
-
-      // Configure map view for 3D navigation
-      _hereMapController!.camera.lookAtPoint(
-        HERE.GeoCoordinates(
-          widget.destinationLat,
-          widget.destinationLng,
-        ),
-      );
-
-      // Tilt camera for 3D effect
-      _hereMapController!.camera.setOrientationAtTarget(
-          HERE.GeoOrientationUpdate(0, 60) // 60-degree tilt for 3D view
-          );
-
-      // Start simulation
-      _locationSimulator!.start();
-
-      debugPrint('✅ Navigation with 3D view started successfully');
-    } catch (e) {
-      debugPrint('❌ Failed to set up location simulation: $e');
-      setState(() {
-        _errorMessage = "Failed to start navigation visualization";
-        _isNavigating = false;
-        _isLoading = false;
-      });
-    }
   }
 
   void _stopNavigation() {
@@ -640,6 +630,35 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
+  Widget _buildDistanceTraveled() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top +
+          (_navigationInstruction.isNotEmpty ? 100 : 10),
+      left: _mapPadding,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Text(
+          "Distance traveled: $_distanceTraveled m",
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLoadingIndicator() {
     return const Center(
       child: Card(
@@ -691,51 +710,43 @@ class _NavigationViewState extends State<NavigationView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<MapBloc, MapState>(
-      listener: (context, state) {
-        if (state is MapLoaded) {
-          // Add markers to the map
-          _addMapMarkers(state.payload.events);
-        }
-        // TODO: implement listener
-      },
-      builder: (context, state) {
-        return WillPopScope(
-          onWillPop: _handleBackPress,
-          child: Scaffold(
-            body: Stack(
-              children: [
-                // Map layer
-                HereMap(onMapCreated: _onMapCreated),
+    return WillPopScope(
+      onWillPop: _handleBackPress,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Map layer
+            HereMap(onMapCreated: _onMapCreated),
 
-                // Loading indicator
-                if (_isLoading) _buildLoadingIndicator(),
+            // Loading indicator
+            if (_isLoading) _buildLoadingIndicator(),
 
-                // Error message
-                if (_errorMessage.isNotEmpty) _buildErrorMessage(),
+            // Error message
+            if (_errorMessage.isNotEmpty) _buildErrorMessage(),
 
-                // Navigation instruction
-                if (_isNavigating && _navigationInstruction.isNotEmpty)
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 10,
-                    left: _mapPadding,
-                    right: _mapPadding,
-                    child: _buildNavigationInstructionCard(),
-                  ),
+            // Navigation instruction
+            if (_isNavigating && _navigationInstruction.isNotEmpty)
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 10,
+                left: _mapPadding,
+                right: _mapPadding,
+                child: _buildNavigationInstructionCard(),
+              ),
 
-                // Bottom controls
-                if (_isNavigating)
-                  Positioned(
-                    bottom: 30,
-                    left: _mapPadding,
-                    right: _mapPadding,
-                    child: _buildNavigationControls(),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
+            // Distance traveled indicator
+            if (_isNavigating) _buildDistanceTraveled(),
+
+            // Bottom controls
+            if (_isNavigating)
+              Positioned(
+                bottom: 30,
+                left: _mapPadding,
+                right: _mapPadding,
+                child: _buildNavigationControls(),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

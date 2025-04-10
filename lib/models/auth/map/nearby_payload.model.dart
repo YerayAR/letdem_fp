@@ -12,12 +12,17 @@ class MapNearbyPayload {
 
   factory MapNearbyPayload.fromJson(Map<String, dynamic> json) {
     return MapNearbyPayload(
-      spaces: (json['spaces'] as List<dynamic>)
-          .map((space) => Space.fromJson(space))
-          .toList(),
-      events: (json['events'] as List<dynamic>)
-          .map((event) => Event.fromJson(event))
-          .toList(),
+      spaces: json['spaces'] == null
+          ? []
+          : (json['spaces'] as List<dynamic>)
+              .map((space) => Space.fromJson(space))
+              .toList(),
+      events: json['events'] == null
+          ? []
+          : // Check if events is null
+          (json['events'] as List<dynamic>)
+              .map((event) => Event.fromJson(event))
+              .toList(),
     );
   }
 
