@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
@@ -172,11 +173,40 @@ class _ViewAllViewState extends State<ViewAllView> {
       final activities = _getFilteredActivities(state.activities);
 
       if (activities.isEmpty) {
-        return const Expanded(
-          child: Center(
-            child: Text('No activities found'),
+        return Expanded(
+            child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Iconsax.bookmark,
+                  size: 40,
+                  color: AppColors.primary500,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'No Contributions Yet',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'You have not made any contributions yet. Please check back later.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.neutral400,
+                ),
+              ),
+            ],
           ),
-        );
+        ));
       }
 
       return Expanded(

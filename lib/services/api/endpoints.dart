@@ -161,6 +161,13 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
+  // language
+
+  static Endpoint updateLanguageEndpoint = Endpoint(
+    url: "/users/me/language",
+    method: HTTPMethod.PUT,
+  );
+
   static Endpoint getScheduleNotification = Endpoint(
     url: "/users/me/scheduled-notifications?page_size=3&page=1",
     method: HTTPMethod.GET,
@@ -197,6 +204,11 @@ class EndPoints {
   static var notifications = Endpoint(
     url: "/users/me/notifications?read=false ",
     method: HTTPMethod.GET,
+  );
+
+  static var clearNotifications = Endpoint(
+    url: "/users/me/notifications",
+    method: HTTPMethod.DELETE,
   );
 
   static readNotification(String id) {

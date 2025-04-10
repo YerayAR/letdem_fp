@@ -131,50 +131,54 @@ void main() async {
             create: (_) => NotificationRepository(),
           ),
         ],
-        child: MultiBlocProvider(providers: [
-          BlocProvider(
-            create: (context) => MapBloc(
-              mapRepository: context.read<MapRepository>(),
-            ),
-          ),
-          BlocProvider(
-            create: (context) => ScheduleNotificationsBloc(
-              scheduleNotificationsRepository:
-                  context.read<ScheduleNotificationsRepository>(),
-            ),
-          ),
-          BlocProvider<NotificationsBloc>(
-            create: (context) => NotificationsBloc(
-              notificationRepository: context.read<NotificationRepository>(),
-            ),
-          ),
-          BlocProvider<AuthBloc>(
-            create: (context) => AuthBloc(
-              authRepository: context.read<AuthRepository>(),
-            ),
-          ),
-          BlocProvider(
-            create: (context) => SearchLocationBloc(
-              searchLocationRepository:
-                  context.read<SearchLocationRepository>(),
-            ),
-          ),
-          BlocProvider<UserBloc>(
-            create: (context) => UserBloc(
-              userRepository: context.read<UserRepository>(),
-            ),
-          ),
-          BlocProvider<ActivitiesBloc>(
-            create: (context) => ActivitiesBloc(
-              activityRepository: context.read<ActivityRepository>(),
-            ),
-          ),
-          BlocProvider(
-            create: (context) => CarBloc(
-              carRepository: context.read<CarRepository>(),
-            ),
-          ),
-        ], child: const LetDemApp()),
+        child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => MapBloc(
+                  mapRepository: context.read<MapRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => ScheduleNotificationsBloc(
+                  scheduleNotificationsRepository:
+                      context.read<ScheduleNotificationsRepository>(),
+                ),
+              ),
+              BlocProvider<NotificationsBloc>(
+                create: (context) => NotificationsBloc(
+                  notificationRepository:
+                      context.read<NotificationRepository>(),
+                ),
+              ),
+              BlocProvider<AuthBloc>(
+                create: (context) => AuthBloc(
+                  authRepository: context.read<AuthRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => SearchLocationBloc(
+                  searchLocationRepository:
+                      context.read<SearchLocationRepository>(),
+                ),
+              ),
+              BlocProvider<UserBloc>(
+                create: (context) => UserBloc(
+                  userRepository: context.read<UserRepository>(),
+                ),
+              ),
+              BlocProvider<ActivitiesBloc>(
+                create: (context) => ActivitiesBloc(
+                  activityRepository: context.read<ActivityRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => CarBloc(
+                  carRepository: context.read<CarRepository>(),
+                ),
+              ),
+            ],
+            child: AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiOverlayStyle.dark, child: const LetDemApp())),
       ),
     ),
   );

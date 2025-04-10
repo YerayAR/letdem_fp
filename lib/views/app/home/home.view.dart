@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,6 +28,8 @@ import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.wi
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
+// ... your imports remain unchanged
+
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -41,16 +42,24 @@ class _HomeViewState extends State<HomeView>
   HereMapController? _mapController;
 
   GeoCoordinates? _currentPosition;
+  GeoCoordinates? _lastFetchPosition;
 
   bool isLocationLoading = false;
   bool isLoadingAssets = true;
   bool hasNoPermission = false;
+  bool _isListeningToLocation = false;
 
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
   MapMarker? _currentLocationMarker;
   final Map<MapMarker, Space> _spaceMarkers = {};
   final Map<MapMarker, Event> _eventMarkers = {};
+
+  late LocationEngine _locationEngine;
+  LocationIndicator? _locationIndicator;
+
+  static const double TRIGGER_DISTANCE_METERS = 250.0;
+  LocationListener? _locationListener;
 
   @override
   void initState() {
@@ -61,177 +70,170 @@ class _HomeViewState extends State<HomeView>
 
   Future<void> _loadAssets() async {
     await _assetsProvider.loadAssets();
-    setState(() {
-      isLoadingAssets = false;
-    });
-  }
-
-  late LocationEngine _locationEngine;
-   LocationIndicator? _locationIndicator;
-
-
-  void _addMyLocationToMap(Location myLocation) {
-
-    // Set-up location indicator.
-    _locationIndicator = LocationIndicator();
-    // Enable a halo to indicate the horizontal accuracy.
-    _locationIndicator!.isAccuracyVisualized = false;
-    _locationIndicator!.locationIndicatorStyle = LocationIndicatorIndicatorStyle.navigation;
-    _locationIndicator!.updateLocation(myLocation);
-    _locationIndicator!.enable(_mapController!);
-    _locationIndicator!.setHaloColor(LocationIndicatorIndicatorStyle.navigation,  Colors.transparent);
-
-
-    // Point camera at given location.
-    MapMeasure mapMeasureZoom = MapMeasure(MapMeasureKind.distanceInMeters, 3);
-    _mapController!.camera.lookAtPointWithMeasure(
-      myLocation.coordinates,
-      mapMeasureZoom,
-    );
-
-
+    setState(() => isLoadingAssets = false);
   }
 
   Future<void> _getCurrentLocation() async {
     try {
-      setState(() {
-        isLocationLoading = true;
-      });
-
-      _locationEngine = LocationEngine();
-
-
+      setState(() => isLocationLoading = true);
       bool serviceEnabled =
           await geolocator.Geolocator.isLocationServiceEnabled();
+
       if (!serviceEnabled) {
-        await geolocator.Geolocator.requestPermission();
+        await geolocator.Geolocator.openLocationSettings();
+        setState(() {
+          isLocationLoading = false;
+          hasNoPermission = true;
+        });
+        return;
       }
 
-      geolocator.LocationPermission permission =
-          await geolocator.Geolocator.checkPermission();
-
+      var permission = await geolocator.Geolocator.checkPermission();
       if (permission == geolocator.LocationPermission.denied ||
           permission == geolocator.LocationPermission.deniedForever) {
-        setState(() {
-          hasNoPermission = true;
-          isLocationLoading = false;
-        });
         permission = await geolocator.Geolocator.requestPermission();
-      }
-
-      if (permission == geolocator.LocationPermission.whileInUse ||
-          permission == geolocator.LocationPermission.always) {
-        var position = await geolocator.Geolocator.getCurrentPosition(
-          desiredAccuracy: geolocator.LocationAccuracy.high,
-        );
-
-        setState(() {
-          isLocationLoading = false;
-          _currentPosition =
-              GeoCoordinates(position.latitude, position.longitude);
-        });
-
-        if (_currentPosition != null) {
-          context.read<MapBloc>().add(GetNearbyPlaces(
-                queryParams: MapQueryParams(
-                  currentPoint: "${position.latitude},${position.longitude}",
-                  radius: 8000,
-                  drivingMode: false,
-                  options: ['spaces', 'events'],
-                ),
-              ));
+        if (permission == geolocator.LocationPermission.denied ||
+            permission == geolocator.LocationPermission.deniedForever) {
+          setState(() {
+            hasNoPermission = true;
+            isLocationLoading = false;
+          });
+          return;
         }
       }
+
+      final position = await geolocator.Geolocator.getCurrentPosition(
+        desiredAccuracy: geolocator.LocationAccuracy.high,
+      );
+
+      _currentPosition = GeoCoordinates(position.latitude, position.longitude);
+      setState(() => isLocationLoading = false);
+
+      if (_mapController != null && _currentPosition != null) {
+        _addMyLocationToMap(Location.withCoordinates(_currentPosition!));
+        _setupLocationUpdates();
+        _fetchNearbyPlaces(_currentPosition!);
+      }
     } catch (e) {
-      setState(() {
-        isLocationLoading = false;
-      });
       debugPrint("Error getting location: $e");
+      setState(() => isLocationLoading = false);
     }
   }
 
+  void _addMyLocationToMap(Location myLocation) {
+    if (_locationIndicator == null) {
+      _locationIndicator = LocationIndicator()
+        ..isAccuracyVisualized = false
+        ..locationIndicatorStyle = LocationIndicatorIndicatorStyle.navigation
+        ..enable(_mapController!)
+        ..setHaloColor(
+            LocationIndicatorIndicatorStyle.navigation, Colors.transparent);
+    }
+    _locationIndicator!.updateLocation(myLocation);
+
+    if (_lastFetchPosition == null) {
+      _mapController!.camera.lookAtPointWithMeasure(
+        myLocation.coordinates,
+        MapMeasure(MapMeasureKind.distanceInMeters, 3000),
+      );
+    }
+  }
+
+  void _setupLocationUpdates() {
+    if (_mapController == null ||
+        _currentPosition == null ||
+        _isListeningToLocation) return;
+
+    try {
+      _locationEngine = LocationEngine();
+      _locationListener = LocationListener((Location location) {
+        _currentPosition = location.coordinates;
+        setState(() {});
+        _locationIndicator?.updateLocation(location);
+        _checkDistanceAndFetchIfNeeded(location.coordinates);
+      });
+
+      _locationEngine.addLocationListener(_locationListener!);
+      _locationEngine.startWithLocationAccuracy(LocationAccuracy.navigation);
+      _isListeningToLocation = true;
+    } catch (e) {
+      debugPrint("Location setup error: $e");
+    }
+  }
+
+  void _checkDistanceAndFetchIfNeeded(GeoCoordinates newPosition) {
+    if (_lastFetchPosition == null) {
+      _fetchNearbyPlaces(newPosition);
+      return;
+    }
+
+    final distanceMoved = geolocator.Geolocator.distanceBetween(
+      _lastFetchPosition!.latitude,
+      _lastFetchPosition!.longitude,
+      newPosition.latitude,
+      newPosition.longitude,
+    );
+
+    if (distanceMoved >= TRIGGER_DISTANCE_METERS) {
+      _fetchNearbyPlaces(newPosition);
+    }
+  }
+
+  void _fetchNearbyPlaces(GeoCoordinates position) {
+    _lastFetchPosition = position;
+    context.read<MapBloc>().add(GetNearbyPlaces(
+          queryParams: MapQueryParams(
+            currentPoint: "${position.latitude},${position.longitude}",
+            radius: 8000,
+            drivingMode: false,
+            options: ['spaces', 'events'],
+          ),
+        ));
+  }
+
   void _addMapMarkers(List<Space> spaces, List<Event> events) {
+    for (var marker in _spaceMarkers.keys.toList()) {
+      _mapController?.mapScene.removeMapMarker(marker);
+    }
+    for (var marker in _eventMarkers.keys.toList()) {
+      _mapController?.mapScene.removeMapMarker(marker);
+    }
+
     _spaceMarkers.clear();
     _eventMarkers.clear();
 
     for (var space in spaces) {
       try {
-        Uint8List imageData = _assetsProvider.getImageForType(space.type);
-
-        MapImage mapImage =
-            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
-
+        final imageData = _assetsProvider.getImageForType(space.type);
         final marker = MapMarker(
           GeoCoordinates(space.location.point.lat, space.location.point.lng),
-          mapImage,
+          MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
-
         _mapController?.mapScene.addMapMarker(marker);
         _spaceMarkers[marker] = space;
       } catch (e) {
-        print("Error adding space marker: $e");
+        debugPrint("Space marker error: $e");
       }
     }
 
     for (var event in events) {
       try {
-        Uint8List imageData = _assetsProvider.getEventIcon(event.type);
-
-        MapImage mapImage =
-            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
-
+        final imageData = _assetsProvider.getEventIcon(event.type);
         final marker = MapMarker(
           GeoCoordinates(event.location.point.lat, event.location.point.lng),
-          mapImage,
+          MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
-
         _mapController?.mapScene.addMapMarker(marker);
         _eventMarkers[marker] = event;
       } catch (e) {
-        print("Error adding event marker: $e");
+        debugPrint("Event marker error: $e");
       }
     }
   }
 
   void _setTapGestureHandler() {
-    _mapController!.gestures.tapListener = TapListener((Point2D touchPoint) {
+    _mapController!.gestures.tapListener = TapListener((touchPoint) {
       _pickMapMarker(touchPoint);
-    });
-  }
-
-  void _pickMapMarker(Point2D touchPoint) {
-    Point2D originInPixels = Point2D(touchPoint.x, touchPoint.y);
-    Size2D sizeInPixels = Size2D(1, 1);
-    Rectangle2D rectangle = Rectangle2D(originInPixels, sizeInPixels);
-
-    List<MapSceneMapPickFilterContentType> contentTypesToPickFrom = [
-      MapSceneMapPickFilterContentType.mapItems
-    ];
-
-    MapSceneMapPickFilter filter =
-        MapSceneMapPickFilter(contentTypesToPickFrom);
-    _mapController!.pick(filter, rectangle, (pickMapItemsResult) {
-      if (pickMapItemsResult == null) return;
-
-      PickMapItemsResult? mapItemsResult = pickMapItemsResult.mapItems;
-
-      if (mapItemsResult != null) {
-        List<MapMarker>? mapMarkerList = mapItemsResult.markers;
-
-        if (mapMarkerList.isNotEmpty) {
-          MapMarker topmostMapMarker = mapMarkerList.first;
-
-          if (_spaceMarkers.containsKey(topmostMapMarker)) {
-            Space space = _spaceMarkers[topmostMapMarker]!;
-            showSpacePopup(space: space);
-          } else if (_eventMarkers.containsKey(topmostMapMarker)) {
-            Event event = _eventMarkers[topmostMapMarker]!;
-            showEventPopup(
-              event: event,
-            );
-          }
-        }
-      }
     });
   }
 
@@ -416,34 +418,51 @@ class _HomeViewState extends State<HomeView>
     );
   }
 
+  void _pickMapMarker(Point2D touchPoint) {
+    final rectangle = Rectangle2D(touchPoint, Size2D(1, 1));
+    final filter =
+        MapSceneMapPickFilter([MapSceneMapPickFilterContentType.mapItems]);
 
+    _mapController?.pick(filter, rectangle, (result) {
+      if (result == null || result.mapItems == null) return;
 
-  void _onMapCreated(HereMapController hereMapController) {
-    _mapController = hereMapController;
+      final markers = result.mapItems!.markers;
+      if (markers.isNotEmpty) {
+        final topMarker = markers.first;
 
-    const double distanceToEarthInMeters = 14000;
-    MapMeasure mapMeasureZoom =
-        MapMeasure(MapMeasureKind.distanceInMeters, distanceToEarthInMeters);
+        if (_spaceMarkers.containsKey(topMarker)) {
+          final space = _spaceMarkers[topMarker]!;
 
-    GeoCoordinates targetCoordinates =
-        _currentPosition ?? GeoCoordinates(37.3318, -122.0312);
+          showSpacePopup(space: space);
+        } else if (_eventMarkers.containsKey(topMarker)) {
+          final event = _eventMarkers[topMarker]!;
+          showEventPopup(event: event);
+        }
+      }
+    });
+  }
 
-    hereMapController.camera
-        .lookAtPointWithMeasure(targetCoordinates, mapMeasureZoom);
-
+  void _onMapCreated(HereMapController controller) {
+    _mapController = controller;
     _setTapGestureHandler();
-    _addMyLocationToMap(Location.withCoordinates(_currentPosition!));
-    hereMapController.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
+
+    _mapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
         (error) {
       if (error != null) {
-        print('Map scene not loaded. MapError: ${error.toString()}');
-      } else {}
-    });
+        debugPrint('Map load error: $error');
+        return;
+      }
 
-    final state = context.read<MapBloc>().state;
-    if (state is MapLoaded) {
-      _addMapMarkers(state.payload.spaces, state.payload.events);
-    }
+      final target = _currentPosition ?? GeoCoordinates(37.3318, -122.0312);
+      _mapController!.camera.lookAtPointWithMeasure(
+          target, MapMeasure(MapMeasureKind.distanceInMeters, 14000));
+
+      if (_currentPosition != null) {
+        _addMyLocationToMap(Location.withCoordinates(_currentPosition!));
+        _setupLocationUpdates();
+        _fetchNearbyPlaces(_currentPosition!);
+      }
+    });
   }
 
   @override
@@ -465,12 +484,8 @@ class _HomeViewState extends State<HomeView>
                     alignment: Alignment.topCenter,
                     children: [
                       _currentPosition != null
-                          ? HereMap(
-
-                              key: UniqueKey(),
-                              onMapCreated: _onMapCreated,
-                            )
-                          : const CircularProgressIndicator(),
+                          ? HereMap(onMapCreated: _onMapCreated)
+                          : const Center(child: CircularProgressIndicator()),
                       const HomeMapBottomSection(),
                     ],
                   );
@@ -480,7 +495,15 @@ class _HomeViewState extends State<HomeView>
 
   @override
   void dispose() {
+    if (_locationListener != null) {
+      _locationEngine.removeLocationListener(_locationListener!);
+    }
+
+    _locationIndicator?.disable();
+    _locationIndicator = null;
     _mapController = null;
+    _isListeningToLocation = false;
+
     super.dispose();
   }
 

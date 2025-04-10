@@ -13,14 +13,38 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<ReadNotificationEvent>(_onReadNotification);
     on<MarkNotificationAsReadEvent>(_onMarkNotificationAsRead);
+    on<ClearNotificationsEvent>(_onClearNotifications);
   }
 
-  Future<void> _onMarkNotificationAsRead(
-      MarkNotificationAsReadEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onClearNotifications(
+      ClearNotificationsEvent event, Emitter<NotificationsState> emit) async {
+    try {
+      if (state is NotificationsLoaded) {
+        await notificationRepository.clearNotifications();
+
+        var state = this.state as NotificationsLoaded;
+
+        emit(NotificationsLoaded(
+          notifications: NotificationModel(
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+          ),
+        ));
+      }
+
+      emit(NotificationsInitial());
+    } catch (err) {
+      emit(NotificationsError(error: "Unable to clear notifications"));
+    }
+  }
+
+  Future<void> _onMarkNotificationAsRead(MarkNotificationAsReadEvent event,
+      Emitter<NotificationsState> emit) async {
     try {
       await notificationRepository.markNotificationAsRead(event.id);
-    //   remove notification from the list
-
+      //   remove notification from the list
     } catch (err) {
       emit(NotificationsError(error: "Unable to mark notification as read"));
     }
@@ -54,4 +78,3 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     }
   }
 }
-

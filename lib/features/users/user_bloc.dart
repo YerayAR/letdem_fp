@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/extenstions/location.dart';
@@ -20,9 +22,39 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<EditBasicInfoEvent>(_onEditBasicInfo);
     on<IncreaseUserPointEvent>(_onIncreaseUserPoint);
     on<ChangePasswordEvent>(_onChangePassword);
+    on<ChangeLanguageEvent>(_onChangeLanguage);
     on<DeleteAccountEvent>(_onDeleteAccount);
     on<UpdatePreferencesEvent>(_onUpdatePreferences);
     on<UpdateNotificationPreferencesEvent>(_onUpdateNotificationPreferences);
+  }
+
+  Future<void> _onChangeLanguage(
+      ChangeLanguageEvent event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      UserLoaded userLoaded = state as UserLoaded;
+
+      try {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: true,
+        ));
+        await userRepository.changeLanguage(event.locale);
+
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        emit(const UserInfoChanged());
+      } on ApiError catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError(err.message);
+      } catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError("Unable to change language");
+      }
+    }
   }
 
   Future<void> _onUpdateNotificationPreferences(

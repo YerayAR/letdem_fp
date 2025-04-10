@@ -40,9 +40,15 @@ class NotificationRepository implements INotificationRepository {
     return await ApiService.sendRequest(
         endpoint: EndPoints.markNotificationAsRead(id));
   }
+
+  @override
+  Future clearNotifications() async {
+    return await ApiService.sendRequest(endpoint: EndPoints.clearNotifications);
+  }
 }
 
 abstract class INotificationRepository {
+  Future<void> clearNotifications();
   Future<NotificationModel> getNotifications();
   Future<void> markNotificationAsRead(String id);
   Future<void> addNotification(NotificationModel notification);

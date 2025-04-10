@@ -215,7 +215,40 @@ class _NotificationsViewState extends State<NotificationsView> {
             selectedColor: AppColors.primary400,
             unselectedTextColor: AppColors.neutral500,
           ),
-          Dimens.space(4),
+          Dimens.space(2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: context.read<NotificationsBloc>().state
+                        is NotificationsLoading ||
+                    context.read<NotificationsBloc>().state
+                            is NotificationsLoaded &&
+                        (context.read<NotificationsBloc>().state
+                                    as NotificationsLoaded)
+                                .notifications
+                                .count ==
+                            0
+                ? []
+                : [
+                    Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        context.read<NotificationsBloc>().add(
+                              ClearNotificationsEvent(),
+                            );
+                      },
+                      child: Text(
+                        'Clear all',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                          color: AppColors.primary400,
+                        ),
+                      ),
+                    ),
+                  ],
+          ),
+          Dimens.space(2),
           BlocConsumer<NotificationsBloc, NotificationsState>(
             listener: (context, state) {
               // TODO: implement listener
@@ -229,6 +262,13 @@ class _NotificationsViewState extends State<NotificationsView> {
                       return const NotificationShimmer();
                     },
                   ),
+                );
+              }
+
+              if (state is NotificationsLoaded &&
+                  state.notifications.count == 0) {
+                return const Expanded(
+                  child: EmptyNotificationView(),
                 );
               }
 
@@ -253,10 +293,11 @@ class _NotificationsViewState extends State<NotificationsView> {
                         isRecent: false,
                         onActionPressed: () {
                           // Perform action here
-                        }, onRead: (String id) {
+                        },
+                        onRead: (String id) {
                           context.read<NotificationsBloc>().add(
-                            MarkNotificationAsReadEvent(id: id),
-                          );
+                                MarkNotificationAsReadEvent(id: id),
+                              );
                         },
                       );
                     },
@@ -493,10 +534,8 @@ class NotificationItem extends StatelessWidget {
         onDismissed: (direction) {
           // Remove the item from the data source.
           onRead(notificationObject.id);
-
         },
         child: Container(
-
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),

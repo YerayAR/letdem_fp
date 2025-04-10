@@ -23,7 +23,7 @@ class AppColors {
   static Color neutral100 = const Color(0xffCFD8DC);
   static Color neutral50 = const Color(0xffECEFF1);
 
-  static Color tetiary5000 = const Color(0xffFFF4FD);
+  static Color tetiary5000 = const Color(0xfffce5f9);
 
   static Color green50 = const Color(0xffE9FBF2);
   static Color green600 = const Color(0xff1BA864);

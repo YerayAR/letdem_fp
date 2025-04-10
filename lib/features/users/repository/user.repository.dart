@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
@@ -67,9 +69,17 @@ class UserRepository extends IUserRepository {
       endpoint: EndPoints.updatePreferencesEndpoint.copyWithDTO(preferences),
     );
   }
+
+  @override
+  Future changeLanguage(Locale locale) async {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.updateLanguageEndpoint,
+    );
+  }
 }
 
 abstract class IUserRepository {
+  Future<void> changeLanguage(Locale locale);
   Future<void> createUser();
   Future<void> deleteUser();
 

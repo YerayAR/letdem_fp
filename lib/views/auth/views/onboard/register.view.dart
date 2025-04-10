@@ -188,18 +188,14 @@ class _RegisterViewState extends State<RegisterView> {
                                 'Password must be at least 8 characters');
                             return;
                           }
-                          if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
+                          print(_repeatPasswordCTRL.text);
+                          if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
                               .hasMatch(_repeatPasswordCTRL.text)) {
                             Toast.showError(
                                 'Password must contain at least one special character');
                             return;
                           }
-                          if (RegExp(r'[0-9]')
-                              .hasMatch(_repeatPasswordCTRL.text)) {
-                            Toast.showError(
-                                'Password must contain at least one number');
-                            return;
-                          }
+
                           context.read<AuthBloc>().add(RegisterEvent(
                               email: _emailCTRL.text,
                               password: _passwordCTRL.text));

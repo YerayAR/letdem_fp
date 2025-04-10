@@ -10,6 +10,15 @@ class FetchUserInfoEvent extends UserEvent {
   List<Object?> get props => [];
 }
 
+class ChangeLanguageEvent extends UserEvent {
+  final Locale locale;
+
+  const ChangeLanguageEvent({required this.locale});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [locale];
+}
+
 class ChangePasswordEvent extends UserEvent {
   final String oldPassword;
   final String newPassword;
