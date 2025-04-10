@@ -536,7 +536,7 @@ class _NavigationViewState extends State<NavigationView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${_distanceToNextManeuver > 0 ? _distanceToNextManeuver : _totalRouteDistance}m ahead',
+                  '${_distanceToNextManeuver > 0 ? _distanceToNextManeuver.toFormattedDistance() : _totalRouteDistance.toFormattedDistance()} ahead',
                   style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -609,7 +609,7 @@ class _NavigationViewState extends State<NavigationView> {
           child: Column(
             children: [
               Text(
-                "${(_totalRouteTime.toFormattedTime())} ($_totalRouteDistance m)",
+                "${(_totalRouteTime.toFormattedTime())} (${_totalRouteDistance.toFormattedDistance()})",
                 style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -743,16 +743,21 @@ class _NavigationViewState extends State<NavigationView> {
 // Extension to parse seconds to minutes and seconds
 extension TimeFormatter on int {
   String toFormattedTime() {
-    if (this < 60) {
-      return "$this seconds";
-    } else if (this < 3600) {
-      final minutes = (this / 60).floor();
-      final seconds = this % 60;
-      return seconds > 0 ? "$minutes min $seconds sec" : "$minutes minutes";
+    int minutes = this ~/ 60;
+    int seconds = this % 60;
+
+    String minutesStr = minutes.toString().padLeft(2, '0');
+    String secondsStr = seconds.toString().padLeft(2, '0');
+
+    return "${minutesStr}m ${secondsStr}s";
+  }
+
+//   format meters to km
+  String toFormattedDistance() {
+    if (this >= 1000) {
+      return "${(this / 1000).toStringAsFixed(1)} km";
     } else {
-      final hours = (this / 3600).floor();
-      final minutes = ((this % 3600) / 60).floor();
-      return minutes > 0 ? "$hours hr $minutes min" : "$hours hours";
+      return "${this} m";
     }
   }
 }
