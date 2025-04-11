@@ -22,8 +22,6 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       if (state is NotificationsLoaded) {
         await notificationRepository.clearNotifications();
 
-        var state = this.state as NotificationsLoaded;
-
         emit(NotificationsLoaded(
           notifications: NotificationModel(
             count: 0,
@@ -33,8 +31,6 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
           ),
         ));
       }
-
-      emit(NotificationsInitial());
     } catch (err) {
       emit(NotificationsError(error: "Unable to clear notifications"));
     }

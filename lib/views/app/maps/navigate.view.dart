@@ -74,11 +74,6 @@ class _NavigationViewState extends State<NavigationView> {
   @override
   void initState() {
     super.initState();
-    _lifecycleListener = AppLifecycleListener(
-      onDetach: _disposeHERESDK,
-      onPause: _pauseNavigation,
-      onResume: _resumeNavigation,
-    );
 
     // Delay navigation start until map is created
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -97,6 +92,7 @@ class _NavigationViewState extends State<NavigationView> {
   // Permission handling
   Future<void> _requestLocationPermission() async {
     setState(() => _isLoading = true);
+    await _assetsProvider.loadAssets();
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -382,13 +378,22 @@ class _NavigationViewState extends State<NavigationView> {
 
     // Set up route progress listener with throttling
     DateTime lastUpdateTime = DateTime.now();
+
     _visualNavigator!.routeProgressListener =
         HERE.RouteProgressListener((HERE.RouteProgress routeProgress) {
       // Throttle updates to avoid too many setState calls
       final now = DateTime.now();
+
       if (now.difference(lastUpdateTime).inMilliseconds < 500) {
         return;
       }
+
+      var sectionProgress = routeProgress.sectionProgress;
+
+      print("Section progress: ${sectionProgress.length}");
+      print(
+          'Section progress: ${sectionProgress.first.remainingDistanceInMeters}m');
+
       lastUpdateTime = now;
 
       final maneuver = routeProgress.maneuverProgress;
@@ -506,6 +511,7 @@ class _NavigationViewState extends State<NavigationView> {
     }
 
     return Container(
+      height: 110,
       padding: const EdgeInsets.symmetric(
           horizontal: _containerPadding, vertical: _containerPadding + 5),
       decoration: BoxDecoration(
@@ -534,6 +540,7 @@ class _NavigationViewState extends State<NavigationView> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   '${_distanceToNextManeuver > 0 ? _distanceToNextManeuver.toFormattedDistance() : _totalRouteDistance.toFormattedDistance()} ahead',

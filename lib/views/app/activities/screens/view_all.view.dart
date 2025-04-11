@@ -182,7 +182,7 @@ class _ViewAllViewState extends State<ViewAllView> {
                 radius: 40,
                 backgroundColor: Colors.white,
                 child: Icon(
-                  Iconsax.bookmark,
+                  Iconsax.star,
                   size: 40,
                   color: AppColors.primary500,
                 ),

@@ -7,6 +7,7 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
@@ -235,6 +236,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                         context.read<NotificationsBloc>().add(
                               ClearNotificationsEvent(),
                             );
+                        context.read<UserBloc>().add(FetchUserInfoEvent());
                       },
                       child: Text(
                         'Clear all',
