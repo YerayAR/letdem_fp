@@ -68,22 +68,18 @@ class TextInputFieldState extends State<TextInputField> {
   void _calculatePasswordStrength(String password) {
     int strength = 0;
 
-    // Check length (8+ characters)
     if (password.length >= 8) {
       strength++;
     }
 
-    // Check for numbers
     if (RegExp(r'[0-9]').hasMatch(password)) {
       strength++;
     }
 
-    // Check for special characters
-    if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]').hasMatch(password)) {
+    if (RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]').hasMatch(password)) {
       strength++;
     }
 
-    // Check for uppercase and lowercase combination
     if (RegExp(r'[A-Z]').hasMatch(password) &&
         RegExp(r'[a-z]').hasMatch(password)) {
       strength++;
@@ -153,6 +149,24 @@ class TextInputFieldState extends State<TextInputField> {
                 if (value == null || value.isEmpty) {
                   return 'Please enter${widget.placeHolder.toLowerCase().replaceAll("enter", "")}';
                 }
+                if (widget.inputType == TextFieldType.password &&
+                    value.length < 8) {
+                  return 'Password must be at least 8 characters';
+                }
+                if (widget.inputType == TextFieldType.password &&
+                    !RegExp(r'[0-9]').hasMatch(value)) {
+                  return 'Password must contain at least one number';
+                }
+                if (widget.inputType == TextFieldType.password &&
+                    !RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]')
+                        .hasMatch(value)) {
+                  return 'Password must contain at least one special character';
+                }
+                if (widget.inputType == TextFieldType.password &&
+                    !RegExp(r'[A-Z]').hasMatch(value)) {
+                  return 'Password must contain at least one uppercase letter';
+                }
+
                 if (widget.inputType == TextFieldType.email &&
                     !value.isValidEmail()) {
                   return 'Please enter valid email';

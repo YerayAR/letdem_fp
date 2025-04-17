@@ -1,6 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
+import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 
@@ -11,7 +12,10 @@ class NotificationRepository implements INotificationRepository {
   }
 
   @override
-  Future<NotificationModel> getNotifications() async {
+  Future<NotificationModel> getNotifications(bool unreadOnly) async {
+    EndPoints.notifications.setParams([
+      QParam(key: 'read', value: (!unreadOnly).toString()),
+    ]);
     ApiResponse res =
         await ApiService.sendRequest(endpoint: EndPoints.notifications);
     // Get notifications from database
@@ -49,7 +53,7 @@ class NotificationRepository implements INotificationRepository {
 
 abstract class INotificationRepository {
   Future<void> clearNotifications();
-  Future<NotificationModel> getNotifications();
+  Future<NotificationModel> getNotifications(bool unreadOnly);
   Future<void> markNotificationAsRead(String id);
   Future<void> addNotification(NotificationModel notification);
 

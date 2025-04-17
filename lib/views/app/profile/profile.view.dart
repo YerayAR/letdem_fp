@@ -22,7 +22,6 @@ import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
-import 'package:letdem/views/auth/views/onboard/basic_info.view.dart';
 
 import 'screens/preferences/preferences.view.dart';
 import 'screens/scheduled_notifications/scheduled_notifications.view.dart';
@@ -112,19 +111,19 @@ class ProfileView extends StatelessWidget {
                                       ),
                                     ),
                                     Positioned(
-                                      bottom: -13,
+                                      bottom: -17,
                                       child: DecoratedChip(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
+                                          horizontal: 12,
                                           vertical: 4,
                                         ),
                                         textStyle: Typo.smallBody.copyWith(
                                           color: Colors.white,
-                                          fontSize: 10,
+                                          fontSize: 8,
                                           fontWeight: FontWeight.w800,
                                         ),
                                         text:
-                                            '${state.user.totalPoints} Points',
+                                            '${state.user.totalPoints}\nLetDem Points',
                                         color: Colors.white,
                                         backgroundColor: AppColors.secondary600,
                                       ),

@@ -70,6 +70,7 @@ class DecoratedChip extends StatelessWidget {
                         fontSize: textSize ?? 12,
                         fontWeight: FontWeight.w700,
                       ),
+                  textAlign: TextAlign.center,
                   overflow: TextOverflow.clip,
                 ),
               ],

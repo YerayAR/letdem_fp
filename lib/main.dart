@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
@@ -35,6 +36,7 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
@@ -82,6 +84,8 @@ void main() async {
     print("FlutterError: ${details.exception}");
   };
   OneSignal.initialize(AppCredentials.oneSignalAppId);
+  final String defaultLocale =
+      Platform.localeName; // Returns locale string in the form 'en_US'
 
   //getting the language preference and assign in into the app, if none default is japanese
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -99,9 +103,16 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => LocaleProvider(
-            defaultLocale: Locale(languageCode ?? "es"),
-          ),
+          create: (_) {
+            const fallbackLocale = Locale('es');
+            final resolvedLocale = (languageCode != null)
+                ? Locale(languageCode!)
+                : (L10n.all.contains(Locale(defaultLocale))
+                    ? Locale(defaultLocale)
+                    : fallbackLocale);
+
+            return LocaleProvider(defaultLocale: resolvedLocale);
+          },
         ),
       ],
       child: MultiRepositoryProvider(

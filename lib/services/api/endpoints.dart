@@ -202,7 +202,7 @@ class EndPoints {
   );
 
   static var notifications = Endpoint(
-    url: "/users/me/notifications?read=false ",
+    url: "/users/me/notifications",
     method: HTTPMethod.GET,
   );
 

@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
+import 'package:letdem/services/toast/toast.dart';
 
 part 'notifications_event.dart';
 part 'notifications_state.dart';
@@ -23,6 +24,12 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         await notificationRepository.clearNotifications();
 
         emit(NotificationsLoaded(
+          unreadNotifications: NotificationModel(
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+          ),
           notifications: NotificationModel(
             count: 0,
             next: null,
@@ -49,9 +56,9 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   Future<void> _onReadNotification(
       ReadNotificationEvent event, Emitter<NotificationsState> emit) async {
     try {
-      await notificationRepository.readNotification(event.id);
+      await notificationRepository.markNotificationAsRead(event.id);
     } catch (err) {
-      emit(NotificationsError(error: "Unable to read notification"));
+      Toast.showError("Unable to read notification");
     }
   }
 
@@ -59,15 +66,22 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       LoadNotificationsEvent event, Emitter<NotificationsState> emit) async {
     try {
       emit(NotificationsLoading());
-      var notifications = await notificationRepository.getNotifications();
+      var notifications = await notificationRepository.getNotifications(false);
+      var unread = await notificationRepository.getNotifications(true);
 
       var currentPos = await Geolocator.getCurrentPosition();
 
       for (var notification in notifications.results) {
         notification.setDistance(currentPos);
       }
+      for (var notification in unread.results) {
+        notification.setDistance(currentPos);
+      }
 
-      emit(NotificationsLoaded(notifications: notifications));
+      emit(NotificationsLoaded(
+        notifications: notifications,
+        unreadNotifications: unread,
+      ));
     } catch (err, st) {
       print(st);
       emit(NotificationsError(error: "Unable to load notifications"));

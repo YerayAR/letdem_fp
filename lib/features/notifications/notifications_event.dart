@@ -34,3 +34,13 @@ class ReadNotificationEvent extends NotificationsEvent {
   @override
   List<Object> get props => [id];
 }
+
+// In notifications_event.dart
+class FilterNotificationsEvent extends NotificationsEvent {
+  final bool showUnread;
+
+  FilterNotificationsEvent({required this.showUnread});
+
+  @override
+  List<Object> get props => [showUnread];
+}

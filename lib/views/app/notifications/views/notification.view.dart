@@ -206,8 +206,6 @@ class _NotificationsViewState extends State<NotificationsView> {
             getName: (type) => type.name,
             initialValue: viewAllType,
             onSelected: (type) {
-              context.read<NotificationsBloc>().add(LoadNotificationsEvent(
-                  showUnread: type == NotificationType.unread));
               setState(() {
                 viewAllType = type;
               });
@@ -277,9 +275,13 @@ class _NotificationsViewState extends State<NotificationsView> {
               if (state is NotificationsLoaded) {
                 return Expanded(
                   child: ListView.builder(
-                    itemCount: state.notifications.results.length,
+                    itemCount: viewAllType == NotificationType.all
+                        ? state.notifications.count
+                        : state.unreadNotifications.count,
                     itemBuilder: (context, index) {
-                      var notification = state.notifications.results[index];
+                      var notification = viewAllType == NotificationType.all
+                          ? state.notifications.results[index]
+                          : state.unreadNotifications.results[index];
                       return NotificationItem(
                         type: notification.type,
                         notificationObject: notification.notificationObject,

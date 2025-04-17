@@ -266,7 +266,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     Dimens.space(2),
                     Text(
-                      "Ensure to use at least 8 characters, with a number and a special character.",
+                      "Ensure to use at least 8 characters, with a number and a special character and uppercase letter",
                       style: Typo.smallBody.copyWith(
                         color: AppColors.neutral400,
                         fontSize: 14,

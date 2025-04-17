@@ -6,6 +6,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/CarTagType.dart';
 import 'package:letdem/features/car/car_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
@@ -169,11 +170,31 @@ class _RegisterCarViewState extends State<RegisterCarView> {
                   placeHolder: 'Enter plate number',
                 ),
                 Dimens.space(2),
-                Text(
-                  "Select Tag",
-                  style: Typo.mediumBody.copyWith(
-                    color: AppColors.neutral400,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      "Select Tag",
+                      style: Typo.mediumBody.copyWith(
+                        color: AppColors.neutral400,
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        AppPopup.showDialogSheet(
+                          context,
+                          const EmissionsTagScreen(),
+                        );
+                      },
+                      child: Text(
+                        "What’s this?",
+                        style: Typo.mediumBody.copyWith(
+                          color: AppColors.secondary600,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Dimens.space(1),
                 Row(
@@ -225,6 +246,147 @@ class _RegisterCarViewState extends State<RegisterCarView> {
           ),
         );
       },
+    );
+  }
+}
+
+class EmissionsTagScreen extends StatelessWidget {
+  const EmissionsTagScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 0, bottom: 0),
+              child: Text(
+                'What Tag Means',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF3A4556),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: ListView(
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCategorySection(
+                    title: 'Eco Label',
+                    items: const [
+                      'Plug-in hybrids with an electric range of less than 40 km.',
+                      'Non-plug-in hybrids (HEV).',
+                      'Gas-powered vehicles (LPG, CNG, or LNG).',
+                    ],
+                  ),
+                  _buildCategorySection(
+                    title: 'Zero Emmission Label',
+                    items: const [
+                      '100% electric vehicles (BEV).',
+                      'Plug-in hybrids (PHEV) with an electric range of more than 40 km.',
+                      'Hydrogen-powered vehicles.',
+                    ],
+                  ),
+                  _buildCategorySection(
+                    title: 'B Label Yellow',
+                    items: const [
+                      'Petrol cars and vans registered from January 2001 onwards.',
+                      'Diesel cars and vans registered from January 2006 onwards.',
+                      'Industrial vehicles and buses registered from 2005 onwards.',
+                    ],
+                  ),
+                  _buildCategorySection(
+                    title: 'C Label Green',
+                    items: const [
+                      'Petrol cars and vans registered from January 2006 onwards.',
+                      'Diesel cars and vans registered from September 2015 onwards.',
+                      'Industrial vehicles and buses registered from 2014 onwards.',
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'No Label',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+            Dimens.space(2),
+            PrimaryButton(
+              text: 'Got it',
+              onTap: () {
+                NavigatorHelper.pop();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategorySection(
+      {required String title, required List<String> items}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          ...items.map((item) => _buildBulletPoint(item)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 6, right: 8),
+            child: CircleAvatar(
+              radius: 3,
+              backgroundColor: Color(0xFF8494AB),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF8494AB),
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
