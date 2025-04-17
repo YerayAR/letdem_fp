@@ -56,15 +56,53 @@ class TextInputField extends StatefulWidget {
 class TextInputFieldState extends State<TextInputField> {
   bool isPasswordVisible = false;
 
-  Map<String, bool> passwordValid = {
-    'isLength': false,
-    'isSpecial': false,
-    'isNumber': false,
-  };
+  // We'll track password strength level instead of individual criteria
+  int passwordStrength = 0; // 0-4 scale for strength levels
 
   @override
   void initState() {
     super.initState();
+  }
+
+  // Calculate password strength based on criteria
+  void _calculatePasswordStrength(String password) {
+    int strength = 0;
+
+    // Check length (8+ characters)
+    if (password.length >= 8) {
+      strength++;
+    }
+
+    // Check for numbers
+    if (RegExp(r'[0-9]').hasMatch(password)) {
+      strength++;
+    }
+
+    // Check for special characters
+    if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]').hasMatch(password)) {
+      strength++;
+    }
+
+    // Check for uppercase and lowercase combination
+    if (RegExp(r'[A-Z]').hasMatch(password) &&
+        RegExp(r'[a-z]').hasMatch(password)) {
+      strength++;
+    }
+
+    setState(() {
+      passwordStrength = strength;
+    });
+  }
+
+  // Get color based on password strength level
+  Color _getStrengthColor() {
+    if (passwordStrength <= 1) {
+      return Colors.red; // Weak password
+    } else if (passwordStrength <= 3) {
+      return Colors.amber; // Medium password (yellow)
+    } else {
+      return Colors.green; // Strong password
+    }
   }
 
   @override
@@ -101,33 +139,10 @@ class TextInputFieldState extends State<TextInputField> {
           TextFormField(
               enabled: widget.isEnabled,
               onChanged: widget.showPasswordStrengthIndicator
-                  ? (e) {
-                      if (e.length >= 8) {
-                        setState(() {
-                          passwordValid['isLength'] = true;
-                        });
-                      } else {
-                        setState(() {
-                          passwordValid['isLength'] = false;
-                        });
-                      }
-                      if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]').hasMatch(e)) {
-                        setState(() {
-                          passwordValid['isSpecial'] = true;
-                        });
-                      } else {
-                        setState(() {
-                          passwordValid['isSpecial'] = false;
-                        });
-                      }
-                      if (RegExp(r'[0-9]').hasMatch(e)) {
-                        setState(() {
-                          passwordValid['isNumber'] = true;
-                        });
-                      } else {
-                        setState(() {
-                          passwordValid['isNumber'] = false;
-                        });
+                  ? (value) {
+                      _calculatePasswordStrength(value);
+                      if (widget.onChanged != null) {
+                        widget.onChanged!(value);
                       }
                     }
                   : widget.onChanged,
@@ -239,6 +254,9 @@ class TextInputFieldState extends State<TextInputField> {
                                   ),
                                   onTap: () {
                                     widget.controller!.clear();
+                                    setState(() {
+                                      passwordStrength = 0;
+                                    });
                                   },
                                 ),
                               ),
@@ -267,46 +285,42 @@ class TextInputFieldState extends State<TextInputField> {
                               ),
                             )
                           : null)),
-          Column(
-            children: widget.showPasswordStrengthIndicator &&
-                    widget.controller != null &&
-                    widget.controller!.text.isNotEmpty
-                ? <Widget>[
-                    Dimens.space(2),
-                    Row(
-                      children: [
-                        Text(
-                          "Password Strength",
-                          style: Typo.mediumBody.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Spacer(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: passwordValid.keys.map((key) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child: AnimatedContainer(
-                                height: 7,
-                                duration: const Duration(milliseconds: 600),
-                                width: 24,
-                                decoration: BoxDecoration(
-                                  color: passwordValid[key] == true
-                                      ? AppColors.green500
-                                      : AppColors.neutral50,
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
+          if (widget.showPasswordStrengthIndicator &&
+              widget.controller != null &&
+              widget.controller!.text.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: List.generate(4, (index) {
+                  final isActive = index < passwordStrength;
+
+                  Color segmentColor = Colors.grey.withOpacity(0.2);
+
+                  if (isActive) {
+                    if (passwordStrength <= 1) {
+                      segmentColor = Colors.red;
+                    } else if (passwordStrength <= 3) {
+                      segmentColor = Colors.amber; // Yellow
+                    } else {
+                      segmentColor = Colors.green;
+                    }
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Container(
+                      width: 22,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: segmentColor,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
-                  ]
-                : [],
-          ),
+                  );
+                }),
+              ),
+            ),
         ],
       ),
     );

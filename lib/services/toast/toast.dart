@@ -15,6 +15,7 @@ class Toast {
       ),
       message: message,
       animationDuration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 4000),
       backgroundColor: AppColors.red500,
       trailingWidget: IconButton(
         icon: const Icon(

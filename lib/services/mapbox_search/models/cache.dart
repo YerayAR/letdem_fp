@@ -32,40 +32,79 @@ class DatabaseHelper {
     final path = join(await getDatabasesPath(), 'mapbox_places.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Increment version to handle schema change
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE places (
             id TEXT PRIMARY KEY,
-            data TEXT
+            data TEXT,
+            timestamp INTEGER
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          // Add timestamp column to existing table
+          await db.execute('ALTER TABLE places ADD COLUMN timestamp INTEGER');
+          // Update existing records with current timestamp
+          await db.execute(
+              'UPDATE places SET timestamp = ${DateTime.now().millisecondsSinceEpoch}');
+        }
       },
     );
   }
 
   Future<void> savePlace(MapBoxPlace place) async {
     final db = await database;
-    final jsonString = jsonEncode(place.toJson());
-    await db.insert(
-      'places',
-      {'id': place.mapboxId, 'data': jsonString},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+
+    // Start a transaction for atomic operations
+    await db.transaction((txn) async {
+      // Insert the new place with timestamp
+      final jsonString = jsonEncode(place.toJson());
+      await txn.insert(
+        'places',
+        {
+          'id': place.mapboxId,
+          'data': jsonString,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      // Get count of places
+      final count = Sqflite.firstIntValue(
+          await txn.rawQuery('SELECT COUNT(*) FROM places'));
+
+      // If we have more than 5 places, delete the oldest one(s)
+      if (count != null && count > 5) {
+        // This query finds the oldest records by timestamp and deletes them
+        await txn.rawDelete('''
+          DELETE FROM places WHERE id IN (
+            SELECT id FROM places ORDER BY timestamp ASC LIMIT ${count - 5}
+          )
+        ''');
+      }
+    });
   }
 
   Future<List<MapBoxPlace>> getPlaces() async {
     final db = await database;
 
-    final List<Map<String, dynamic>> maps = await db.query(
-      'places',
-      limit: 5,
-    );
-    return maps
-        .map((map) => MapBoxPlace.fromJson(jsonDecode(map['data'])))
-        .toList()
-        .reversed
-        .toList();
+    try {
+      // Query with order by timestamp descending (most recent first)
+      final List<Map<String, dynamic>> maps = await db.query(
+        'places',
+        orderBy: 'timestamp DESC',
+        limit: 5,
+      );
+
+      return maps
+          .map((map) => MapBoxPlace.fromJson(jsonDecode(map['data'])))
+          .toList();
+    } catch (e) {
+      print('Error getting places: $e');
+      return [];
+    }
   }
 
   Future<void> clearAll() async {

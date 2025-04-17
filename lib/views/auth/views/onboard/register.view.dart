@@ -49,22 +49,112 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
+  bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(Dimens.defaultMargin),
-          child: PrimaryButton(
-            outline: true,
-            onTap: () {
-              context.read<AuthBloc>().add(const GoogleRegisterEvent());
-            },
-            color: Colors.white,
-            widgetImage: SvgPicture.asset(AppAssets.google),
-            textColor: const Color(0xFF344054),
-            borderColor: AppColors.neutral50,
-            text: 'Sign up with Google',
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PrimaryButton(
+                isLoading: context.watch<AuthBloc>().state is RegisterLoading,
+                onTap: () {
+                  if (_formKey.currentState!.validate()) {
+                    if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
+                      Toast.showError('Passwords do not match');
+                      return;
+                    }
+                    if (_passwordCTRL.text.length < 8) {
+                      Toast.showError('Password must be at least 8 characters');
+                      return;
+                    }
+                    print(_repeatPasswordCTRL.text);
+                    if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
+                        .hasMatch(_repeatPasswordCTRL.text)) {
+                      Toast.showError(
+                          'Password must contain at least one special character');
+                      return;
+                    }
+
+                    context.read<AuthBloc>().add(RegisterEvent(
+                        email: _emailCTRL.text, password: _passwordCTRL.text));
+                  }
+                },
+                isDisabled: !isChecked,
+                text: 'Continue',
+              ),
+              Dimens.space(1),
+
+              PrimaryButton(
+                outline: true,
+                onTap: () {
+                  context.read<AuthBloc>().add(const GoogleRegisterEvent());
+                },
+                color: Colors.white,
+                widgetImage: SvgPicture.asset(AppAssets.google),
+                textColor: const Color(0xFF344054),
+                borderColor: AppColors.neutral50,
+                text: 'Sign up with Google',
+              ),
+              Dimens.space(1),
+
+              //By continuing, I agree to LetDem Terms & Conditions
+              Row(
+                children: [
+                  CustomCheckbox(
+                    value: isChecked,
+                    onChanged: (value) {
+                      setState(() {
+                        isChecked = value;
+                      });
+                    },
+                    activeColor: AppColors.primary500,
+                    size: 21.0,
+                    borderRadius: 7.0,
+                  ),
+                  Dimens.space(1),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'By continuing, I agree to LetDem ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 13,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'Terms & Conditions',
+                            style: TextStyle(
+                              color: AppColors.primary500,
+                              fontSize: 13,
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // handle tap here (e.g. open a web page or navigate to terms screen)
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Text.rich(
+              //   TextSpan(
+
+              // You can add more widgets here like:
+              // SizedBox(height: 12),
+              // PrimaryButton(...),
+              // Text(...),
+            ],
           ),
         ),
       ),
@@ -120,7 +210,7 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                       ],
                     ),
-                    Dimens.space(3),
+                    Dimens.space(1),
                     Text(
                       'Get Started',
                       style:
@@ -175,39 +265,153 @@ class _RegisterViewState extends State<RegisterView> {
                       placeHolder: 'Enter your password',
                     ),
                     Dimens.space(2),
-                    PrimaryButton(
-                      isLoading: state is RegisterLoading,
-                      onTap: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
-                            Toast.showError('Passwords do not match');
-                            return;
-                          }
-                          if (_passwordCTRL.text.length < 8) {
-                            Toast.showError(
-                                'Password must be at least 8 characters');
-                            return;
-                          }
-                          print(_repeatPasswordCTRL.text);
-                          if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
-                              .hasMatch(_repeatPasswordCTRL.text)) {
-                            Toast.showError(
-                                'Password must contain at least one special character');
-                            return;
-                          }
-
-                          context.read<AuthBloc>().add(RegisterEvent(
-                              email: _emailCTRL.text,
-                              password: _passwordCTRL.text));
-                        }
-                      },
-                      text: 'Register',
+                    Text(
+                      "Ensure to use at least 8 characters, with a number and a special character.",
+                      style: Typo.smallBody.copyWith(
+                        color: AppColors.neutral400,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class CustomCheckbox extends StatefulWidget {
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+  final Color activeColor;
+  final Color inactiveColor;
+  final Color checkColor;
+  final double size;
+  final double borderRadius;
+  final double borderWidth;
+  final Widget? label;
+  final EdgeInsets padding;
+
+  const CustomCheckbox({
+    Key? key,
+    required this.value,
+    required this.onChanged,
+    this.activeColor = Colors.blue,
+    this.inactiveColor = Colors.transparent,
+    this.checkColor = Colors.white,
+    this.size = 24.0,
+    this.borderRadius = 6.0,
+    this.borderWidth = 2.0,
+    this.label,
+    this.padding = const EdgeInsets.symmetric(vertical: 8.0),
+  }) : super(key: key);
+
+  @override
+  State<CustomCheckbox> createState() => _CustomCheckboxState();
+}
+
+class _CustomCheckboxState extends State<CustomCheckbox> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: widget.padding,
+      child: InkWell(
+        onTap: () {
+          if (widget.onChanged != null) {
+            widget.onChanged!(!widget.value);
+          }
+        },
+        onHover: (isHovered) {
+          setState(() {
+            _isHovered = isHovered;
+          });
+        },
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: widget.size,
+              height: widget.size,
+              decoration: BoxDecoration(
+                color: widget.value ? widget.activeColor : widget.inactiveColor,
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+                border: Border.all(
+                  color: widget.value
+                      ? widget.activeColor
+                      : _isHovered
+                          ? widget.activeColor.withOpacity(0.7)
+                          : Colors.grey,
+                  width: widget.borderWidth,
+                ),
+              ),
+              child: widget.value
+                  ? Center(
+                      child: Icon(
+                        Icons.check,
+                        size: widget.size * 0.7,
+                        color: widget.checkColor,
+                      ),
+                    )
+                  : null,
+            ),
+            if (widget.label != null)
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: widget.label!,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Example usage:
+class CheckboxExample extends StatefulWidget {
+  const CheckboxExample({Key? key}) : super(key: key);
+
+  @override
+  State<CheckboxExample> createState() => _CheckboxExampleState();
+}
+
+class _CheckboxExampleState extends State<CheckboxExample> {
+  bool isChecked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+
+            // Checkbox with different style
+            CustomCheckbox(
+              value: isChecked,
+              onChanged: (value) {
+                setState(() {
+                  isChecked = value;
+                });
+              },
+              activeColor: Colors.purple,
+              size: 28.0,
+              borderRadius: 14.0, // Fully rounded
+              borderWidth: 1.5,
+              checkColor: Colors.white,
+            ),
+          ],
         ),
       ),
     );

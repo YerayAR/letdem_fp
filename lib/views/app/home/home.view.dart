@@ -69,6 +69,7 @@ class _HomeViewState extends State<HomeView>
   }
 
   Future<void> _loadAssets() async {
+    setState(() => isLoadingAssets = true);
     await _assetsProvider.loadAssets();
     setState(() => isLoadingAssets = false);
   }
@@ -219,6 +220,11 @@ class _HomeViewState extends State<HomeView>
     for (var event in events) {
       try {
         final imageData = _assetsProvider.getEventIcon(event.type);
+
+        // print lat and lng
+
+        print(
+            "??Adding ${event.type} marker at ${event.location.point.lat}, ${event.location.point.lng}");
         final marker = MapMarker(
           GeoCoordinates(event.location.point.lat, event.location.point.lng),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),

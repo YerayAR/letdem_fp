@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:here_sdk/core.dart' as HERE;
 import 'package:here_sdk/core.engine.dart';
 import 'package:here_sdk/core.errors.dart';
+import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart' as HERE;
 import 'package:here_sdk/mapview.dart';
 import 'package:here_sdk/navigation.dart' as HERE;
@@ -13,9 +14,11 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
+import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 
 class NavigationView extends StatefulWidget {
@@ -40,7 +43,7 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
   static const int _distanceTriggerThreshold =
-      250; // 50m threshold for triggering
+      200; // 50m threshold for triggering
   // Controllers and engines
   HereMapController? _hereMapController;
   late final AppLifecycleListener _lifecycleListener;
@@ -81,6 +84,22 @@ class _NavigationViewState extends State<NavigationView> {
     });
   }
 
+  putParkingsSpacesOnMao() {
+    context.read<MapBloc>().add(
+          GetNearbyPlaces(
+            queryParams: MapQueryParams(
+              currentPoint:
+                  "${_currentLocation?.latitude},${_currentLocation?.longitude}",
+              previousPoint:
+                  "${_currentLocation?.latitude},${_currentLocation?.longitude}",
+              radius: 1000,
+              drivingMode: false,
+              options: ['spaces'],
+            ),
+          ),
+        );
+  }
+
   @override
   void dispose() {
     _cleanupNavigation();
@@ -118,10 +137,18 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() => _isLoading = false);
   }
 
+  bool _isPopupDisplayed = false;
+
   // Map initialization and cleanup
   void _onMapCreated(HereMapController hereMapController) {
     debugPrint('🗺️ Map created!');
     _hereMapController = hereMapController;
+
+    // move gestures
+
+    _hereMapController?.gestures.enableDefaultAction(
+      GestureType.pinchRotate,
+    );
     _loadMapScene();
   }
 
@@ -157,9 +184,38 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _cleanupNavigation() {
     debugPrint('🧹 Cleaning up navigation resources...');
-    _visualNavigator?.stopRendering();
-    _locationSimulator?.stop();
-    _locationEngine?.stop();
+
+    // Stop visual rendering
+    if (_visualNavigator != null) {
+      _visualNavigator!.stopRendering();
+      _visualNavigator = null; // Explicitly clear reference
+    }
+
+    // Stop location simulator
+    if (_locationSimulator != null) {
+      _locationSimulator!.stop();
+      _locationSimulator = null; // Explicitly clear reference
+    }
+
+    // Stop location engine
+    if (_locationEngine != null) {
+      _locationEngine!.stop();
+      _locationEngine = null; // Explicitly clear reference
+    }
+
+    // Clear route
+    _routingEngine = null;
+
+    // Reset navigation state
+    setState(() {
+      _isNavigating = false;
+      _navigationInstruction = "";
+      _distanceToNextManeuver = 0;
+      _totalRouteTime = 0;
+      _totalRouteDistance = 0;
+    });
+
+    debugPrint('✅ Navigation resources fully cleaned up.');
   }
 
   Future<bool> _handleBackPress() async {
@@ -170,9 +226,10 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _disposeHERESDK() {
     debugPrint('🧼 Disposing HERE SDK resources...');
-    _cleanupNavigation();
     SDKNativeEngine.sharedInstance?.dispose();
     HERE.SdkContext.release();
+    _lifecycleListener.dispose();
+    // HERE.SdkContext.release();
     debugPrint('✅ HERE SDK resources disposed.');
   }
 
@@ -204,6 +261,8 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _startNavigation() async {
+    _cleanupNavigation();
+
     if (_hereMapController == null) return;
 
     setState(() => _isLoading = true);
@@ -269,12 +328,13 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _showDistanceTriggerToast() {
-    debugPrint('🚶 Distance trigger: $_distanceTraveled meters traveled');
+    debugPrint('Distance trigger: $_distanceTraveled meters traveled');
     context.read<MapBloc>().add(
           GetNearbyPlaces(
               queryParams: MapQueryParams(
             currentPoint: "$_lastLatitude,$_lastLongitude",
-            radius: _distanceTriggerThreshold,
+            previousPoint: "$_lastLatitude,$_lastLongitude",
+            radius: 400,
             drivingMode: false,
             options: ['events'],
           )),
@@ -283,8 +343,8 @@ class _NavigationViewState extends State<NavigationView> {
 
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
-  void _addMapMarkers(List<Event> spaces) {
-    for (var space in spaces) {
+  void _addMapMarkers(List<Event> events, List<Space> spaces) {
+    for (var space in events) {
       try {
         Uint8List imageData = _assetsProvider.getEventIcon(space.type);
 
@@ -300,6 +360,19 @@ class _NavigationViewState extends State<NavigationView> {
         _hereMapController?.mapScene.addMapMarker(marker);
       } catch (e) {
         print("Error adding space marker: $e");
+      }
+    }
+    for (var space in spaces) {
+      try {
+        final imageData = _assetsProvider.getImageForType(space.type);
+        final marker = MapMarker(
+          HERE.GeoCoordinates(
+              space.location.point.lat, space.location.point.lng),
+          MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
+        );
+        _hereMapController?.mapScene.addMapMarker(marker);
+      } catch (e) {
+        debugPrint("Space marker error: $e");
       }
     }
   }
@@ -384,31 +457,63 @@ class _NavigationViewState extends State<NavigationView> {
       // Throttle updates to avoid too many setState calls
       final now = DateTime.now();
 
+      HERE.SectionProgress lastSectionProgress =
+          routeProgress.sectionProgress.last;
+      int distance = lastSectionProgress.remainingDistanceInMeters;
+      Duration trafficDelay = lastSectionProgress.trafficDelay;
+
       if (now.difference(lastUpdateTime).inMilliseconds < 500) {
         return;
       }
+      String getStreetNameFromManeuver(HERE.Maneuver maneuver,
+          {List<Locale> preferredLocales = const []}) {
+        // Try next road name first (where the vehicle is heading)
+        String? name = maneuver.nextRoadTexts.names.getDefaultValue();
 
-      var sectionProgress = routeProgress.sectionProgress;
+        // Fallback to current road name if next is unavailable
+        name ??= maneuver.roadTexts.names.getDefaultValue();
 
-      print("Section progress: ${sectionProgress.length}");
-      print(
-          'Section progress: ${sectionProgress.first.remainingDistanceInMeters}m');
+        return name ?? 'Unnamed Road';
+      }
+
+      // var sectionProgress = routeProgress.sectionProgress;
+// Access the last SectionProgress in the list
+
+// Retrieve the remaining distance and duration
+      final remainingDistanceInMeters =
+          lastSectionProgress.remainingDistanceInMeters;
+      final remainingDurationInSeconds =
+          lastSectionProgress.remainingDuration.inSeconds;
+
+      setState(() {
+        _distanceToNextManeuver = remainingDistanceInMeters;
+      });
+
+      // load spaces if 10 m away from destination
+
+      if (remainingDistanceInMeters < 1) {
+        if (!_isPopupDisplayed) {
+          setState(() {
+            _isPopupDisplayed = true;
+          });
+
+          putParkingsSpacesOnMao();
+
+          AppPopup.showDialogSheet(context, ParkingRatingWidget());
+        }
+        return;
+      }
 
       lastUpdateTime = now;
 
       final maneuver = routeProgress.maneuverProgress;
       if (maneuver.isEmpty) return;
 
-      debugPrint(
-          '🗺️ Maneuver progress: ${maneuver.first.remainingDistanceInMeters}m');
-
       if (mounted) {
         setState(() {
           _distanceToNextManeuver = maneuver.first.remainingDistanceInMeters;
-          _totalRouteDistance =
-              routeProgress.maneuverProgress.first.remainingDistanceInMeters;
-          _totalRouteTime =
-              routeProgress.maneuverProgress.first.remainingDuration.inSeconds;
+          _totalRouteDistance = distance;
+          _totalRouteTime = remainingDurationInSeconds;
         });
       }
     });
@@ -416,10 +521,14 @@ class _NavigationViewState extends State<NavigationView> {
     // Set up voice instruction listener
     _visualNavigator!.eventTextListener =
         HERE.EventTextListener((HERE.EventText eventText) {
-      debugPrint("🗣️ Voice maneuver text: ${eventText.text}");
+      String? streetName = getStreetNameFromManeuver(
+        eventText.maneuverNotificationDetails!.maneuver,
+      );
+
+      debugPrint("🗣️ Voice maneuver text: ${streetName}");
       if (mounted) {
         setState(() {
-          _navigationInstruction = eventText.text;
+          _navigationInstruction = streetName;
         });
       }
     });
@@ -427,6 +536,17 @@ class _NavigationViewState extends State<NavigationView> {
     // Set route and start location simulation
     _visualNavigator!.route = route;
     _setupLocationSource(_visualNavigator!, route);
+  }
+
+  String getStreetNameFromManeuver(HERE.Maneuver maneuver,
+      {List<Locale> preferredLocales = const []}) {
+    // Try next road name first (where the vehicle is heading)
+    String? name = maneuver.nextRoadTexts.names.getDefaultValue();
+
+    // Fallback to current road name if next is unavailable
+    name ??= maneuver.roadTexts.names.getDefaultValue();
+
+    return name ?? 'Unnamed Road';
   }
 
   void _setupLocationSource(
@@ -511,7 +631,7 @@ class _NavigationViewState extends State<NavigationView> {
     }
 
     return Container(
-      height: 110,
+      height: 90,
       padding: const EdgeInsets.symmetric(
           horizontal: _containerPadding, vertical: _containerPadding + 5),
       decoration: BoxDecoration(
@@ -551,7 +671,7 @@ class _NavigationViewState extends State<NavigationView> {
                 ),
                 Text(
                   _navigationInstruction,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  style: const TextStyle(color: Colors.white, fontSize: 15),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -702,7 +822,7 @@ class _NavigationViewState extends State<NavigationView> {
       listener: (context, state) {
         if (state is MapLoaded) {
           // Add markers to the map
-          _addMapMarkers(state.payload.events);
+          _addMapMarkers(state.payload.events, state.payload.spaces);
         }
         // TODO: implement listener
       },
@@ -718,11 +838,29 @@ class _NavigationViewState extends State<NavigationView> {
                 // Loading indicator
                 if (_isLoading) _buildLoadingIndicator(),
 
+                // ParkingRatingWidget once done
+                //
+                // if (_totalRouteDistance < 3 &&
+                //     _totalRouteTime < 1 &&
+                //     _isNavigating)
+                //   Positioned(
+                //     bottom: 0,
+                //     child: SizedBox(
+                //       width: MediaQuery.of(context).size.width,
+                //       child: const Positioned(
+                //         bottom: 0,
+                //         child: ParkingRatingWidget(),
+                //       ),
+                //     ),
+                //   ),
+
                 // Error message
                 if (_errorMessage.isNotEmpty) _buildErrorMessage(),
 
                 // Navigation instruction
-                if (_isNavigating && _navigationInstruction.isNotEmpty)
+                if (_isNavigating &&
+                    _navigationInstruction.isNotEmpty &&
+                    _totalRouteDistance > 0)
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 10,
                     left: _mapPadding,
@@ -756,7 +894,9 @@ extension TimeFormatter on int {
     String minutesStr = minutes.toString().padLeft(2, '0');
     String secondsStr = seconds.toString().padLeft(2, '0');
 
-    return "${minutesStr}m ${secondsStr}s";
+    return "${minutesStr} min".startsWith("00")
+        ? "${secondsStr} sec"
+        : "${minutesStr} min";
   }
 
 //   format meters to km
@@ -766,5 +906,201 @@ extension TimeFormatter on int {
     } else {
       return "${this} m";
     }
+  }
+}
+
+class ParkingRatingWidget extends StatefulWidget {
+  const ParkingRatingWidget({Key? key}) : super(key: key);
+
+  @override
+  _ParkingRatingWidgetState createState() => _ParkingRatingWidgetState();
+}
+
+class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
+  String? _selectedOption;
+  bool _submitted = false;
+
+  final List<Map<String, dynamic>> _options = [
+    {
+      'id': 'take',
+      'label': "I'll take it",
+      'icon': Icons.thumb_up,
+      'color': Colors.green.shade100,
+      'iconColor': Colors.green
+    },
+    {
+      'id': 'inuse',
+      'label': "It's in use",
+      'icon': Icons.directions_car,
+      'color': AppColors.primary500.withOpacity(0.1),
+      'iconColor': AppColors.primary500
+    },
+    {
+      'id': 'notuseful',
+      'label': "Not useful",
+      'icon': Icons.thumb_down,
+      'color': Colors.amber.shade100,
+      'iconColor': Colors.amber.shade700
+    },
+    {
+      'id': 'prohibited',
+      'label': "Prohibited",
+      'icon': Icons.not_interested,
+      'color': Colors.red.shade100,
+      'iconColor': Colors.red
+    },
+  ];
+
+  void _handleSubmit() {
+    NavigatorHelper.pop();
+    return;
+
+    if (_selectedOption != null) {
+      setState(() {
+        _submitted = true;
+      });
+      // Here you would typically send data to backend
+      print('Selected option: $_selectedOption');
+    }
+  }
+
+  void _resetForm() {
+    setState(() {
+      _selectedOption = null;
+      _submitted = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildRatingForm();
+  }
+
+  Widget _buildRatingForm() {
+    return Container(
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Location icon
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: AppColors.primary500.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary500,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.location_on,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Text
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'You have arrived at your destination.',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "Available parking spaces are shown on the map. Select an option to navigate to the nearest one.",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            // const SizedBox(height: 32),
+
+            // Options Grid
+
+            // SingleChildScrollView(
+            //   scrollDirection: Axis.horizontal,
+            //   child: Row(
+            //     spacing: Dimens.defaultMargin / 2,
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: _options.map((option) {
+            //       return GestureDetector(
+            //         onTap: () {
+            //           setState(() {
+            //             _selectedOption = option['id'];
+            //           });
+            //         },
+            //         child: Container(
+            //           padding: const EdgeInsets.all(10),
+            //           decoration: BoxDecoration(
+            //             color: _selectedOption == option['id']
+            //                 ? Colors.transparent
+            //                 : Colors.transparent,
+            //             borderRadius: BorderRadius.circular(15),
+            //             border: Border.all(
+            //               color: _selectedOption == option['id']
+            //                   ? AppColors.primary500
+            //                   : Colors.grey.withOpacity(0.3),
+            //               width: _selectedOption == option['id'] ? 2 : 1,
+            //             ),
+            //           ),
+            //           child: Column(
+            //             mainAxisSize: MainAxisSize.min,
+            //             children: [
+            //               Icon(
+            //                 option['icon'],
+            //                 color: _selectedOption == option['id']
+            //                     ? option['iconColor']
+            //                     : Colors.grey,
+            //                 size: 32,
+            //               ),
+            //               const SizedBox(height: 8),
+            //               Text(
+            //                 option['label'],
+            //                 style: TextStyle(
+            //                   fontSize: 16,
+            //                   color: Colors.black87,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       );
+            //     }).toList(),
+            //   ),
+            // ),
+            Dimens.space(4),
+
+            // Submit Button
+            PrimaryButton(
+              text: _submitted ? 'Submitted' : 'Go Back',
+              isLoading: _submitted,
+              onTap: _submitted ? null : _handleSubmit,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
