@@ -68,6 +68,7 @@ class _VerifyForgotPasswordEmailViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
@@ -116,8 +117,8 @@ class _VerifyForgotPasswordEmailViewState
                       length: 6,
                       width: MediaQuery.of(context).size.width,
                       otpFieldStyle: OtpFieldStyle(
-                        enabledBorderColor: AppColors.neutral50,
-                        borderColor: AppColors.neutral50.withOpacity(0.5),
+                        enabledBorderColor: Colors.black,
+                        borderColor: Colors.black,
                       ),
                       fieldWidth: 50,
                       controller: otpbox,

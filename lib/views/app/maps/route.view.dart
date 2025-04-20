@@ -1,14 +1,15 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
-import 'package:http/http.dart' as http;
+import 'package:here_sdk/animation.dart' as an;
+import 'package:here_sdk/core.dart';
+import 'package:here_sdk/mapview.dart';
+import 'package:here_sdk/navigation.dart' as navigation;
+import 'package:here_sdk/routing.dart' as routing;
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
-import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -26,15 +27,11 @@ import 'package:letdem/views/app/maps/navigate.view.dart';
 import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 class TrafficRouteLineExample extends StatefulWidget {
   final double lat;
   final double lng;
-
   final String? streetName;
-
   final bool hideToggle;
 
   const TrafficRouteLineExample(
@@ -49,185 +46,284 @@ class TrafficRouteLineExample extends StatefulWidget {
 }
 
 class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
-  late MapboxMap mapboxMap;
   RouteInfo? routeInfo;
-
   bool isDataLoading = true;
 
+  HereMapController? _hereMapController;
+  routing.RoutingEngine? _routingEngine;
+  navigation.VisualNavigator? _visualNavigator;
+
+  // London Heath coordinates
+
   @override
-  initState() {
+  void initState() {
     super.initState();
     getMapData();
+    _routingEngine = routing.RoutingEngine();
+  }
+
+  // Initialize _currentRoute as nullable
+  routing.Route? _currentRoute;
+
+  @override
+  void dispose() {
+    _visualNavigator?.stopRendering();
+    // Clear map resources
+    _clearMapResources();
+    super.dispose();
+  }
+
+  List<MapMarker> _mapMarkers = [];
+  final List<MapPolyline> _mapPolylines = [];
+
+  void _addMapMarker(GeoCoordinates geoCoordinates, Uint8List icon) {
+    if (_hereMapController == null) return;
+
+    try {
+      // Create a map marker with the image
+      final marker = MapMarker(
+        geoCoordinates,
+        MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+      );
+      // Add the marker to the map
+      _hereMapController!.mapScene.addMapMarker(marker);
+
+      // var destination = _assetsProvider.destinationMarker;
+      //
+      // // Create a map marker with the image
+      // final destinationMarker = MapMarker(
+      //   geoCoordinates,
+      //   MapImage.withPixelDataAndImageFormat(destination, ImageFormat.png),
+      // );
+      // Add the marker to the map
+      // _hereMapController!.mapScene.addMapMarker(destinationMarker);
+    } catch (e) {
+      print("Error adding map marker: $e");
+    }
+  }
+
+  void _showRouteOnMap(routing.Route route) {
+    if (_hereMapController == null) return;
+
+    // Show route as polyline.
+    GeoPolyline routeGeoPolyline = route.geometry;
+    double widthInPixels = 20;
+    Color polylineColor = AppColors.primary300;
+
+    try {
+      MapPolyline routeMapPolyline = MapPolyline.withRepresentation(
+          routeGeoPolyline,
+          MapPolylineSolidRepresentation(
+            MapMeasureDependentRenderSize.withSingleSize(
+                RenderSizeUnit.pixels, widthInPixels),
+            polylineColor,
+            LineCap.round,
+          ));
+      _hereMapController!.mapScene.addMapPolyline(routeMapPolyline);
+      _mapPolylines.add(routeMapPolyline);
+    } on MapPolylineRepresentationInstantiationException catch (e) {
+      print("MapPolylineRepresentation Exception: ${e.error.name}");
+      return;
+    } on MapMeasureDependentRenderSizeInstantiationException catch (e) {
+      print("MapMeasureDependentRenderSize Exception: ${e.error.name}");
+      return;
+    } catch (e) {
+      print("Error showing route on map: $e");
+      return;
+    }
+
+    // Optionally, render traffic on route.
+    // _showTrafficOnRoute(route);
+  }
+
+  void _calculateRoute(List<routing.Waypoint> waypoints) {
+    if (_routingEngine == null) {
+      print("RoutingEngine not initialized");
+      return;
+    }
+
+    // Print waypoints for debugging
+    print("Calculating route with waypoints:");
+    for (var waypoint in waypoints) {
+      print(
+          "Waypoint: ${waypoint.coordinates.latitude}, ${waypoint.coordinates.longitude}");
+    }
+
+    routing.CarOptions carOptions = routing.CarOptions();
+    carOptions.routeOptions.enableTolls = true;
+    carOptions.routeOptions.enableRouteHandle = true;
+    carOptions.routeOptions.trafficOptimizationMode =
+        routing.TrafficOptimizationMode.timeDependent;
+
+    _routingEngine?.calculateCarRoute(waypoints, carOptions,
+        (routing.RoutingError? routingError,
+            List<routing.Route>? routeList) async {
+      if (routingError == null && routeList != null && routeList.isNotEmpty) {
+        _currentRoute = routeList.first;
+        _showRouteOnMap(_currentRoute!);
+        _animateToRoute(_currentRoute!);
+      } else {
+        var error = routingError?.toString() ?? "Unknown routing error";
+        print("Error calculating route: $error");
+
+        // Handle "no route found" case specifically
+        if (routingError == routing.RoutingError.noRouteFound) {
+          // Consider showing a user-friendly message
+          print(
+              "Could not find a route between the specified locations. Try different coordinates.");
+
+          // Optionally, you could try with different routing options
+          // such as disabling toll roads or trying a different transport mode
+        }
+      }
+    });
+  }
+
+  // Implement clearMap function to remove previous routes and markers
+  void _clearMapResources() {
+    if (_hereMapController == null) return;
+
+    // Clear markers
+    for (var marker in _mapMarkers) {
+      _hereMapController?.mapScene.removeMapMarker(marker);
+    }
+    _mapMarkers.clear();
+
+    // Clear polylines
+    for (var polyline in _mapPolylines) {
+      _hereMapController?.mapScene.removeMapPolyline(polyline);
+    }
+    _mapPolylines.clear();
+  }
+
+  List<routing.Waypoint> waypoints = [];
+
+  void _animateToRoute(routing.Route route) {
+    if (_hereMapController == null) return;
+
+    try {
+      // The animation results in an untilted and unrotated map.
+      double bearing = 0;
+      double tilt = 0;
+      // We want to show the route fitting in the map view with an additional padding of 50 pixels.
+      Point2D origin = Point2D(50, 50);
+      Size2D sizeInPixels = Size2D(_hereMapController!.viewportSize.width - 100,
+          _hereMapController!.viewportSize.height - 100);
+      Rectangle2D mapViewport = Rectangle2D(origin, sizeInPixels);
+
+      // Animate to the route within a duration of 3 seconds.
+      MapCameraUpdate update =
+          MapCameraUpdateFactory.lookAtAreaWithGeoOrientationAndViewRectangle(
+              route.boundingBox,
+              GeoOrientationUpdate(bearing, tilt),
+              mapViewport);
+      MapCameraAnimation animation =
+          MapCameraAnimationFactory.createAnimationFromUpdateWithEasing(
+        update,
+        const Duration(milliseconds: 3000),
+        an.Easing(
+          an.EasingFunction.inCubic,
+        ),
+      );
+      _hereMapController!.camera.startAnimation(animation);
+    } catch (e) {
+      print("Error animating to route: $e");
+    }
+  }
+
+  Future<void> addRoute() async {
+    // Clear any previous route.
+    _clearMapResources();
+
+    var currentLocation = await geolocator.Geolocator.getCurrentPosition();
+
+    var startGeoCoordinates =
+        GeoCoordinates(currentLocation.latitude, currentLocation.longitude);
+    var destinationGeoCoordinates = GeoCoordinates(widget.lat, widget.lng);
+    var startWaypoint = routing.Waypoint.withDefaults(startGeoCoordinates);
+    var destinationWaypoint =
+        routing.Waypoint.withDefaults(destinationGeoCoordinates);
+
+    waypoints = [startWaypoint, destinationWaypoint];
+
+    // Check if assets exist before adding markers
+    try {
+      var startMarker = _assetsProvider.currentLocationMarker;
+      var destinationMarker = _assetsProvider.destinationMarker;
+
+      _addMapMarker(startGeoCoordinates, startMarker);
+      _addMapMarker(destinationGeoCoordinates, destinationMarker);
+      _calculateRoute(waypoints);
+    } catch (e) {
+      print("Error adding route: $e");
+    }
+  }
+
+  void _onHereMapCreated(HereMapController hereMapController) {
+    _hereMapController = hereMapController;
+
+    // focus on the current location
+    _hereMapController!.camera.lookAtPointWithMeasure(
+      GeoCoordinates(currentLocation.latitude, currentLocation.longitude),
+      MapMeasure(MapMeasureKind.distanceInMeters, 1000),
+    );
+
+    // Set map scheme
+    _hereMapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
+        (MapError? error) {
+      if (error != null) {
+        print('Map scene loading failed: ${error.toString()}');
+        return;
+      }
+
+      // Add route once map is ready
+      addRoute();
+    });
   }
 
   late geolocator.Position currentLocation;
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
-  getMapData() async {
+  Future<void> getMapData() async {
     setState(() {
       isDataLoading = true;
     });
 
-    await _assetsProvider.loadAssets();
-
-    var currentLocationInfo = await geolocator.Geolocator.getCurrentPosition();
-
-    print("Current Location");
-    print(currentLocationInfo.latitude);
-    print(currentLocationInfo.longitude);
-
-    print("Destination Location");
-    print(widget.lat);
-    print(widget.lng);
-
-    print("Street Name");
-    print(widget.streetName);
-
-    routeInfo = await MapboxService.getRoutes(
-      currentPointLatitude: currentLocationInfo.latitude,
-      currentPointLongitude: currentLocationInfo.longitude,
-      destinationLatitude: widget.lat,
-      destinationLongitude: widget.lng,
-      destination: widget.streetName,
-    );
-
-    setState(() {
-      currentLocation = currentLocationInfo;
-      isDataLoading = false;
-    });
-  }
-
-  Future _fetchRouteData() async {
     try {
-      var currentLocation = await geolocator.Geolocator.getCurrentPosition();
-      final coordinates =
-          "${currentLocation.longitude},${currentLocation.latitude};"
-          "${widget.lng},${widget.lat}";
+      await _assetsProvider.loadAssets();
 
-      final url =
-          'https://api.mapbox.com/directions/v5/mapbox/driving/$coordinates?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${AppCredentials.mapBoxAccessToken}';
+      var currentLocationInfo =
+          await geolocator.Geolocator.getCurrentPosition();
 
-      final response = await http.get(Uri.parse(url));
+      print("Current Location");
+      print(currentLocationInfo.latitude);
+      print(currentLocationInfo.longitude);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+      print("Destination Location");
+      print(widget.lat);
+      print(widget.lng);
 
-        final route = data['routes'][0];
-        final geometry = route['geometry'];
+      print("Street Name");
+      print(widget.streetName);
 
-        final geoJson = {
-          "type": "Feature",
-          "properties": {"route-color": "rgb(51, 102, 255)"},
-          "geometry": geometry
-        };
+      routeInfo = await MapboxService.getRoutes(
+        currentPointLatitude: currentLocationInfo.latitude,
+        currentPointLongitude: currentLocationInfo.longitude,
+        destinationLatitude: widget.lat,
+        destinationLongitude: widget.lng,
+        destination: widget.streetName,
+      );
 
-        return geoJson;
-      } else {
-        print('Failed to load route data: ${response.statusCode}');
-      }
+      setState(() {
+        currentLocation = currentLocationInfo;
+        isDataLoading = false;
+      });
     } catch (e) {
-      print('Error fetching route data: $e');
+      print("Error getting map data: $e");
+      setState(() {
+        isDataLoading = false;
+      });
     }
-  }
-
-  _onMapCreated(MapboxMap mapboxMap) async {
-    this.mapboxMap = mapboxMap;
-
-    // hide the compass
-
-    mapboxMap.compass
-        .updateSettings(CompassSettings(visibility: false, opacity: 0));
-    mapboxMap.setBounds(CameraBoundsOptions(
-      minZoom: 9,
-    ));
-
-    mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
-      enabled: false,
-    ));
-    pointAnnotationManager =
-        await mapboxMap.annotations.createPointAnnotationManager();
-
-    addTwoPinsForRoute();
-  }
-
-  _onStyleLoadedCallback(StyleLoadedEventData data) async {
-    var geoJson = await _fetchRouteData();
-
-    await mapboxMap.style
-        .addSource(GeoJsonSource(id: "line", data: json.encode(geoJson)));
-    await _addRouteLine();
-  }
-
-  final bool _isRouteLoaded = false;
-  mapbox.PointAnnotationManager? pointAnnotationManager;
-
-  addTwoPinsForRoute() {
-    pointAnnotationManager?.create(
-      mapbox.PointAnnotationOptions(
-          geometry: mapbox.Point(
-              coordinates: mapbox.Position(
-                  currentLocation.longitude, currentLocation.latitude)),
-          iconSize: 1.3,
-          image: _assetsProvider.currentLocationMarker),
-    );
-
-    pointAnnotationManager?.create(
-      mapbox.PointAnnotationOptions(
-          geometry: mapbox.Point(
-              coordinates: mapbox.Position(widget.lng, widget.lat)),
-          iconSize: 1.3,
-          image: _assetsProvider.destinationMarker),
-    );
-  }
-
-  _addRouteLine() async {
-    await mapboxMap.style.addLayer(LineLayer(
-      id: "line-layer",
-      sourceId: "line",
-      lineBorderColor: Colors.black.value,
-      // Defines a line-width, line-border-width and line-color at different zoom extents
-      // by interpolating exponentially between stops.
-      // Doc: https://docs.mapbox.com/style-spec/reference/expressions/
-      lineWidthExpression: [
-        'interpolate',
-        ['exponential', 1.5],
-        ['zoom'],
-        4.0,
-        6.0,
-        10.0,
-        7.0,
-        13.0,
-        9.0,
-        16.0,
-        3.0,
-        19.0,
-        7.0,
-        22.0,
-        21.0,
-      ],
-      lineBorderWidthExpression: [
-        'interpolate',
-        ['exponential', 1.5],
-        ['zoom'],
-        9.0,
-        1.0,
-        16.0,
-        3.0,
-      ],
-      lineColorExpression: [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        8.0,
-        'rgb(51, 102, 255)',
-        11.0,
-        [
-          'coalesce',
-          ['get', 'route-color'],
-          'rgb(51, 102, 255)'
-        ],
-      ],
-    ));
   }
 
   @override
@@ -266,21 +362,16 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
         body: Stack(
           children: [
             SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
               child: isDataLoading
                   ? const Center(
                       child: CupertinoActivityIndicator(),
                     )
-                  : MapWidget(
+                  : HereMap(
                       key: UniqueKey(),
-                      cameraOptions: CameraOptions(
-                          center: mapbox.Point(
-                            coordinates:
-                                mapbox.Position(widget.lng, widget.lat),
-                          ),
-                          zoom: 12.0),
-                      textureView: true,
-                      onMapCreated: _onMapCreated,
-                      onStyleLoadedListener: _onStyleLoadedCallback),
+                      onMapCreated: _onHereMapCreated,
+                    ),
             ),
             Positioned(
                 left: 0,
@@ -734,13 +825,15 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                                       radius: radius.toDouble(),
                                       location: widget.notification.location,
                                     ));
-                              }else{
+                              } else {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => NavigationView(
-                                      destinationLat: widget.notification.location.point.latitude,
-                                      destinationLng: widget.notification.location.point.longitude,
+                                      destinationLat: widget
+                                          .notification.location.point.latitude,
+                                      destinationLng: widget.notification
+                                          .location.point.longitude,
                                     ),
                                   ),
                                 );

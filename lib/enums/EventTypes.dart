@@ -25,7 +25,7 @@ String eventTypeToString(EventTypes type) {
     case EventTypes.police:
       return "Police";
     case EventTypes.closeRoad:
-      return "Close Road";
+      return "Closed Road";
     case EventTypes.accident:
       return "Accident";
   }

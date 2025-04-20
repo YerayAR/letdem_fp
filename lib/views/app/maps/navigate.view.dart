@@ -343,6 +343,8 @@ class _NavigationViewState extends State<NavigationView> {
 
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
+  String normalManuevers = "";
+
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
     for (var space in events) {
       try {
@@ -529,6 +531,7 @@ class _NavigationViewState extends State<NavigationView> {
       if (mounted) {
         setState(() {
           _navigationInstruction = streetName;
+          normalManuevers = eventText.text;
         });
       }
     });
@@ -624,7 +627,8 @@ class _NavigationViewState extends State<NavigationView> {
 
     // Check if any of the direction phrases are contained in the instruction
     for (final entry in _directionIcons.entries) {
-      if (_navigationInstruction.toLowerCase().contains(entry.key)) {
+      print(normalManuevers);
+      if (normalManuevers.toLowerCase().contains(entry.key)) {
         directionIcon = entry.value;
         break;
       }
