@@ -5,9 +5,12 @@ class MapNearbyPayload {
   final List<Space> spaces;
   final List<Event> events;
 
+  final List<Alert> alerts;
+
   MapNearbyPayload({
     required this.spaces,
     required this.events,
+    required this.alerts,
   });
 
   factory MapNearbyPayload.fromJson(Map<String, dynamic> json) {
@@ -16,6 +19,11 @@ class MapNearbyPayload {
           ? []
           : (json['spaces'] as List<dynamic>)
               .map((space) => Space.fromJson(space))
+              .toList(),
+      alerts: json['alerts'] == null
+          ? []
+          : (json['alerts'] as List<dynamic>)
+              .map((alert) => Alert.fromJson(alert))
               .toList(),
       events: json['events'] == null
           ? []
@@ -157,6 +165,42 @@ class Point {
     return {
       'lng': lng,
       'lat': lat,
+    };
+  }
+}
+
+class Alert {
+  final String type; // 'Camera' or 'Radar'
+  final String road;
+  final String direction;
+  final double latitude;
+  final double longitude;
+
+  Alert({
+    required this.type,
+    required this.road,
+    required this.direction,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  factory Alert.fromJson(Map<String, dynamic> json) {
+    return Alert(
+      type: json['type'] as String,
+      road: json['road'] as String,
+      direction: json['direction'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'road': road,
+      'direction': direction,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

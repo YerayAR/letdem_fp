@@ -6,6 +6,7 @@ import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/models/activities/activity.model.dart';
+import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/image/compressor.dart';
 import 'package:letdem/services/location/location.service.dart';
@@ -21,6 +22,20 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     on<PublishSpaceEvent>(_onPublishSpace);
     on<GetActivitiesEvent>(_onGetActivities);
     on<PublishRoadEventEvent>(_onPublishRoadEvent);
+    on<TakeSpaceEvent>(_onTakeSpace);
+  }
+
+  Future<void> _onTakeSpace(
+      TakeSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+      await activityRepository.takeSpace(event.spaceID, event.type);
+      emit(const ActivitiesPublished(totalPointsEarned: 0));
+    } on ApiError catch (err) {
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      emit(const ActivitiesError(error: "Unable to take space"));
+    }
   }
 
   Future<void> _onPublishRoadEvent(

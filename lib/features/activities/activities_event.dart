@@ -4,6 +4,19 @@ sealed class ActivitiesEvent extends Equatable {
   const ActivitiesEvent();
 }
 
+final class TakeSpaceEvent extends ActivitiesEvent {
+  final String spaceID;
+  final TakeSpaceType type;
+
+  const TakeSpaceEvent({
+    required this.spaceID,
+    required this.type,
+  });
+
+  // TODO: implement props
+  List<Object?> get props => [spaceID, type];
+}
+
 final class PublishRoadEventEvent extends ActivitiesEvent {
   final String locationName;
   final double latitude;

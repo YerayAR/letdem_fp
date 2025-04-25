@@ -20,6 +20,13 @@ class ActivityRepository extends IActivityRepository {
     throw UnimplementedError();
   }
 
+  Future takeSpace(String spaceID, TakeSpaceType t) async {
+    ApiResponse res = await ApiService.sendRequest(
+      endpoint: EndPoints.takeSpace(spaceID).copyWithDTO(TakeSpaceDTO(type: t)),
+    );
+    return res;
+  }
+
   @override
   Future<ActivityResponse> getActivities() async {
     ApiResponse response = await ApiService.sendRequest(

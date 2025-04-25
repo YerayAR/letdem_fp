@@ -10,6 +10,7 @@ import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/google/google.service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -171,8 +172,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       RegisterEvent event, Emitter<AuthState> emit) async {
     try {
       emit(RegisterLoading());
-      await authRepository
-          .register(RegisterDTO(email: event.email, password: event.password));
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var lang = await prefs.getString("locale");
+      await authRepository.register(RegisterDTO(
+        email: event.email,
+        password: event.password,
+        language: lang ?? "es",
+      ));
 
       emit(RegisterSuccess());
     } on ApiError catch (err) {

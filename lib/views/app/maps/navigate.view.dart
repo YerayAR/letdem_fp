@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:here_sdk/core.dart' as HERE;
 import 'package:here_sdk/core.engine.dart';
@@ -10,24 +13,39 @@ import 'package:here_sdk/location.dart' as HERE;
 import 'package:here_sdk/mapview.dart';
 import 'package:here_sdk/navigation.dart' as HERE;
 import 'package:here_sdk/routing.dart' as HERE;
+import 'package:iconly/iconly.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
+import 'package:letdem/views/app/maps/route.view.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
+import 'package:toastification/toastification.dart';
+
+import '../publish_space/screens/publish_space.view.dart';
 
 class NavigationView extends StatefulWidget {
   final double destinationLat;
   final double destinationLng;
 
+  final bool hideTrigger;
+
   const NavigationView({
     super.key,
     required this.destinationLat,
+    this.hideTrigger = false,
     required this.destinationLng,
   });
 
@@ -44,12 +62,12 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _borderRadius = 20;
   static const int _distanceTriggerThreshold =
       200; // 50m threshold for triggering
+
   // Controllers and engines
   HereMapController? _hereMapController;
   late final AppLifecycleListener _lifecycleListener;
   HERE.RoutingEngine? _routingEngine;
   HERE.VisualNavigator? _visualNavigator;
-  HERE.LocationSimulator? _locationSimulator;
   HERE.LocationEngine? _locationEngine;
 
   // Navigation state
@@ -62,10 +80,16 @@ class _NavigationViewState extends State<NavigationView> {
   int _totalRouteDistance = 0;
   bool _isMuted = false;
   String _errorMessage = "";
-  int _lastTriggerDistance = 0;
+  int _lastTriggerDistance = 10;
   double _lastLatitude = 0;
   double _lastLongitude = 0;
   int _distanceTraveled = 0;
+
+  // Added for the fixes
+  bool _isDeviatingFromRoute = false;
+  final int _lastReRouteTime = 0; // To prevent too frequent re-routing
+  bool _hasShownArrivalNotification = false;
+
   // Map of direction icons
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
@@ -78,13 +102,23 @@ class _NavigationViewState extends State<NavigationView> {
   void initState() {
     super.initState();
 
+    // Set up app lifecycle listener
+    _lifecycleListener = AppLifecycleListener(
+      onDetach: _cleanupNavigation,
+      onHide: _cleanupNavigation,
+      onPause: _cleanupNavigation,
+      onRestart: _startNavigation,
+    );
+
     // Delay navigation start until map is created
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _requestLocationPermission();
     });
   }
 
-  putParkingsSpacesOnMao() {
+  putParkingSpacesOnMap() {
+    if (_currentLocation == null) return;
+
     context.read<MapBloc>().add(
           GetNearbyPlaces(
             queryParams: MapQueryParams(
@@ -103,6 +137,8 @@ class _NavigationViewState extends State<NavigationView> {
   @override
   void dispose() {
     _cleanupNavigation();
+    _rerouteDebounceTimer?.cancel();
+
     _disposeHERESDK();
     _lifecycleListener.dispose();
     super.dispose();
@@ -145,10 +181,16 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController = hereMapController;
 
     // move gestures
-
     _hereMapController?.gestures.enableDefaultAction(
       GestureType.pinchRotate,
     );
+
+    // Enable tap gestures for marker selection
+    _hereMapController?.gestures.tapListener =
+        TapListener((HERE.Point2D touchPoint) {
+      _pickMapMarker(touchPoint);
+    });
+
     _loadMapScene();
   }
 
@@ -191,12 +233,6 @@ class _NavigationViewState extends State<NavigationView> {
       _visualNavigator = null; // Explicitly clear reference
     }
 
-    // Stop location simulator
-    if (_locationSimulator != null) {
-      _locationSimulator!.stop();
-      _locationSimulator = null; // Explicitly clear reference
-    }
-
     // Stop location engine
     if (_locationEngine != null) {
       _locationEngine!.stop();
@@ -213,6 +249,8 @@ class _NavigationViewState extends State<NavigationView> {
       _distanceToNextManeuver = 0;
       _totalRouteTime = 0;
       _totalRouteDistance = 0;
+      _hasShownArrivalNotification = false;
+      _isDeviatingFromRoute = false;
     });
 
     debugPrint('✅ Navigation resources fully cleaned up.');
@@ -228,21 +266,7 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('🧼 Disposing HERE SDK resources...');
     SDKNativeEngine.sharedInstance?.dispose();
     HERE.SdkContext.release();
-    _lifecycleListener.dispose();
-    // HERE.SdkContext.release();
     debugPrint('✅ HERE SDK resources disposed.');
-  }
-
-  void _pauseNavigation() {
-    if (_isNavigating) {
-      _locationSimulator?.pause();
-    }
-  }
-
-  void _resumeNavigation() {
-    if (_isNavigating) {
-      _locationSimulator?.resume();
-    }
   }
 
   // Location and routing
@@ -284,6 +308,12 @@ class _NavigationViewState extends State<NavigationView> {
         currentLocationGeo.latitude,
         currentLocationGeo.longitude,
       );
+
+      // Initialize last known position
+      _lastLatitude = currentLocationGeo.latitude;
+      _lastLongitude = currentLocationGeo.longitude;
+      _distanceTraveled = 0;
+      _lastTriggerDistance = 0;
 
       _calculateRoute(
         _currentLocation!,
@@ -328,6 +358,7 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _showDistanceTriggerToast() {
+    if (widget.hideTrigger) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
     context.read<MapBloc>().add(
           GetNearbyPlaces(
@@ -336,16 +367,162 @@ class _NavigationViewState extends State<NavigationView> {
             previousPoint: "$_lastLatitude,$_lastLongitude",
             radius: 400,
             drivingMode: false,
-            options: ['events'],
+            options: ['events', 'alerts', 'spaces'],
           )),
         );
   }
 
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+  final Map<MapMarker, Space> _spaceMarkers = {};
 
-  String normalManuevers = "";
+  bool _isNavigatingToParking = false;
+  String _parkingSpaceName =
+      ""; // Store parking space name for the thank you message
+
+// Modified showSpacePopup to set the flag when navigating to a parking space
+  showSpacePopup({
+    required Space space,
+  }) {
+    AppPopup.showBottomSheet(
+      context,
+      Padding(
+        padding: EdgeInsets.all(Dimens.defaultMargin + 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(13),
+                      child: Image(
+                        image: NetworkImage(space.image),
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Dimens.space(2),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                getSpaceTypeIcon(space.type),
+                                width: 20,
+                                height: 20,
+                              ),
+                              Dimens.space(1),
+                              Text(
+                                getSpaceAvailabilityMessage(space.type),
+                                style: Typo.largeBody
+                                    .copyWith(fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            space.location.streetName,
+                            style: Typo.largeBody.copyWith(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.neutral600),
+                          ),
+                          Dimens.space(1),
+                          DecoratedChip(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            text: '${parseMeters(Geolocator.distanceBetween(
+                              _currentLocation!.latitude,
+                              _currentLocation!.longitude,
+                              space.location.point.lat,
+                              space.location.point.lng,
+                            ))} away',
+                            textStyle: Typo.smallBody.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.green600,
+                            ),
+                            icon: Iconsax.clock,
+                            color: AppColors.green500,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Dimens.space(2),
+                PrimaryButton(
+                  icon: IconlyBold.location,
+                  text: 'Navigate to Space',
+                  onTap: () {
+                    // Close the popup first
+                    Navigator.pop(context);
+
+                    // Clean up existing navigation
+                    _stopNavigation();
+                    _cleanupNavigation();
+
+                    // Navigate to the space directly instead of creating a new screen
+                    setState(() {
+                      _hasShownArrivalNotification = false;
+                      _isLoading = true;
+                      // Set flag for parking navigation and store space name
+                      _isNavigatingToParking = true;
+                      _parkingSpaceName = space.location.streetName;
+                    });
+
+                    // Recalculate route to the space
+                    if (_currentLocation != null) {
+                      _calculateRoute(
+                          _currentLocation!,
+                          HERE.GeoCoordinates(space.location.point.lat,
+                              space.location.point.lng));
+
+                      // Show toast notification
+                      _showToast("Navigating to parking space",
+                          backgroundColor: AppColors.primary500);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Timer? _rerouteDebounceTimer;
+  int _lastRerouteTime = 0;
+  void _pickMapMarker(HERE.Point2D touchPoint) {
+    final rectangle = HERE.Rectangle2D(touchPoint, HERE.Size2D(1, 1));
+    final filter =
+        MapSceneMapPickFilter([MapSceneMapPickFilterContentType.mapItems]);
+
+    _hereMapController?.pick(filter, rectangle, (result) {
+      if (result == null || result.mapItems == null) return;
+
+      final markers = result.mapItems!.markers;
+      if (markers.isNotEmpty) {
+        final topMarker = markers.first;
+
+        if (_spaceMarkers.containsKey(topMarker)) {
+          final space = _spaceMarkers[topMarker]!;
+
+          showSpacePopup(space: space);
+        }
+      }
+    });
+  }
 
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
+    // Clear existing markers
+    _hereMapController?.mapScene.removeMapMarkers(_spaceMarkers.keys.toList());
+    _spaceMarkers.clear();
+
     for (var space in events) {
       try {
         Uint8List imageData = _assetsProvider.getEventIcon(space.type);
@@ -373,6 +550,7 @@ class _NavigationViewState extends State<NavigationView> {
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
         _hereMapController?.mapScene.addMapMarker(marker);
+        _spaceMarkers[marker] = space;
       } catch (e) {
         debugPrint("Space marker error: $e");
       }
@@ -400,6 +578,8 @@ class _NavigationViewState extends State<NavigationView> {
 
     // Create car options with realistic route
     final carOptions = HERE.CarOptions();
+    carOptions.routeOptions.enableTolls = true;
+    carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
 
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
@@ -417,6 +597,7 @@ class _NavigationViewState extends State<NavigationView> {
           setState(() {
             _isNavigating = true;
             _isLoading = false;
+            _isDeviatingFromRoute = false;
           });
 
           _startGuidance(calculatedRoute);
@@ -432,12 +613,15 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
+  String normalManuevers = "";
+
   void _startGuidance(HERE.Route route) {
     if (_hereMapController == null) return;
 
     debugPrint('🧭 Starting visual guidance...');
     try {
       _visualNavigator = HERE.VisualNavigator();
+      _setupRouteDeviationListener();
       debugPrint('✅ VisualNavigator initialized.');
     } on InstantiationException {
       debugPrint('❌ Initialization of VisualNavigator failed.');
@@ -462,26 +646,11 @@ class _NavigationViewState extends State<NavigationView> {
       HERE.SectionProgress lastSectionProgress =
           routeProgress.sectionProgress.last;
       int distance = lastSectionProgress.remainingDistanceInMeters;
-      Duration trafficDelay = lastSectionProgress.trafficDelay;
 
       if (now.difference(lastUpdateTime).inMilliseconds < 500) {
         return;
       }
-      String getStreetNameFromManeuver(HERE.Maneuver maneuver,
-          {List<Locale> preferredLocales = const []}) {
-        // Try next road name first (where the vehicle is heading)
-        String? name = maneuver.nextRoadTexts.names.getDefaultValue();
 
-        // Fallback to current road name if next is unavailable
-        name ??= maneuver.roadTexts.names.getDefaultValue();
-
-        return name ?? 'Unnamed Road';
-      }
-
-      // var sectionProgress = routeProgress.sectionProgress;
-// Access the last SectionProgress in the list
-
-// Retrieve the remaining distance and duration
       final remainingDistanceInMeters =
           lastSectionProgress.remainingDistanceInMeters;
       final remainingDurationInSeconds =
@@ -491,17 +660,29 @@ class _NavigationViewState extends State<NavigationView> {
         _distanceToNextManeuver = remainingDistanceInMeters;
       });
 
-      // load spaces if 10 m away from destination
+      // Show arrival notification when very close to destination (within 10 meters)
+      if (remainingDistanceInMeters < 10) {
+        if (!_hasShownArrivalNotification && widget.hideTrigger) {
+          setState(() {
+            _hasShownArrivalNotification = true;
+          });
 
+          // Show toast notification
+          _showToast("You have arrived at your destination space!",
+              backgroundColor: AppColors.green600);
+
+          putParkingSpacesOnMap();
+        }
+      }
+
+      // load spaces if very close to destination
       if (remainingDistanceInMeters < 1) {
         if (!_isPopupDisplayed) {
           setState(() {
             _isPopupDisplayed = true;
           });
 
-          putParkingsSpacesOnMao();
-
-          AppPopup.showDialogSheet(context, ParkingRatingWidget());
+          putParkingSpacesOnMap();
         }
         return;
       }
@@ -519,6 +700,8 @@ class _NavigationViewState extends State<NavigationView> {
         });
       }
     });
+    //
+    // // Add route deviation listener for re-routing
 
     // Set up voice instruction listener
     _visualNavigator!.eventTextListener =
@@ -541,6 +724,170 @@ class _NavigationViewState extends State<NavigationView> {
     _setupLocationSource(_visualNavigator!, route);
   }
 
+  bool _isRecalculatingRoute = false;
+
+// Replace the entire routeDeviationListener implementation with this optimized version
+  void _setupRouteDeviationListener() {
+    _visualNavigator!.routeDeviationListener =
+        HERE.RouteDeviationListener((HERE.RouteDeviation routeDeviation) {
+      debugPrint('🛰️ Route deviation listener triggered');
+
+      // Skip processing if already calculating a new route
+      if (_isRecalculatingRoute) {
+        debugPrint('⏳ Already recalculating route. Skipping...');
+        return;
+      }
+
+      // Get current route or skip if none
+      HERE.Route? route = _visualNavigator?.route;
+      if (route == null) {
+        debugPrint(
+            '❌ No active route found. Skipping route deviation handling.');
+        return;
+      }
+
+      // Get current location coordinates
+      HERE.GeoCoordinates currentGeoCoordinates =
+          routeDeviation.currentLocation.originalLocation.coordinates;
+      debugPrint(
+          '📍 Current location: (${currentGeoCoordinates.latitude}, ${currentGeoCoordinates.longitude})');
+
+      // Calculate deviation distance
+      double distanceInMeters = Geolocator.distanceBetween(
+        _currentLocation!.latitude,
+        _currentLocation!.longitude,
+        currentGeoCoordinates.latitude,
+        currentGeoCoordinates.longitude,
+      );
+      debugPrint('📏 Calculated deviation: ${distanceInMeters} meters');
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      debugPrint('⏰ Time since last reroute: ${now - _lastRerouteTime} ms');
+
+      // Conditions to trigger reroute
+      bool isSignificantlyOffRoute = true;
+      bool isFarEnoughFromDestination = _totalRouteDistance > 50;
+      bool isTimeElapsedSinceLastReroute = (now - _lastRerouteTime > 5000);
+
+      if (isSignificantlyOffRoute &&
+          isFarEnoughFromDestination &&
+          isTimeElapsedSinceLastReroute) {
+        debugPrint(
+            '⚠️ Significant deviation detected! Off by ${distanceInMeters}m');
+        debugPrint('📡 Initiating reroute sequence...');
+
+        // Cancel any existing timer
+        _rerouteDebounceTimer?.cancel();
+
+        // Set flag to prevent multiple calculations
+        _isRecalculatingRoute = true;
+        _lastRerouteTime = now;
+
+        // Show toast to inform user
+        _showToast(
+          "Recalculating route...",
+          backgroundColor: AppColors.red500,
+        );
+
+        // Force the UI to update before heavy calculation
+        setState(() {
+          _isDeviatingFromRoute = true;
+        });
+
+        // Delay slightly to allow UI to update
+        Future.delayed(const Duration(milliseconds: 100), () {
+          debugPrint('🚀 Launching route recalculation from new position...');
+          _recalculateRouteFromCurrentLocation(currentGeoCoordinates);
+        });
+      } else {
+        debugPrint('✅ No reroute needed at this time.');
+        if (!isSignificantlyOffRoute)
+          debugPrint('📌 Deviation is within acceptable range.');
+        if (!isFarEnoughFromDestination)
+          debugPrint('🏁 Already close to destination.');
+        if (!isTimeElapsedSinceLastReroute)
+          debugPrint('⌛ Too soon since last reroute.');
+      }
+    });
+  }
+
+// New method to separate route recalculation logic
+  void _recalculateRouteFromCurrentLocation(
+      HERE.GeoCoordinates currentPosition) {
+    if (_currentLocation == null) return;
+
+    try {
+      debugPrint('🧭 Recalculating route from current position...');
+
+      HERE.Waypoint startWaypoint = HERE.Waypoint(currentPosition);
+      HERE.Waypoint destinationWaypoint = HERE.Waypoint(
+          HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng));
+
+      // Create car options with realistic route
+      final carOptions = HERE.CarOptions();
+      carOptions.routeOptions.enableTolls = true;
+      carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
+
+      // Check if routing engine is still valid
+      if (_routingEngine == null) {
+        _routingEngine = HERE.RoutingEngine();
+      }
+
+      _routingEngine!.calculateCarRoute(
+        [startWaypoint, destinationWaypoint],
+        carOptions,
+        (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+          if (routingError == null &&
+              routeList != null &&
+              routeList.isNotEmpty) {
+            HERE.Route calculatedRoute = routeList.first;
+
+            _totalRouteTime = calculatedRoute.duration.inSeconds;
+            _totalRouteDistance = calculatedRoute.lengthInMeters;
+
+            debugPrint(
+                '✅ Route recalculated: ${_totalRouteDistance}m, ${_totalRouteTime ~/ 60} minutes');
+
+            if (_visualNavigator != null && mounted) {
+              // Set new route for visualization
+              _visualNavigator!.route = calculatedRoute;
+
+              // Update UI state
+              setState(() {
+                _isNavigating = true;
+                _isDeviatingFromRoute = false;
+                _isRecalculatingRoute = false;
+              });
+
+              // Show success toast
+            }
+          } else {
+            final error = routingError?.toString() ?? "Unknown error";
+            debugPrint('❌ Error while recalculating route: $error');
+
+            setState(() {
+              _isRecalculatingRoute = false;
+              _isDeviatingFromRoute = false;
+            });
+
+            // Show error toast
+            _showToast(
+              "Could not recalculate route",
+              backgroundColor: AppColors.red500,
+            );
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('❌ Exception during route recalculation: $e');
+      setState(() {
+        _isRecalculatingRoute = false;
+        _isDeviatingFromRoute = false;
+      });
+    }
+  }
+
   String getStreetNameFromManeuver(HERE.Maneuver maneuver,
       {List<Locale> preferredLocales = const []}) {
     // Try next road name first (where the vehicle is heading)
@@ -558,25 +905,31 @@ class _NavigationViewState extends State<NavigationView> {
     try {
       // Set the route for visualization first
       _visualNavigator!.route = route;
+      _locationEngine = HERE.LocationEngine();
 
-      // Create simulator options with realistic movement
-      final options = HERE.LocationSimulatorOptions()
-        ..speedFactor = 2.0; // Speed up a bit for testing
+      _locationEngine?.startWithLocationAccuracy(
+        HERE.LocationAccuracy.navigation,
+      );
 
-      // Create the location simulator with our route
-      _locationSimulator = HERE.LocationSimulator.withRoute(route, options);
+      _locationEngine!.addLocationListener(
+        HERE.LocationListener((HERE.Location location) {
+          // Update current location
+          _currentLocation = location.coordinates;
 
-      // Add our custom location listener to track 50m intervals
-      _locationSimulator!.listener =
-          HERE.LocationListener((HERE.Location location) {
-        final coordinates = location.coordinates;
+          // reset the last location if it is in 50m
+          if (_lastLatitude == 0 && _lastLongitude == 0) {
+            _lastLatitude = location.coordinates.latitude;
+            _lastLongitude = location.coordinates.longitude;
+          }
 
-        // Check distance trigger for 50m intervals
-        _checkDistanceTrigger(coordinates.latitude, coordinates.longitude);
-
-        // Forward to visual navigator's listener to update the 3D navigation view
-        locationListener.onLocationUpdated(location);
-      });
+          // Check distance trigger for 50m intervals
+          _checkDistanceTrigger(
+            location.coordinates.latitude,
+            location.coordinates.longitude,
+          );
+          locationListener.onLocationUpdated(location);
+        }),
+      );
 
       // Set visual navigator to follow the route
       _visualNavigator!.startRendering(_hereMapController!);
@@ -593,9 +946,6 @@ class _NavigationViewState extends State<NavigationView> {
       _hereMapController!.camera.setOrientationAtTarget(
           HERE.GeoOrientationUpdate(0, 60) // 60-degree tilt for 3D view
           );
-
-      // Start simulation
-      _locationSimulator!.start();
 
       debugPrint('✅ Navigation with 3D view started successfully');
     } catch (e) {
@@ -618,6 +968,22 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     debugPrint('✅ Navigation stopped.');
+  }
+
+  // Add a method to show toast notifications
+  void _showToast(String message, {Color backgroundColor = Colors.black}) {
+    // Fluttertoast.showToast(
+    //     msg: message,
+    //     toastLength: Toast.LENGTH_LONG,
+    //     gravity: ToastGravity.CENTER,
+    //     timeInSecForIosWeb: 2,
+    //     backgroundColor: backgroundColor,
+    //     textColor: Colors.white,
+    //     fontSize: 16.0
+    // );
+    Toast.show(
+      message,
+    );
   }
 
   // UI Components
@@ -724,32 +1090,38 @@ class _NavigationViewState extends State<NavigationView> {
         const Spacer(),
 
         // Time and distance indicator
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(2000),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Text(
-                "${(_totalRouteTime.toFormattedTime())} (${_totalRouteDistance.toFormattedDistance()})",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        GestureDetector(
+          onDoubleTap: () {
+            //   get the current location
+            var currentLocation = _currentLocation;
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(2000),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
-                semanticsLabel:
-                    "Estimated arrival in ${_totalRouteTime.toFormattedTime()} with ${_totalRouteDistance} meters remaining",
-              ),
-            ],
+              ],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  "${(_totalRouteTime.toFormattedTime())} (${_totalRouteDistance.toFormattedDistance()})",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  semanticsLabel:
+                      "Estimated arrival in ${_totalRouteTime.toFormattedTime()} with ${_totalRouteDistance} meters remaining",
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -827,6 +1199,76 @@ class _NavigationViewState extends State<NavigationView> {
         if (state is MapLoaded) {
           // Add markers to the map
           _addMapMarkers(state.payload.events, state.payload.spaces);
+
+          if (state.payload.alerts.isNotEmpty) {
+            for (var alert in state.payload.alerts) {
+              toastification.show(
+                context: context, // optional if you use ToastificationWrapper
+                type: ToastificationType.success,
+                style: ToastificationStyle.flat,
+                autoCloseDuration: const Duration(seconds: 5),
+                title: Text("${alert.type} Alert"),
+                description: RichText(
+                  text: TextSpan(
+                    text: alert.type.toLowerCase() == "camera"
+                        ? "You are in a CCTV Camera surveillance zone "
+                        : "You are approaching a nearby radar zone",
+                    style: TextStyle(),
+                  ),
+                ),
+                alignment: Alignment.topRight,
+                direction: TextDirection.ltr,
+                animationDuration: const Duration(milliseconds: 300),
+                animationBuilder: (context, animation, alignment, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                icon: const Icon(Icons.check),
+                showIcon: true, // show or hide the icon
+                primaryColor: Colors.green,
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x07000000),
+                    blurRadius: 16,
+                    offset: Offset(0, 16),
+                    spreadRadius: 0,
+                  )
+                ],
+                showProgressBar: true,
+                closeButton: ToastCloseButton(
+                  showType: CloseButtonShowType.onHover,
+                  buttonBuilder: (context, onClose) {
+                    return OutlinedButton.icon(
+                      onPressed: onClose,
+                      icon: const Icon(Icons.close, size: 20),
+                      label: const Text('Close'),
+                    );
+                  },
+                ),
+                closeOnClick: false,
+                pauseOnHover: true,
+                dragToClose: true,
+                applyBlurEffect: true,
+                callbacks: ToastificationCallbacks(
+                  onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
+                  onCloseButtonTap: (toastItem) =>
+                      print('Toast ${toastItem.id} close button tapped'),
+                  onAutoCompleteCompleted: (toastItem) =>
+                      print('Toast ${toastItem.id} auto complete completed'),
+                  onDismissed: (toastItem) =>
+                      print('Toast ${toastItem.id} dismissed'),
+                ),
+              );
+            }
+          }
         }
         // TODO: implement listener
       },
@@ -841,22 +1283,6 @@ class _NavigationViewState extends State<NavigationView> {
 
                 // Loading indicator
                 if (_isLoading) _buildLoadingIndicator(),
-
-                // ParkingRatingWidget once done
-                //
-                // if (_totalRouteDistance < 3 &&
-                //     _totalRouteTime < 1 &&
-                //     _isNavigating)
-                //   Positioned(
-                //     bottom: 0,
-                //     child: SizedBox(
-                //       width: MediaQuery.of(context).size.width,
-                //       child: const Positioned(
-                //         bottom: 0,
-                //         child: ParkingRatingWidget(),
-                //       ),
-                //     ),
-                //   ),
 
                 // Error message
                 if (_errorMessage.isNotEmpty) _buildErrorMessage(),
@@ -930,18 +1356,21 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
       'label': "I'll take it",
       'icon': Icons.thumb_up,
       'color': Colors.green.shade100,
+      "enum": TakeSpaceType.TAKE_IT,
       'iconColor': Colors.green
     },
     {
       'id': 'inuse',
       'label': "It's in use",
       'icon': Icons.directions_car,
+      "enum": TakeSpaceType.IN_USE,
       'color': AppColors.primary500.withOpacity(0.1),
       'iconColor': AppColors.primary500
     },
     {
       'id': 'notuseful',
       'label': "Not useful",
+      "enum": TakeSpaceType.NOT_USEFUL,
       'icon': Icons.thumb_down,
       'color': Colors.amber.shade100,
       'iconColor': Colors.amber.shade700
@@ -949,6 +1378,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
     {
       'id': 'prohibited',
       'label': "Prohibited",
+      "enum": TakeSpaceType.PROHIBITED,
       'icon': Icons.not_interested,
       'color': Colors.red.shade100,
       'iconColor': Colors.red
@@ -981,130 +1411,96 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
   }
 
   Widget _buildRatingForm() {
-    return Container(
-      child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Location icon
-            Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: AppColors.primary500.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary500,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.location_on,
-                  color: Colors.white,
-                  size: 32,
-                ),
-              ),
+    return BlocConsumer<ActivitiesBloc, ActivitiesState>(
+      listener: (context, state) {
+        if (state is ActivitiesPublished) {
+          // Show success message
+          AppPopup.showDialogSheet(
+            context,
+            SuccessDialog(
+              title: "Your feedback has been submitted",
+              subtext: "Thank you for your input!",
+              onProceed: () {
+                NavigatorHelper.pop();
+                NavigatorHelper.pop();
+              },
             ),
-            const SizedBox(height: 24),
-
-            // Text
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'You have arrived at your destination.',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+          );
+        }
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        return Container(
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Location icon
+                Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary500.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
                       color: AppColors.primary500,
+                      shape: BoxShape.circle,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Available parking spaces are shown on the map. Select an option to navigate to the nearest one.",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
+                    child: Icon(
+                      Icons.location_on,
+                      color: Colors.white,
+                      size: 32,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 24),
+
+                // Text
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'You have arrived at your destination.',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Available parking spaces are shown on the map. Select an option to navigate to the nearest one.",
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+
+                Dimens.space(4),
+
+                // Submit Button
+                PrimaryButton(
+                  text: _submitted ? 'Submitted' : 'Go Back',
+                  isLoading: _submitted,
+                  onTap: _submitted ? null : _handleSubmit,
+                ),
+              ],
             ),
-
-            // const SizedBox(height: 32),
-
-            // Options Grid
-
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(
-            //     spacing: Dimens.defaultMargin / 2,
-            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //     children: _options.map((option) {
-            //       return GestureDetector(
-            //         onTap: () {
-            //           setState(() {
-            //             _selectedOption = option['id'];
-            //           });
-            //         },
-            //         child: Container(
-            //           padding: const EdgeInsets.all(10),
-            //           decoration: BoxDecoration(
-            //             color: _selectedOption == option['id']
-            //                 ? Colors.transparent
-            //                 : Colors.transparent,
-            //             borderRadius: BorderRadius.circular(15),
-            //             border: Border.all(
-            //               color: _selectedOption == option['id']
-            //                   ? AppColors.primary500
-            //                   : Colors.grey.withOpacity(0.3),
-            //               width: _selectedOption == option['id'] ? 2 : 1,
-            //             ),
-            //           ),
-            //           child: Column(
-            //             mainAxisSize: MainAxisSize.min,
-            //             children: [
-            //               Icon(
-            //                 option['icon'],
-            //                 color: _selectedOption == option['id']
-            //                     ? option['iconColor']
-            //                     : Colors.grey,
-            //                 size: 32,
-            //               ),
-            //               const SizedBox(height: 8),
-            //               Text(
-            //                 option['label'],
-            //                 style: TextStyle(
-            //                   fontSize: 16,
-            //                   color: Colors.black87,
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       );
-            //     }).toList(),
-            //   ),
-            // ),
-            Dimens.space(4),
-
-            // Submit Button
-            PrimaryButton(
-              text: _submitted ? 'Submitted' : 'Go Back',
-              isLoading: _submitted,
-              onTap: _submitted ? null : _handleSubmit,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

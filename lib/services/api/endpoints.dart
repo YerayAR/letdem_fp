@@ -90,6 +90,11 @@ class EndPoints {
     method: HTTPMethod.POST,
   );
 
+  static Endpoint takeSpace(String id) => Endpoint<TakeSpaceDTO>(
+        url: "/spaces/$id/feedback",
+        method: HTTPMethod.POST,
+      );
+
   static Endpoint<PostLetDemoLocationDTO> addHomeLocation = Endpoint(
     url: "/users/me/addresses/home",
     method: HTTPMethod.POST,
@@ -223,5 +228,26 @@ class EndPoints {
       url: "/users/me/notifications/$id/read",
       method: HTTPMethod.PUT,
     );
+  }
+}
+
+enum TakeSpaceType { TAKE_IT, IN_USE, NOT_USEFUL, PROHIBITED }
+
+class TakeSpaceDTO extends DTO {
+  final TakeSpaceType type;
+
+  TakeSpaceDTO({required this.type});
+
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type.name.toUpperCase(),
+    };
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "type": type.name.toUpperCase(),
+    };
   }
 }

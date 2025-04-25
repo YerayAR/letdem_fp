@@ -48,6 +48,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
 
 import 'firebase_options.dart';
 
@@ -200,44 +201,46 @@ class LetDemApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        locale: context.watch<LocaleProvider>().defaultLocale,
-        localizationsDelegates: const [
-          AppLocalizations.delegate, // Add this line
+    return ToastificationWrapper(
+      child: MaterialApp(
+          locale: context.watch<LocaleProvider>().defaultLocale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate, // Add this line
 
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [
-          Locale('en'), // English
-          Locale('es'), // Spanish
-        ],
-        builder: FlashyFlushbarProvider.init(),
-        theme: ThemeData(
-          appBarTheme: AppBarTheme(
-            backgroundColor: AppColors.scaffoldColor,
-            titleTextStyle: TextStyle(
-              color: AppColors.neutral600,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            Locale('en'), // English
+            Locale('es'), // Spanish
+          ],
+          builder: FlashyFlushbarProvider.init(),
+          theme: ThemeData(
+            appBarTheme: AppBarTheme(
+              backgroundColor: AppColors.scaffoldColor,
+              titleTextStyle: TextStyle(
+                color: AppColors.neutral600,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+              elevation: 0,
             ),
-            elevation: 0,
+            scaffoldBackgroundColor: AppColors.scaffoldColor,
+            fontFamily: 'DMSans',
           ),
-          scaffoldBackgroundColor: AppColors.scaffoldColor,
-          fontFamily: 'DMSans',
-        ),
-        navigatorKey: NavigatorHelper.navigatorKey,
-        debugShowCheckedModeBanner: false,
-        debugShowMaterialGrid: false,
-        home: const AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: Brightness.dark,
-              systemNavigationBarColor: Colors.black54,
-              systemNavigationBarIconBrightness: Brightness.dark,
-            ),
-            child: SplashView()));
+          navigatorKey: NavigatorHelper.navigatorKey,
+          debugShowCheckedModeBanner: false,
+          debugShowMaterialGrid: false,
+          home: const AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.dark,
+                systemNavigationBarColor: Colors.black54,
+                systemNavigationBarIconBrightness: Brightness.dark,
+              ),
+              child: SplashView())),
+    );
   }
 }
 

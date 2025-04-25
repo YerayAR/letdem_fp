@@ -5,9 +5,12 @@ class RegisterDTO extends DTO {
   final String email;
   final String password;
 
+  final String language;
+
   RegisterDTO({
     required this.email,
     required this.password,
+    required this.language,
   });
 
   @override
@@ -15,6 +18,7 @@ class RegisterDTO extends DTO {
     return {
       'email': email,
       'password': password,
+      'language': language,
       'device_id': OneSignal.User.pushSubscription.id
     };
   }

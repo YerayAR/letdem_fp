@@ -139,7 +139,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                                         Text(
                                           eventTypeToString(e),
                                           style: Typo.smallBody.copyWith(
-                                            fontSize: 16,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w500,
                                           ),
                                           textAlign: TextAlign.center,
