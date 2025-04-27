@@ -15,6 +15,7 @@ import 'package:here_sdk/navigation.dart' as HERE;
 import 'package:here_sdk/routing.dart' as HERE;
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -28,7 +29,6 @@ import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
@@ -40,13 +40,16 @@ class NavigationView extends StatefulWidget {
   final double destinationLat;
   final double destinationLng;
 
-  final bool hideTrigger;
+  final bool isNavigatingToParking;
+
+  final String? parkingSpaceID;
 
   const NavigationView({
     super.key,
     required this.destinationLat,
-    this.hideTrigger = false,
+    this.isNavigatingToParking = false,
     required this.destinationLng,
+    this.parkingSpaceID,
   });
 
   @override
@@ -75,9 +78,7 @@ class _NavigationViewState extends State<NavigationView> {
   bool _isNavigating = false;
   bool _isLoading = false;
   String _navigationInstruction = "";
-  int _distanceToNextManeuver = 0;
   int _totalRouteTime = 0;
-  int _totalRouteDistance = 0;
   bool _isMuted = false;
   String _errorMessage = "";
   int _lastTriggerDistance = 10;
@@ -85,9 +86,9 @@ class _NavigationViewState extends State<NavigationView> {
   double _lastLongitude = 0;
   int _distanceTraveled = 0;
 
+  Space? _currentSpace;
+
   // Added for the fixes
-  bool _isDeviatingFromRoute = false;
-  final int _lastReRouteTime = 0; // To prevent too frequent re-routing
   bool _hasShownArrivalNotification = false;
 
   // Map of direction icons
@@ -100,6 +101,12 @@ class _NavigationViewState extends State<NavigationView> {
 
   @override
   void initState() {
+    print("IS navigating to parking: ${widget.isNavigatingToParking}");
+    print("Parking space ID: ${widget.parkingSpaceID}");
+    // assert(
+    //   widget.isNavigatingToParking && widget.parkingSpaceID != null,
+    //   "isNavigatingToParking cannot be null",
+    // );
     super.initState();
 
     // Set up app lifecycle listener
@@ -127,8 +134,8 @@ class _NavigationViewState extends State<NavigationView> {
               previousPoint:
                   "${_currentLocation?.latitude},${_currentLocation?.longitude}",
               radius: 1000,
-              drivingMode: false,
-              options: ['spaces'],
+              drivingMode: true,
+              options: ['spaces', 'events', 'alerts'],
             ),
           ),
         );
@@ -138,6 +145,7 @@ class _NavigationViewState extends State<NavigationView> {
   void dispose() {
     _cleanupNavigation();
     _rerouteDebounceTimer?.cancel();
+    _distanceNotifier.dispose();
 
     _disposeHERESDK();
     _lifecycleListener.dispose();
@@ -180,10 +188,21 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('🗺️ Map created!');
     _hereMapController = hereMapController;
 
-    // move gestures
-    _hereMapController?.gestures.enableDefaultAction(
-      GestureType.pinchRotate,
-    );
+    // Enable all map gestures for user interaction
+    _hereMapController?.gestures.enableDefaultAction(GestureType.pan);
+    _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
+    _hereMapController?.gestures.enableDefaultAction(GestureType.twoFingerPan);
+    _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
+
+    // Set up gesture callbacks to detect user panning
+    _hereMapController?.gestures.panListener = PanListener((GestureState state,
+        HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
+      if (state == GestureState.begin) {
+        setState(() {
+          _isUserPanning = true;
+        });
+      }
+    });
 
     // Enable tap gestures for marker selection
     _hereMapController?.gestures.tapListener =
@@ -193,6 +212,8 @@ class _NavigationViewState extends State<NavigationView> {
 
     _loadMapScene();
   }
+
+  bool _isUserPanning = false;
 
   void _loadMapScene() {
     if (_hereMapController == null) return;
@@ -246,11 +267,8 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() {
       _isNavigating = false;
       _navigationInstruction = "";
-      _distanceToNextManeuver = 0;
       _totalRouteTime = 0;
-      _totalRouteDistance = 0;
       _hasShownArrivalNotification = false;
-      _isDeviatingFromRoute = false;
     });
 
     debugPrint('✅ Navigation resources fully cleaned up.');
@@ -358,7 +376,7 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _showDistanceTriggerToast() {
-    if (widget.hideTrigger) return;
+    if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
     context.read<MapBloc>().add(
           GetNearbyPlaces(
@@ -366,7 +384,7 @@ class _NavigationViewState extends State<NavigationView> {
             currentPoint: "$_lastLatitude,$_lastLongitude",
             previousPoint: "$_lastLatitude,$_lastLongitude",
             radius: 400,
-            drivingMode: false,
+            drivingMode: true,
             options: ['events', 'alerts', 'spaces'],
           )),
         );
@@ -461,6 +479,10 @@ class _NavigationViewState extends State<NavigationView> {
                     // Close the popup first
                     Navigator.pop(context);
 
+                    setState(() {
+                      _currentSpace = space;
+                    });
+
                     // Clean up existing navigation
                     _stopNavigation();
                     _cleanupNavigation();
@@ -494,6 +516,8 @@ class _NavigationViewState extends State<NavigationView> {
       ),
     );
   }
+
+  final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
 
   Timer? _rerouteDebounceTimer;
   int _lastRerouteTime = 0;
@@ -589,15 +613,12 @@ class _NavigationViewState extends State<NavigationView> {
           HERE.Route calculatedRoute = routeList.first;
 
           _totalRouteTime = calculatedRoute.duration.inSeconds;
-          _totalRouteDistance = calculatedRoute.lengthInMeters;
-
-          debugPrint(
-              '✅ Route calculated: ${_totalRouteDistance}m, ${_totalRouteTime ~/ 60} minutes');
+          _distanceNotifier.value =
+              calculatedRoute.lengthInMeters; // Update distance notifier
 
           setState(() {
             _isNavigating = true;
             _isLoading = false;
-            _isDeviatingFromRoute = false;
           });
 
           _startGuidance(calculatedRoute);
@@ -640,14 +661,19 @@ class _NavigationViewState extends State<NavigationView> {
 
     _visualNavigator!.routeProgressListener =
         HERE.RouteProgressListener((HERE.RouteProgress routeProgress) {
-      // Throttle updates to avoid too many setState calls
       final now = DateTime.now();
-
       HERE.SectionProgress lastSectionProgress =
           routeProgress.sectionProgress.last;
       int distance = lastSectionProgress.remainingDistanceInMeters;
 
+      print('🟡 Route progress update at ${now.toIso8601String()}');
+      print('➡️ Remaining distance in section: $distance meters');
+      print(
+          '➡️ Section remaining duration: ${lastSectionProgress.remainingDuration.inSeconds} seconds');
+
+      // Throttle updates to avoid too many setState calls
       if (now.difference(lastUpdateTime).inMilliseconds < 500) {
+        print('⏱ Throttling update. Skipping this tick.');
         return;
       }
 
@@ -656,28 +682,45 @@ class _NavigationViewState extends State<NavigationView> {
       final remainingDurationInSeconds =
           lastSectionProgress.remainingDuration.inSeconds;
 
-      setState(() {
-        _distanceToNextManeuver = remainingDistanceInMeters;
-      });
+      _distanceNotifier.value = remainingDistanceInMeters;
 
       // Show arrival notification when very close to destination (within 10 meters)
       if (remainingDistanceInMeters < 10) {
-        if (!_hasShownArrivalNotification && widget.hideTrigger) {
+        print('✅ Within 10 meters of destination.');
+        if (!_hasShownArrivalNotification) {
+          print('📣 Showing arrival notification...');
           setState(() {
             _hasShownArrivalNotification = true;
           });
 
-          // Show toast notification
-          _showToast("You have arrived at your destination space!",
-              backgroundColor: AppColors.green600);
+          if (_isNavigatingToParking) {
+            print(
+                '🅿️ Navigated to a selected parking space. Showing rating UI.');
+            AppPopup.showBottomSheet(
+                context,
+                ParkingRatingWidget(
+                  spaceID: _currentSpace?.id ?? widget.parkingSpaceID!,
+                  onSubmit: () {
+                    _stopNavigation();
+                    _cleanupNavigation();
+                    NavigatorHelper.pop();
+                  },
+                ));
+          } else {
+            print('🎯 Standard destination reached. Showing toast.');
+            _showToast("You have arrived at your destination!",
+                backgroundColor: AppColors.green600);
+          }
 
           putParkingSpacesOnMap();
         }
       }
 
-      // load spaces if very close to destination
+      // Load spaces if very close to destination
       if (remainingDistanceInMeters < 1) {
+        print('📌 Less than 1 meter away. Checking if popup needs to show.');
         if (!_isPopupDisplayed) {
+          print('🧩 Showing nearby parking spaces.');
           setState(() {
             _isPopupDisplayed = true;
           });
@@ -690,16 +733,42 @@ class _NavigationViewState extends State<NavigationView> {
       lastUpdateTime = now;
 
       final maneuver = routeProgress.maneuverProgress;
-      if (maneuver.isEmpty) return;
+      if (maneuver.isEmpty) {
+        print('⚠️ No maneuvers found in route progress.');
+        return;
+      }
 
       if (mounted) {
+        _distanceNotifier.value = distance;
+
         setState(() {
-          _distanceToNextManeuver = maneuver.first.remainingDistanceInMeters;
-          _totalRouteDistance = distance;
           _totalRouteTime = remainingDurationInSeconds;
         });
+
+        if (distance < 10 &&
+            (_isNavigatingToParking || widget.isNavigatingToParking)) {
+          AppPopup.showBottomSheet(
+            context,
+            ParkingRatingWidget(
+              spaceID: _currentSpace?.id ?? widget.parkingSpaceID!,
+              onSubmit: () {
+                _stopNavigation();
+                _cleanupNavigation();
+                NavigatorHelper.pop();
+              },
+            ),
+          );
+        }
+
+        print('🚗 Maneuver updated:');
+        print(
+            '➡️ Distance to next maneuver: ${_distanceNotifier.value} meters');
+        print(
+            '📏 Total remaining route distance: ${_distanceNotifier.value} meters');
+        print('⏳ Total remaining time: $_totalRouteTime seconds');
       }
     });
+
     //
     // // Add route deviation listener for re-routing
 
@@ -767,7 +836,7 @@ class _NavigationViewState extends State<NavigationView> {
 
       // Conditions to trigger reroute
       bool isSignificantlyOffRoute = true;
-      bool isFarEnoughFromDestination = _totalRouteDistance > 50;
+      bool isFarEnoughFromDestination = _distanceNotifier.value > 50;
       bool isTimeElapsedSinceLastReroute = (now - _lastRerouteTime > 5000);
 
       if (isSignificantlyOffRoute &&
@@ -791,9 +860,6 @@ class _NavigationViewState extends State<NavigationView> {
         );
 
         // Force the UI to update before heavy calculation
-        setState(() {
-          _isDeviatingFromRoute = true;
-        });
 
         // Delay slightly to allow UI to update
         Future.delayed(const Duration(milliseconds: 100), () {
@@ -802,8 +868,6 @@ class _NavigationViewState extends State<NavigationView> {
         });
       } else {
         debugPrint('✅ No reroute needed at this time.');
-        if (!isSignificantlyOffRoute)
-          debugPrint('📌 Deviation is within acceptable range.');
         if (!isFarEnoughFromDestination)
           debugPrint('🏁 Already close to destination.');
         if (!isTimeElapsedSinceLastReroute)
@@ -811,6 +875,8 @@ class _NavigationViewState extends State<NavigationView> {
       }
     });
   }
+
+  bool _isCameraLocked = true; // Add this flag to track camera lock state
 
 // New method to separate route recalculation logic
   void _recalculateRouteFromCurrentLocation(
@@ -844,10 +910,8 @@ class _NavigationViewState extends State<NavigationView> {
             HERE.Route calculatedRoute = routeList.first;
 
             _totalRouteTime = calculatedRoute.duration.inSeconds;
-            _totalRouteDistance = calculatedRoute.lengthInMeters;
-
-            debugPrint(
-                '✅ Route recalculated: ${_totalRouteDistance}m, ${_totalRouteTime ~/ 60} minutes');
+            _distanceNotifier.value =
+                calculatedRoute.lengthInMeters; // Update distance notifier
 
             if (_visualNavigator != null && mounted) {
               // Set new route for visualization
@@ -856,7 +920,6 @@ class _NavigationViewState extends State<NavigationView> {
               // Update UI state
               setState(() {
                 _isNavigating = true;
-                _isDeviatingFromRoute = false;
                 _isRecalculatingRoute = false;
               });
 
@@ -868,7 +931,6 @@ class _NavigationViewState extends State<NavigationView> {
 
             setState(() {
               _isRecalculatingRoute = false;
-              _isDeviatingFromRoute = false;
             });
 
             // Show error toast
@@ -883,7 +945,6 @@ class _NavigationViewState extends State<NavigationView> {
       debugPrint('❌ Exception during route recalculation: $e');
       setState(() {
         _isRecalculatingRoute = false;
-        _isDeviatingFromRoute = false;
       });
     }
   }
@@ -935,16 +996,16 @@ class _NavigationViewState extends State<NavigationView> {
       _visualNavigator!.startRendering(_hereMapController!);
 
       // Configure map view for 3D navigation
-      _hereMapController!.camera.lookAtPoint(
-        HERE.GeoCoordinates(
-          widget.destinationLat,
-          widget.destinationLng,
-        ),
-      );
+      // _hereMapController!.camera.lookAtPoint(
+      //   HERE.GeoCoordinates(
+      //     widget.destinationLat,
+      //     widget.destinationLng,
+      //   ),
+      // );
 
       // Tilt camera for 3D effect
       _hereMapController!.camera.setOrientationAtTarget(
-          HERE.GeoOrientationUpdate(0, 60) // 60-degree tilt for 3D view
+          HERE.GeoOrientationUpdate(0, 65) // 60-degree tilt for 3D view
           );
 
       debugPrint('✅ Navigation with 3D view started successfully');
@@ -981,9 +1042,9 @@ class _NavigationViewState extends State<NavigationView> {
     //     textColor: Colors.white,
     //     fontSize: 16.0
     // );
-    Toast.show(
-      message,
-    );
+    // Toast.show(
+    //   message,
+    // );
   }
 
   // UI Components
@@ -1027,26 +1088,51 @@ class _NavigationViewState extends State<NavigationView> {
             child: Icon(directionIcon, color: Colors.black, size: 24),
           ),
           const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${_distanceToNextManeuver > 0 ? _distanceToNextManeuver.toFormattedDistance() : _totalRouteDistance.toFormattedDistance()} ahead',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+          ValueListenableBuilder<int>(
+            valueListenable: _distanceNotifier,
+            builder: (context, state, _) {
+              print("Distance: $state");
+              if (state < 4) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    _isPopupDisplayed = true;
+                    AppPopup.showBottomSheet(
+                      context,
+                      ParkingRatingWidget(
+                        spaceID:
+                            _currentSpace?.id ?? widget.parkingSpaceID ?? "-1",
+                        onSubmit: () {
+                          _stopNavigation();
+                          _cleanupNavigation();
+                          NavigatorHelper.pop();
+                        },
+                      ),
+                    );
+                  }
+                });
+              }
+              return Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${state > 0 ? state.toFormattedDistance() : _distanceNotifier.value.toFormattedDistance()} ahead',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                    Text(
+                      _navigationInstruction,
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                Text(
-                  _navigationInstruction,
-                  style: const TextStyle(color: Colors.white, fontSize: 15),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+              );
+            },
           ),
           Dimens.space(1),
           CircleAvatar(
@@ -1092,8 +1178,59 @@ class _NavigationViewState extends State<NavigationView> {
         // Time and distance indicator
         GestureDetector(
           onDoubleTap: () {
+            toastification.show(
+              context: context,
+              type: ToastificationType.warning,
+              style: ToastificationStyle.minimal,
+              autoCloseDuration: const Duration(seconds: 5),
+              title: Text(
+                "Speed Limit Alert",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              description: Text(
+                "You are driving at speed limit, slow down",
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                ),
+              ),
+              alignment: Alignment.topCenter,
+              animationDuration: const Duration(milliseconds: 300),
+              animationBuilder: (context, animation, alignment, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              icon: Icon(Icons.warning_amber_rounded, color: Color(0xFFFF5722)),
+              showIcon: true,
+              primaryColor: Color(0xFFFF5722),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x1A000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                  spreadRadius: 0,
+                )
+              ],
+              showProgressBar: false,
+              closeButton: ToastCloseButton(
+                showType: CloseButtonShowType.none,
+              ),
+              closeOnClick: true,
+              dragToClose: true,
+              applyBlurEffect: false,
+            );
             //   get the current location
-            var currentLocation = _currentLocation;
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -1111,14 +1248,12 @@ class _NavigationViewState extends State<NavigationView> {
             child: Column(
               children: [
                 Text(
-                  "${(_totalRouteTime.toFormattedTime())} (${_totalRouteDistance.toFormattedDistance()})",
+                  "${(_totalRouteTime.toFormattedTime())} (${_distanceNotifier.value.toFormattedDistance()})",
                   style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
-                  semanticsLabel:
-                      "Estimated arrival in ${_totalRouteTime.toFormattedTime()} with ${_totalRouteDistance} meters remaining",
                 ),
               ],
             ),
@@ -1205,19 +1340,26 @@ class _NavigationViewState extends State<NavigationView> {
               toastification.show(
                 context: context, // optional if you use ToastificationWrapper
                 type: ToastificationType.success,
-                style: ToastificationStyle.flat,
+                style: ToastificationStyle.minimal,
                 autoCloseDuration: const Duration(seconds: 5),
-                title: Text("${alert.type} Alert"),
+                title: Text("${toBeginningOfSentenceCase(alert.type)} Alert",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                    )),
                 description: RichText(
                   text: TextSpan(
                     text: alert.type.toLowerCase() == "camera"
                         ? "You are in a CCTV Camera surveillance zone "
                         : "You are approaching a nearby radar zone",
-                    style: TextStyle(),
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 alignment: Alignment.topRight,
-                direction: TextDirection.ltr,
                 animationDuration: const Duration(milliseconds: 300),
                 animationBuilder: (context, animation, alignment, child) {
                   return FadeTransition(
@@ -1256,7 +1398,7 @@ class _NavigationViewState extends State<NavigationView> {
                 closeOnClick: false,
                 pauseOnHover: true,
                 dragToClose: true,
-                applyBlurEffect: true,
+                applyBlurEffect: false,
                 callbacks: ToastificationCallbacks(
                   onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
                   onCloseButtonTap: (toastItem) =>
@@ -1290,7 +1432,7 @@ class _NavigationViewState extends State<NavigationView> {
                 // Navigation instruction
                 if (_isNavigating &&
                     _navigationInstruction.isNotEmpty &&
-                    _totalRouteDistance > 0)
+                    _distanceNotifier.value > 0)
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 10,
                     left: _mapPadding,
@@ -1340,14 +1482,19 @@ extension TimeFormatter on int {
 }
 
 class ParkingRatingWidget extends StatefulWidget {
-  const ParkingRatingWidget({Key? key}) : super(key: key);
+  final VoidCallback onSubmit;
+
+  final String spaceID;
+  const ParkingRatingWidget(
+      {Key? key, required this.onSubmit, required this.spaceID})
+      : super(key: key);
 
   @override
   _ParkingRatingWidgetState createState() => _ParkingRatingWidgetState();
 }
 
 class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
-  String? _selectedOption;
+  TakeSpaceType? _selectedOption;
   bool _submitted = false;
 
   final List<Map<String, dynamic>> _options = [
@@ -1386,7 +1533,12 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
   ];
 
   void _handleSubmit() {
-    NavigatorHelper.pop();
+    context.read<ActivitiesBloc>().add(
+          TakeSpaceEvent(
+            type: _selectedOption as TakeSpaceType,
+            spaceID: widget.spaceID,
+          ),
+        );
     return;
 
     if (_selectedOption != null) {
@@ -1423,6 +1575,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
               onProceed: () {
                 NavigatorHelper.pop();
                 NavigatorHelper.pop();
+                widget.onSubmit();
               },
             ),
           );
@@ -1435,6 +1588,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Dimens.space(3),
                 // Location icon
                 Container(
                   padding: EdgeInsets.all(15),
@@ -1477,7 +1631,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                       ),
                       const SizedBox(height: 12),
                       const Text(
-                        "Available parking spaces are shown on the map. Select an option to navigate to the nearest one.",
+                        "How would you like to rate this parking space?",
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.black87,
@@ -1487,13 +1641,61 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                     ],
                   ),
                 ),
+                Dimens.space(3),
+
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Rating options
+                      ..._options.map((option) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedOption = option['enum'];
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: _selectedOption == option['enum']
+                                  ? (option['color'] as Color).withOpacity(0.4)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: _selectedOption == option['enum']
+                                    ? option['iconColor']
+                                    : Colors.grey.withOpacity(0.4),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor:
+                                      (option['iconColor'] as Color)
+                                          .withOpacity(0.1),
+                                  child: Icon(option['icon'],
+                                      color: option['iconColor']),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(option['label']),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
 
                 Dimens.space(4),
 
                 // Submit Button
                 PrimaryButton(
-                  text: _submitted ? 'Submitted' : 'Go Back',
-                  isLoading: _submitted,
+                  text: 'Done',
+                  isLoading: state is ActivitiesLoading,
                   onTap: _submitted ? null : _handleSubmit,
                 ),
               ],

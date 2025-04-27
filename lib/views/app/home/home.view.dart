@@ -410,6 +410,7 @@ class _HomeViewState extends State<HomeView>
                   onTap: () {
                     NavigatorHelper.to(TrafficRouteLineExample(
                       hideToggle: true,
+                      spaceInfo: space,
                       streetName: space.location.streetName,
                       lat: space.location.point.lat,
                       lng: space.location.point.lng,

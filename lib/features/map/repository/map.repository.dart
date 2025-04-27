@@ -36,6 +36,12 @@ class MapRepository extends IMapRepository {
         value: queryParams.currentPoint.toString(),
       ));
     }
+    if (queryParams.previousPoint != null) {
+      qParams.add(QParam(
+        key: 'previous-point',
+        value: queryParams.previousPoint.toString(),
+      ));
+    }
 
     EndPoints.getNearby.setParams(qParams);
 

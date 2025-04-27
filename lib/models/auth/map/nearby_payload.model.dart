@@ -170,37 +170,30 @@ class Point {
 }
 
 class Alert {
-  final String type; // 'Camera' or 'Radar'
+  final String type;
   final String road;
-  final String direction;
   final double latitude;
   final double longitude;
+  final String direction;
+  final double distance;
 
   Alert({
     required this.type,
     required this.road,
-    required this.direction,
     required this.latitude,
     required this.longitude,
+    required this.direction,
+    required this.distance,
   });
 
   factory Alert.fromJson(Map<String, dynamic> json) {
     return Alert(
       type: json['type'] as String,
       road: json['road'] as String,
+      latitude: double.tryParse(json['latitude'].toString()) ?? 0.0,
+      longitude: double.tryParse(json['longitude'].toString()) ?? 0.0,
       direction: json['direction'] as String,
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
+      distance: (json['distance'] as num).toDouble(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'road': road,
-      'direction': direction,
-      'latitude': latitude,
-      'longitude': longitude,
-    };
   }
 }

@@ -10,6 +10,7 @@ import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/image/compressor.dart';
 import 'package:letdem/services/location/location.service.dart';
+import 'package:letdem/services/toast/toast.dart';
 
 part 'activities_event.dart';
 part 'activities_state.dart';
@@ -33,8 +34,11 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       emit(const ActivitiesPublished(totalPointsEarned: 0));
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
+      (Toast.showError(err.message));
     } catch (err) {
-      emit(const ActivitiesError(error: "Unable to take space"));
+      emit(ActivitiesError(error: "Unable to take space"));
+
+      Toast.showError("Unable to take space");
     }
   }
 

@@ -17,6 +17,7 @@ import 'package:letdem/features/scheduled_notifications/schedule_notifications_b
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
 import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
@@ -33,13 +34,15 @@ class TrafficRouteLineExample extends StatefulWidget {
   final double lng;
   final String? streetName;
   final bool hideToggle;
+  final Space? spaceInfo;
 
   const TrafficRouteLineExample(
       {super.key,
       required this.lat,
       required this.lng,
       required this.hideToggle,
-      required this.streetName});
+      required this.streetName,
+      this.spaceInfo});
 
   @override
   State createState() => TrafficRouteLineExampleState();
@@ -400,6 +403,7 @@ class TrafficRouteLineExampleState extends State<TrafficRouteLineExample> {
                           ),
                         )
                       : NavigateNotificationCard(
+                          spaceInfo: widget.spaceInfo,
                           hideToggle: widget.hideToggle,
                           routeInfo: routeInfo,
                           notification: ScheduledNotification(
@@ -426,11 +430,14 @@ class NavigateNotificationCard extends StatefulWidget {
   final RouteInfo? routeInfo;
 
   final bool hideToggle;
+
+  final Space? spaceInfo;
   const NavigateNotificationCard(
       {super.key,
       required this.notification,
       required this.hideToggle,
-      this.routeInfo});
+      this.routeInfo,
+      this.spaceInfo});
 
   @override
   State<NavigateNotificationCard> createState() =>
@@ -830,6 +837,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => NavigationView(
+                                      parkingSpaceID: widget.spaceInfo?.id,
+                                      isNavigatingToParking:
+                                          widget.spaceInfo != null,
                                       destinationLat: widget
                                           .notification.location.point.latitude,
                                       destinationLng: widget.notification
