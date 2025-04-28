@@ -7,11 +7,14 @@ class Car {
   final String registrationNumber;
   final CarTagType tagType;
 
+  final LastParkingLocation? lastParkingLocation;
+
   Car({
     required this.id,
     required this.brand,
     required this.registrationNumber,
     required this.tagType,
+    required this.lastParkingLocation,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
@@ -19,7 +22,30 @@ class Car {
       id: json['id'],
       brand: json['name'],
       registrationNumber: json['plate_number'],
+      lastParkingLocation: json['parked_place'] != null
+          ? LastParkingLocation.fromJson(json['parked_place'])
+          : null,
       tagType: fromJsonToTag(json['label']),
+    );
+  }
+}
+
+class LastParkingLocation {
+  final String streetName;
+  final double lat;
+  final double lng;
+
+  LastParkingLocation({
+    required this.lat,
+    required this.lng,
+    required this.streetName,
+  });
+
+  factory LastParkingLocation.fromJson(Map<String, dynamic> json) {
+    return LastParkingLocation(
+      lat: json['point']['lat'],
+      lng: json['point']['lng'],
+      streetName: json['street_name'],
     );
   }
 }

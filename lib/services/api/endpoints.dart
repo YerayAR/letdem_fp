@@ -229,9 +229,30 @@ class EndPoints {
       method: HTTPMethod.PUT,
     );
   }
+
+  static Endpoint<EventFeedBackDTO> eventFeedBack(
+    String id,
+  ) =>
+      Endpoint(
+        url: "/events/$id/feedback",
+        method: HTTPMethod.POST,
+      );
 }
 
 enum TakeSpaceType { TAKE_IT, IN_USE, NOT_USEFUL, PROHIBITED }
+
+class EventFeedBackDTO extends DTO {
+  final bool isThere;
+
+  EventFeedBackDTO({required this.isThere});
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "type": isThere ? "IS_THERE" : "NOT_THERE",
+    };
+  }
+}
 
 class TakeSpaceDTO extends DTO {
   final TakeSpaceType type;

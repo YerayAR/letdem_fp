@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:here_sdk/core.dart';
+import 'package:here_sdk/mapview.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/CarTagType.dart';
+import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/car/car.model.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
+import 'package:letdem/views/app/maps/test.dart';
 
 class RegisteredCarWidget extends StatelessWidget {
   final Car car;
@@ -119,21 +123,142 @@ class RegisteredCarWidget extends StatelessWidget {
   }
 }
 
-class LastParkedWidget extends StatelessWidget {
-  const LastParkedWidget({super.key});
+class LastParkedWidget extends StatefulWidget {
+  final LastParkingLocation? lastParked;
+  const LastParkedWidget({super.key, required this.lastParked});
+
+  @override
+  State<LastParkedWidget> createState() => _LastParkedWidgetState();
+}
+
+class _LastParkedWidgetState extends State<LastParkedWidget> {
+  HereMapController? _mapController;
+
+  void _onMapCreated(HereMapController controller) {
+    _mapController = controller;
+
+    _mapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
+        (error) {
+      if (error != null) {
+        debugPrint('Map load error: $error');
+        return;
+      }
+
+      // Set the parking location coordinates
+      final parkingLocation = GeoCoordinates(widget.lastParked?.lat ?? 37.3318,
+          widget.lastParked?.lng ?? -122.0312);
+
+      // Add a marker at the parking location
+      _addMarker(parkingLocation);
+
+      // Center the map on the parking location
+      _mapController!.camera.lookAtPointWithMeasure(
+          parkingLocation, MapMeasure(MapMeasureKind.distanceInMeters, 500));
+    });
+  }
+
+  void _addMarker(GeoCoordinates coordinates) {
+    // // Create a default marker image
+    // final mapMarker = MapMarker(
+    //   coordinates,
+    // );
+    //
+    // // Alternative: create a default marker if you don't have a custom image
+    // // final mapMarker = MapMarker(coordinates);
+    //
+    // // Add the marker to the map
+    // _mapController?.mapScene.addMapMarker(mapMarker);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        vertical: 0,
-        horizontal: 0,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.primary500,
-        borderRadius: BorderRadius.circular(20),
-      ),
-    );
+    return widget.lastParked == null
+        ? SizedBox()
+        : Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Last place Parked",
+                            style: Typo.smallBody.copyWith(
+                              color: AppColors.neutral500,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Dimens.space(1),
+                          Text(
+                            widget.lastParked?.streetName ?? "Unknown",
+                            style: Typo.largeBody.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Dimens.space(2),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            child: PrimaryButton(
+                              color: AppColors.primary300,
+                              onTap: () {
+                                NavigatorHelper.to(NavigationView(
+                                  destinationLat: widget.lastParked?.lat ?? 0,
+                                  destinationLng: widget.lastParked?.lng ?? 0,
+                                ));
+                              },
+                              text: "Navigate to car",
+                              iconRight: Icons.arrow_forward,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Right side - Map with shadow effect
+                  // Padding(
+                  //   padding: const EdgeInsets.only(right: 0),
+                  //   child: Container(
+                  //     width: 150,
+                  //     height: 150,
+                  //     decoration: BoxDecoration(),
+                  //     child: ClipRRect(
+                  //       child: Stack(
+                  //         children: [
+                  //           HereMap(onMapCreated: _onMapCreated),
+                  //           // Optional: Add a very slight overlay for a shadow-like effect
+                  //           Container(
+                  //             decoration: BoxDecoration(
+                  //               gradient: LinearGradient(
+                  //                 begin: Alignment.topCenter,
+                  //                 end: Alignment.bottomCenter,
+                  //                 colors: [
+                  //                   Colors.black.withOpacity(0.05),
+                  //                   Colors.black.withOpacity(0.1),
+                  //                 ],
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          );
   }
 }

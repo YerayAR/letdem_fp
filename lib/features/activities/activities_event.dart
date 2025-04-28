@@ -4,6 +4,17 @@ sealed class ActivitiesEvent extends Equatable {
   const ActivitiesEvent();
 }
 
+final class EventFeedBackEvent extends ActivitiesEvent {
+  final String eventID;
+  final bool isThere;
+
+  const EventFeedBackEvent({required this.eventID, required this.isThere});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [eventID, isThere];
+}
+
 final class TakeSpaceEvent extends ActivitiesEvent {
   final String spaceID;
   final TakeSpaceType type;

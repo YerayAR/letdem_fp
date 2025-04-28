@@ -33,9 +33,13 @@ class CarBloc extends Bloc<CarEvent, CarState> {
               tagType: event.tagType,
             ));
       emit(CarLoaded(car));
-    } on ApiError catch (e) {
+    } on ApiError catch (e, st) {
+      print(st);
+      print(e);
       emit(CarError(e.message));
-    } catch (e) {
+    } catch (e, st) {
+      print(st);
+      print(e);
       emit(CarError(e.toString()));
     }
   }
@@ -45,7 +49,9 @@ class CarBloc extends Bloc<CarEvent, CarState> {
     try {
       final car = await carRepository.getCar();
       emit(CarLoaded(car));
-    } catch (e) {
+    } catch (e, st) {
+      print(st);
+      print(e);
       emit(CarError(e.toString()));
     }
   }

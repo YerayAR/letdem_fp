@@ -24,6 +24,23 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     on<GetActivitiesEvent>(_onGetActivities);
     on<PublishRoadEventEvent>(_onPublishRoadEvent);
     on<TakeSpaceEvent>(_onTakeSpace);
+    on<EventFeedBackEvent>(_onEventFeedBack);
+  }
+
+  Future<void> _onEventFeedBack(
+      EventFeedBackEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+      await activityRepository.eventFeedback(
+        eventID: event.eventID,
+        isThere: event.isThere,
+      );
+      emit(const ActivitiesPublished(totalPointsEarned: 0));
+    } on ApiError catch (err) {
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      emit(const ActivitiesError(error: "Unable to send feedback"));
+    }
   }
 
   Future<void> _onTakeSpace(

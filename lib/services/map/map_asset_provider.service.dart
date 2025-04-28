@@ -49,7 +49,7 @@ class MapAssetsProvider {
     }
   }
 
-  String getAssetEvent(EventTypes type) {
+  static String getAssetEvent(EventTypes type) {
     switch (type) {
       case EventTypes.accident:
         return AppAssets.accident;

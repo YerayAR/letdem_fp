@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
@@ -76,8 +77,16 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                     return ProfileSection(
                       child: [
                         state.car != null
-                            ? RegisteredCarWidget(
-                                car: state.car!,
+                            ? Column(
+                                children: [
+                                  RegisteredCarWidget(
+                                    car: state.car!,
+                                  ),
+                                  Dimens.space(1),
+                                  LastParkedWidget(
+                                    lastParked: state.car!.lastParkingLocation,
+                                  ),
+                                ],
                               )
                             : const NoCarRegisteredWidget(),
                       ],

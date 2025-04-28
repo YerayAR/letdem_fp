@@ -15,6 +15,8 @@ class PrimaryButton extends StatelessWidget {
   final bool isLoading;
   final bool isDisabled;
 
+  final EdgeInsetsGeometry? padding;
+
   final Color? borderColor;
   final Color? loadingIndicatorColor;
   final IconData? iconRight;
@@ -34,6 +36,7 @@ class PrimaryButton extends StatelessWidget {
     required this.text,
     this.onTap,
     this.iconRight,
+    this.padding,
     this.isLoading = false,
     this.isDisabled = false,
     this.borderColor,
@@ -97,7 +100,8 @@ class PrimaryButton extends StatelessWidget {
         }
       },
       child: Container(
-        height: 55,
+        padding: padding,
+        height: padding != null ? null : 55,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10000),

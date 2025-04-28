@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,11 +30,13 @@ import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../enums/EventTypes.dart';
 import '../publish_space/screens/publish_space.view.dart';
 
 class NavigationView extends StatefulWidget {
@@ -392,6 +395,7 @@ class _NavigationViewState extends State<NavigationView> {
 
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
   final Map<MapMarker, Space> _spaceMarkers = {};
+  final Map<MapMarker, Event> _eventMarkers = {};
 
   bool _isNavigatingToParking = false;
   String _parkingSpaceName =
@@ -538,6 +542,25 @@ class _NavigationViewState extends State<NavigationView> {
 
           showSpacePopup(space: space);
         }
+        if (_eventMarkers.containsKey(topMarker)) {
+          final event = _eventMarkers[topMarker]!;
+
+          AppPopup.showBottomSheet(
+            context,
+            EventFeedback(
+              currentDistance: Geolocator.distanceBetween(
+                _currentLocation!.latitude,
+                _currentLocation!.longitude,
+                event.location.point.lat,
+                event.location.point.lng,
+              ),
+              event: event,
+              onSubmit: () {
+                NavigatorHelper.pop();
+              },
+            ),
+          );
+        }
       }
     });
   }
@@ -559,8 +582,10 @@ class _NavigationViewState extends State<NavigationView> {
               space.location.point.lat, space.location.point.lng),
           mapImage,
         );
+        marker.fadeDuration = Duration(seconds: 2);
 
         _hereMapController?.mapScene.addMapMarker(marker);
+        _eventMarkers[marker] = space;
       } catch (e) {
         print("Error adding space marker: $e");
       }
@@ -573,6 +598,8 @@ class _NavigationViewState extends State<NavigationView> {
               space.location.point.lat, space.location.point.lng),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
+        marker.fadeDuration = Duration(seconds: 2);
+
         _hereMapController?.mapScene.addMapMarker(marker);
         _spaceMarkers[marker] = space;
       } catch (e) {
@@ -1700,6 +1727,235 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class EventFeedback extends StatelessWidget {
+  final Event event;
+  final double currentDistance;
+  final VoidCallback? onSubmit;
+
+  const EventFeedback(
+      {super.key,
+      required this.event,
+      this.onSubmit,
+      required this.currentDistance});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(Dimens.defaultMargin + 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: [
+                Image(
+                  image: AssetImage(
+                    MapAssetsProvider.getAssetEvent(event.type),
+                  ),
+                  height: 40,
+                ),
+                Dimens.space(1),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          getEventMessage(event.type),
+                          style: Typo.largeBody.copyWith(
+                              fontWeight: FontWeight.w700, fontSize: 18),
+                        ),
+                        Dimens.space(2),
+                        DecoratedChip(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 5),
+                          text: '${currentDistance.floor()}m away',
+                          textStyle: Typo.smallBody.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.green600,
+                          ),
+                          icon: Iconsax.clock,
+                          color: AppColors.green500,
+                        )
+                      ],
+                    ),
+                    Text(
+                      event.location.streetName,
+                      style: Typo.largeBody.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.neutral600),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Dimens.space(4),
+            Row(
+              children: <Widget>[
+                const Flexible(
+                  child: PrimaryButton(
+                    text: 'Got it, Thank you',
+                  ),
+                ),
+                Dimens.space(1),
+                Flexible(
+                  child: PrimaryButton(
+                    outline: true,
+                    onTap: () {
+                      AppPopup.showBottomSheet(
+                        context,
+                        FeedbackForm(eventID: event.id),
+                      );
+                    },
+                    background: AppColors.primary50,
+                    borderColor: Colors.transparent,
+                    color: AppColors.primary500,
+                    text: 'Feedback',
+                  ),
+                )
+              ],
+            ),
+          ],
+        ));
+  }
+}
+
+class FeedbackForm extends StatelessWidget {
+  final String eventID;
+  const FeedbackForm({super.key, required this.eventID});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ActivitiesBloc, ActivitiesState>(
+      listener: (context, state) {
+        if (state is ActivitiesPublished) {
+          // Show success message
+          AppPopup.showDialogSheet(
+            context,
+            SuccessDialog(
+              title: "Your feedback has been submitted",
+              subtext: "Thank you for your input!",
+              onProceed: () {
+                NavigatorHelper.pop();
+                NavigatorHelper.pop();
+              },
+            ),
+          );
+        }
+        if (state is ActivitiesError) {
+          // Show error message
+          Toast.showError(
+            state.error,
+          );
+        }
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        return Padding(
+          padding: EdgeInsets.all(Dimens.defaultMargin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: [
+                  Text(
+                    "Event Feedback",
+                    style: Typo.largeBody
+                        .copyWith(fontWeight: FontWeight.w700, fontSize: 18),
+                  ),
+                  Dimens.space(1),
+                  SizedBox(
+                      child: state is ActivitiesLoading
+                          ? CupertinoActivityIndicator()
+                          : null),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Iconsax.close_circle5,
+                      color: AppColors.neutral100,
+                    ),
+                  ),
+                ],
+              ),
+              Dimens.space(1),
+              GestureDetector(
+                onTap: () {
+                  context.read<ActivitiesBloc>().add(
+                        EventFeedBackEvent(
+                          eventID: eventID,
+                          isThere: true,
+                        ),
+                      );
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 17,
+                      backgroundColor: AppColors.green50,
+                      child: Icon(
+                        Icons.done,
+                        color: AppColors.green500,
+                        size: 17,
+                      ),
+                    ),
+                    Dimens.space(1),
+                    Text("its still there",
+                        style: Typo.largeBody.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.neutral600,
+                        )),
+                  ],
+                ),
+              ),
+              Dimens.space(2),
+              Divider(
+                color: Colors.grey.withOpacity(0.2),
+                height: 1,
+              ),
+              Dimens.space(2),
+              GestureDetector(
+                onTap: () {
+                  context.read<ActivitiesBloc>().add(
+                        EventFeedBackEvent(
+                          eventID: eventID,
+                          isThere: false,
+                        ),
+                      );
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 17,
+                      backgroundColor: AppColors.secondary50,
+                      child: Icon(
+                        Icons.close,
+                        color: AppColors.secondary600,
+                        size: 17,
+                      ),
+                    ),
+                    Dimens.space(1),
+                    Text("It’s not there",
+                        style: Typo.largeBody.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.neutral600,
+                        )),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },

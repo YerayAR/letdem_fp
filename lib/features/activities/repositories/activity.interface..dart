@@ -11,4 +11,9 @@ abstract class IActivityRepository {
   Future publishSpace(PublishSpaceDTO dto);
 
   Future publishRoadEvent(PublishRoadEventDTO dto);
+
+  Future eventFeedback({
+    required String eventID,
+    required bool isThere,
+  });
 }

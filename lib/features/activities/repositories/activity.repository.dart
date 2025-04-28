@@ -61,4 +61,13 @@ class ActivityRepository extends IActivityRepository {
       endpoint: EndPoints.publishRoadEvent.copyWithDTO(dto),
     );
   }
+
+  @override
+  Future eventFeedback({required String eventID, required bool isThere}) {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.eventFeedBack(eventID).copyWithDTO(
+        EventFeedBackDTO(isThere: isThere),
+      ),
+    );
+  }
 }
