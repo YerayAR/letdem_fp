@@ -69,6 +69,8 @@ dependencies:
   shared_preferences: ^2.5.3
   provider: ^6.1.4
   toastification: ^3.0.2
+  flutter_tts: ^4.2.2
+  audioplayers: ^6.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -96,6 +98,7 @@ flutter:
   assets:
     - assets/branding/
     - assets/icon/
+    - assets/audio/
     - assets/icon/car_tags/
     - assets/res/
 #    - .env

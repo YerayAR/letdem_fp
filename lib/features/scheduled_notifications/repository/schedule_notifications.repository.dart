@@ -64,8 +64,8 @@ class CreateScheduledNotificationDTO extends DTO {
   @override
   Map<String, dynamic> toMap() {
     return {
-      'starts_at': startsAt.toIso8601String(),
-      'ends_at': endsAt.toIso8601String(),
+      'starts_at': startsAt.toUtc().toIso8601String(),
+      'ends_at': endsAt.toUtc().toIso8601String(),
       'location': {
         'lat': location.point.latitude,
         'lng': location.point.longitude,

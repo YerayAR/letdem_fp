@@ -310,8 +310,11 @@ class _HomeViewState extends State<HomeView>
             Dimens.space(4),
             Row(
               children: <Widget>[
-                const Flexible(
+                Flexible(
                   child: PrimaryButton(
+                    onTap: () {
+                      NavigatorHelper.pop();
+                    },
                     text: 'Got it, Thank you',
                   ),
                 ),

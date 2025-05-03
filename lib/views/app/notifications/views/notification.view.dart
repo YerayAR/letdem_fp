@@ -222,10 +222,10 @@ class _NotificationsViewState extends State<NotificationsView> {
                     context.read<NotificationsBloc>().state
                             is NotificationsLoaded &&
                         (context.read<NotificationsBloc>().state
-                                    as NotificationsLoaded)
-                                .notifications
-                                .count ==
-                            0
+                                as NotificationsLoaded)
+                            .notifications
+                            .results
+                            .isEmpty
                 ? []
                 : [
                     Spacer(),
@@ -300,7 +300,8 @@ class _NotificationsViewState extends State<NotificationsView> {
                         },
                         onRead: (String id) {
                           context.read<NotificationsBloc>().add(
-                                MarkNotificationAsReadEvent(id: id),
+                                MarkNotificationAsReadEvent(
+                                    id: notification.id),
                               );
                         },
                       );

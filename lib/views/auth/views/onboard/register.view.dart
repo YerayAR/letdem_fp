@@ -92,6 +92,10 @@ class _RegisterViewState extends State<RegisterView> {
               PrimaryButton(
                 outline: true,
                 onTap: () {
+                  if (!isChecked) {
+                    Toast.showError('Please accept the terms and conditions');
+                    return;
+                  }
                   context.read<AuthBloc>().add(const GoogleRegisterEvent());
                 },
                 color: Colors.white,

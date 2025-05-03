@@ -20,6 +20,7 @@ import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
@@ -31,10 +32,11 @@ import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/services/toast/tone.dart';
+import 'package:letdem/services/tts/tts.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
-import 'package:toastification/toastification.dart';
 
 import '../../../enums/EventTypes.dart';
 import '../publish_space/screens/publish_space.view.dart';
@@ -68,6 +70,8 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _borderRadius = 20;
   static const int _distanceTriggerThreshold =
       200; // 50m threshold for triggering
+  DateTime? _navigationStartTime;
+  bool _hasShownFatigueAlert = false;
 
   // Controllers and engines
   HereMapController? _hereMapController;
@@ -78,6 +82,8 @@ class _NavigationViewState extends State<NavigationView> {
 
   // Navigation state
   HERE.GeoCoordinates? _currentLocation;
+
+  double _speed = 0;
   bool _isNavigating = false;
   bool _isLoading = false;
   String _navigationInstruction = "";
@@ -93,6 +99,154 @@ class _NavigationViewState extends State<NavigationView> {
 
   // Added for the fixes
   bool _hasShownArrivalNotification = false;
+  HERE.SpeedLimit? _currentSpeedLimit;
+  bool _isOverSpeedLimit = false;
+
+// Add this method to initialize the speed limit listener
+  void _setupSpeedLimitListener() {
+    if (_visualNavigator == null) return;
+
+    debugPrint('🚗 Setting up speed limit listener...');
+
+    _visualNavigator!.speedLimitListener =
+        HERE.SpeedLimitListener((HERE.SpeedLimit? speedLimit) {
+      if (speedLimit == null) {
+        debugPrint('⚠️ No speed limit information available');
+        setState(() {
+          _currentSpeedLimit = null;
+        });
+        return;
+      }
+
+      debugPrint(
+          '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s');
+
+      setState(() {
+        _currentSpeedLimit = speedLimit;
+
+        // Check if current speed exceeds speed limit (with a small buffer)
+        if (_speed > 0 && _currentSpeedLimit != null) {
+          // Adding a 5% buffer to avoid overly sensitive alerts
+          final buffer =
+              _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+          _isOverSpeedLimit = _speed >
+              (_currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
+
+          // Show speed limit alert if over the limit and not already shown
+          if (_isOverSpeedLimit && !_isMuted) {
+            _showSpeedLimitAlert();
+          }
+        }
+      });
+    });
+
+    debugPrint('✅ Speed limit listener set up successfully');
+  }
+
+  Widget _buildSpeedLimitIndicator() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 120,
+      right: _mapPadding,
+      child: Container(
+        padding: EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Current maximum speed indicator
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 13),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    (_speed * 3.6).round().toString(),
+                    style: TextStyle(
+                      color: Colors.orange.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                  ),
+                  Text(
+                    "Km/h",
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Speed limit indicator
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.red, width: 2),
+              ),
+              child: Center(
+                child: _currentSpeedLimit != null &&
+                        _currentSpeedLimit!.speedLimitInMetersPerSecond != null
+                    ? Text(
+                        "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      )
+                    : Icon(
+                        Icons.speed,
+                        color: Colors.grey.shade400,
+                        size: 18,
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+// Add this method to show speed limit alerts
+  void _showSpeedLimitAlert() {
+    if (_currentSpeedLimit == null || context.isSpeedAlertEnabled) return;
+
+    // Convert m/s to km/h for display
+    final speedLimitKmh =
+        (_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
+    final currentSpeedKmh = (_speed * 3.6).round();
+
+    AlertHelper.showWarning(
+      context: context,
+      title: 'Speed Limit Alert',
+      subtext: 'You are driving at speed limit, slow down',
+    );
+
+    // Optionally use text-to-speech for alert
+    if (!_isMuted) {
+      speech.speak("Speed limit is $speedLimitKmh kilometers per hour");
+    }
+  }
 
   // Map of direction icons
   final Map<String, IconData> _directionIcons = {
@@ -184,6 +338,8 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() => _isLoading = false);
   }
 
+  final speech = SpeechService();
+
   bool _isPopupDisplayed = false;
 
   // Map initialization and cleanup
@@ -196,6 +352,39 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
     _hereMapController?.gestures.enableDefaultAction(GestureType.twoFingerPan);
     _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
+
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.buildingFootprints: MapFeatureModes.buildingFootprintsAll
+    });
+    _hereMapController?.mapScene
+        .enableFeatures({MapFeatures.contours: MapFeatureModes.contoursAll});
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.congestionZones: MapFeatureModes.congestionZonesAll});
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.environmentalZones: MapFeatureModes.environmentalZonesAll
+    });
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.landmarks: MapFeatureModes.landmarksTextured});
+    _hereMapController?.mapScene
+        .enableFeatures({MapFeatures.shadows: MapFeatureModes.shadowsAll});
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll});
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.safetyCameras: MapFeatureModes.defaultMode});
+    _hereMapController?.mapScene
+        .enableFeatures({MapFeatures.shadows: MapFeatureModes.shadowsAll});
+    _hereMapController?.mapScene
+        .enableFeatures({MapFeatures.terrain: MapFeatureModes.defaultMode});
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow});
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.lowSpeedZones: MapFeatureModes.lowSpeedZonesAll});
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.ambientOcclusion: MapFeatureModes.ambientOcclusionAll});
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.vehicleRestrictions:
+          MapFeatureModes.vehicleRestrictionsActiveAndInactive
+    });
 
     // Set up gesture callbacks to detect user panning
     _hereMapController?.gestures.panListener = PanListener((GestureState state,
@@ -240,7 +429,8 @@ class _NavigationViewState extends State<NavigationView> {
             MapMeasureKind.distanceInMeters, _initialZoomDistanceInMeters);
 
         _hereMapController!.camera.lookAtPointWithMeasure(
-            HERE.GeoCoordinates(52.520798, 13.409408), mapMeasureZoom);
+            HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+            mapMeasureZoom);
 
         _initLocationEngine();
         _startNavigation();
@@ -307,6 +497,8 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _startNavigation() async {
     _cleanupNavigation();
+    _navigationStartTime = DateTime.now();
+    _hasShownFatigueAlert = false;
 
     if (_hereMapController == null) return;
 
@@ -521,8 +713,10 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
+  String _lastSpokenInstruction = "";
 
+  final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
+  int _nextManuoverDistance = 0;
   Timer? _rerouteDebounceTimer;
   int _lastRerouteTime = 0;
   void _pickMapMarker(HERE.Point2D touchPoint) {
@@ -704,6 +898,15 @@ class _NavigationViewState extends State<NavigationView> {
         return;
       }
 
+      if (!_isMuted && normalManuevers != _lastSpokenInstruction) {
+        _lastSpokenInstruction = normalManuevers;
+        speech.speak(normalManuevers);
+      }
+
+      _nextManuoverDistance = routeProgress
+          .maneuverProgress.first!.remainingDistanceInMeters!
+          .floor();
+
       final remainingDistanceInMeters =
           lastSectionProgress.remainingDistanceInMeters;
       final remainingDurationInSeconds =
@@ -771,7 +974,25 @@ class _NavigationViewState extends State<NavigationView> {
         setState(() {
           _totalRouteTime = remainingDurationInSeconds;
         });
+        if (context.isFatigueAlertEnabled) {
+          if (_navigationStartTime != null &&
+              !_hasShownFatigueAlert &&
+              DateTime.now().difference(_navigationStartTime!).inSeconds >=
+                  10800) {
+            _hasShownFatigueAlert = true;
+            AlertHelper.showWarning(
+              context: context,
+              title: 'Fatigue Alert',
+              subtext:
+                  'You have been driving for 3 hours. Please consider taking a break.',
+            );
 
+            if (!_isMuted) {
+              speech.speak(
+                  "You have been driving for three hours. Please take a rest.");
+            }
+          }
+        }
         if (distance < 10 &&
             (_isNavigatingToParking || widget.isNavigatingToParking)) {
           AppPopup.showBottomSheet(
@@ -817,6 +1038,7 @@ class _NavigationViewState extends State<NavigationView> {
 
     // Set route and start location simulation
     _visualNavigator!.route = route;
+
     _setupLocationSource(_visualNavigator!, route);
   }
 
@@ -1003,6 +1225,11 @@ class _NavigationViewState extends State<NavigationView> {
         HERE.LocationListener((HERE.Location location) {
           // Update current location
           _currentLocation = location.coordinates;
+          double? speed = location.speedInMetersPerSecond;
+
+          setState(() {
+            _speed = speed ?? 0;
+          });
 
           // reset the last location if it is in 50m
           if (_lastLatitude == 0 && _lastLongitude == 0) {
@@ -1021,6 +1248,7 @@ class _NavigationViewState extends State<NavigationView> {
 
       // Set visual navigator to follow the route
       _visualNavigator!.startRendering(_hereMapController!);
+      _setupSpeedLimitListener();
 
       // Configure map view for 3D navigation
       // _hereMapController!.camera.lookAtPoint(
@@ -1144,7 +1372,7 @@ class _NavigationViewState extends State<NavigationView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${state > 0 ? state.toFormattedDistance() : _distanceNotifier.value.toFormattedDistance()} ahead',
+                      '${_nextManuoverDistance.toFormattedDistance()} ahead',
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -1170,6 +1398,7 @@ class _NavigationViewState extends State<NavigationView> {
               onPressed: () {
                 setState(() {
                   _isMuted = !_isMuted;
+
                   // TODO: Implement actual muting of navigation instructions
                   if (_visualNavigator != null) {
                     // _visualNavigator!.isVoiceEnabled = !_isMuted;
@@ -1177,6 +1406,11 @@ class _NavigationViewState extends State<NavigationView> {
                     debugPrint('🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}');
                   }
                 });
+                if (_isMuted) {
+                  speech.mute();
+                } else {
+                  speech.unmute();
+                }
               },
             ),
           ),
@@ -1204,61 +1438,6 @@ class _NavigationViewState extends State<NavigationView> {
 
         // Time and distance indicator
         GestureDetector(
-          onDoubleTap: () {
-            toastification.show(
-              context: context,
-              type: ToastificationType.warning,
-              style: ToastificationStyle.minimal,
-              autoCloseDuration: const Duration(seconds: 5),
-              title: Text(
-                "Speed Limit Alert",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              description: Text(
-                "You are driving at speed limit, slow down",
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                ),
-              ),
-              alignment: Alignment.topCenter,
-              animationDuration: const Duration(milliseconds: 300),
-              animationBuilder: (context, animation, alignment, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              icon: Icon(Icons.warning_amber_rounded, color: Color(0xFFFF5722)),
-              showIcon: true,
-              primaryColor: Color(0xFFFF5722),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x1A000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                  spreadRadius: 0,
-                )
-              ],
-              showProgressBar: false,
-              closeButton: ToastCloseButton(
-                showType: CloseButtonShowType.none,
-              ),
-              closeOnClick: true,
-              dragToClose: true,
-              applyBlurEffect: false,
-            );
-            //   get the current location
-          },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
@@ -1364,77 +1543,12 @@ class _NavigationViewState extends State<NavigationView> {
 
           if (state.payload.alerts.isNotEmpty) {
             for (var alert in state.payload.alerts) {
-              toastification.show(
-                context: context, // optional if you use ToastificationWrapper
-                type: ToastificationType.success,
-                style: ToastificationStyle.minimal,
-                autoCloseDuration: const Duration(seconds: 5),
-                title: Text("${toBeginningOfSentenceCase(alert.type)} Alert",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black,
-                    )),
-                description: RichText(
-                  text: TextSpan(
-                    text: alert.type.toLowerCase() == "camera"
-                        ? "You are in a CCTV Camera surveillance zone "
-                        : "You are approaching a nearby radar zone",
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                alignment: Alignment.topRight,
-                animationDuration: const Duration(milliseconds: 300),
-                animationBuilder: (context, animation, alignment, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-                icon: const Icon(Icons.check),
-                showIcon: true, // show or hide the icon
-                primaryColor: Colors.green,
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x07000000),
-                    blurRadius: 16,
-                    offset: Offset(0, 16),
-                    spreadRadius: 0,
-                  )
-                ],
-                showProgressBar: true,
-                closeButton: ToastCloseButton(
-                  showType: CloseButtonShowType.onHover,
-                  buttonBuilder: (context, onClose) {
-                    return OutlinedButton.icon(
-                      onPressed: onClose,
-                      icon: const Icon(Icons.close, size: 20),
-                      label: const Text('Close'),
-                    );
-                  },
-                ),
-                closeOnClick: false,
-                pauseOnHover: true,
-                dragToClose: true,
-                applyBlurEffect: false,
-                callbacks: ToastificationCallbacks(
-                  onTap: (toastItem) => print('Toast ${toastItem.id} tapped'),
-                  onCloseButtonTap: (toastItem) =>
-                      print('Toast ${toastItem.id} close button tapped'),
-                  onAutoCompleteCompleted: (toastItem) =>
-                      print('Toast ${toastItem.id} auto complete completed'),
-                  onDismissed: (toastItem) =>
-                      print('Toast ${toastItem.id} dismissed'),
-                ),
+              AlertHelper.showWarning(
+                context: context,
+                title: "${toBeginningOfSentenceCase(alert.type)} Alert",
+                subtext: alert.type.toLowerCase() == "camera"
+                    ? "You are in a CCTV Camera surveillance zone "
+                    : "You are approaching a nearby radar zone",
               );
             }
           }
@@ -1449,7 +1563,7 @@ class _NavigationViewState extends State<NavigationView> {
               children: [
                 // Map layer
                 HereMap(onMapCreated: _onMapCreated),
-
+                _buildSpeedLimitIndicator(),
                 // Loading indicator
                 if (_isLoading) _buildLoadingIndicator(),
 
@@ -1800,8 +1914,11 @@ class EventFeedback extends StatelessWidget {
             Dimens.space(4),
             Row(
               children: <Widget>[
-                const Flexible(
+                Flexible(
                   child: PrimaryButton(
+                    onTap: () {
+                      NavigatorHelper.pop();
+                    },
                     text: 'Got it, Thank you',
                   ),
                 ),

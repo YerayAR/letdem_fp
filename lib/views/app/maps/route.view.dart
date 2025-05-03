@@ -567,10 +567,13 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                               const Spacer(),
                               Row(
                                 children: [
-                                  const Text(
-                                    "Traffic Level",
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: const Text(
+                                      "Traffic Level",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),

@@ -13,6 +13,23 @@ extension UserBlocExtension on BuildContext {
     }
     return null;
   }
+//   get is fatigue alert enabled;l
+
+  bool get isFatigueAlertEnabled {
+    final state = userBloc.state;
+    if (state is UserLoaded) {
+      return state.user.preferences.isFatigueAlert;
+    }
+    return false;
+  }
+
+  bool get isSpeedAlertEnabled {
+    final state = userBloc.state;
+    if (state is UserLoaded) {
+      return state.user.preferences.isSpeedLimitAlert;
+    }
+    return false;
+  }
 
 // List<City>? get userCities {
 //   final state = userBloc.state;
