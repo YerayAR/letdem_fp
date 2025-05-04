@@ -14,8 +14,8 @@ class SpeechService {
   Future<void> _init() async {
     if (_isInitialized) return;
     await _flutterTts.setLanguage("en-GB");
-    await _flutterTts.setSpeechRate(0.4);
-    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setSpeechRate(0.45);
+    await _flutterTts.setPitch(.8);
     _isInitialized = true;
   }
 

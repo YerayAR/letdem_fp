@@ -12,10 +12,13 @@ class SettingsRow extends StatelessWidget {
   final Widget? widget;
 
   final IconData? icon;
+
+  final Widget? leading;
   const SettingsRow(
       {super.key,
       required this.text,
       this.onTap,
+      this.leading,
       this.showDivider = true,
       this.icon,
       this.widget});
@@ -39,22 +42,35 @@ class SettingsRow extends StatelessWidget {
                         icon,
                         color: AppColors.neutral600,
                       ),
-                    Text(
-                      text,
-                      style: Typo.mediumBody.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.neutral600,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          text,
+                          style: Typo.mediumBody.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.neutral600,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 SizedBox(
-                  child: widget ??
-                      Icon(
-                        Iconsax.arrow_right_3,
-                        color: AppColors.neutral300,
-                      ),
+                  child: Row(
+                    children: [
+                      if (leading != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: leading!,
+                        ),
+                      widget ??
+                          Icon(
+                            Iconsax.arrow_right_3,
+                            color: AppColors.neutral300,
+                          ),
+                    ],
+                  ),
                 ),
               ],
             ),

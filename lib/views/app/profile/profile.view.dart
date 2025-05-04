@@ -9,12 +9,15 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/screens/view_all.view.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
+import 'package:letdem/views/app/profile/popups/connect_account/money_laundry.popup.dart';
+import 'package:letdem/views/app/profile/screens/connect_account/connect_account.view.dart';
 import 'package:letdem/views/app/profile/screens/edit/edit_basic_info.view.dart';
 import 'package:letdem/views/app/profile/screens/language/change_language.view.dart';
 import 'package:letdem/views/app/profile/screens/security/security.view.dart';
@@ -162,10 +165,31 @@ class ProfileView extends StatelessWidget {
                               onTap: () {},
                             ),
                             SettingsRow(
+                              leading: DecoratedChip(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                backgroundColor: AppColors.green600,
+                                textStyle: Typo.smallBody.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                text: 'Connect Account',
+                                color: AppColors.green500,
+                              ),
                               icon: IconlyLight.wallet,
                               text: context.l10n.earnings,
                               showDivider: false,
-                              onTap: () {},
+                              onTap: () {
+                                AppPopup.showBottomSheet(context,
+                                    MoneyLaundryPopup(
+                                  onContinue: () {
+                                    NavigatorHelper.to(ProfileOnboardingApp());
+                                  },
+                                ));
+                              },
                             ),
                           ],
                         ))

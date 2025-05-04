@@ -13,6 +13,7 @@ import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/tts/tts.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/home/widgets/search/search_bottom_sheet.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
@@ -71,9 +72,14 @@ class HomeMapBottomSection extends StatelessWidget {
               ),
             ),
             Dimens.space(2),
-            Text(
-              context.l10n.whatDoYouWantToDo,
-              style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),
+            GestureDetector(
+              onTap: () {
+                SpeechService().speak("Esto es tan genial que me gusta mucho");
+              },
+              child: Text(
+                context.l10n.whatDoYouWantToDo,
+                style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),
+              ),
             ),
             Dimens.space(2),
             Row(

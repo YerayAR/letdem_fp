@@ -385,24 +385,45 @@ class _NavigationViewState extends State<NavigationView> {
       MapFeatures.vehicleRestrictions:
           MapFeatureModes.vehicleRestrictionsActiveAndInactive
     });
-
-    // Set up gesture callbacks to detect user panning
-    _hereMapController?.gestures.panListener = PanListener((GestureState state,
-        HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
-      if (state == GestureState.begin) {
-        setState(() {
-          _isUserPanning = true;
-        });
-      }
-    });
-
-    // Enable tap gestures for marker selection
     _hereMapController?.gestures.tapListener =
         TapListener((HERE.Point2D touchPoint) {
       _pickMapMarker(touchPoint);
     });
+    _hereMapController?.gestures.panListener = PanListener((GestureState state,
+        HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
+      if (state == GestureState.begin) {
+        // User started panning - disable automatic camera tracking
+        if (_isCameraLocked && _visualNavigator != null) {
+          setState(() {
+            _isUserPanning = true;
+            _isCameraLocked = false;
+          });
+          _visualNavigator!.cameraBehavior = null;
+          debugPrint('🖐️ User panning detected, disabled camera tracking');
+        }
+      }
+    });
 
     _loadMapScene();
+  }
+
+  void _toggleCameraTracking() {
+    if (_visualNavigator == null) return;
+
+    setState(() {
+      _isCameraLocked = !_isCameraLocked;
+      _isUserPanning = false;
+    });
+
+    if (_isCameraLocked) {
+      // Re-enable camera tracking
+      _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
+      debugPrint('🔒 Camera tracking re-enabled');
+    } else {
+      // Disable camera tracking
+      _visualNavigator!.cameraBehavior = null;
+      debugPrint('🔓 Camera tracking disabled');
+    }
   }
 
   bool _isUserPanning = false;
@@ -763,7 +784,6 @@ class _NavigationViewState extends State<NavigationView> {
     // Clear existing markers
     _hereMapController?.mapScene.removeMapMarkers(_spaceMarkers.keys.toList());
     _spaceMarkers.clear();
-
     for (var space in events) {
       try {
         Uint8List imageData = _assetsProvider.getEventIcon(space.type);
@@ -1566,7 +1586,25 @@ class _NavigationViewState extends State<NavigationView> {
                 _buildSpeedLimitIndicator(),
                 // Loading indicator
                 if (_isLoading) _buildLoadingIndicator(),
-
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 200,
+                  right: _mapPadding,
+                  child: CircleAvatar(
+                    radius: _buttonRadius,
+                    backgroundColor: Colors.white,
+                    child: IconButton(
+                      icon: Icon(
+                        _isCameraLocked ? Icons.gps_fixed : Icons.gps_not_fixed,
+                        color: _isCameraLocked
+                            ? AppColors.primary500
+                            : Colors.grey,
+                      ),
+                      onPressed: _toggleCameraTracking,
+                      tooltip:
+                          _isCameraLocked ? "Free camera" : "Lock to position",
+                    ),
+                  ),
+                ),
                 // Error message
                 if (_errorMessage.isNotEmpty) _buildErrorMessage(),
 
