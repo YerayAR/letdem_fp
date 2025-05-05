@@ -7,6 +7,7 @@ import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/features/car/dto/create_car.dto.dart';
+import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
@@ -223,6 +224,22 @@ class EndPoints {
     );
   }
 
+  static Endpoint<EarningsAccountDTO> submitEarningsAccount = Endpoint(
+    url: "/credits/earnings/account",
+    method: HTTPMethod.POST,
+  );
+  static Endpoint<EarningsAddressDTO> submitEarningsAddress = Endpoint(
+    url: "/credits/earnings/address",
+    method: HTTPMethod.POST,
+  );
+  static Endpoint<EarningsDocumentDTO> submitEarningsDocument = Endpoint(
+    url: "/credits/earnings/document",
+    method: HTTPMethod.POST,
+  );
+  static Endpoint<EarningsBankAccountDTO> submitBankAccount = Endpoint(
+    url: "/credits/earnings/bank-account",
+    method: HTTPMethod.POST,
+  );
   static markNotificationAsRead(String id) {
     return Endpoint(
       url: "/users/me/notifications/$id/read",

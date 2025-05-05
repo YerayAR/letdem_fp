@@ -23,6 +23,8 @@ import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
+import 'package:letdem/features/earning_account/earning_account_bloc.dart';
+import 'package:letdem/features/earning_account/repository/earning.repository.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
@@ -127,6 +129,9 @@ void main() async {
           RepositoryProvider<ActivityRepository>(
             create: (_) => ActivityRepository(),
           ),
+          RepositoryProvider<EarningsRepository>(
+            create: (_) => EarningsRepository(),
+          ),
           RepositoryProvider(
             create: (_) => SearchLocationRepository(),
           ),
@@ -145,6 +150,11 @@ void main() async {
         ],
         child: MultiBlocProvider(
             providers: [
+              BlocProvider(
+                create: (context) => EarningsBloc(
+                  repository: context.read<EarningsRepository>(),
+                ),
+              ),
               BlocProvider(
                 create: (context) => MapBloc(
                   mapRepository: context.read<MapRepository>(),

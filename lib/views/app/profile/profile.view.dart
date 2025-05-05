@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -176,19 +177,39 @@ class ProfileView extends StatelessWidget {
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
                                 ),
-                                text: 'Connect Account',
-                                color: AppColors.green500,
+                                text:
+                                    context.userProfile!.earningAccount == null
+                                        ? context.l10n.connectAccount
+                                        : toBeginningOfSentenceCase(context
+                                            .userProfile!.earningAccount!.status
+                                            .replaceAll("_", " ")
+                                            .toLowerCase()),
+                                color:
+                                    context.userProfile!.earningAccount == null
+                                        ? AppColors.green600
+                                        : context.userProfile!.earningAccount!
+                                                    .status ==
+                                                "MISSING_INFO"
+                                            ? Colors.red
+                                            : AppColors.red500,
                               ),
                               icon: IconlyLight.wallet,
                               text: context.l10n.earnings,
                               showDivider: false,
                               onTap: () {
-                                AppPopup.showBottomSheet(context,
-                                    MoneyLaundryPopup(
-                                  onContinue: () {
-                                    NavigatorHelper.to(ProfileOnboardingApp());
-                                  },
-                                ));
+                                if (context.userProfile!.earningAccount ==
+                                    null) {
+                                  AppPopup.showBottomSheet(context,
+                                      MoneyLaundryPopup(
+                                    onContinue: () {
+                                      NavigatorHelper.to(
+                                          const ProfileOnboardingApp());
+                                    },
+                                  ));
+                                } else {
+                                  NavigatorHelper.to(
+                                      const ProfileOnboardingApp());
+                                }
                               },
                             ),
                           ],

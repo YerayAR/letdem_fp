@@ -96,6 +96,87 @@ abstract class IUserRepository {
   Future<void> updateUser(EditBasicInfoDTO dto);
 }
 
+class AddressInfo {
+  // Replace with actual fields
+  AddressInfo();
+
+  factory AddressInfo.fromJson(Map<String, dynamic> json) {
+    return AddressInfo(); // Implement properly once you know the fields
+  }
+}
+
+class DocumentInfo {
+  // Replace with actual fields
+  DocumentInfo();
+
+  factory DocumentInfo.fromJson(Map<String, dynamic> json) {
+    return DocumentInfo(); // Implement properly once you know the fields
+  }
+}
+
+class PayoutMethod {
+  // Replace with actual fields
+  PayoutMethod();
+
+  factory PayoutMethod.fromJson(Map<String, dynamic> json) {
+    return PayoutMethod(); // Implement properly once you know the fields
+  }
+}
+
+class EarningAccount {
+  final double balance;
+  final double pendingBalance;
+  final String currency;
+  final String legalFirstName;
+  final String legalLastName;
+  final String phone;
+  final String birthday;
+  final String status;
+  final String step;
+  final AddressInfo? address;
+  final DocumentInfo? document;
+  final List<PayoutMethod> payoutMethods;
+
+  EarningAccount({
+    required this.balance,
+    required this.pendingBalance,
+    required this.currency,
+    required this.legalFirstName,
+    required this.legalLastName,
+    required this.phone,
+    required this.birthday,
+    required this.status,
+    required this.step,
+    this.address,
+    this.document,
+    required this.payoutMethods,
+  });
+
+  factory EarningAccount.fromJson(Map<String, dynamic> json) {
+    return EarningAccount(
+      balance: double.parse(json['balance'].toString()),
+      pendingBalance: double.parse((json['pending_balance']).toString()),
+      currency: json['currency'] ?? '',
+      legalFirstName: json['legal_first_name'] ?? '',
+      legalLastName: json['legal_last_name'] ?? '',
+      phone: json['phone'] ?? '',
+      birthday: json['birthday'] ?? '',
+      status: json['status'] ?? '',
+      step: json['step'] ?? '',
+      address: json['address'] != null
+          ? AddressInfo.fromJson(json['address'])
+          : null,
+      document: json['document'] != null
+          ? DocumentInfo.fromJson(json['document'])
+          : null,
+      payoutMethods: (json['payout_methods'] as List<dynamic>?)
+              ?.map((e) => PayoutMethod.fromJson(e))
+              .toList() ??
+          [],
+    );
+  }
+}
+
 class LetDemUser {
   final String id;
   final String email;
@@ -108,6 +189,8 @@ class LetDemUser {
 
   final List<Activity> contributions;
 
+  final EarningAccount? earningAccount;
+
   final UserPreferences preferences;
 
   final NotificationPreferences notificationPreferences;
@@ -119,6 +202,7 @@ class LetDemUser {
     required this.notificationPreferences,
     required this.firstName,
     required this.lastName,
+    this.earningAccount,
     required this.isSocial,
     required this.totalPoints,
     required this.notificationsCount,
@@ -132,6 +216,9 @@ class LetDemUser {
           NotificationPreferences.fromJSON(json['notifications_preferences']),
       email: json['email'] ?? '',
       firstName: json['first_name'] ?? '',
+      earningAccount: json['earning_account'] != null
+          ? EarningAccount.fromJson(json['earning_account'])
+          : null,
       preferences: UserPreferences(
         isProhibitedZoneAlert: json['alerts_preferences']
             ['prohibited_zone_alert'],

@@ -1,13 +1,51 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:letdem/features/earning_account/earning_account_state.dart';
+import 'package:letdem/features/earning_account/repository/earning.repository.dart';
 
-part 'earning_account_event.dart';
-part 'earning_account_state.dart';
+import 'earning_account_event.dart';
 
-class EarningAccountBloc extends Bloc<EarningAccountEvent, EarningAccountState> {
-  EarningAccountBloc() : super(EarningAccountInitial()) {
-    on<EarningAccountEvent>((event, emit) {
-      // TODO: implement event handler
+class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
+  final EarningsRepository repository;
+
+  EarningsBloc({required this.repository}) : super(EarningsInitial()) {
+    on<SubmitEarningsAccount>((event, emit) async {
+      emit(EarningsLoading());
+      try {
+        await repository.submitAccount(event.dto);
+        emit(EarningsSuccess());
+      } catch (e) {
+        emit(EarningsFailure(e.toString()));
+      }
+    });
+
+    on<SubmitEarningsAddress>((event, emit) async {
+      emit(EarningsLoading());
+      try {
+        await repository.submitAddress(event.dto);
+        emit(EarningsSuccess());
+      } catch (e) {
+        emit(EarningsFailure(e.toString()));
+      }
+    });
+
+    on<SubmitEarningsDocument>((event, emit) async {
+      emit(EarningsLoading());
+      try {
+        await repository.submitDocument(event.dto);
+        emit(EarningsSuccess());
+      } catch (e) {
+        emit(EarningsFailure(e.toString()));
+      }
+    });
+
+    on<SubmitEarningsBankAccount>((event, emit) async {
+      emit(EarningsLoading());
+      try {
+        await repository.submitBankAccount(event.dto);
+        emit(EarningsSuccess());
+      } catch (e) {
+        emit(EarningsFailure(e.toString()));
+      }
     });
   }
 }
