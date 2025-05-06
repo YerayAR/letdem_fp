@@ -8,6 +8,22 @@ import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/views/app/profile/screens/preferences/preferences.view.dart';
 
+enum EarningStatus {
+  missingInfo,
+  pending,
+  rejected,
+  blocked,
+  accepted,
+}
+
+enum EarningStep {
+  personalInfo,
+  addressInfo,
+  documentUpload,
+  bankAccountInfo,
+  submitted,
+}
+
 class UserRepository extends IUserRepository {
   @override
   Future<void> createUser() {
@@ -131,8 +147,8 @@ class EarningAccount {
   final String legalLastName;
   final String phone;
   final String birthday;
-  final String status;
-  final String step;
+  final EarningStatus status;
+  final EarningStep step;
   final AddressInfo? address;
   final DocumentInfo? document;
   final List<PayoutMethod> payoutMethods;
@@ -154,15 +170,16 @@ class EarningAccount {
 
   factory EarningAccount.fromJson(Map<String, dynamic> json) {
     return EarningAccount(
-      balance: double.parse(json['balance'].toString()),
-      pendingBalance: double.parse((json['pending_balance']).toString()),
+      balance: double.tryParse(json['balance'].toString()) ?? 0.0,
+      pendingBalance:
+          double.tryParse((json['pending_balance']).toString()) ?? 0.0,
       currency: json['currency'] ?? '',
       legalFirstName: json['legal_first_name'] ?? '',
       legalLastName: json['legal_last_name'] ?? '',
       phone: json['phone'] ?? '',
       birthday: json['birthday'] ?? '',
-      status: json['status'] ?? '',
-      step: json['step'] ?? '',
+      status: parseEarningStatus(json['status'].toString().toLowerCase()),
+      step: parseEarningStep(json['step'].toString().toLowerCase()),
       address: json['address'] != null
           ? AddressInfo.fromJson(json['address'])
           : null,
@@ -174,6 +191,70 @@ class EarningAccount {
               .toList() ??
           [],
     );
+  }
+}
+
+EarningStatus parseEarningStatus(String? value) {
+  switch (value) {
+    case 'missing_info':
+      return EarningStatus.missingInfo;
+    case 'pending':
+      return EarningStatus.pending;
+    case 'rejected':
+      return EarningStatus.rejected;
+    case 'blocked':
+      return EarningStatus.blocked;
+    case 'accepted':
+      return EarningStatus.accepted;
+    default:
+      return EarningStatus.missingInfo;
+  }
+}
+
+EarningStep parseEarningStep(String? value) {
+  switch (value) {
+    case 'personal_info':
+      return EarningStep.personalInfo;
+    case 'address_info':
+      return EarningStep.addressInfo;
+    case 'document_info':
+      return EarningStep.documentUpload;
+    case 'bank_account_info':
+      return EarningStep.bankAccountInfo;
+    case 'submitted':
+      return EarningStep.submitted;
+    default:
+      return EarningStep.personalInfo;
+  }
+}
+
+getStatusString(EarningStatus status) {
+  switch (status) {
+    case EarningStatus.missingInfo:
+      return 'Missing Info';
+    case EarningStatus.pending:
+      return 'Pending';
+    case EarningStatus.rejected:
+      return 'Rejected';
+    case EarningStatus.blocked:
+      return 'Blocked';
+    case EarningStatus.accepted:
+      return 'Accepted';
+  }
+}
+
+getStepString(EarningStep step) {
+  switch (step) {
+    case EarningStep.personalInfo:
+      return 'Personal Info';
+    case EarningStep.addressInfo:
+      return 'Address Info';
+    case EarningStep.documentUpload:
+      return 'Document Upload';
+    case EarningStep.bankAccountInfo:
+      return 'Bank Account Info';
+    case EarningStep.submitted:
+      return 'Submitted';
   }
 }
 

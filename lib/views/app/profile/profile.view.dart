@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
+import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
@@ -171,7 +171,14 @@ class ProfileView extends StatelessWidget {
                                   horizontal: 12,
                                   vertical: 4,
                                 ),
-                                backgroundColor: AppColors.green600,
+                                backgroundColor:
+                                    context.userProfile!.earningAccount == null
+                                        ? AppColors.green600
+                                        : context.userProfile!.earningAccount!
+                                                    .status ==
+                                                EarningStatus.missingInfo
+                                            ? Colors.red
+                                            : AppColors.red500,
                                 textStyle: Typo.smallBody.copyWith(
                                   color: Colors.white,
                                   fontSize: 11,
@@ -180,16 +187,14 @@ class ProfileView extends StatelessWidget {
                                 text:
                                     context.userProfile!.earningAccount == null
                                         ? context.l10n.connectAccount
-                                        : toBeginningOfSentenceCase(context
-                                            .userProfile!.earningAccount!.status
-                                            .replaceAll("_", " ")
-                                            .toLowerCase()),
+                                        : getStatusString(context.userProfile!
+                                            .earningAccount!.status),
                                 color:
                                     context.userProfile!.earningAccount == null
                                         ? AppColors.green600
                                         : context.userProfile!.earningAccount!
                                                     .status ==
-                                                "MISSING_INFO"
+                                                EarningStatus.missingInfo
                                             ? Colors.red
                                             : AppColors.red500,
                               ),
@@ -202,13 +207,21 @@ class ProfileView extends StatelessWidget {
                                   AppPopup.showBottomSheet(context,
                                       MoneyLaundryPopup(
                                     onContinue: () {
-                                      NavigatorHelper.to(
-                                          const ProfileOnboardingApp());
+                                      NavigatorHelper.to(ProfileOnboardingApp(
+                                        remainingStep: context
+                                            .userProfile!.earningAccount!.step,
+                                        status: context.userProfile!
+                                            .earningAccount!.status,
+                                      ));
                                     },
                                   ));
                                 } else {
-                                  NavigatorHelper.to(
-                                      const ProfileOnboardingApp());
+                                  NavigatorHelper.to(ProfileOnboardingApp(
+                                    remainingStep: context
+                                        .userProfile!.earningAccount!.step,
+                                    status: context
+                                        .userProfile!.earningAccount!.status,
+                                  ));
                                 }
                               },
                             ),

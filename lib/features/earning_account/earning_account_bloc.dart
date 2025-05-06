@@ -1,8 +1,29 @@
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
+import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
+import 'package:letdem/views/app/profile/screens/connect_account/connect_account.view.dart';
 
 import 'earning_account_event.dart';
+
+Future<IpApiResponse?> fetchIpApiInfo() async {
+  try {
+    final response = await http.get(Uri.parse('https://ipapi.co/json/'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return IpApiResponse.fromJson(data);
+    } else {
+      print('Failed to fetch IP info: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Error fetching IP info: $e');
+    return null;
+  }
+}
 
 class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
   final EarningsRepository repository;
@@ -11,7 +32,14 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
     on<SubmitEarningsAccount>((event, emit) async {
       emit(EarningsLoading());
       try {
-        await repository.submitAccount(event.dto);
+        await repository.submitAccount(EarningsAccountDTO(
+          country: event.dto.country,
+          userIp: event.dto.userIp,
+          legalFirstName: event.dto.legalFirstName,
+          legalLastName: event.dto.legalLastName,
+          phone: event.dto.phone,
+          birthday: event.dto.birthday,
+        ));
         emit(EarningsSuccess());
       } catch (e) {
         emit(EarningsFailure(e.toString()));

@@ -147,7 +147,7 @@ class TextInputFieldState extends State<TextInputField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return 'Please enter${widget.placeHolder.toLowerCase().replaceAll("enter", "")}';
+                  return 'Please enter${widget.label?.toLowerCase().replaceAll("enter", "")}';
                 }
                 if (widget.inputType == TextFieldType.password &&
                     value.length < 8) {

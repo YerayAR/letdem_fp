@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -7,16 +9,21 @@ import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
+import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/services/file_picker/file_picker.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 
 import '../../../../../constants/ui/typo.dart';
 
 class ProfileOnboardingApp extends StatefulWidget {
-  const ProfileOnboardingApp({Key? key}) : super(key: key);
+  final EarningStatus status;
+  final EarningStep remainingStep;
+  const ProfileOnboardingApp(
+      {super.key, required this.status, required this.remainingStep});
 
   @override
   State<ProfileOnboardingApp> createState() => _ProfileOnboardingAppState();
@@ -24,7 +31,52 @@ class ProfileOnboardingApp extends StatefulWidget {
 
 class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
   final PageController _pageController = PageController();
+  late final List<Widget> _pages;
+
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = _buildPagesBasedOnStatus(widget.status, widget.remainingStep);
+  }
+
+  List<Widget> _buildPagesBasedOnStatus(
+      EarningStatus status, EarningStep step) {
+    final pages = <Widget>[];
+
+    void addStep() {
+      switch (widget.remainingStep) {
+        case EarningStep.personalInfo:
+          pages.add(PersonalInfoPage(onNext: _goToNextPage));
+          break;
+        case EarningStep.bankAccountInfo:
+          pages.add(BankInfoView(onNext: _goToNextPage));
+          break;
+        case EarningStep.addressInfo:
+          pages.add(AddressInfoPage(onNext: _goToNextPage));
+          break;
+        case EarningStep.documentUpload:
+          pages.add(UploadIDPictureView(onNext: _goToNextPage));
+          pages.add(IDTypePage(onNext: _goToNextPage));
+          break;
+        case EarningStep.submitted:
+          pages.add(const Center(
+            child: Text("Submitted"),
+          ));
+          break;
+      }
+    }
+
+    if (status == EarningStatus.accepted || status == EarningStatus.blocked) {
+      // Skip onboarding completely for accepted or blocked users
+      return [];
+    }
+
+    addStep();
+
+    return pages;
+  }
 
   @override
   void dispose() {
@@ -33,7 +85,7 @@ class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
   }
 
   void _goToNextPage() {
-    if (_currentPage < 5) {
+    if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -50,7 +102,7 @@ class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
             // Fixed header with progress bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: _buildHeader(_currentPage),
+              child: _buildHeader(_currentPage, _pages.length),
             ),
             const SizedBox(height: 30),
 
@@ -65,14 +117,7 @@ class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
                     _currentPage = index;
                   });
                 },
-                children: [
-                  CountrySelectionPage(onNext: _goToNextPage),
-                  PersonalInfoPage(onNext: _goToNextPage),
-                  AddressInfoPage(onNext: _goToNextPage),
-                  IDTypePage(onNext: _goToNextPage),
-                  UploadIDPictureView(onNext: _goToNextPage),
-                  BankInfoView(onNext: _goToNextPage),
-                ],
+                children: _pages,
               ),
             ),
           ],
@@ -135,6 +180,26 @@ class CountrySelectionPage extends StatelessWidget {
           _buildNextButton(context, onNext),
         ],
       ),
+    );
+  }
+}
+
+class IpApiResponse {
+  final String ip;
+  final String countryName;
+  final String countryCode;
+
+  IpApiResponse({
+    required this.ip,
+    required this.countryName,
+    required this.countryCode,
+  });
+
+  factory IpApiResponse.fromJson(Map<String, dynamic> json) {
+    return IpApiResponse(
+      ip: json['ip'] ?? '',
+      countryName: json['country_name'] ?? '',
+      countryCode: json['country'] ?? '',
     );
   }
 }
@@ -425,8 +490,10 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
   Widget _buildIDTypeOption({
     required String title,
     required String subtitle,
-    required bool value,
+    required File? file,
+    required bool isSelected,
     required VoidCallback onTap,
+    required VoidCallback onDelete,
   }) {
     return InkWell(
       onTap: onTap,
@@ -442,11 +509,13 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
         child: Row(
           children: [
             CircleAvatar(
-              radius: 26,
-              backgroundColor: AppColors.neutral100.withOpacity(0.4),
+              radius: isSelected ? 20 : 26,
+              backgroundColor: isSelected
+                  ? AppColors.green500.withOpacity(0.17)
+                  : AppColors.neutral100.withOpacity(0.4),
               child: Icon(
-                Iconsax.gallery5,
-                color: AppColors.neutral600,
+                isSelected ? Icons.done : Iconsax.card5,
+                color: isSelected ? AppColors.green500 : AppColors.neutral600,
                 size: 26,
               ),
             ),
@@ -456,21 +525,30 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    !isSelected ? title : 'Upload completed',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    subtitle,
+                    file != null ? file.path.split('/').last : subtitle,
                     style: TextStyle(fontSize: 12, color: AppColors.neutral600),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Iconsax.arrow_right_3,
-              color: AppColors.neutral600.withOpacity(0.4),
-              size: 26,
+            Dimens.space(2),
+            GestureDetector(
+              onTap: onDelete,
+              child: CircleAvatar(
+                backgroundColor: isSelected
+                    ? AppColors.neutral100.withOpacity(0.17)
+                    : Colors.transparent,
+                child: Icon(
+                  isSelected ? Iconsax.trash : Iconsax.arrow_right_3,
+                  color: AppColors.neutral600.withOpacity(0.4),
+                  size: 24,
+                ),
+              ),
             ),
           ],
         ),
@@ -478,7 +556,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
     );
   }
 
-  void inIDTypeSelected(bool isFront) {
+  void inIDTypeSelected(bool isFront, Function(File file) onFileSelected) {
     AppPopup.showBottomSheet(
       context,
       Padding(
@@ -503,26 +581,37 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
             ],
           ),
           Dimens.space(3),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.primary50,
-                child: Icon(
-                  Iconsax.camera,
-                  color: AppColors.primary500,
-                  size: 14,
+          GestureDetector(
+            onTap: () async {
+              final file =
+                  await FileService().pickFile(FileSourceOption.camera);
+
+              if (file != null) {
+                onFileSelected(file);
+                NavigatorHelper.pop();
+              }
+            },
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: AppColors.primary50,
+                  child: Icon(
+                    Iconsax.camera,
+                    color: AppColors.primary500,
+                    size: 14,
+                  ),
                 ),
-              ),
-              Dimens.space(2),
-              Text(
-                'Open Camera',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
+                Dimens.space(2),
+                Text(
+                  'Open Camera',
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Dimens.space(2),
           Divider(
@@ -531,32 +620,46 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
           ),
           Dimens.space(2),
           // Delete Notification
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.red50,
-                child: Icon(
-                  Iconsax.document,
-                  color: AppColors.red500,
-                  size: 14,
+          GestureDetector(
+            onTap: () async {
+              final file =
+                  await FileService().pickFile(FileSourceOption.upload);
+
+              if (file != null) {
+                onFileSelected(file);
+                NavigatorHelper.pop();
+              }
+            },
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: AppColors.red50,
+                  child: Icon(
+                    Iconsax.document,
+                    color: AppColors.red500,
+                    size: 14,
+                  ),
                 ),
-              ),
-              Dimens.space(2),
-              Text(
-                'Upload',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
+                Dimens.space(2),
+                Text(
+                  'Upload',
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Dimens.space(4),
         ]),
       ),
     );
   }
+
+  File? _fileFront;
+  File? _fileBack;
 
   @override
   Widget build(BuildContext context) {
@@ -575,17 +678,38 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
           ),
           const SizedBox(height: 30),
           _buildIDTypeOption(
+            onDelete: () {
+              setState(() {
+                _fileFront = null;
+              });
+            }, // Delete Notification
+
+            file: _fileFront,
             title: 'Tap to upload ID Card Front',
             subtitle: 'Only images supported Max: 2MB',
-            value: true,
-            onTap: () => inIDTypeSelected(true),
+            isSelected: _fileFront != null,
+            onTap: () => inIDTypeSelected(true, (file) {
+              setState(() {
+                _fileFront = file;
+              });
+            }),
           ),
           const SizedBox(height: 16),
           _buildIDTypeOption(
+            file: _fileBack,
+            onDelete: () {
+              setState(() {
+                _fileBack = null;
+              });
+            },
             title: 'Tap to upload ID Card Back',
             subtitle: 'Only images supported Max: 2MB',
-            value: false,
-            onTap: () => inIDTypeSelected(false),
+            isSelected: _fileBack != null,
+            onTap: () => inIDTypeSelected(false, (file) {
+              setState(() {
+                _fileBack = file;
+              });
+            }),
           ),
 
           // Add your upload ID picture widget here
@@ -716,7 +840,7 @@ class _IDTypePageState extends State<IDTypePage> {
   }
 }
 
-Widget _buildHeader(int pageIndex) {
+Widget _buildHeader(int pageIndex, int totalPages) {
   return Row(
     children: [
       IconButton(
@@ -729,7 +853,7 @@ Widget _buildHeader(int pageIndex) {
       Expanded(
         child: Row(
           children: List.generate(
-            4, // Fixing to number of actual pages
+            totalPages,
             (index) => Expanded(
               child: Container(
                 height: 4,
