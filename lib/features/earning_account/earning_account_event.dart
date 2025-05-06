@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 
@@ -27,12 +29,15 @@ class SubmitEarningsAddress extends EarningsEvent {
 }
 
 class SubmitEarningsDocument extends EarningsEvent {
-  final EarningsDocumentDTO dto;
+  final File? frontSide;
+  final File? backSide;
+  final String documentType;
 
-  const SubmitEarningsDocument(this.dto);
+  const SubmitEarningsDocument(
+      this.frontSide, this.backSide, this.documentType);
 
   @override
-  List<Object?> get props => [dto];
+  List<Object?> get props => [frontSide, backSide, documentType];
 }
 
 class SubmitEarningsBankAccount extends EarningsEvent {

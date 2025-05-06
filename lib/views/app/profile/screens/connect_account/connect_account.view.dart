@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -57,8 +58,8 @@ class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
           pages.add(AddressInfoPage(onNext: _goToNextPage));
           break;
         case EarningStep.documentUpload:
-          pages.add(UploadIDPictureView(onNext: _goToNextPage));
           pages.add(IDTypePage(onNext: _goToNextPage));
+          pages.add(UploadIDPictureView(onNext: _goToNextPage));
           break;
         case EarningStep.submitted:
           pages.add(const Center(
@@ -374,10 +375,9 @@ class _BankInfoViewState extends State<BankInfoView> {
               const Spacer(),
               BlocBuilder<EarningsBloc, EarningsState>(
                 builder: (context, state) {
-                  return PrimaryButton(
-                    onTap: state is EarningsLoading ? null : _submit,
-                    text: state is EarningsLoading ? "Submitting..." : "Next",
-                  );
+                  return _buildNextButton(context, () {
+                    _submit();
+                  });
                 },
               ),
             ],
@@ -714,9 +714,29 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
 
           // Add your upload ID picture widget here
           const Spacer(),
-          _buildNextButton(
-            context,
-            widget.onNext,
+          BlocConsumer<EarningsBloc, EarningsState>(
+            listener: (context, state) {
+              // TODO: implement listener
+            },
+            builder: (context, state) {
+              return _buildNextButton(
+                context,
+                () {
+                  if (_fileFront != null && _fileBack != null) {
+                    context.read<EarningsBloc>().add(
+                          SubmitEarningsDocument(
+                            _fileFront!,
+                            _fileBack!,
+                            'NATIONAL_ID',
+                          ),
+                        );
+                    widget.onNext();
+                  } else {
+                    Toast.showError("Please upload both sides of your ID");
+                  }
+                },
+              );
+            },
           ),
         ],
       ),
@@ -877,6 +897,7 @@ Widget _buildNextButton(BuildContext context, VoidCallback onNext) {
   return SizedBox(
     width: double.infinity,
     child: PrimaryButton(
+      isLoading: context.read<EarningsBloc>().state is EarningsLoading,
       onTap: onNext,
       text: ('Next'),
     ),
@@ -892,4 +913,29 @@ Widget _buildProfileIcon(Color color) {
       shape: BoxShape.circle,
     ),
   );
+}
+
+extension FileBase64Extension on File {
+  /// Converts this File to a base64 string.
+  Future<String> toBase64() async {
+    try {
+      final bytes = await readAsBytes();
+      return base64Encode(bytes);
+    } catch (e) {
+      print('[FileBase64Extension] Failed to encode to base64: $e');
+      return '';
+    }
+  }
+
+  /// Converts this File to a base64 Data URI (optional: use for images or display).
+  Future<String> toBase64DataUri(
+      {String mimeType = 'application/octet-stream'}) async {
+    try {
+      final base64Str = await toBase64();
+      return 'data:$mimeType;base64,$base64Str';
+    } catch (e) {
+      print('[FileBase64Extension] Failed to generate data URI: $e');
+      return '';
+    }
+  }
 }

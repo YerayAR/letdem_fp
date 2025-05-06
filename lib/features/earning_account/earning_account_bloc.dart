@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
+import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/views/app/profile/screens/connect_account/connect_account.view.dart';
 
 import 'earning_account_event.dart';
@@ -41,6 +42,8 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
           birthday: event.dto.birthday,
         ));
         emit(EarningsSuccess());
+      } on ApiError catch (er) {
+        emit(EarningsFailure(er.message));
       } catch (e) {
         emit(EarningsFailure(e.toString()));
       }
@@ -51,6 +54,8 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
       try {
         await repository.submitAddress(event.dto);
         emit(EarningsSuccess());
+      } on ApiError catch (er) {
+        emit(EarningsFailure(er.message));
       } catch (e) {
         emit(EarningsFailure(e.toString()));
       }
@@ -59,8 +64,24 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
     on<SubmitEarningsDocument>((event, emit) async {
       emit(EarningsLoading());
       try {
-        await repository.submitDocument(event.dto);
+        var base64FrontSide = event.frontSide != null
+            ? base64Encode(await event.frontSide!.readAsBytes())
+            : null;
+
+        var base64BackSide = event.backSide != null
+            ? base64Encode(await event.backSide!.readAsBytes())
+            : null;
+
+        await repository.submitDocument(
+          EarningsDocumentDTO(
+            documentType: event.documentType,
+            frontSide: base64FrontSide!,
+            backSide: base64BackSide!,
+          ),
+        );
         emit(EarningsSuccess());
+      } on ApiError catch (er) {
+        emit(EarningsFailure(er.message));
       } catch (e) {
         emit(EarningsFailure(e.toString()));
       }
@@ -71,6 +92,8 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
       try {
         await repository.submitBankAccount(event.dto);
         emit(EarningsSuccess());
+      } on ApiError catch (er) {
+        emit(EarningsFailure(er.message));
       } catch (e) {
         emit(EarningsFailure(e.toString()));
       }
