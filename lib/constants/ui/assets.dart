@@ -34,6 +34,10 @@ class AppAssets {
 
   static String carTagZero = 'assets/icon/car_tags/zero.svg';
   static String carTagEco = 'assets/icon/car_tags/eco.svg';
+
+  static String visa = 'assets/icon/visa.png';
+  static String masterCard = 'assets/icon/mastercard.png';
+
   static String carTagC = 'assets/icon/car_tags/c.svg';
   static String carTagB = 'assets/icon/car_tags/b.svg';
   static String carTagNone = 'assets/icon/car_tags/none.svg';

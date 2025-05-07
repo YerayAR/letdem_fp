@@ -247,6 +247,30 @@ class EndPoints {
     );
   }
 
+  static Endpoint addPaymentMethod = Endpoint(
+    url: '/credits/payment-methods',
+    method: HTTPMethod.POST,
+  );
+
+  static Endpoint getPaymentMethods = Endpoint(
+    url: '/credits/payment-methods',
+    method: HTTPMethod.GET,
+  );
+
+  static Endpoint removePaymentMethod(String id) {
+    return Endpoint(
+      url: '/users/me/payment-methods/$id/',
+      method: HTTPMethod.DELETE,
+    );
+  }
+
+  static Endpoint setDefaultPaymentMethod(String id) {
+    return Endpoint(
+      url: '/users/me/payment-methods/$id/default/',
+      method: HTTPMethod.PUT,
+    );
+  }
+
   static Endpoint<EventFeedBackDTO> eventFeedBack(
     String id,
   ) =>

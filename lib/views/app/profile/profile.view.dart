@@ -17,6 +17,7 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/screens/view_all.view.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
+import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
 import 'package:letdem/views/app/profile/popups/connect_account/money_laundry.popup.dart';
 import 'package:letdem/views/app/profile/screens/connect_account/connect_account.view.dart';
 import 'package:letdem/views/app/profile/screens/edit/edit_basic_info.view.dart';
@@ -163,7 +164,9 @@ class ProfileView extends StatelessWidget {
                             SettingsRow(
                               icon: Iconsax.card,
                               text: context.l10n.paymentMethods,
-                              onTap: () {},
+                              onTap: () {
+                                NavigatorHelper.to(PaymentMethodsScreen());
+                              },
                             ),
                             SettingsRow(
                               leading: DecoratedChip(

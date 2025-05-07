@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/core.engine.dart';
@@ -29,6 +30,8 @@ import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
+import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
+import 'package:letdem/features/payment_methods/repository/payments.repository.dart';
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
@@ -58,6 +61,8 @@ Future _initializeHERESDK() async {
   try {
     print("HERE SDK init starting...");
     SdkContext.init(IsolateOrigin.main);
+    Stripe.publishableKey =
+        'pk_test_51RLvJ9PMAWvHlMt2SCSXypnn2ne6DOtpsqbKblOQFuqRgmAVgexMtRE6xqHmaVjLyuOeDKGGIkeuoFXKoEzTs0wI00vObUwZb4'; // Use your real Stripe publishable key
 
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
@@ -123,6 +128,9 @@ void main() async {
           RepositoryProvider<AuthRepository>(
             create: (_) => AuthRepository(),
           ),
+          RepositoryProvider<PaymentMethodRepository>(
+            create: (_) => PaymentMethodRepository(),
+          ),
           RepositoryProvider<UserRepository>(
             create: (_) => UserRepository(),
           ),
@@ -153,6 +161,11 @@ void main() async {
               BlocProvider(
                 create: (context) => EarningsBloc(
                   repository: context.read<EarningsRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => PaymentMethodBloc(
+                  repository: context.read<PaymentMethodRepository>(),
                 ),
               ),
               BlocProvider(
