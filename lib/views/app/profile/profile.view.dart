@@ -212,9 +212,9 @@ class ProfileView extends StatelessWidget {
                                     onContinue: () {
                                       NavigatorHelper.to(ProfileOnboardingApp(
                                         remainingStep: context
-                                            .userProfile!.earningAccount!.step,
+                                            .userProfile!.earningAccount?.step,
                                         status: context.userProfile!
-                                            .earningAccount!.status,
+                                            .earningAccount?.status,
                                       ));
                                     },
                                   ));

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -49,27 +50,30 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 icon: Icons.close,
               ),
               Dimens.space(3),
+              Expanded(
+                child: state is PaymentMethodLoaded
+                    ? ListView.builder(
+                        itemCount: state.paymentMethods.length,
+                        itemBuilder: (context, index) {
+                          final paymentMethod = state.paymentMethods[index];
+                          return _buildCardItem(
+                            last4: paymentMethod.last4,
+                            cardType: paymentMethod.brand,
+                            holderName: paymentMethod.holderName,
+                            isDefault: paymentMethod.isDefault,
+                            onMenuTap: () {
+                              setState(() {
+                                showOptions = true;
+                              });
+                            },
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: CupertinoActivityIndicator(),
+                      ),
+              ),
               // Visa Card Item (Default)
-              _buildCardItem(
-                cardType: 'visa',
-                isDefault: true,
-                onMenuTap: () {
-                  setState(() {
-                    showOptions = true;
-                  });
-                },
-              ),
-
-              // Mastercard Item
-              _buildCardItem(
-                cardType: 'mastercard',
-                isDefault: false,
-                onMenuTap: () {
-                  setState(() {
-                    showOptions = true;
-                  });
-                },
-              ),
 
               Dimens.space(3),
 
@@ -101,7 +105,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
   Widget _buildCardItem({
     required String cardType,
+    required String holderName,
     required bool isDefault,
+    required String last4,
     required VoidCallback onMenuTap,
   }) {
     return Container(
@@ -117,9 +123,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Visa ending with 0967',
-                style: TextStyle(
+              Text(
+                'Visa ending with $last4',
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -162,7 +168,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Abubakar Sadeeq Ismail',
+                holderName,
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

@@ -4,6 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
+import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
@@ -37,27 +38,17 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Text(
-          'Add Payment Method',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: SizedBox(
             child: StyledBody(
               children: [
+                StyledAppBar(
+                  onTap: () => Navigator.of(context).pop,
+                  title: 'Add Payment Method',
+                  icon: Icons.close,
+                ),
+                Dimens.space(2),
                 TextInputField(
                   label: 'Cardholder Name',
                   controller: _nameController,

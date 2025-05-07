@@ -27,7 +27,7 @@ class PaymentMethodModel {
 
   factory PaymentMethodModel.fromJson(Map<String, dynamic> json) {
     return PaymentMethodModel(
-      paymentMethodId: json['payment_method_id'],
+      paymentMethodId: json['id'],
       holderName: json['holder_name'],
       last4: json['last4'],
       brand: json['brand'],
@@ -53,7 +53,8 @@ class PaymentMethodRepository implements IPaymentMethodRepository {
     );
 
     return List<PaymentMethodModel>.from(
-      (res.data as List).map((item) => PaymentMethodModel.fromJson(item)),
+      (res.data['results'] as List)
+          .map((item) => PaymentMethodModel.fromJson(item)),
     );
   }
 
