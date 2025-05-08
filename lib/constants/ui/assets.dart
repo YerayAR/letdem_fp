@@ -10,6 +10,9 @@ class AppAssets {
 
   static String free = 'assets/icon/free.svg';
   static String disabled = 'assets/icon/disabled.svg';
+
+  static String ellipse = 'assets/icon/ellipse.svg';
+  static String ellipseLeft = 'assets/icon/ellipseLeft.svg';
   static String green = 'assets/icon/green.svg';
   static String blue = 'assets/icon/blue.svg';
 

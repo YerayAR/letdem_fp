@@ -23,9 +23,32 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<IncreaseUserPointEvent>(_onIncreaseUserPoint);
     on<ChangePasswordEvent>(_onChangePassword);
     on<ChangeLanguageEvent>(_onChangeLanguage);
+    on<UpdateEarningAccountEvent>(_onUpdateEarningAccount);
     on<DeleteAccountEvent>(_onDeleteAccount);
     on<UpdatePreferencesEvent>(_onUpdatePreferences);
     on<UpdateNotificationPreferencesEvent>(_onUpdateNotificationPreferences);
+  }
+
+  Future<void> _onUpdateEarningAccount(
+      UpdateEarningAccountEvent event, Emitter<UserState> emit) async {
+    try {
+      if (state is UserLoaded) {
+        UserLoaded userLoaded = state as UserLoaded;
+
+        LetDemUser user = userLoaded.user;
+
+        user.setEarningAccount(event.account);
+        emit(UserLoaded(
+          user: user,
+          points: userLoaded.points,
+          isLocationPermissionGranted: userLoaded.isLocationPermissionGranted,
+        ));
+      }
+    } on ApiError catch (err) {
+      emit(UserError(error: err.message, apiError: err));
+    } catch (err) {
+      emit(const UserError(error: "Unable to load user"));
+    }
   }
 
   Future<void> _onChangeLanguage(

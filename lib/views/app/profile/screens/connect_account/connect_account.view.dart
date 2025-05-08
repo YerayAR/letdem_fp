@@ -13,6 +13,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -24,6 +25,8 @@ import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/global/models/country_codes.model.dart';
+// import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
@@ -32,6 +35,7 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 
 import '../../../../../constants/ui/typo.dart';
+import '../../../../auth/views/onboard/verify_account.view.dart';
 
 class ProfileOnboardingApp extends StatefulWidget {
   final EarningStatus? status;
@@ -63,44 +67,50 @@ class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
 
     final pages = <Widget>[];
 
-    if (step == null) {
-      pages.add(PersonalInfoPage(onNext: _goToNextPage));
-      pages.add(AddressInfoPage(onNext: _goToNextPage));
-      pages.add(IDTypePage(onNext: (type) {
-        setState(() => selectedIdType = type);
-        _goToNextPage();
-      }));
-      pages.add(UploadIDPictureView(
-        onNext: _goToNextPage,
-        idType: selectedIdType,
-      ));
-      pages.add(BankInfoView(onNext: _goToNextPage));
-      return pages;
+    void addRemainingStepsFrom(EarningStep fromStep) {
+      final stepsOrder = [
+        EarningStep.personalInfo,
+        EarningStep.addressInfo,
+        EarningStep.documentUpload,
+        EarningStep.bankAccountInfo,
+      ];
+
+      final startIndex = stepsOrder.indexOf(fromStep);
+      final remainingSteps = stepsOrder.sublist(startIndex);
+
+      for (final s in remainingSteps) {
+        switch (s) {
+          case EarningStep.personalInfo:
+            pages.add(PersonalInfoPage(onNext: _goToNextPage));
+            break;
+          case EarningStep.addressInfo:
+            pages.add(AddressInfoPage(onNext: _goToNextPage));
+            break;
+          case EarningStep.documentUpload:
+            pages.add(IDTypePage(onNext: (type) {
+              setState(() => selectedIdType = type);
+              _goToNextPage();
+            }));
+            pages.add(UploadIDPictureView(
+              onNext: _goToNextPage,
+              idType: selectedIdType,
+            ));
+            break;
+          case EarningStep.bankAccountInfo:
+            pages.add(BankInfoView(onNext: _goToNextPage));
+            break;
+          case EarningStep.submitted:
+            pages.add(const Center(child: Text("Submitted")));
+            break;
+        }
+      }
     }
 
-    switch (step) {
-      case EarningStep.personalInfo:
-        pages.add(PersonalInfoPage(onNext: _goToNextPage));
-        break;
-      case EarningStep.addressInfo:
-        pages.add(AddressInfoPage(onNext: _goToNextPage));
-        break;
-      case EarningStep.documentUpload:
-        pages.add(IDTypePage(onNext: (type) {
-          setState(() => selectedIdType = type);
-          _goToNextPage();
-        }));
-        pages.add(UploadIDPictureView(
-          onNext: _goToNextPage,
-          idType: selectedIdType,
-        ));
-        break;
-      case EarningStep.bankAccountInfo:
-        pages.add(BankInfoView(onNext: _goToNextPage));
-        break;
-      case EarningStep.submitted:
-        pages.add(const Center(child: Text("Submitted")));
-        break;
+    if (step == null) {
+      // All steps
+      addRemainingStepsFrom(EarningStep.personalInfo);
+    } else {
+      addRemainingStepsFrom(step);
     }
 
     return pages;
@@ -125,11 +135,7 @@ class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
     return Scaffold(
       body: SafeArea(
         child: BlocConsumer<EarningsBloc, EarningsState>(
-          listener: (context, state) {
-            if (state is EarningsSuccess) {
-              context.read<UserBloc>().add(FetchUserInfoEvent());
-            }
-          },
+          listener: (context, state) {},
           builder: (context, state) {
             return Column(
               children: [
@@ -232,8 +238,8 @@ class IpApiResponse {
   factory IpApiResponse.fromJson(Map<String, dynamic> json) {
     return IpApiResponse(
       ip: json['ip'] ?? '',
-      countryName: json['country_name'] ?? '',
-      countryCode: json['country'] ?? '',
+      countryName: json['country'] ?? '',
+      countryCode: json['country_code'] ?? '',
     );
   }
 }
@@ -262,24 +268,29 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      final dto = EarningsAccountDTO(
-        country: "ES", // Replace with real value from context/state
-        userIp: "8.8.8.3", // Replace with real IP from backend or provider
-        legalFirstName: _firstNameController.text.trim(),
-        legalLastName: _lastNameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        birthday: "1995-02-02", // Replace with datepicker field if needed
-      );
-
-      context.read<EarningsBloc>().add(SubmitEarningsAccount(dto));
+      if (_dateOfBirth == null) {
+        Toast.showError("Please select your date of birth");
+        return;
+      }
+      context.read<EarningsBloc>().add(SubmitEarningsAccount(
+            legalFirstName: _firstNameController.text.trim(),
+            legalLastName: _lastNameController.text.trim(),
+            phone: _phoneController.text.trim().replaceAll("-", ""),
+            birthday: '1999-01-01', // Replace with actual date of birth
+          ));
     }
   }
+
+  DateTime? _dateOfBirth;
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<EarningsBloc, EarningsState>(
       listener: (context, state) {
         if (state is EarningsSuccess) {
+          context.read<UserBloc>().add(UpdateEarningAccountEvent(
+                account: state.info,
+              ));
           widget.onNext();
         } else if (state is EarningsFailure) {
           Toast.showError(state.message);
@@ -309,17 +320,73 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 controller: _lastNameController,
               ),
               const SizedBox(height: 16),
-              TextInputField(
+              GestureDetector(
+                onTap: () {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: 300,
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            // Done button
+                            Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Done'),
+                              ),
+                            ),
+                            Expanded(
+                              child: CupertinoDatePicker(
+                                mode: CupertinoDatePickerMode.date,
+                                initialDateTime:
+                                    _dateOfBirth ?? DateTime(1990, 1, 1),
+                                minimumDate: DateTime(1900),
+                                maximumDate: DateTime.now(),
+                                onDateTimeChanged: (DateTime date) {
+                                  setState(() {
+                                    _dateOfBirth = date;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: AbsorbPointer(
+                  child: TextInputField(
+                    mustValidate: false,
+                    label: 'Select date of birth',
+                    placeHolder: _dateOfBirth != null
+                        ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}'
+                        : 'Eg. 01/01/1990',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TSLPhoneField(
                 label: 'Enter phone number',
-                placeHolder: 'Eg. +1234567890',
-                controller: _phoneController,
+                onChanged: (String text, String countryCode) {
+                  _phoneController.text = "$countryCode$text";
+                },
+                initialValue: '',
               ),
               const Spacer(),
               BlocBuilder<EarningsBloc, EarningsState>(
                 builder: (context, state) {
                   return PrimaryButton(
                     onTap: state is EarningsLoading ? null : _submitForm,
-                    text: state is EarningsLoading ? "Submitting..." : "Next",
+                    isLoading: state is EarningsLoading,
+                    text: "Next",
                   );
                 },
               ),
@@ -361,8 +428,19 @@ class _BankInfoViewState extends State<BankInfoView> {
   Widget build(BuildContext context) {
     return BlocListener<EarningsBloc, EarningsState>(
       listener: (context, state) {
-        if (state is EarningsSuccess) {
-          widget.onNext();
+        if (state is EarningsCompleted) {
+          context.read<UserBloc>().add(UpdateEarningAccountEvent(
+                account: state.info,
+              ));
+          AppPopup.showDialogSheet(
+              context,
+              SuccessDialog(
+                onProceed: () {
+                  NavigatorHelper.pop();
+                },
+                title: 'Success',
+                subtext: 'Your account has been successfully created.',
+              ));
         } else if (state is EarningsFailure) {
           Toast.showError(state.message);
         }
@@ -460,6 +538,9 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
     return BlocListener<EarningsBloc, EarningsState>(
       listener: (context, state) {
         if (state is EarningsSuccess) {
+          context.read<UserBloc>().add(UpdateEarningAccountEvent(
+                account: state.info,
+              ));
           widget.onNext();
         } else if (state is EarningsFailure) {
           Toast.showError(state.message);
@@ -498,6 +579,7 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
               BlocBuilder<EarningsBloc, EarningsState>(
                 builder: (context, state) {
                   return PrimaryButton(
+                    isLoading: state is EarningsLoading,
                     onTap: state is EarningsLoading ? null : _submit,
                     text: "Next",
                   );
@@ -752,6 +834,9 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
           BlocConsumer<EarningsBloc, EarningsState>(
             listener: (context, state) {
               if (state is EarningsSuccess) {
+                context.read<UserBloc>().add(UpdateEarningAccountEvent(
+                      account: state.info,
+                    ));
                 widget.onNext();
               } else if (state is EarningsFailure) {
                 Toast.showError(state.message);

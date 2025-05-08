@@ -271,6 +271,10 @@ class EndPoints {
     );
   }
 
+  static Endpoint getTransactions = Endpoint(
+    url: '/credits/transactions',
+    method: HTTPMethod.GET,
+  );
   static Endpoint<EventFeedBackDTO> eventFeedBack(
     String id,
   ) =>

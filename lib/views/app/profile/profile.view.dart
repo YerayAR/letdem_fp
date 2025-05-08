@@ -26,6 +26,7 @@ import 'package:letdem/views/app/profile/screens/security/security.view.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
+import 'package:letdem/views/app/wallet/screens/wallet.view.dart';
 import 'package:letdem/views/auth/views/login.view.dart';
 
 import 'screens/preferences/preferences.view.dart';
@@ -169,42 +170,66 @@ class ProfileView extends StatelessWidget {
                               },
                             ),
                             SettingsRow(
-                              leading: DecoratedChip(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 4,
-                                ),
-                                backgroundColor:
-                                    context.userProfile!.earningAccount == null
-                                        ? AppColors.green600
-                                        : context.userProfile!.earningAccount!
-                                                    .status ==
-                                                EarningStatus.missingInfo
-                                            ? Colors.red
-                                            : AppColors.red500,
-                                textStyle: Typo.smallBody.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                                text:
-                                    context.userProfile!.earningAccount == null
-                                        ? context.l10n.connectAccount
-                                        : getStatusString(context.userProfile!
-                                            .earningAccount!.status),
-                                color:
-                                    context.userProfile!.earningAccount == null
-                                        ? AppColors.green600
-                                        : context.userProfile!.earningAccount!
-                                                    .status ==
-                                                EarningStatus.missingInfo
-                                            ? Colors.red
-                                            : AppColors.red500,
-                              ),
+                              leading: context.userProfile!.earningAccount !=
+                                          null &&
+                                      context.userProfile!.earningAccount!
+                                              .status ==
+                                          EarningStatus.accepted
+                                  ? null
+                                  : DecoratedChip(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
+                                      backgroundColor:
+                                          context.userProfile!.earningAccount ==
+                                                  null
+                                              ? AppColors.green600
+                                              : context
+                                                          .userProfile!
+                                                          .earningAccount!
+                                                          .status ==
+                                                      EarningStatus.missingInfo
+                                                  ? Colors.red
+                                                  : AppColors.red500,
+                                      textStyle: Typo.smallBody.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                      text:
+                                          context.userProfile!.earningAccount ==
+                                                  null
+                                              ? context.l10n.connectAccount
+                                              : getStatusString(context
+                                                  .userProfile!
+                                                  .earningAccount!
+                                                  .status),
+                                      color:
+                                          context.userProfile!.earningAccount ==
+                                                  null
+                                              ? AppColors.green600
+                                              : context
+                                                          .userProfile!
+                                                          .earningAccount!
+                                                          .status ==
+                                                      EarningStatus.missingInfo
+                                                  ? Colors.red
+                                                  : AppColors.red500,
+                                    ),
                               icon: IconlyLight.wallet,
                               text: context.l10n.earnings,
                               showDivider: false,
                               onTap: () {
+                                if (context.userProfile!.earningAccount !=
+                                        null &&
+                                    context.userProfile!.earningAccount!
+                                            .status ==
+                                        EarningStatus.accepted) {
+                                  NavigatorHelper.to(const WalletScreen());
+                                  return;
+                                }
+
                                 if (context.userProfile!.earningAccount ==
                                     null) {
                                   AppPopup.showBottomSheet(context,

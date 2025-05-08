@@ -93,7 +93,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   }
 
   getCardIcon(String cardType) {
-    switch (cardType) {
+    switch (cardType.toLowerCase()) {
       case 'visa':
         return AppAssets.visa;
       case 'mastercard':

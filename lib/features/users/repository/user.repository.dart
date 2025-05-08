@@ -270,7 +270,7 @@ class LetDemUser {
 
   final List<Activity> contributions;
 
-  final EarningAccount? earningAccount;
+  EarningAccount? earningAccount;
 
   final UserPreferences preferences;
 
@@ -320,6 +320,10 @@ class LetDemUser {
           .toList(),
       notificationsCount: json['notifications_count'] ?? 0,
     );
+  }
+
+  void setEarningAccount(EarningAccount account) {
+    earningAccount = account;
   }
 
   Map<String, dynamic> toJSON() {

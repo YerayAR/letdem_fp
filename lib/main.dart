@@ -38,6 +38,8 @@ import 'package:letdem/features/search/repository/search_location.repository.dar
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/features/wallet/repository/transaction.repository.dart';
+import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
@@ -62,7 +64,7 @@ Future _initializeHERESDK() async {
     print("HERE SDK init starting...");
     SdkContext.init(IsolateOrigin.main);
     Stripe.publishableKey =
-        'pk_test_51RLvJ9PMAWvHlMt2SCSXypnn2ne6DOtpsqbKblOQFuqRgmAVgexMtRE6xqHmaVjLyuOeDKGGIkeuoFXKoEzTs0wI00vObUwZb4'; // Use your real Stripe publishable key
+        'pk_test_51RDvqzPEUIIf4s33G882VANwPqFFwMpBq5i7cNy3qtYlqBwYNaUNgmzuX1RbGqDhdlSmFoD4uaONs0KSvoYpagnm00ldkkhPFt'; // Use your real Stripe publishable key
 
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
@@ -131,6 +133,9 @@ void main() async {
           RepositoryProvider<PaymentMethodRepository>(
             create: (_) => PaymentMethodRepository(),
           ),
+          RepositoryProvider<TransactionRepository>(
+            create: (_) => TransactionRepository(),
+          ),
           RepositoryProvider<UserRepository>(
             create: (_) => UserRepository(),
           ),
@@ -166,6 +171,11 @@ void main() async {
               BlocProvider(
                 create: (context) => PaymentMethodBloc(
                   repository: context.read<PaymentMethodRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => WalletBloc(
+                  transactionRepository: context.read<TransactionRepository>(),
                 ),
               ),
               BlocProvider(

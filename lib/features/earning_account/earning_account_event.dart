@@ -11,12 +11,25 @@ abstract class EarningsEvent extends Equatable {
 }
 
 class SubmitEarningsAccount extends EarningsEvent {
-  final EarningsAccountDTO dto;
+  final String legalFirstName;
+  final String legalLastName;
+  final String phone;
+  final String birthday;
 
-  const SubmitEarningsAccount(this.dto);
+  const SubmitEarningsAccount({
+    required this.legalFirstName,
+    required this.legalLastName,
+    required this.phone,
+    required this.birthday,
+  });
 
   @override
-  List<Object?> get props => [dto];
+  List<Object?> get props => [
+        legalFirstName,
+        legalLastName,
+        phone,
+        birthday,
+      ];
 }
 
 class SubmitEarningsAddress extends EarningsEvent {

@@ -1,8 +1,9 @@
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
+import 'package:letdem/features/users/repository/user.repository.dart';
 
 abstract class IEarningsRepository {
-  Future<void> submitAccount(EarningsAccountDTO dto);
-  Future<void> submitAddress(EarningsAddressDTO dto);
-  Future<void> submitDocument(EarningsDocumentDTO dto);
-  Future<void> submitBankAccount(EarningsBankAccountDTO dto);
+  Future<EarningAccount> submitAccount(EarningsAccountDTO dto);
+  Future<EarningAccount> submitAddress(EarningsAddressDTO dto);
+  Future<EarningAccount> submitDocument(EarningsDocumentDTO dto);
+  Future<EarningAccount> submitBankAccount(EarningsBankAccountDTO dto);
 }

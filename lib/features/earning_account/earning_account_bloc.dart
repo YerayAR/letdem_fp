@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
@@ -10,9 +11,17 @@ import 'package:letdem/views/app/profile/screens/connect_account/connect_account
 
 import 'earning_account_event.dart';
 
+String getCountryCodeFromLocale() {
+  return ui.window.locale.countryCode ?? "ES";
+}
+
 Future<IpApiResponse?> fetchIpApiInfo() async {
   try {
-    final response = await http.get(Uri.parse('https://ipapi.co/json/'));
+    final response = await http.get(Uri.parse('https://ipwho.is'));
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return IpApiResponse.fromJson(data);
@@ -33,15 +42,23 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
     on<SubmitEarningsAccount>((event, emit) async {
       emit(EarningsLoading());
       try {
-        await repository.submitAccount(EarningsAccountDTO(
-          country: event.dto.country,
-          userIp: event.dto.userIp,
-          legalFirstName: event.dto.legalFirstName,
-          legalLastName: event.dto.legalLastName,
-          phone: event.dto.phone,
-          birthday: event.dto.birthday,
+        // Fetch IP information
+        final ipInfo = await fetchIpApiInfo();
+
+        if (ipInfo == null) {
+          emit(const EarningsFailure("Failed to fetch IP information."));
+          return;
+        }
+
+        var account = await repository.submitAccount(EarningsAccountDTO(
+          country: "ES",
+          userIp: ipInfo.ip,
+          legalFirstName: event.legalFirstName,
+          legalLastName: event.legalLastName,
+          phone: event.phone,
+          birthday: event.birthday,
         ));
-        emit(EarningsSuccess());
+        emit(EarningsSuccess(account));
       } on ApiError catch (er) {
         emit(EarningsFailure(er.message));
       } catch (e) {
@@ -52,8 +69,8 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
     on<SubmitEarningsAddress>((event, emit) async {
       emit(EarningsLoading());
       try {
-        await repository.submitAddress(event.dto);
-        emit(EarningsSuccess());
+        var account = await repository.submitAddress(event.dto);
+        emit(EarningsSuccess(account));
       } on ApiError catch (er) {
         emit(EarningsFailure(er.message));
       } catch (e) {
@@ -72,14 +89,14 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
             ? base64Encode(await event.backSide!.readAsBytes())
             : null;
 
-        await repository.submitDocument(
+        var account = await repository.submitDocument(
           EarningsDocumentDTO(
             documentType: event.documentType,
             frontSide: base64FrontSide!,
             backSide: base64BackSide!,
           ),
         );
-        emit(EarningsSuccess());
+        emit(EarningsSuccess(account));
       } on ApiError catch (er) {
         emit(EarningsFailure(er.message));
       } catch (e) {
@@ -90,8 +107,8 @@ class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
     on<SubmitEarningsBankAccount>((event, emit) async {
       emit(EarningsLoading());
       try {
-        await repository.submitBankAccount(event.dto);
-        emit(EarningsSuccess());
+        var account = await repository.submitBankAccount(event.dto);
+        emit(EarningsCompleted(account));
       } on ApiError catch (er) {
         emit(EarningsFailure(er.message));
       } catch (e) {

@@ -52,6 +52,15 @@ class EditBasicInfoEvent extends UserEvent {
   List<Object?> get props => [firstName, lastName];
 }
 
+class UpdateEarningAccountEvent extends UserEvent {
+  final EarningAccount account;
+
+  UpdateEarningAccountEvent({required this.account});
+
+  @override
+  List<Object?> get props => [account];
+}
+
 class UpdateNotificationPreferencesEvent extends UserEvent {
   final bool pushNotifications;
   final bool emailNotifications;
