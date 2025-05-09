@@ -25,6 +25,7 @@ class StyledBody extends StatelessWidget {
         right: Dimens.defaultMargin,
       ),
       child: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
           mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,

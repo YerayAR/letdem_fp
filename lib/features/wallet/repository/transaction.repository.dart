@@ -21,11 +21,12 @@ class TransactionRepository implements ITransactionRepository {
     EndPoints.getTransactions.setParams([
       QParam(
         key: 'start_date',
-        value: data.startDate.toIso8601String(),
+        value:
+            "${data.startDate.year}-${data.startDate.month}-${data.startDate.day}",
       ),
       QParam(
         key: 'end_date',
-        value: data.endDate.toIso8601String(),
+        value: "${data.endDate.year}-${data.endDate.month}-${data.endDate.day}",
       ),
       QParam(
         key: 'page_size',
@@ -40,12 +41,7 @@ class TransactionRepository implements ITransactionRepository {
         await ApiService.sendRequest(endpoint: EndPoints.getTransactions);
 
     return (response.data['results'] as List)
-        .map((e) => Transaction(
-              id: e['id'],
-              amount: e['amount'],
-              description: e['description'],
-              date: DateTime.parse(e['date']),
-            ))
+        .map((e) => Transaction.fromJson(e))
         .toList();
   }
 }
@@ -71,16 +67,47 @@ abstract class ITransactionRepository {
   Future<void> deleteTransaction(String transactionId);
 }
 
-class Transaction {
-  final String id;
-  final double amount;
-  final String description;
-  final DateTime date;
+enum TransactionType {
+  SPACE_PAYMENT,
+  WITHDRAW,
+  SPACE_TRANSFER,
+  SPACE_WITHDRAWAL,
+  SPACE_DEPOSIT,
+}
 
-  Transaction({
-    required this.id,
-    required this.amount,
-    required this.description,
-    required this.date,
-  });
+TransactionType getTransactionType(String type) {
+  switch (type) {
+    case 'SPACE_PAYMENT':
+      return TransactionType.SPACE_PAYMENT;
+    case 'WITHDRAW':
+      return TransactionType.WITHDRAW;
+    case 'SPACE_TRANSFER':
+      return TransactionType.SPACE_TRANSFER;
+    case 'SPACE_WITHDRAWAL':
+      return TransactionType.SPACE_WITHDRAWAL;
+    case 'SPACE_DEPOSIT':
+      return TransactionType.SPACE_DEPOSIT;
+    default:
+      throw Exception('Unknown transaction type: $type');
+  }
+}
+
+class Transaction {
+  // {amount: 2.00, currency: eur, source: SPACE_PAYMENT, created: 2025-05-09T00:49:26.802051Z}
+  final double amount;
+  final TransactionType source;
+  final DateTime created;
+
+  Transaction(
+      {required this.amount, required this.source, required this.created});
+
+  factory Transaction.fromJson(Map<String, dynamic> json) {
+    return Transaction(
+      amount: getTransactionType(json['source']) == TransactionType.WITHDRAW
+          ? double.parse(json['amount'].toString()) * -1
+          : double.parse(json['amount'].toString()),
+      source: getTransactionType(json['source']),
+      created: DateTime.parse(json['created']),
+    );
+  }
 }

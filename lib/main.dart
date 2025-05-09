@@ -32,6 +32,8 @@ import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
 import 'package:letdem/features/payment_methods/repository/payments.repository.dart';
+import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
+import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
@@ -139,6 +141,9 @@ void main() async {
           RepositoryProvider<UserRepository>(
             create: (_) => UserRepository(),
           ),
+          RepositoryProvider<PayoutMethodRepository>(
+            create: (_) => PayoutMethodRepository(),
+          ),
           RepositoryProvider<ActivityRepository>(
             create: (_) => ActivityRepository(),
           ),
@@ -163,6 +168,12 @@ void main() async {
         ],
         child: MultiBlocProvider(
             providers: [
+              BlocProvider(
+                create: (context) => PayoutMethodBloc(
+                  payoutMethodRepository:
+                      context.read<PayoutMethodRepository>(),
+                ),
+              ),
               BlocProvider(
                 create: (context) => EarningsBloc(
                   repository: context.read<EarningsRepository>(),

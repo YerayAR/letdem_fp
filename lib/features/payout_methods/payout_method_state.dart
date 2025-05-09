@@ -1,10 +1,25 @@
 part of 'payout_method_bloc.dart';
 
-sealed class PayoutMethodState extends Equatable {
+abstract class PayoutMethodState extends Equatable {
   const PayoutMethodState();
+  @override
+  List<Object?> get props => [];
 }
 
-final class PayoutMethodInitial extends PayoutMethodState {
+class PayoutMethodInitial extends PayoutMethodState {}
+
+class PayoutMethodLoading extends PayoutMethodState {}
+
+class PayoutMethodSuccess extends PayoutMethodState {
+  final List<PayoutMethod> methods;
+  const PayoutMethodSuccess(this.methods);
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [methods];
+}
+
+class PayoutMethodFailure extends PayoutMethodState {
+  final String message;
+  const PayoutMethodFailure(this.message);
+  @override
+  List<Object?> get props => [message];
 }

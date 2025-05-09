@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
+import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
@@ -130,15 +131,6 @@ class DocumentInfo {
   }
 }
 
-class PayoutMethod {
-  // Replace with actual fields
-  PayoutMethod();
-
-  factory PayoutMethod.fromJson(Map<String, dynamic> json) {
-    return PayoutMethod(); // Implement properly once you know the fields
-  }
-}
-
 class EarningAccount {
   final double balance;
   final double pendingBalance;
@@ -186,10 +178,7 @@ class EarningAccount {
       document: json['document'] != null
           ? DocumentInfo.fromJson(json['document'])
           : null,
-      payoutMethods: (json['payout_methods'] as List<dynamic>?)
-              ?.map((e) => PayoutMethod.fromJson(e))
-              .toList() ??
-          [],
+      payoutMethods: [],
     );
   }
 }
