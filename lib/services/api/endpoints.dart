@@ -1,5 +1,6 @@
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
+import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
@@ -26,6 +27,13 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
+  // /v1/spaces/9d4d174c1edd4e53ad2e6aa58694eb83/reserve
+
+  static Endpoint<ReserveSpaceDTO> reserveSpace(String id) => Endpoint(
+        url: "/spaces/$id/reserve",
+        method: HTTPMethod.POST,
+      );
+
   static Endpoint<LoginDTO> loginEndpoint = Endpoint(
     url: "/auth/login",
     method: HTTPMethod.POST,
@@ -43,11 +51,21 @@ class EndPoints {
     isProtected: true,
   );
 
-  static Endpoint deletePayoutMethod = Endpoint(
-    url: "/wallet/payout-methods/{id}",
-    method: HTTPMethod.DELETE,
-    isProtected: true,
-  );
+  // {{BASE_URI}}/v1/spaces/9cdf9787a5a84cf9bfd4b37fe8b50ae5/confirm-reservation
+
+  static Endpoint<ConfirmationCodeDTO> confirmReservation(String id) =>
+      Endpoint(
+        url: "/spaces/$id/confirm-reservation",
+        method: HTTPMethod.POST,
+      );
+
+  static Endpoint deletePayoutMethod(
+    String id,
+  ) =>
+      Endpoint(
+        url: "/credits/payout-methods/$id",
+        method: HTTPMethod.DELETE,
+      );
 
   static Endpoint<RegisterDTO> registerEndpoint = Endpoint(
     url: "/auth/signup",
@@ -104,8 +122,12 @@ class EndPoints {
     method: HTTPMethod.POST,
   );
 
-  static Endpoint<PublishSpaceDTO> publishSpace = Endpoint(
+  static Endpoint<PublishSpaceDTO> publishSpaceFree = Endpoint(
     url: "/spaces/free",
+    method: HTTPMethod.POST,
+  );
+  static Endpoint<PublishSpaceDTO> publishSpacePaid = Endpoint(
+    url: "/spaces/paid",
     method: HTTPMethod.POST,
   );
 
@@ -277,7 +299,7 @@ class EndPoints {
 
   static Endpoint removePaymentMethod(String id) {
     return Endpoint(
-      url: '/users/me/payment-methods/$id/',
+      url: '/credits/payment-methods/$id',
       method: HTTPMethod.DELETE,
     );
   }

@@ -45,6 +45,27 @@ final class PublishRoadEventEvent extends ActivitiesEvent {
   List<Object?> get props => [locationName, latitude, longitude, type];
 }
 
+final class ConfirmSpaceReserveEvent extends ActivitiesEvent {
+  final ConfirmationCodeDTO confirmationCode;
+
+  const ConfirmSpaceReserveEvent({required this.confirmationCode});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [confirmationCode];
+}
+
+final class ReserveSpaceEvent extends ActivitiesEvent {
+  final String spaceID;
+  final String paymentMethodID;
+
+  ReserveSpaceEvent({required this.spaceID, required this.paymentMethodID});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [spaceID, paymentMethodID];
+}
+
 final class PublishSpaceEvent extends ActivitiesEvent {
   final File image;
   final String locationName;
@@ -52,16 +73,33 @@ final class PublishSpaceEvent extends ActivitiesEvent {
   final double longitude;
   final String type;
 
-  const PublishSpaceEvent(
-      {required this.image,
-      required this.locationName,
-      required this.type,
-      required this.latitude,
-      required this.longitude});
+  final String? price;
+  final int? waitTime;
+  final String? phoneNumber;
+
+  const PublishSpaceEvent({
+    required this.image,
+    required this.locationName,
+    required this.type,
+    required this.latitude,
+    required this.longitude,
+    this.price,
+    this.waitTime,
+    this.phoneNumber,
+  });
 
   @override
   // TODO: implement props
-  List<Object?> get props => [image, locationName, latitude, longitude];
+  List<Object?> get props => [
+        image,
+        locationName,
+        latitude,
+        longitude,
+        type,
+        price,
+        waitTime,
+        phoneNumber
+      ];
 }
 
 final class GetActivitiesEvent extends ActivitiesEvent {

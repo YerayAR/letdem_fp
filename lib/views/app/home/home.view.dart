@@ -14,19 +14,27 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/EventTypes.dart';
+import 'package:letdem/extenstions/user.dart';
+import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/widgets/appbar.dart';
+import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart' hide Location;
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
+import 'package:letdem/views/app/payment_method/screens/add_payment_method.view.dart';
+import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 // ... your imports remain unchanged
 
@@ -364,64 +372,222 @@ class _HomeViewState extends State<HomeView>
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize:
+                            MainAxisSize.min, // Important to avoid overflow
                         children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SvgPicture.asset(
                                 getSpaceTypeIcon(space.type),
                                 width: 20,
                                 height: 20,
                               ),
-                              Dimens.space(1),
-                              Text(
-                                getSpaceAvailabilityMessage(space.type),
-                                style: Typo.largeBody
-                                    .copyWith(fontWeight: FontWeight.w800),
+                              SizedBox(
+                                  width:
+                                      8), // Replaces Dimens.space(1) for horizontal spacing
+                              Expanded(
+                                // Make sure text wraps and doesn't overflow
+                                child: Text(
+                                  getSpaceAvailabilityMessage(space.type),
+                                  style: Typo.largeBody
+                                      .copyWith(fontWeight: FontWeight.w800),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Dimens.space(2),
+                              SizedBox(
+                                child: space.isPremium
+                                    ? Text("€${space.price}",
+                                        style: Typo.largeBody.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                        ))
+                                    : null,
                               ),
                             ],
                           ),
+                          SizedBox(height: 8), // Replaces Dimens.space(1)
                           Text(
                             space.location.streetName,
                             style: Typo.largeBody.copyWith(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.neutral600),
-                          ),
-                          Dimens.space(1),
-                          DecoratedChip(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 5),
-                            text:
-                                '${parseMeters(geolocator.Geolocator.distanceBetween(
-                              _currentPosition!.latitude,
-                              _currentPosition!.longitude,
-                              space.location.point.lat,
-                              space.location.point.lng,
-                            ))} away',
-                            textStyle: Typo.smallBody.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.green600,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.neutral600,
                             ),
-                            icon: Iconsax.clock,
-                            color: AppColors.green500,
-                          )
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8), // Replaces Dimens.space(1)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DecoratedChip(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 5),
+                                text:
+                                    '${parseMeters(geolocator.Geolocator.distanceBetween(
+                                  _currentPosition!.latitude,
+                                  _currentPosition!.longitude,
+                                  space.location.point.lat,
+                                  space.location.point.lng,
+                                ))} away',
+                                textStyle: Typo.smallBody.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.green600,
+                                ),
+                                icon: Iconsax.clock5,
+                                color: AppColors.green500,
+                              ),
+                              Dimens.space(1),
+                              SizedBox(
+                                child: space.isPremium &&
+                                        space.expirationDate != null
+                                    ? DecoratedChip(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 5),
+                                        text: getTimeLeftMessage(DateTime.now(),
+                                            space.expirationDate!),
+                                        textStyle: Typo.smallBody.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primary500,
+                                        ),
+                                        icon: Iconsax.clock5,
+                                        color: AppColors.primary200,
+                                      )
+                                    : null,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                Dimens.space(2),
-                PrimaryButton(
-                  icon: IconlyBold.location,
-                  text: 'Navigate to Space',
-                  onTap: () {
-                    NavigatorHelper.to(TrafficRouteLineExample(
-                      hideToggle: true,
-                      spaceInfo: space,
-                      streetName: space.location.streetName,
-                      lat: space.location.point.lat,
-                      lng: space.location.point.lng,
-                    ));
+                Dimens.space(3),
+                SizedBox(
+                    child: space.isPremium
+                        ? Container(
+                            margin: const EdgeInsets.only(bottom: 24),
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 18, vertical: 14),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: AppColors.neutral50,
+                              ),
+                            ),
+                            child: context.userProfile!.defaultPaymentMethod !=
+                                    null
+                                ? Row(
+                                    children: [
+                                      Image.asset(
+                                        getCardIcon(
+                                          context.userProfile!
+                                              .defaultPaymentMethod!.brand,
+                                        ),
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                      Dimens.space(1),
+                                      Text(
+                                        '${context.userProfile!.defaultPaymentMethod!.brand}  ending with ${context.userProfile!.defaultPaymentMethod!.last4}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      GestureDetector(
+                                        onTap: () {
+                                          NavigatorHelper.to(
+                                            const PaymentMethodsScreen(),
+                                          );
+                                        },
+                                        child: Icon(
+                                          Icons.keyboard_arrow_right_sharp,
+                                          size: 25,
+                                          color: AppColors.neutral100,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Add payment method',
+                                        style: Typo.mediumBody.copyWith(
+                                          color: AppColors.primary500,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                      Icon(
+                                        IconlyBold.arrow_right_2,
+                                        size: 18,
+                                        color: AppColors.neutral100,
+                                      ),
+                                    ],
+                                  ),
+                          )
+                        : const SizedBox()),
+                BlocConsumer<ActivitiesBloc, ActivitiesState>(
+                  listener: (context, state) {
+                    if (state is SpaceReserved) {
+                      AppPopup.showDialogSheet(
+                        context,
+                        SuccessDialog(
+                          onProceed: () {
+                            NavigatorHelper.to(ReservedSpaceDetailView(
+                              space: space,
+                              details: state.spaceID,
+                            ));
+                          },
+                          title: 'Payment Successful',
+                          subtext:
+                              'You have successfully reserved a paid space. You can get the details by clicking below.',
+                          buttonText: 'Get Details of space',
+                        ),
+                      );
+                    } else if (state is ActivitiesError) {
+                      Toast.showError(state.error);
+                    }
+                    // TODO: implement listener
+                  },
+                  builder: (context, state) {
+                    return PrimaryButton(
+                      icon: space.isPremium ? null : Iconsax.location5,
+                      isLoading: context.read<ActivitiesBloc>().state
+                          is ActivitiesLoading,
+                      text: space.isPremium
+                          ? 'Reserve space'
+                          : 'Navigate to space',
+                      onTap: () {
+                        if (space.isPremium) {
+                          if (context.userProfile!.defaultPaymentMethod ==
+                              null) {
+                            NavigatorHelper.to(AddPaymentMethod());
+                          } else {
+                            context
+                                .read<ActivitiesBloc>()
+                                .add(ReserveSpaceEvent(
+                                  spaceID: space.id,
+                                  paymentMethodID: context.userProfile!
+                                      .defaultPaymentMethod!.paymentMethodId,
+                                ));
+                          }
+                        } else {
+                          NavigatorHelper.to(TrafficRouteLineExample(
+                            hideToggle: true,
+                            spaceInfo: space,
+                            streetName: space.location.streetName,
+                            lat: space.location.point.lat,
+                            lng: space.location.point.lng,
+                          ));
+                        }
+                      },
+                    );
                   },
                 ),
               ],
@@ -523,4 +689,227 @@ class _HomeViewState extends State<HomeView>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class ReservedSpaceDetailView extends StatelessWidget {
+  final ReservedSpacePayload details;
+  final Space space;
+  const ReservedSpaceDetailView(
+      {super.key, required this.details, required this.space});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StyledBody(
+        isBottomPadding: false,
+        children: [
+          StyledAppBar(
+            title: 'Reserved Space',
+            onTap: () {
+              NavigatorHelper.pop();
+            },
+            icon: Iconsax.close_circle5,
+          ),
+          // Parking Image
+          Expanded(
+            child: ListView(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    space.image,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Confirmation Code Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Confirmation Code',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        details.confirmationCode,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary50,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Share this code with the parking space owner',
+                          style: TextStyle(
+                            color: AppColors.secondary600,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Dimens.space(3),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'The Owner\'s Plate Number: ',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Text(
+                            details.carPlateNumber,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Properties Row
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            SvgPicture.asset(
+                              getSpaceTypeIcon(space.type),
+                              width: 60,
+                              height: 60,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              getSpaceAvailabilityMessage(space.type),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.centerRight,
+                              children: [
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor: AppColors.green600,
+                                  child: const Icon(
+                                    IconlyBold.wallet,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '€${details.price.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Navigate Button
+                PrimaryButton(
+                  onTap: () {},
+                  text: 'Navigate to Space',
+                ),
+                const SizedBox(height: 16),
+
+                // Call Button
+                PrimaryButton(
+                  onTap: () {},
+                  borderWidth: 1,
+                  background: Colors.white,
+                  textColor: AppColors.neutral500,
+                  icon: IconlyBold.call,
+                  text: 'Call Space Owner',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

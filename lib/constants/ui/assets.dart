@@ -21,6 +21,13 @@ class AppAssets {
   static String greenMapMarker = 'assets/icon/map_pin_green.png';
   static String blueMapMarker = 'assets/icon/map_pin_blue.png';
 
+  // paid map markers
+
+  static String paidFreeMapMarker = 'assets/icon/map_pin_free.png';
+  static String paidDisabledMapMarker = 'assets/icon/map_pin_disabled.png';
+  static String paidGreenMapMarker = 'assets/icon/map_pin_green_paid.png';
+  static String paidBlueMapMarker = 'assets/icon/map_pin_blue_paid.png';
+
   static String accidentMapMarker = 'assets/icon/map_pin_crash.png';
   static String closedRoadMapMarker = 'assets/icon/map_pin_accident.png';
 

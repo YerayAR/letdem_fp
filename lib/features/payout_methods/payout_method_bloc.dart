@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/services/api/models/error.dart';
+import 'package:letdem/services/toast/toast.dart';
 
 part 'payout_method_event.dart';
 part 'payout_method_state.dart';
@@ -36,9 +37,11 @@ class PayoutMethodBloc extends Bloc<PayoutMethodEvent, PayoutMethodState> {
       await payoutMethodRepository.addPayoutMethod(event.method);
       add(FetchPayoutMethods());
     } on ApiError catch (err) {
-      emit(PayoutMethodFailure(err.message));
+      Toast.showError(err.message);
+      add(FetchPayoutMethods());
     } catch (e) {
-      emit(PayoutMethodFailure(e.toString()));
+      Toast.showError("An error occurred");
+      add(FetchPayoutMethods());
     }
   }
 
@@ -47,7 +50,10 @@ class PayoutMethodBloc extends Bloc<PayoutMethodEvent, PayoutMethodState> {
     emit(PayoutMethodLoading());
     try {
       await payoutMethodRepository.deletePayoutMethod(event.methodId);
-      add(FetchPayoutMethods());
+
+      var data = await payoutMethodRepository.fetchPayoutMethods();
+
+      emit(PayoutMethodSuccess(data));
     } catch (e) {
       emit(PayoutMethodFailure(e.toString()));
     }

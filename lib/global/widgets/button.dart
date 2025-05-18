@@ -27,6 +27,8 @@ class PrimaryButton extends StatelessWidget {
 
   final Color? background;
 
+  final double? borderRadius;
+
   const PrimaryButton({
     super.key,
     this.color,
@@ -38,6 +40,7 @@ class PrimaryButton extends StatelessWidget {
     this.iconRight,
     this.padding,
     this.isLoading = false,
+    this.borderRadius,
     this.isDisabled = false,
     this.borderColor,
     this.loadingIndicatorColor,
@@ -104,7 +107,7 @@ class PrimaryButton extends StatelessWidget {
         height: padding != null ? null : 55,
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10000),
+          borderRadius: BorderRadius.circular(borderRadius ?? 10000),
           color: isDisabled
               ? AppColors.primary200
               : background ??
@@ -152,7 +155,10 @@ class PrimaryButton extends StatelessWidget {
                                     icon,
                                     color: outline
                                         ? color ?? AppColors.primary500
-                                        : Colors.white,
+                                        : textColor ??
+                                            (isDisabled
+                                                ? Colors.white.withOpacity(0.8)
+                                                : Colors.white),
                                     size: 18,
                                   ),
                                   Dimens.space(1)

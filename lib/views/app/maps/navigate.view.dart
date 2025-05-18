@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +23,7 @@ import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
@@ -303,8 +303,6 @@ class _NavigationViewState extends State<NavigationView> {
     _cleanupNavigation();
     _rerouteDebounceTimer?.cancel();
     _distanceNotifier.dispose();
-
-    _disposeHERESDK();
     _lifecycleListener.dispose();
     super.dispose();
   }
@@ -482,6 +480,14 @@ class _NavigationViewState extends State<NavigationView> {
       _isNavigating = false;
       _navigationInstruction = "";
       _totalRouteTime = 0;
+      _errorMessage = "";
+      _navigationInstruction = "";
+      _isNavigating = false;
+      _isLoading = false;
+      _isMuted = false;
+      _hasShownFatigueAlert = false;
+      _currentSpeedLimit = null;
+      _isOverSpeedLimit = false;
       _hasShownArrivalNotification = false;
     });
 
@@ -2014,104 +2020,40 @@ class FeedbackForm extends StatelessWidget {
         // TODO: implement listener
       },
       builder: (context, state) {
-        return Padding(
-          padding: EdgeInsets.all(Dimens.defaultMargin),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: [
-                  Text(
-                    "Event Feedback",
-                    style: Typo.largeBody
-                        .copyWith(fontWeight: FontWeight.w700, fontSize: 18),
-                  ),
-                  Dimens.space(1),
-                  SizedBox(
-                      child: state is ActivitiesLoading
-                          ? CupertinoActivityIndicator()
-                          : null),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Iconsax.close_circle5,
-                      color: AppColors.neutral100,
-                    ),
-                  ),
-                ],
-              ),
-              Dimens.space(1),
-              GestureDetector(
-                onTap: () {
-                  context.read<ActivitiesBloc>().add(
-                        EventFeedBackEvent(
-                          eventID: eventID,
-                          isThere: true,
-                        ),
-                      );
-                },
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 17,
-                      backgroundColor: AppColors.green50,
-                      child: Icon(
-                        Icons.done,
-                        color: AppColors.green500,
-                        size: 17,
+        return MultiSelectPopup(
+          title: "Event Feedback",
+          isLoading: state is ActivitiesLoading,
+          items: [
+            MultiSelectItem(
+              backgroundColor: AppColors.green50,
+              icon: Icons.done,
+              iconColor: AppColors.green500,
+              text: "It’s still there",
+              onTap: () {
+                context.read<ActivitiesBloc>().add(
+                      EventFeedBackEvent(
+                        eventID: eventID,
+                        isThere: true,
                       ),
-                    ),
-                    Dimens.space(1),
-                    Text("its still there",
-                        style: Typo.largeBody.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.neutral600,
-                        )),
-                  ],
-                ),
-              ),
-              Dimens.space(2),
-              Divider(
-                color: Colors.grey.withOpacity(0.2),
-                height: 1,
-              ),
-              Dimens.space(2),
-              GestureDetector(
-                onTap: () {
-                  context.read<ActivitiesBloc>().add(
-                        EventFeedBackEvent(
-                          eventID: eventID,
-                          isThere: false,
-                        ),
-                      );
-                },
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 17,
-                      backgroundColor: AppColors.secondary50,
-                      child: Icon(
-                        Icons.close,
-                        color: AppColors.secondary600,
-                        size: 17,
+                    );
+              },
+            ),
+            const Divider(color: Colors.grey, height: 1),
+            MultiSelectItem(
+              backgroundColor: AppColors.secondary50,
+              icon: Icons.close,
+              iconColor: AppColors.secondary600,
+              text: "It’s not there",
+              onTap: () {
+                context.read<ActivitiesBloc>().add(
+                      EventFeedBackEvent(
+                        eventID: eventID,
+                        isThere: false,
                       ),
-                    ),
-                    Dimens.space(1),
-                    Text("It’s not there",
-                        style: Typo.largeBody.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.neutral600,
-                        )),
-                  ],
-                ),
-              ),
-            ],
-          ),
+                    );
+              },
+            ),
+          ],
         );
       },
     );

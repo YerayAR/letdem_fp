@@ -13,6 +13,7 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/payment_method/screens/add_payment_method.view.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {
@@ -37,6 +38,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     return Scaffold(
       body: BlocConsumer<PaymentMethodBloc, PaymentMethodState>(
         listener: (context, state) {
+          if (state is PaymentMethodError) {
+            Toast.showError(state.message);
+          }
           // TODO: implement listener
         },
         builder: (context, state) {
@@ -52,23 +56,26 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               Dimens.space(3),
               Expanded(
                 child: state is PaymentMethodLoaded
-                    ? ListView.builder(
-                        itemCount: state.paymentMethods.length,
-                        itemBuilder: (context, index) {
-                          final paymentMethod = state.paymentMethods[index];
-                          return _buildCardItem(
-                            last4: paymentMethod.last4,
-                            cardType: paymentMethod.brand,
-                            holderName: paymentMethod.holderName,
-                            isDefault: paymentMethod.isDefault,
-                            onMenuTap: () {
-                              setState(() {
-                                showOptions = true;
-                              });
+                    ? (state).paymentMethods.isEmpty
+                        ? const EmptyPaymentMethodView()
+                        : ListView.builder(
+                            itemCount: state.paymentMethods.length,
+                            itemBuilder: (context, index) {
+                              final paymentMethod = state.paymentMethods[index];
+                              return _buildCardItem(
+                                cardId: paymentMethod.paymentMethodId,
+                                last4: paymentMethod.last4,
+                                cardType: paymentMethod.brand,
+                                holderName: paymentMethod.holderName,
+                                isDefault: paymentMethod.isDefault,
+                                onMenuTap: () {
+                                  setState(() {
+                                    showOptions = true;
+                                  });
+                                },
+                              );
                             },
-                          );
-                        },
-                      )
+                          )
                     : const Center(
                         child: CupertinoActivityIndicator(),
                       ),
@@ -92,20 +99,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     );
   }
 
-  getCardIcon(String cardType) {
-    switch (cardType.toLowerCase()) {
-      case 'visa':
-        return AppAssets.visa;
-      case 'mastercard':
-        return AppAssets.masterCard;
-      default:
-        return '';
-    }
-  }
-
   Widget _buildCardItem({
     required String cardType,
     required String holderName,
+    required String cardId,
     required bool isDefault,
     required String last4,
     required VoidCallback onMenuTap,
@@ -146,7 +143,12 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                   GestureDetector(
                     onTap: () {
                       AppPopup.showBottomSheet(
-                          context, _buildPayoutOptionsSheet());
+                          context,
+                          _buildPayoutOptionsSheet(
+                            context,
+                            cardId,
+                            // Show options sheet
+                          ));
                     },
                     child: Icon(
                       Icons.more_horiz,
@@ -185,7 +187,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     );
   }
 
-  Widget _buildPayoutOptionsSheet() {
+  Widget _buildPayoutOptionsSheet(
+    BuildContext context,
+    String cardId,
+  ) {
     return Padding(
       padding: EdgeInsets.all(Dimens.defaultMargin / 2),
       child: Column(
@@ -194,7 +199,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           Row(
             children: [
               Text(
-                "Payout options",
+                "Payment method",
                 style: Typo.largeBody
                     .copyWith(fontWeight: FontWeight.w700, fontSize: 18),
               ),
@@ -212,7 +217,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ),
           Dimens.space(3),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              context.read<PaymentMethodBloc>().add(
+                    SetDefaultPaymentMethod(cardId),
+                  );
+            },
             child: Row(
               children: [
                 CircleAvatar(
@@ -240,7 +249,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ),
           Dimens.space(1),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              context.read<PaymentMethodBloc>().add(
+                    RemovePaymentMethod(cardId),
+                  );
+            },
             child: Row(
               children: [
                 CircleAvatar(
@@ -353,5 +366,57 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
         ],
       ),
     );
+  }
+}
+
+class EmptyPaymentMethodView extends StatelessWidget {
+  const EmptyPaymentMethodView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Iconsax.card5, // Alternatively: Iconsax.card, Iconsax.money
+              size: 40,
+              color: AppColors.primary500,
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'No Payment Methods Added',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'You haven’t added any payment methods yet.\nAdd one to make payments easily.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.neutral400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+getCardIcon(String cardType) {
+  switch (cardType.toLowerCase()) {
+    case 'visa':
+      return AppAssets.visa;
+    case 'mastercard':
+      return AppAssets.masterCard;
+    default:
+      return '';
   }
 }

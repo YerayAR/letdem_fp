@@ -10,6 +10,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
@@ -68,7 +69,6 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is RegisterError) {
@@ -97,6 +97,11 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                StyledAppBar(
+                  onTap: () => NavigatorHelper.pop(),
+                  title: 'Verify Account',
+                  icon: Icons.close,
+                ),
                 const Spacer(),
                 Column(
                   children: <Widget>[
@@ -127,13 +132,13 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                       length: 6,
                       width: MediaQuery.of(context).size.width,
                       otpFieldStyle: OtpFieldStyle(
-                        enabledBorderColor: Colors.black,
-                        borderColor: Colors.black,
+                        enabledBorderColor: AppColors.neutral200,
+                        borderColor: Colors.black.withOpacity(0.2),
                       ),
                       fieldWidth: 50,
                       controller: otpbox,
                       style: const TextStyle(fontSize: 17),
-                      spaceBetween: 15,
+                      spaceBetween: 5,
                       textFieldAlignment: MainAxisAlignment.center,
                       fieldStyle: FieldStyle.box,
                       onChanged: (value) {

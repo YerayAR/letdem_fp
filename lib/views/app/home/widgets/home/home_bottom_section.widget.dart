@@ -10,15 +10,16 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/mapbox_search/models/service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/tts/tts.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/home/widgets/search/search_bottom_sheet.widget.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 import '../../../../../global/widgets/textfield.dart';
+import '../../../publish_space/screens/publish_space.view.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
   const HomeMapBottomSection({super.key});
@@ -88,15 +89,54 @@ class HomeMapBottomSection extends StatelessWidget {
                   child: PrimaryButton(
                     onTap: () async {
                       ImagePicker imagePicker = ImagePicker();
-                      XFile? image = kDebugMode
-                          ? await imagePicker.pickImage(
-                              source: ImageSource.gallery)
-                          : await imagePicker.pickImage(
-                              source: ImageSource.camera);
-                      if (image != null) {
-                        NavigatorHelper.to(
-                            PublishSpaceScreen(file: File(image.path)));
-                      }
+
+                      AppPopup.showBottomSheet(
+                          context,
+                          MultiSelectPopup(
+                            title: context.l10n.publishSpace,
+                            items: [
+                              MultiSelectItem(
+                                backgroundColor: AppColors.primary50,
+                                icon: Iconsax.location,
+                                iconColor: AppColors.primary500,
+                                text: "Regular Space",
+                                onTap: () async {
+                                  XFile? image = kDebugMode
+                                      ? await imagePicker.pickImage(
+                                          source: ImageSource.gallery)
+                                      : await imagePicker.pickImage(
+                                          source: ImageSource.camera);
+                                  if (image != null) {
+                                    NavigatorHelper.to(
+                                      PublishSpaceScreen(
+                                          isPaid: false,
+                                          file: File(image.path)),
+                                    );
+                                  }
+                                },
+                              ),
+                              Divider(color: AppColors.neutral50, height: 1),
+                              MultiSelectItem(
+                                backgroundColor: AppColors.secondary50,
+                                icon: Iconsax.money,
+                                iconColor: AppColors.secondary600,
+                                text: "Paid Space",
+                                onTap: () async {
+                                  XFile? image = kDebugMode
+                                      ? await imagePicker.pickImage(
+                                          source: ImageSource.gallery)
+                                      : await imagePicker.pickImage(
+                                          source: ImageSource.camera);
+                                  if (image != null) {
+                                    NavigatorHelper.to(
+                                      PublishSpaceScreen(
+                                          isPaid: true, file: File(image.path)),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ));
                     },
                     icon: Iconsax.location5,
                     text: context.l10n.publishSpace,

@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/core.engine.dart';
@@ -65,8 +65,8 @@ Future _initializeHERESDK() async {
   try {
     print("HERE SDK init starting...");
     SdkContext.init(IsolateOrigin.main);
-    Stripe.publishableKey =
-        'pk_test_51RDvqzPEUIIf4s33G882VANwPqFFwMpBq5i7cNy3qtYlqBwYNaUNgmzuX1RbGqDhdlSmFoD4uaONs0KSvoYpagnm00ldkkhPFt'; // Use your real Stripe publishable key
+    // Stripe.publishableKey =
+    //     'pk_test_51RDvqzPEUIIf4s33G882VANwPqFFwMpBq5i7cNy3qtYlqBwYNaUNgmzuX1RbGqDhdlSmFoD4uaONs0KSvoYpagnm00ldkkhPFt'; // Use your real Stripe publishable key
 
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;

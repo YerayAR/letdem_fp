@@ -1,12 +1,17 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/extenstions/locale.dart';
+import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
 import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class NoContributionsWidget extends StatelessWidget {
@@ -35,19 +40,54 @@ class NoContributionsWidget extends StatelessWidget {
           width: MediaQuery.of(context).size.width / 1.9,
           child: PrimaryButton(
             onTap: () async {
-              ImagePicker picker = ImagePicker();
-              var pickedFile =
-                  await picker.pickImage(source: ImageSource.camera);
+              ImagePicker imagePicker = ImagePicker();
 
-              if (pickedFile == null) return;
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      PublishSpaceScreen(file: File(pickedFile.path)),
-                ),
-              );
+              AppPopup.showBottomSheet(
+                  context,
+                  MultiSelectPopup(
+                    title: context.l10n.publishSpace,
+                    items: [
+                      MultiSelectItem(
+                        backgroundColor: AppColors.green50,
+                        icon: Icons.done,
+                        iconColor: AppColors.green500,
+                        text: "Regular Space",
+                        onTap: () async {
+                          XFile? image = kDebugMode
+                              ? await imagePicker.pickImage(
+                                  source: ImageSource.gallery)
+                              : await imagePicker.pickImage(
+                                  source: ImageSource.camera);
+                          if (image != null) {
+                            NavigatorHelper.to(
+                              PublishSpaceScreen(
+                                  isPaid: false, file: File(image.path)),
+                            );
+                          }
+                        },
+                      ),
+                      const Divider(color: Colors.grey, height: 1),
+                      MultiSelectItem(
+                        backgroundColor: AppColors.secondary50,
+                        icon: Icons.close,
+                        iconColor: AppColors.secondary600,
+                        text: "Paid Space",
+                        onTap: () async {
+                          XFile? image = kDebugMode
+                              ? await imagePicker.pickImage(
+                                  source: ImageSource.gallery)
+                              : await imagePicker.pickImage(
+                                  source: ImageSource.camera);
+                          if (image != null) {
+                            NavigatorHelper.to(
+                              PublishSpaceScreen(
+                                  isPaid: true, file: File(image.path)),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ));
             },
             icon: Iconsax.location5,
             text: 'Publish Space',

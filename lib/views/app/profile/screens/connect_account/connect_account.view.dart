@@ -432,14 +432,18 @@ class _BankInfoViewState extends State<BankInfoView> {
           context.read<UserBloc>().add(UpdateEarningAccountEvent(
                 account: state.info,
               ));
+
           AppPopup.showDialogSheet(
-              context,
+              NavigatorHelper.navigatorKey.currentState!.context,
               SuccessDialog(
                 onProceed: () {
                   NavigatorHelper.pop();
+                  NavigatorHelper.pop();
                 },
-                title: 'Success',
-                subtext: 'Your account has been successfully created.',
+                title: 'Details Submitted',
+                buttonText: 'Goi it, Thanks',
+                subtext:
+                    'Your account connection details submitted successfully, you will soon be able to receive money  for paid spaces. ',
               ));
         } else if (state is EarningsFailure) {
           Toast.showError(state.message);

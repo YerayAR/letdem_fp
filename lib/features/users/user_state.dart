@@ -52,8 +52,7 @@ class UserLoaded extends UserState {
   }) {
     return UserLoaded(
       user: user ?? this.user,
-      isUpdateLoading:
-          isUpdateLoading ?? this.isUpdateLoading,
+      isUpdateLoading: isUpdateLoading ?? this.isUpdateLoading,
       isLocationPermissionGranted:
           isLocationPermissionGranted ?? this.isLocationPermissionGranted,
       points: points ?? this.points,

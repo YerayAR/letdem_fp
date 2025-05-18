@@ -17,3 +17,21 @@ class VerifyEmailDTO extends DTO {
     };
   }
 }
+
+class ConfirmationCodeDTO extends DTO {
+  final String code;
+
+  final String spaceID;
+
+  ConfirmationCodeDTO({
+    required this.code,
+    required this.spaceID,
+  });
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'confirmation_code': code,
+    };
+  }
+}

@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:equatable/equatable.dart';
+import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
+import 'package:letdem/features/payment_methods/repository/payments.repository.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
@@ -247,25 +250,24 @@ getStepString(EarningStep step) {
   }
 }
 
-class LetDemUser {
+class LetDemUser extends Equatable {
   final String id;
   final String email;
   final String firstName;
+
+  final ReservedSpacePayload? activeReservation;
   final String lastName;
+
+  final PaymentMethodModel? defaultPaymentMethod;
   final bool isSocial;
   final int totalPoints;
-
   final int notificationsCount;
-
   final List<Activity> contributions;
-
-  EarningAccount? earningAccount;
-
+  final EarningAccount? earningAccount;
   final UserPreferences preferences;
-
   final NotificationPreferences notificationPreferences;
 
-  LetDemUser({
+  const LetDemUser({
     required this.id,
     required this.email,
     required this.preferences,
@@ -273,11 +275,33 @@ class LetDemUser {
     required this.firstName,
     required this.lastName,
     this.earningAccount,
+    this.defaultPaymentMethod,
+    this.activeReservation,
     required this.isSocial,
     required this.totalPoints,
     required this.notificationsCount,
     required this.contributions,
   });
+
+  LetDemUser copyWith({
+    EarningAccount? earningAccount,
+  }) {
+    return LetDemUser(
+      id: id,
+      email: email,
+      preferences: preferences,
+      notificationPreferences: notificationPreferences,
+      firstName: firstName,
+      lastName: lastName,
+      earningAccount: earningAccount ?? this.earningAccount,
+      isSocial: isSocial,
+      totalPoints: totalPoints,
+      defaultPaymentMethod: defaultPaymentMethod,
+      activeReservation: activeReservation,
+      notificationsCount: notificationsCount,
+      contributions: contributions,
+    );
+  }
 
   factory LetDemUser.fromJSON(Map<String, dynamic> json) {
     return LetDemUser(
@@ -288,6 +312,12 @@ class LetDemUser {
       firstName: json['first_name'] ?? '',
       earningAccount: json['earning_account'] != null
           ? EarningAccount.fromJson(json['earning_account'])
+          : null,
+      defaultPaymentMethod: json['default_payment_method'] != null
+          ? PaymentMethodModel.fromJson(json['default_payment_method'])
+          : null,
+      activeReservation: json['active_reservation'] != null
+          ? ReservedSpacePayload.fromJson(json['active_reservation'])
           : null,
       preferences: UserPreferences(
         isProhibitedZoneAlert: json['alerts_preferences']
@@ -311,10 +341,6 @@ class LetDemUser {
     );
   }
 
-  void setEarningAccount(EarningAccount account) {
-    earningAccount = account;
-  }
-
   Map<String, dynamic> toJSON() {
     return {
       'email': email,
@@ -325,6 +351,21 @@ class LetDemUser {
       'notifications_count': notificationsCount,
     };
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        email,
+        firstName,
+        lastName,
+        isSocial,
+        totalPoints,
+        notificationsCount,
+        contributions,
+        earningAccount,
+        preferences,
+        notificationPreferences,
+      ];
 }
 
 class EditBasicInfoDTO extends DTO {

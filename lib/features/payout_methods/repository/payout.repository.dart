@@ -30,9 +30,9 @@ class PayoutMethodRepository implements IPayoutMethodRepository {
 
   @override
   Future<void> deletePayoutMethod(String id) async {
-    // await ApiService.sendRequest(
-    //   endpoint: EndPoints.deletePayoutMethod.copyWith(pathParams: [id]),
-    // );
+    await ApiService.sendRequest(
+      endpoint: EndPoints.deletePayoutMethod(id),
+    );
   }
 }
 

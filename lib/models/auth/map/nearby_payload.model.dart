@@ -42,32 +42,57 @@ class MapNearbyPayload {
   }
 }
 
+String getTimeLeftMessage(DateTime now, DateTime reservationEndTime) {
+  final difference = reservationEndTime.difference(now);
+
+  if (difference.isNegative) {
+    return 'Reservation expired';
+  } else if (difference.inMinutes < 1) {
+    return 'Less than a minute left';
+  } else {
+    return '${difference.inMinutes} mins left to reserve space';
+  }
+}
+
 class Space {
   final String id;
   final PublishSpaceType type;
   final String image;
+
+  final String? price;
   final Location location;
   final DateTime created;
   final String resourceType;
+
+  final DateTime? expirationDate;
+
+  final bool isPremium;
 
   Space({
     required this.id,
     required this.type,
     required this.image,
     required this.location,
+    this.expirationDate,
     required this.created,
+    this.price,
+    this.isPremium = false,
     required this.resourceType,
   });
 
   factory Space.fromJson(Map<String, dynamic> json) {
     return Space(
-      id: json['id'],
-      type: getEnumFromText(json['type']),
-      image: json['image'],
-      location: Location.fromJson(json['location']),
-      created: DateTime.parse(json['created']),
-      resourceType: json['resourcetype'],
-    );
+        id: json['id'],
+        type: getEnumFromText(json['type'], json['resourcetype']),
+        image: json['image'],
+        location: Location.fromJson(json['location']),
+        price: json['price']?.toString(),
+        created: DateTime.parse(json['created']),
+        resourceType: json['resourcetype'],
+        expirationDate: json['expires_at'] != null
+            ? DateTime.parse(json['expires_at'])
+            : null,
+        isPremium: json['resourcetype'] == 'PaidSpace');
   }
 
   Map<String, dynamic> toJson() {

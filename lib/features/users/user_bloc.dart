@@ -35,11 +35,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       if (state is UserLoaded) {
         UserLoaded userLoaded = state as UserLoaded;
 
-        LetDemUser user = userLoaded.user;
-
-        user.setEarningAccount(event.account);
+        final updatedUser = userLoaded.user.copyWith(
+          earningAccount: event.account,
+        );
         emit(UserLoaded(
-          user: user,
+          user: updatedUser,
           points: userLoaded.points,
           isLocationPermissionGranted: userLoaded.isLocationPermissionGranted,
         ));

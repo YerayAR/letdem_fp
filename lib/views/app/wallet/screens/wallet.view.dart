@@ -15,6 +15,7 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
+import 'package:letdem/views/app/wallet/screens/payout/withdraw.view.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -142,9 +143,9 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
                 const SizedBox(height: 8),
                 SizedBox(
                   child: !isVisible
-                      ? Text(
+                      ? const Text(
                           '****',
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: Colors.white,
                               fontSize: 36,
                               fontWeight: FontWeight.bold),
@@ -165,6 +166,9 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
                 ),
                 const SizedBox(height: 24),
                 PrimaryButton(
+                  onTap: () {
+                    NavigatorHelper.to(const WithdrawView());
+                  },
                   text: 'Withdraw',
                   background: AppColors.primary50,
                   textColor: AppColors.primary500,
@@ -383,46 +387,37 @@ class EmptyTransactionsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0F000000),
-            blurRadius: 10,
-            offset: Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'No Transactions Yet',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Your transactions history will be listed here when you have any activity to show.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
-              height: 1.5,
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'No Transactions Yet',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-          const Spacer(),
-          Container(
-            width: 40,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(2.5),
+            const SizedBox(height: 12),
+            Text(
+              'Your transactions history will be listed here when you have any activity to show.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 14,
+                height: 1.5,
+              ),
             ),
-          ),
-        ],
+            const Spacer(),
+            Container(
+              width: 40,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2.5),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

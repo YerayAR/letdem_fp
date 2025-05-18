@@ -4,7 +4,14 @@ import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class MapAssetsProvider {
-  late Uint8List freeMarker, greenMarker, blueMarker, disasterMarker;
+  late Uint8List freeMarker,
+      greenMarker,
+      blueMarker,
+      disasterMarker,
+      paidFreeMarker,
+      paidGreenMarker,
+      paidBlueMarker,
+      paidDisasterMarker;
 
   late Uint8List currentLocationMarker;
 
@@ -24,6 +31,11 @@ class MapAssetsProvider {
     accidentMarker = await _loadImage(AppAssets.accidentMapMarker);
     closedRoadMarker = await _loadImage(AppAssets.closedRoadMapMarker);
     policeMarker = await _loadImage(AppAssets.policeMapMarker);
+
+    paidFreeMarker = await _loadImage(AppAssets.paidFreeMapMarker);
+    paidGreenMarker = await _loadImage(AppAssets.paidGreenMapMarker);
+    paidBlueMarker = await _loadImage(AppAssets.paidBlueMapMarker);
+    paidDisasterMarker = await _loadImage(AppAssets.paidDisabledMapMarker);
   }
 
   // getter for current location marker
@@ -37,6 +49,7 @@ class MapAssetsProvider {
   }
 
   Uint8List getImageForType(PublishSpaceType type) {
+    print("type: $type");
     switch (type) {
       case PublishSpaceType.free:
         return freeMarker;
@@ -46,6 +59,14 @@ class MapAssetsProvider {
         return blueMarker;
       case PublishSpaceType.disabled:
         return disasterMarker;
+      case PublishSpaceType.paidFree:
+        return freeMarker;
+      case PublishSpaceType.paidGreenZone:
+        return paidGreenMarker;
+      case PublishSpaceType.paidBlue:
+        return paidBlueMarker;
+      case PublishSpaceType.paidDisabled:
+        return paidDisasterMarker;
     }
   }
 

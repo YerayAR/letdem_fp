@@ -10,7 +10,7 @@ class StyledBody extends StatelessWidget {
   const StyledBody({
     super.key,
     required this.children,
-    this.isBottomPadding = false,
+    this.isBottomPadding = true,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
   });
@@ -25,7 +25,7 @@ class StyledBody extends StatelessWidget {
         right: Dimens.defaultMargin,
       ),
       child: SafeArea(
-        bottom: false,
+        bottom: isBottomPadding,
         child: Column(
           crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
           mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,

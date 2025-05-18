@@ -1,10 +1,13 @@
+import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/repositories/activity.interface..dart';
+import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/models/activities/activities_response.dto.dart';
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
+import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 
 class ActivityRepository extends IActivityRepository {
@@ -49,10 +52,23 @@ class ActivityRepository extends IActivityRepository {
   }
 
   @override
-  Future publishSpace(PublishSpaceDTO dto) async {
-    ApiResponse res = await ApiService.sendRequest(
-      endpoint: EndPoints.publishSpace.copyWithDTO(dto),
-    );
+  Future publishSpace(PublishSpaceDTO dto, bool isFree) async {
+    // ApiResponse res = await ApiService.sendRequest(
+    //   endpoint: EndPoints.publishSpace.copyWithDTO(dto),
+    // );
+
+    var res;
+
+    if (isFree) {
+      res = await ApiService.sendRequest(
+        endpoint: EndPoints.publishSpaceFree.copyWithDTO(dto),
+      );
+    } else {
+      res = await ApiService.sendRequest(
+        endpoint: EndPoints.publishSpacePaid.copyWithDTO(dto),
+      );
+    }
+    return null;
   }
 
   @override
@@ -69,5 +85,40 @@ class ActivityRepository extends IActivityRepository {
         EventFeedBackDTO(isThere: isThere),
       ),
     );
+  }
+
+  @override
+  Future<ReservedSpacePayload> reserveSpace(
+      {required String spaceID, required String paymentMethodID}) async {
+    var res = await ApiService.sendRequest(
+      endpoint: EndPoints.reserveSpace(spaceID).copyWithDTO(
+        ReserveSpaceDTO(paymentMethodID: paymentMethodID),
+      ),
+    );
+
+    return ReservedSpacePayload.fromJson(res.data);
+  }
+
+  @override
+  Future confirmSpaceReservation(
+      {required ConfirmationCodeDTO confirmationCode,
+      required String spaceID}) async {
+    return ApiService.sendRequest(
+      endpoint:
+          EndPoints.confirmReservation(spaceID).copyWithDTO(confirmationCode),
+    );
+  }
+}
+
+class ReserveSpaceDTO extends DTO {
+  final String paymentMethodID;
+
+  ReserveSpaceDTO({required this.paymentMethodID});
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "payment_method_id": paymentMethodID,
+    };
   }
 }
