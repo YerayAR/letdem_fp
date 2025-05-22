@@ -12,6 +12,7 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/models/country_codes.model.dart';
@@ -342,61 +343,55 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                   e != PublishSpaceType.paidBlue &&
                                   e != PublishSpaceType.paidDisabled &&
                                   e != PublishSpaceType.paidGreenZone)
-                              .map((e) => (e == PublishSpaceType.free &&
-                                      widget.isPaid)
-                                  ? SizedBox()
-                                  : Flexible(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedType = e;
-                                          });
-                                        },
-                                        child: AspectRatio(
-                                          aspectRatio: 1,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            height: 90,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              border: selectedType == e
-                                                  ? Border.all(
-                                                      color:
-                                                          AppColors.primary200,
-                                                      width: 2)
-                                                  : Border.all(
-                                                      color:
-                                                          AppColors.neutral50,
-                                                      width: 2),
-                                            ),
-                                            child: Center(
-                                                child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  getSpaceTypeIcon(e),
-                                                  width: 30,
-                                                  height: 30,
-                                                ),
-                                                Dimens.space(1),
-                                                Text(
-                                                  getSpaceTypeText(e),
-                                                  style:
-                                                      Typo.smallBody.copyWith(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                            )),
+                              .map((e) => Flexible(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedType = e;
+                                        });
+                                      },
+                                      child: AspectRatio(
+                                        aspectRatio: 1,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          height: 90,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            border: selectedType == e
+                                                ? Border.all(
+                                                    color: AppColors.primary200,
+                                                    width: 2)
+                                                : Border.all(
+                                                    color: AppColors.neutral50,
+                                                    width: 2),
                                           ),
+                                          child: Center(
+                                              child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SvgPicture.asset(
+                                                getSpaceTypeIcon(e),
+                                                width: 30,
+                                                height: 30,
+                                              ),
+                                              Dimens.space(1),
+                                              Text(
+                                                getSpaceTypeText(e),
+                                                style: Typo.smallBody.copyWith(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          )),
                                         ),
                                       ),
-                                    ))
+                                    ),
+                                  ))
                               .toList(),
                         ),
                       ],

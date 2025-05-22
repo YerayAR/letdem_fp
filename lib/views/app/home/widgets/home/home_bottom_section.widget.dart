@@ -9,6 +9,7 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
+import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
 import 'package:letdem/global/widgets/button.dart';
@@ -122,6 +123,86 @@ class HomeMapBottomSection extends StatelessWidget {
                                 iconColor: AppColors.secondary600,
                                 text: "Paid Space",
                                 onTap: () async {
+                                  var isPaidAccountExist =
+                                      context.userProfile!.earningAccount !=
+                                          null;
+
+                                  if (!isPaidAccountExist) {
+                                    AppPopup.showBottomSheet(
+                                        context,
+                                        SizedBox(
+                                          child: Container(
+                                            padding: EdgeInsets.all(
+                                                Dimens.defaultMargin),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // Alert icon in purple circle
+                                                Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.primary500
+                                                        .withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.all(22),
+                                                  child: Container(
+                                                    width: 70,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.primary500,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Center(
+                                                      child: Icon(
+                                                        Icons.priority_high,
+                                                        color: Colors.white,
+                                                        size: 32,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 24),
+
+                                                // Important Notice text
+                                                Text(
+                                                  'Important Notice',
+                                                  style: Typo.heading4.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+
+                                                // Description text
+                                                Text(
+                                                  'You need to create an earning account to publish a paid space. Please create an earning account first.',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      Typo.mediumBody.copyWith(
+                                                    color: AppColors.neutral500,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 32),
+
+                                                // Continue button
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: PrimaryButton(
+                                                    onTap: () {
+                                                      NavigatorHelper.pop();
+                                                    },
+                                                    text: 'Continue',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                                    return;
+                                  }
                                   XFile? image = kDebugMode
                                       ? await imagePicker.pickImage(
                                           source: ImageSource.gallery)

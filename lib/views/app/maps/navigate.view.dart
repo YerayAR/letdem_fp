@@ -21,6 +21,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
@@ -2038,7 +2039,7 @@ class FeedbackForm extends StatelessWidget {
                     );
               },
             ),
-            const Divider(color: Colors.grey, height: 1),
+            Divider(color: AppColors.neutral50, height: 1),
             MultiSelectItem(
               backgroundColor: AppColors.secondary50,
               icon: Icons.close,

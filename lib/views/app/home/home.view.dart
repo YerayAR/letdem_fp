@@ -16,6 +16,7 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
@@ -30,11 +31,13 @@ import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
+import 'package:letdem/views/app/maps/navigate.view.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/app/payment_method/screens/add_payment_method.view.dart';
 import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ... your imports remain unchanged
 
@@ -330,6 +333,13 @@ class _HomeViewState extends State<HomeView>
                 Flexible(
                   child: PrimaryButton(
                     outline: true,
+                    onTap: () {
+                      AppPopup.showBottomSheet(
+                          context,
+                          FeedbackForm(
+                            eventID: event.id,
+                          ));
+                    },
                     background: AppColors.primary50,
                     borderColor: Colors.transparent,
                     color: AppColors.primary500,
@@ -891,14 +901,30 @@ class ReservedSpaceDetailView extends StatelessWidget {
 
                 // Navigate Button
                 PrimaryButton(
-                  onTap: () {},
+                  onTap: () {
+                    NavigatorHelper.to(TrafficRouteLineExample(
+                      hideToggle: true,
+                      spaceInfo: space,
+                      streetName: space.location.streetName,
+                      lat: space.location.point.lat,
+                      lng: space.location.point.lng,
+                    ));
+                  },
                   text: 'Navigate to Space',
                 ),
                 const SizedBox(height: 16),
 
                 // Call Button
                 PrimaryButton(
-                  onTap: () {},
+                  onTap: () async {
+                    Uri url = Uri.parse('tel:${details.phone}');
+                    if (!await launchUrl(url)) {
+                      Toast.showError("Could not launch dialer");
+                    } else {
+                      // Successfully launched the dialer
+                      print("Dialer launched successfully");
+                    }
+                  },
                   borderWidth: 1,
                   background: Colors.white,
                   textColor: AppColors.neutral500,

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/payment_methods/repository/payments.repository.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';

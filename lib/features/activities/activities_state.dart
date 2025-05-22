@@ -1,4 +1,6 @@
-part of 'activities_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:letdem/models/activities/activity.model.dart';
+import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 
 sealed class ActivitiesState extends Equatable {
   const ActivitiesState();
@@ -52,7 +54,7 @@ final class SpaceReserved extends ActivitiesState {
 class ReservedSpacePayload {
   final String id;
   final double price;
-  final PublishSpaceType type;
+  final Space space;
   final DateTime expireAt;
   final String status;
   final bool isOwner;
@@ -63,7 +65,7 @@ class ReservedSpacePayload {
   ReservedSpacePayload({
     required this.id,
     required this.price,
-    required this.type,
+    required this.space,
     required this.expireAt,
     required this.status,
     required this.isOwner,
@@ -73,30 +75,28 @@ class ReservedSpacePayload {
   });
 
   factory ReservedSpacePayload.fromJson(Map<String, dynamic> json) {
+    final spaceJson = json['space'] ?? {};
     return ReservedSpacePayload(
       id: json['id'],
-      price: double.parse(json['price'].toString()),
-      type: getEnumFromText(json['type'], json['status']),
-      expireAt: DateTime.parse(json['expires_at']),
-      status: json['status'],
-      isOwner: json['is_owner'],
-      phone: json['phone'],
+      price: double.tryParse(spaceJson['price']?.toString() ?? '0') ?? 0,
+      space: Space.fromJson(spaceJson),
+      expireAt:
+          DateTime.tryParse(spaceJson['expires_at'] ?? '') ?? DateTime.now(),
+      isOwner: json['is_owner'] ?? false,
+      phone: spaceJson['phone'] ?? '',
+      status: json['status'] ?? '',
       confirmationCode: json['confirmation_code'].toString(),
-      carPlateNumber: json['car_plate_number'],
+      carPlateNumber: json['car_plate_number'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'price': price,
-      'type': type,
-      'expires_at': expireAt.toIso8601String(),
-      'status': status,
       'is_owner': isOwner,
-      'phone': phone,
       'confirmation_code': confirmationCode,
       'car_plate_number': carPlateNumber,
+      'space': space.toJson(),
     };
   }
 }

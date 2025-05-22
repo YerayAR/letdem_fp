@@ -155,34 +155,6 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                   ),
                   Dimens.space(2),
                   GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 17,
-                          backgroundColor: AppColors.primary50,
-                          child: Icon(
-                            Iconsax.edit,
-                            color: AppColors.primary600,
-                            size: 17,
-                          ),
-                        ),
-                        Dimens.space(1),
-                        Text("Edit",
-                            style: Typo.largeBody.copyWith(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w500,
-                            )),
-                      ],
-                    ),
-                  ),
-                  Dimens.space(2),
-                  Divider(
-                    color: Colors.grey.withOpacity(0.2),
-                    height: 1,
-                  ),
-                  Dimens.space(2),
-                  GestureDetector(
                     onTap: () {
                       context.read<PayoutMethodBloc>().add(
                             DeletePayoutMethod(method.id),

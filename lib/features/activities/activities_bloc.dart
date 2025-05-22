@@ -2,20 +2,18 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/image/compressor.dart';
 import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 part 'activities_event.dart';
-part 'activities_state.dart';
 
 class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   ActivityRepository activityRepository;

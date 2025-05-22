@@ -8,6 +8,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
@@ -25,6 +26,7 @@ import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 
@@ -64,7 +66,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  "https://upload.wikimedia.org/wikipedia/commons/1/19/Blue_Disc_Parking_Area_Markings_Blue_Paint.JPG",
+                  widget.payload.space.image,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -94,13 +96,14 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                       child: Column(
                         children: [
                           SvgPicture.asset(
-                            getSpaceTypeIcon(widget.payload.type),
+                            getSpaceTypeIcon(widget.payload.space.type),
                             width: 60,
                             height: 60,
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            getSpaceAvailabilityMessage(widget.payload.type),
+                            getSpaceAvailabilityMessage(
+                                widget.payload.space.type),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -179,9 +182,11 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                           radius: 12,
                           backgroundColor: widget.payload.status == "RESERVED"
                               ? AppColors.green500
-                              : AppColors.red500,
-                          child: const Icon(
-                            Icons.done,
+                              : AppColors.neutral200,
+                          child: Icon(
+                            widget.payload.status != "RESERVED"
+                                ? Iconsax.clock5
+                                : Icons.done,
                             size: 17,
                             color: Colors.white,
                           ),
@@ -189,7 +194,9 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                       ),
                       Dimens.space(1),
                       Text(
-                        widget.payload.status,
+                        widget.payload.status == "RESERVED"
+                            ? "Reserved"
+                            : "Waiting",
                         style: Typo.mediumBody.copyWith(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
@@ -216,103 +223,126 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                 onTap: () {
                   AppPopup.showBottomSheet(
                     context,
-                    Padding(
-                      padding: EdgeInsets.all(Dimens.defaultMargin),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Confirmation Code",
-                            textAlign: TextAlign.center,
-                            style: Typo.heading4
-                                .copyWith(color: AppColors.neutral600),
-                          ),
-                          Text(
-                            "The requester of the space will give you a 6-digit confirmation number, enter it here.",
-                            textAlign: TextAlign.center,
-                            style: Typo.mediumBody
-                                .copyWith(color: AppColors.neutral400),
-                          ),
-                          Dimens.space(3),
-                          OTPTextField(
-                            length: 6,
-                            width: MediaQuery.of(context).size.width,
-                            otpFieldStyle: OtpFieldStyle(
-                              enabledBorderColor: AppColors.neutral100,
-                              borderColor: Colors.black.withOpacity(0.2),
-                            ),
-                            fieldWidth: 50,
-                            controller: otpbox,
-                            style: const TextStyle(fontSize: 17),
-                            spaceBetween: 5,
-                            textFieldAlignment: MainAxisAlignment.center,
-                            fieldStyle: FieldStyle.box,
-                            onChanged: (value) {
-                              setState(() {
-                                otp = value;
-                              });
-                            },
-                            onCompleted: (pin) {
-                              setState(() {
-                                otp = pin;
-                              });
-                            },
-                          ),
-                          Dimens.space(3),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 1.50,
-                            decoration: BoxDecoration(
-                              color: AppColors.secondary50,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: Dimens.defaultMargin / 2,
-                              horizontal: Dimens.defaultMargin,
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Kindly ensure that the confirmation code works before you give out the space',
-                                  textAlign: TextAlign.center,
-                                  style: Typo.mediumBody.copyWith(
-                                    color: AppColors.secondary600,
-                                    fontSize: 12,
-                                  ),
+                    BlocConsumer<ActivitiesBloc, ActivitiesState>(
+                      listener: (context, state) {
+                        if (state is SpaceReserved) {
+                          NavigatorHelper.pop();
+                          AppPopup.showBottomSheet(
+                              context,
+                              SuccessDialog(
+                                title: "Space Reserved",
+                                subtext:
+                                    "Your space has been reserved successfully.",
+                                onProceed: () {
+                                  NavigatorHelper.popAll();
+                                },
+                              ));
+                        }
+                        // TODO: implement listener
+                      },
+                      builder: (context, state) {
+                        return Padding(
+                          padding: EdgeInsets.all(Dimens.defaultMargin),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Confirmation Code",
+                                textAlign: TextAlign.center,
+                                style: Typo.heading4
+                                    .copyWith(color: AppColors.neutral600),
+                              ),
+                              Text(
+                                "The requester of the space will give you a 6-digit confirmation number, enter it here.",
+                                textAlign: TextAlign.center,
+                                style: Typo.mediumBody
+                                    .copyWith(color: AppColors.neutral400),
+                              ),
+                              Dimens.space(3),
+                              OTPTextField(
+                                length: 6,
+                                width: MediaQuery.of(context).size.width,
+                                otpFieldStyle: OtpFieldStyle(
+                                  enabledBorderColor: AppColors.neutral100,
+                                  borderColor: Colors.black.withOpacity(0.2),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Dimens.space(17),
-                          PrimaryButton(
-                              text: "Confirm Order",
-                              onTap: () {
-                                if (otp.isEmpty || otp.length < 6) {
-                                  Toast.showError(
-                                    "Please enter the confirmation code",
-                                  );
-                                  return;
-                                }
-                                context
-                                    .read<ActivitiesBloc>()
-                                    .add(ConfirmSpaceReserveEvent(
-                                      confirmationCode: ConfirmationCodeDTO(
-                                        code: otp,
-                                        spaceID: widget.payload.id,
+                                fieldWidth: 50,
+                                controller: otpbox,
+                                style: const TextStyle(fontSize: 17),
+                                spaceBetween: 5,
+                                textFieldAlignment: MainAxisAlignment.center,
+                                fieldStyle: FieldStyle.box,
+                                onChanged: (value) {
+                                  setState(() {
+                                    otp = value;
+                                  });
+                                },
+                                onCompleted: (pin) {
+                                  setState(() {
+                                    otp = pin;
+                                  });
+                                },
+                              ),
+                              Dimens.space(3),
+                              Container(
+                                width: MediaQuery.of(context).size.width / 1.50,
+                                decoration: BoxDecoration(
+                                  color: AppColors.secondary50,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: Dimens.defaultMargin / 2,
+                                  horizontal: Dimens.defaultMargin,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Kindly ensure that the confirmation code works before you give out the space',
+                                      textAlign: TextAlign.center,
+                                      style: Typo.mediumBody.copyWith(
+                                        color: AppColors.secondary600,
+                                        fontSize: 12,
                                       ),
-                                    ));
-                              }),
-                          Dimens.space(2),
-                          PrimaryButton(
-                            text: "Cancel",
-                            color: AppColors.neutral100,
-                            onTap: () {
-                              NavigatorHelper.pop();
-                            },
-                            textColor: Colors.black,
-                            background: Colors.white,
-                            borderWidth: 1,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Dimens.space(17),
+                              PrimaryButton(
+                                  isLoading: context
+                                      .watch<ActivitiesBloc>()
+                                      .state is ActivitiesLoading,
+                                  text: "Confirm Order",
+                                  onTap: () {
+                                    if (otp.isEmpty || otp.length < 6) {
+                                      Toast.showError(
+                                        "Please enter the confirmation code",
+                                      );
+                                      return;
+                                    }
+                                    context
+                                        .read<ActivitiesBloc>()
+                                        .add(ConfirmSpaceReserveEvent(
+                                          confirmationCode: ConfirmationCodeDTO(
+                                            code: otp,
+                                            spaceID: widget.payload.id,
+                                          ),
+                                        ));
+                                  }),
+                              Dimens.space(2),
+                              PrimaryButton(
+                                text: "Cancel",
+                                color: AppColors.neutral100,
+                                onTap: () {
+                                  NavigatorHelper.pop();
+                                },
+                                textColor: Colors.black,
+                                background: Colors.white,
+                                borderWidth: 1,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   );
                 },
@@ -335,15 +365,14 @@ class ActiveReservationView extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (payload.isOwner) {
+        if (!payload.isOwner) {
           NavigatorHelper.to(
             ReservedSpaceDetailView(
                 details: payload,
                 space: Space(
                   id: payload.id,
-                  type: payload.type,
-                  image:
-                      "https://upload.wikimedia.org/wikipedia/commons/1/19/Blue_Disc_Parking_Area_Markings_Blue_Paint.JPG",
+                  type: payload.space.type,
+                  image: payload.space.image,
                   location: Location(
                     address: '',
                     point: Point(lat: 2, lng: 2),
@@ -380,12 +409,12 @@ class ActiveReservationView extends StatelessWidget {
                 Row(
                   children: [
                     SvgPicture.asset(
-                      getSpaceTypeIcon(payload.type),
+                      getSpaceTypeIcon(payload.space.type),
                       width: 25,
                       height: 25,
                     ),
                     Dimens.space(1),
-                    Text(getSpaceAvailabilityMessage(payload.type),
+                    Text(getSpaceAvailabilityMessage(payload.space.type),
                         style: Typo.mediumBody.copyWith(
                           fontWeight: FontWeight.w700,
                         )),
@@ -395,7 +424,7 @@ class ActiveReservationView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 5,
-                      backgroundColor: payload.status == "RESERVED"
+                      backgroundColor: payload.space == "RESERVED"
                           ? AppColors.green500
                           : AppColors.red500,
                     ),

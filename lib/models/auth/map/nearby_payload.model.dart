@@ -83,12 +83,12 @@ class Space {
   factory Space.fromJson(Map<String, dynamic> json) {
     return Space(
         id: json['id'],
-        type: getEnumFromText(json['type'], json['resourcetype']),
+        type: getEnumFromText(json['type'], json['resourcetype'] ?? ""),
         image: json['image'],
         location: Location.fromJson(json['location']),
         price: json['price']?.toString(),
         created: DateTime.parse(json['created']),
-        resourceType: json['resourcetype'],
+        resourceType: json['resourcetype'] ?? "",
         expirationDate: json['expires_at'] != null
             ? DateTime.parse(json['expires_at'])
             : null,

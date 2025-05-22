@@ -76,6 +76,8 @@ dependencies:
 #  stripe_android: ^11.5.0
 
   flag: ^7.0.0
+  flutter_stripe: ^11.5.0
+  url_launcher: ^6.3.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
