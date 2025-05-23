@@ -11,6 +11,7 @@ import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/views/app/profile/screens/preferences/preferences.view.dart';
+import 'package:letdem/views/app/wallet/screens/orders/orders.view.dart';
 
 enum EarningStatus {
   missingInfo,
@@ -39,6 +40,17 @@ class UserRepository extends IUserRepository {
   Future<void> deleteUser() {
     // TODO: implement deleteUser
     throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Order>> getOrders() async {
+    ApiResponse response = await ApiService.sendRequest(
+      endpoint: EndPoints.getOrdersEndpoint,
+    );
+
+    return response.data['results']
+        .map<Order>((e) => Order.fromJson(e))
+        .toList();
   }
 
   @override
@@ -102,6 +114,8 @@ abstract class IUserRepository {
   Future<void> changeLanguage(Locale locale);
   Future<void> createUser();
   Future<void> deleteUser();
+
+  Future<List<Order>> getOrders();
 
   Future updatePreferencesEndpoint(PreferencesDTO dto);
 

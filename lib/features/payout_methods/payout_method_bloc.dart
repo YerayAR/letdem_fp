@@ -22,7 +22,7 @@ class PayoutMethodBloc extends Bloc<PayoutMethodEvent, PayoutMethodState> {
     emit(PayoutMethodLoading());
     try {
       final methods = await payoutMethodRepository.fetchPayoutMethods();
-      emit(PayoutMethodSuccess(methods));
+      emit(PayoutMethodSuccess(methods, [], false));
     } on ApiError catch (err) {
       emit(PayoutMethodFailure(err.message));
     } catch (e) {
@@ -53,7 +53,7 @@ class PayoutMethodBloc extends Bloc<PayoutMethodEvent, PayoutMethodState> {
 
       var data = await payoutMethodRepository.fetchPayoutMethods();
 
-      emit(PayoutMethodSuccess(data));
+      emit(PayoutMethodSuccess(data, [], false));
     } catch (e) {
       emit(PayoutMethodFailure(e.toString()));
     }

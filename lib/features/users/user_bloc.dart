@@ -8,6 +8,7 @@ import 'package:letdem/models/auth/tokens.model.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/views/app/wallet/screens/orders/orders.view.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 part 'user_event.dart';
@@ -25,8 +26,35 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<ChangeLanguageEvent>(_onChangeLanguage);
     on<UpdateEarningAccountEvent>(_onUpdateEarningAccount);
     on<DeleteAccountEvent>(_onDeleteAccount);
+    on<LoadOrdersEvent>(_onLoadOrdererInfo);
     on<UpdatePreferencesEvent>(_onUpdatePreferences);
     on<UpdateNotificationPreferencesEvent>(_onUpdateNotificationPreferences);
+  }
+
+  Future<void> _onLoadOrdererInfo(
+      LoadOrdersEvent event, Emitter<UserState> emit) async {
+    try {
+      if (state is UserLoaded) {
+        UserLoaded userLoaded = state as UserLoaded;
+        emit(userLoaded.copyWith(
+          isOrdersLoading: true,
+        ));
+
+        var orders = await userRepository.getOrders();
+
+        print(orders);
+
+        emit(userLoaded.copyWith(
+          isOrdersLoading: false,
+          orders: orders,
+        ));
+      }
+    } catch (err, st) {
+      print(err);
+      print(st);
+
+      add(FetchUserInfoEvent());
+    }
   }
 
   Future<void> _onUpdateEarningAccount(

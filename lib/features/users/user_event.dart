@@ -88,6 +88,13 @@ class DeleteAccountEvent extends UserEvent {
   List<Object?> get props => [];
 }
 
+class LoadOrdersEvent extends UserEvent {
+  const LoadOrdersEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class UserLoggedOutEvent extends UserEvent {
   @override
   // TODO: implement props

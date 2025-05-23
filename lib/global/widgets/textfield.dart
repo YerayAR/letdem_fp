@@ -31,6 +31,7 @@ class TextInputField extends StatefulWidget {
 
   final bool showDeleteIcon;
 
+  final Widget? child;
   const TextInputField({
     super.key,
     this.controller,
@@ -47,6 +48,7 @@ class TextInputField extends StatefulWidget {
     this.prefixIcon,
     this.isLoading = false,
     this.showDeleteIcon = false,
+    this.child,
   });
 
   @override
@@ -250,55 +252,56 @@ class TextInputFieldState extends State<TextInputField> {
                               color: AppColors
                                   .primary400), // Border color when focused
                         ),
-                  suffixIcon: widget.showDeleteIcon
-                      ? widget.controller!.text.isNotEmpty
-                          ? InkWell(
-                              splashColor:
-                                  Colors.transparent, // Remove ripple effect
-                              highlightColor:
-                                  Colors.transparent, // Remove highlight effect
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 5),
-                                child: GestureDetector(
-                                  child: Icon(
-                                    Iconsax.close_circle5,
-                                    size: 22,
-                                    color: AppColors.neutral100,
-                                    // color: AppColors.gray,
+                  suffixIcon: widget.child ??
+                      (widget.showDeleteIcon
+                          ? widget.controller!.text.isNotEmpty
+                              ? InkWell(
+                                  splashColor: Colors
+                                      .transparent, // Remove ripple effect
+                                  highlightColor: Colors
+                                      .transparent, // Remove highlight effect
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 5),
+                                    child: GestureDetector(
+                                      child: Icon(
+                                        Iconsax.close_circle5,
+                                        size: 22,
+                                        color: AppColors.neutral100,
+                                        // color: AppColors.gray,
+                                      ),
+                                      onTap: () {
+                                        widget.controller!.clear();
+                                        setState(() {
+                                          passwordStrength = 0;
+                                        });
+                                      },
+                                    ),
                                   ),
-                                  onTap: () {
-                                    widget.controller!.clear();
-                                    setState(() {
-                                      passwordStrength = 0;
-                                    });
-                                  },
-                                ),
-                              ),
-                            )
-                          : null
-                      : widget.inputType == TextFieldType.password
-                          ? InkWell(
-                              splashColor:
-                                  Colors.transparent, // Remove ripple effect
-                              highlightColor:
-                                  Colors.transparent, // Remove highlight effect
-                              child: GestureDetector(
-                                child: Icon(
-                                  isPasswordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  size: 18,
-                                  color: AppColors.neutral300,
-                                  // color: AppColors.gray,
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    isPasswordVisible = !isPasswordVisible;
-                                  });
-                                },
-                              ),
-                            )
-                          : null)),
+                                )
+                              : null
+                          : widget.inputType == TextFieldType.password
+                              ? InkWell(
+                                  splashColor: Colors
+                                      .transparent, // Remove ripple effect
+                                  highlightColor: Colors
+                                      .transparent, // Remove highlight effect
+                                  child: GestureDetector(
+                                    child: Icon(
+                                      isPasswordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      size: 18,
+                                      color: AppColors.neutral300,
+                                      // color: AppColors.gray,
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        isPasswordVisible = !isPasswordVisible;
+                                      });
+                                    },
+                                  ),
+                                )
+                              : null))),
           if (widget.showPasswordStrengthIndicator &&
               widget.controller != null &&
               widget.controller!.text.isNotEmpty)

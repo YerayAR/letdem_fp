@@ -37,21 +37,31 @@ class UserLoaded extends UserState {
 
   final bool isLocationPermissionGranted;
 
+  final List<Order> orders;
+  final bool isOrdersLoading;
+
   const UserLoaded({
     required this.user,
     this.isUpdateLoading = false,
     required this.isLocationPermissionGranted,
     required this.points,
+    this.isOrdersLoading = false,
+    this.orders = const [],
   });
 
   UserLoaded copyWith({
     LetDemUser? user,
     bool? isLocationPermissionGranted,
+    bool? isOrdersLoading,
     bool? isUpdateLoading,
+    List<Order>? orders,
     int? points,
   }) {
     return UserLoaded(
       user: user ?? this.user,
+      isOrdersLoading:
+          isOrdersLoading != null ? isOrdersLoading : this.isOrdersLoading,
+      orders: orders ?? this.orders,
       isUpdateLoading: isUpdateLoading ?? this.isUpdateLoading,
       isLocationPermissionGranted:
           isLocationPermissionGranted ?? this.isLocationPermissionGranted,
@@ -65,6 +75,8 @@ class UserLoaded extends UserState {
         user,
         isLocationPermissionGranted,
         isUpdateLoading,
+        isOrdersLoading,
+        orders,
         points,
       ];
 }

@@ -104,32 +104,6 @@ class _SplashViewState extends State<SplashView> {
                   ],
                 ),
               ),
-              // SizedBox(
-              //     child: state is UserError
-              //         ? Container(
-              //             margin: EdgeInsets.only(
-              //               top: Dimens.defaultMargin,
-              //               left: Dimens.defaultMargin,
-              //               right: Dimens.defaultMargin,
-              //             ),
-              //             decoration: BoxDecoration(
-              //               color: AppColors.red500.withOpacity(0.06),
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //             padding: EdgeInsets.symmetric(
-              //               vertical: Dimens.defaultMargin / 2,
-              //               horizontal: Dimens.defaultMargin,
-              //             ),
-              //             child: Text(
-              //               'We were unable to process your request. Please try again later. The error is: ${state.apiError != null ? state.apiError!.message : state.error}',
-              //               style: TextStyle(
-              //                 color: AppColors.red500,
-              //                 fontWeight: FontWeight.w500,
-              //               ),
-              //               textAlign: TextAlign.center,
-              //             ),
-              //           )
-              //         : null),
             ],
           );
         },

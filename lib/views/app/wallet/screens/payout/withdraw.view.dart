@@ -6,11 +6,129 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
+import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
+import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
+import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
+
+class AmountInputCard extends StatefulWidget {
+  final Function(String)? onChange;
+
+  const AmountInputCard({Key? key, this.onChange}) : super(key: key);
+
+  @override
+  _AmountInputCardState createState() => _AmountInputCardState();
+}
+
+class _AmountInputCardState extends State<AmountInputCard> {
+  late TextEditingController _controller;
+  String? _errorText;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _validateAmount(String value) {
+    final balance = context.userProfile!.earningAccount?.balance ?? 0;
+    final entered = double.tryParse(value) ?? 0;
+
+    if (entered > balance) {
+      setState(() => _errorText = 'Amount cannot exceed €$balance');
+      widget.onChange?.call('0');
+      return;
+    } else {
+      setState(() => _errorText = null);
+    }
+
+    // Call the onChange callback
+    widget.onChange?.call(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final balance = context.userProfile!.earningAccount?.balance ?? 0;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(Dimens.defaultMargin),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Amount to receive',
+            style: Typo.mediumBody.copyWith(
+              color: Colors.black.withOpacity(0.6),
+            ),
+          ),
+          Dimens.space(1),
+          Text(
+            '€${(context.userProfile!.earningAccount?.balance ?? 0).toStringAsFixed(2)}',
+            style: Typo.heading3.copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 36,
+            ),
+          ),
+          // TextField(
+          //   controller: _controller,
+          //   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          //   textAlign: TextAlign.center,
+          //   style: Typo.heading3.copyWith(
+          //     fontWeight: FontWeight.w800,
+          //     fontSize: 36,
+          //   ),
+          //   decoration: InputDecoration(
+          //     hintText: '€0.00',
+          //     hintStyle: Typo.heading3.copyWith(
+          //       fontWeight: FontWeight.w800,
+          //       fontSize: 36,
+          //       color: AppColors.neutral200,
+          //     ),
+          //     prefixStyle: Typo.heading3.copyWith(
+          //       fontWeight: FontWeight.w800,
+          //       fontSize: 36,
+          //     ),
+          //     border: InputBorder.none,
+          //     contentPadding: EdgeInsets.zero,
+          //   ),
+          //   textAlignVertical: TextAlignVertical.center,
+          //   inputFormatters: [
+          //     FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+          //   ],
+          //   onChanged: _validateAmount,
+          // ),
+          Dimens.space(1),
+          Text(
+            _errorText ??
+                '€${context.userProfile!.earningAccount?.pendingBalance ?? 0} Pending to be cleared',
+            style: Typo.mediumBody.copyWith(
+              fontSize: 11,
+              color:
+                  _errorText != null ? AppColors.red500 : AppColors.neutral300,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class WithdrawView extends StatefulWidget {
   const WithdrawView({super.key});
@@ -27,6 +145,7 @@ class _PayoutMethodsScreenState extends State<WithdrawView> {
   }
 
   PayoutMethod? selectedMethod;
+  double amount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -51,20 +170,13 @@ class _PayoutMethodsScreenState extends State<WithdrawView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Center(
-                child: Text(
-                  'Amount to receive',
-                  style: Typo.mediumBody.copyWith(
-                    color: Colors.black.withOpacity(0.6),
-                  ),
-                ),
-              ),
-              Dimens.space(1),
-              Text(
-                '€${context.userProfile!.earningAccount?.balance}',
-                style: Typo.heading3
-                    .copyWith(fontWeight: FontWeight.w800, fontSize: 36),
-                textAlign: TextAlign.center,
+              AmountInputCard(
+                onChange: (value) {
+                  setState(() {
+                    amount = double.tryParse(value) ?? 0;
+                  });
+                  // Handle amount change
+                },
               ),
             ],
           ),
@@ -109,7 +221,8 @@ class _PayoutMethodsScreenState extends State<WithdrawView> {
               return Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 0),
-                  itemCount: (state).methods.length, // +1 for the add button
+                  itemCount: (state).methods.length,
+                  // +1 for the add button
                   itemBuilder: (context, index) {
                     final method = (state).methods[index];
                     return Padding(
@@ -146,10 +259,40 @@ class _PayoutMethodsScreenState extends State<WithdrawView> {
           },
         ),
         Dimens.space(2),
-        PrimaryButton(
-          text: 'Withdraw',
-          isLoading: false,
-          onTap: () {},
+        BlocConsumer<WithdrawalBloc, WithdrawalState>(
+          listener: (context, state) {
+            if (state is WithdrawalFailure) {
+              Toast.showError(state.message);
+            }
+            if (state is WithdrawalSuccess) {
+              AppPopup.showDialogSheet(
+                  context,
+                  SuccessDialog(
+                    title: 'Success',
+                    subtext: 'Withdrawal request has been sent successfully.',
+                    onProceed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                  ));
+
+              Navigator.of(context).pop();
+            }
+
+            // TODO: implement listener
+          },
+          builder: (context, state) {
+            return PrimaryButton(
+                text: 'Withdraw',
+                isDisabled: selectedMethod == null,
+                isLoading:
+                    context.watch<WithdrawalBloc>().state is WithdrawalLoading,
+                onTap: () {
+                  context
+                      .read<WithdrawalBloc>()
+                      .add(WithdrawMoneyEvent(selectedMethod!, amount));
+                });
+          },
         ),
       ],
     ));
