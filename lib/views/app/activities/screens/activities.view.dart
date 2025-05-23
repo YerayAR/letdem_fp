@@ -32,6 +32,11 @@ class ActivitiesView extends StatefulWidget {
 }
 
 class _ActivitiesViewState extends State<ActivitiesView> {
+  initState() {
+    super.initState();
+    context.read<ActivitiesBloc>().add(GetActivitiesEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,8 +50,12 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               const CarSection(),
               const ActiveReservationSection(),
               Dimens.space(2),
-              const Expanded(
-                child: ContributionsSection(),
+              Expanded(
+                child: state is ActivitiesLoaded
+                    ? const ContributionsSection()
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      ),
               )
             ],
           );
@@ -126,7 +135,8 @@ class ContributionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contributions = context.userProfile?.contributions ?? [];
+    final contributions =
+        (context.read<ActivitiesBloc>().state as ActivitiesLoaded).activities;
     final isEmpty = contributions.isEmpty;
 
     return Container(
@@ -134,7 +144,10 @@ class ContributionsSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(Dimens.defaultRadius),
+          topRight: Radius.circular(Dimens.defaultRadius),
+        ),
       ),
       child: isEmpty
           ? const NoContributionsWidget()

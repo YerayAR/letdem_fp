@@ -28,7 +28,7 @@ class WalletScreen extends StatefulWidget {
 
 class _WalletScreenState extends State<WalletScreen> {
   @override
-  initState() {
+  void initState() {
     super.initState();
     context.read<WalletBloc>().add(FetchTransactionsEvent(TransactionParams(
           startDate: DateTime.now().subtract(const Duration(days: 30)),
@@ -58,18 +58,15 @@ class _WalletScreenState extends State<WalletScreen> {
           Dimens.space(3),
           Expanded(
             child: BlocConsumer<WalletBloc, WalletState>(
-              listener: (context, state) {
-                // TODO: implement listener
-              },
+              listener: (context, state) {},
               builder: (context, state) {
                 if (state is WalletLoading) {
                   return const LoadingTransactionsView();
-                } else if (state is WalletFailure) {
+                }
+                if (state is WalletFailure) {
                   return const EmptyTransactionsView();
-                } else if (state is WalletSuccess) {
-                  if (state.transactions.isEmpty) {
-                    return const EmptyTransactionsView();
-                  }
+                }
+                if (state is WalletSuccess && state.transactions.isNotEmpty) {
                   return const TransactionList();
                 }
                 return const EmptyTransactionsView();
@@ -93,93 +90,134 @@ class WalletBalanceCard extends StatefulWidget {
 
 class _WalletBalanceCardState extends State<WalletBalanceCard> {
   bool isVisible = true;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.primary600,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF8A3FFC).withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: _buildCardDecoration(),
       child: Stack(
         children: [
-          Positioned(
-              top: 0, right: 0, child: SvgPicture.asset(AppAssets.ellipse)),
-          Positioned(
-              bottom: 0,
-              left: 0,
-              child: SvgPicture.asset(AppAssets.ellipseLeft)),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Wallet Balance',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(width: 10),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          isVisible = !isVisible;
-                        });
-                      },
-                      child: Icon(isVisible ? Iconsax.eye : Iconsax.eye_slash,
-                          color: Colors.white.withOpacity(0.5), size: 16),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  child: !isVisible
-                      ? const Text(
-                          '****',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: widget.balance),
-                          duration: const Duration(seconds: 1),
-                          builder: (context, value, _) {
-                            return Text(
-                              '€${value.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold),
-                            );
-                          },
-                        ),
-                ),
-                const SizedBox(height: 24),
-                PrimaryButton(
-                  onTap: () {
-                    NavigatorHelper.to(const WithdrawView());
-                  },
-                  text: 'Withdraw',
-                  background: AppColors.primary50,
-                  textColor: AppColors.primary500,
-                ),
-              ],
-            ),
-          ),
+          _buildTopRightDecoration(),
+          _buildBottomLeftDecoration(),
+          _buildCardContent(),
         ],
       ),
+    );
+  }
+
+  BoxDecoration _buildCardDecoration() {
+    return BoxDecoration(
+      color: AppColors.primary600,
+      borderRadius: BorderRadius.circular(24),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF8A3FFC).withOpacity(0.3),
+          blurRadius: 10,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTopRightDecoration() {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: SvgPicture.asset(AppAssets.ellipse),
+    );
+  }
+
+  Widget _buildBottomLeftDecoration() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      child: SvgPicture.asset(AppAssets.ellipseLeft),
+    );
+  }
+
+  Widget _buildCardContent() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildHeader(),
+          const SizedBox(height: 8),
+          _buildBalanceDisplay(),
+          const SizedBox(height: 24),
+          _buildWithdrawButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Wallet Balance',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(width: 10),
+        InkWell(
+          onTap: _toggleVisibility,
+          child: Icon(
+            isVisible ? Iconsax.eye : Iconsax.eye_slash,
+            color: Colors.white.withOpacity(0.5),
+            size: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      isVisible = !isVisible;
+    });
+  }
+
+  Widget _buildBalanceDisplay() {
+    if (!isVisible) {
+      return const Text(
+        '****',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: widget.balance),
+      duration: const Duration(seconds: 1),
+      builder: (context, value, _) {
+        return Text(
+          '€${value.toStringAsFixed(2)}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 36,
+            fontWeight: FontWeight.bold,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWithdrawButton() {
+    return PrimaryButton(
+      onTap: () {
+        NavigatorHelper.to(const WithdrawView());
+      },
+      text: 'Withdraw',
+      background: AppColors.primary50,
+      textColor: AppColors.primary500,
     );
   }
 }
