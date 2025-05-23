@@ -19,7 +19,7 @@ import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 class AmountInputCard extends StatefulWidget {
   final Function(String)? onChange;
 
-  const AmountInputCard({Key? key, this.onChange}) : super(key: key);
+  const AmountInputCard({super.key, this.onChange});
 
   @override
   _AmountInputCardState createState() => _AmountInputCardState();
@@ -67,7 +67,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [],
+        boxShadow: const [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -165,7 +165,7 @@ class _PayoutMethodsScreenState extends State<WithdrawView> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [],
+            boxShadow: const [],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -212,7 +212,7 @@ class _PayoutMethodsScreenState extends State<WithdrawView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Dimens.space(5),
-                    EmptyPayoutMethodView(),
+                    const EmptyPayoutMethodView(),
                     Dimens.space(5),
                   ],
                 );

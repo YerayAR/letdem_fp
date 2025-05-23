@@ -47,7 +47,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
                   color: AppColors.primary500,
                   shape: BoxShape.circle,
                 ),
-                child: Center(
+                child: const Center(
                   child: Icon(
                     Icons.priority_high,
                     color: Colors.white,

@@ -606,7 +606,7 @@ class _NavigationViewState extends State<NavigationView> {
                   fontSize: 16,
                 ),
                 semanticsLabel:
-                    "Estimated arrival in ${_totalRouteTime.toFormattedTime()} with ${_totalRouteDistance} meters remaining",
+                    "Estimated arrival in ${_totalRouteTime.toFormattedTime()} with $_totalRouteDistance meters remaining",
               ),
             ],
           ),

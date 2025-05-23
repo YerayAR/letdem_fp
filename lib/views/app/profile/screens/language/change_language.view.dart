@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/extenstions/locale.dart';
-import 'package:letdem/extenstions/user.dart';
-import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
-import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 import 'package:provider/provider.dart';
 
 class Language {
@@ -66,7 +61,7 @@ class _ChangeLanguageViewState extends State<ChangeLanguageView> {
                         children: L10n.all.map((language) {
                           return LanguageOption(
                             flag: "",
-                            name: language ==  Locale('en') ? 'English' : 'Español',
+                            name: language ==  const Locale('en') ? 'English' : 'Español',
                             isSelected: snapshot.defaultLocale == language, onTap: () {
                             context.read<LocaleProvider>().setLocale(language);
                           },
@@ -94,12 +89,12 @@ class LanguageOption extends StatelessWidget {
   final VoidCallback onTap;
 
   const LanguageOption({
-    Key? key,
+    super.key,
     required this.flag,
     required this.name,
     required this.isSelected,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

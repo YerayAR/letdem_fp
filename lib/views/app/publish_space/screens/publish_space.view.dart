@@ -303,7 +303,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       ],
                     ),
                   ],
-                  title: Text(
+                  title: const Text(
                     'Publish Space',
                   ),
                 ),

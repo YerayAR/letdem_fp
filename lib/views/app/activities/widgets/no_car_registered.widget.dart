@@ -356,7 +356,7 @@ class EmissionsTagScreen extends StatelessWidget {
               ),
             ),
           ),
-          ...items.map((item) => _buildBulletPoint(item)).toList(),
+          ...items.map((item) => _buildBulletPoint(item)),
         ],
       ),
     );

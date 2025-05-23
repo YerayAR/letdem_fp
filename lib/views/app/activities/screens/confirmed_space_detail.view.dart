@@ -62,7 +62,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   }
 
   Widget _buildAppBar() {
-    return StyledAppBar(
+    return const StyledAppBar(
       title: "Space Details",
       onTap: NavigatorHelper.pop,
       icon: Iconsax.close_circle5,
@@ -211,7 +211,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
             NavigatorHelper.pop();
             AppPopup.showBottomSheet(
               context,
-              SuccessDialog(
+              const SuccessDialog(
                 title: "Space Reserved",
                 subtext: "Your space has been reserved successfully.",
                 onProceed: NavigatorHelper.popAll,

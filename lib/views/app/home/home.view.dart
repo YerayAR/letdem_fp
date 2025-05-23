@@ -233,7 +233,7 @@ class _HomeViewState extends State<HomeView>
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
         _mapController?.mapScene.addMapMarker(marker);
-        marker.fadeDuration = Duration(seconds: 2);
+        marker.fadeDuration = const Duration(seconds: 2);
         _spaceMarkers[marker] = space;
       } catch (e) {
         debugPrint("Space marker error: $e");
@@ -249,7 +249,7 @@ class _HomeViewState extends State<HomeView>
           GeoCoordinates(event.location.point.lat, event.location.point.lng),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
-        marker.fadeDuration = Duration(seconds: 2);
+        marker.fadeDuration = const Duration(seconds: 2);
         _mapController?.mapScene.addMapMarker(marker);
         _eventMarkers[marker] = event;
       } catch (e) {

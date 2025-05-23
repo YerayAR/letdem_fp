@@ -505,8 +505,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
   }
 
   Widget _buildNotificationOptions() {
-    if (isNotificationScheduled || widget.hideToggle)
+    if (isNotificationScheduled || widget.hideToggle) {
       return const SizedBox.shrink();
+    }
 
     return Column(
       children: [

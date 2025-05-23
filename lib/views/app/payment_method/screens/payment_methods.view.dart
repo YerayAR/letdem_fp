@@ -29,7 +29,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
   @override
   void initState() {
-    context.read<PaymentMethodBloc>().add(FetchPaymentMethods());
+    context.read<PaymentMethodBloc>().add(const FetchPaymentMethods());
     super.initState();
   }
 
@@ -88,7 +88,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               PrimaryButton(
                 text: 'Add New Card',
                 onTap: () {
-                  NavigatorHelper.to(AddPaymentMethod());
+                  NavigatorHelper.to(const AddPaymentMethod());
                   // Add new card action
                 },
               ),

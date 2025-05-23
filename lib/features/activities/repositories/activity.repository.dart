@@ -57,7 +57,7 @@ class ActivityRepository extends IActivityRepository {
     //   endpoint: EndPoints.publishSpace.copyWithDTO(dto),
     // );
 
-    var res;
+    ApiResponse res;
 
     if (isFree) {
       res = await ApiService.sendRequest(

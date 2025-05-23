@@ -33,7 +33,7 @@ void main() async {
   await _initializeHERESDK();
 
   // Ensure that all widgets, including MyApp, have a MaterialLocalizations object available.
-  runApp(MaterialApp(home: MyApp()));
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 Future<void> _initializeHERESDK() async {
@@ -55,6 +55,8 @@ Future<void> _initializeHERESDK() async {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -120,7 +122,7 @@ class _MyAppState extends State<MyApp>
         onWillPop: _handleBackPress,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Custom Navigation'),
+            title: const Text('Custom Navigation'),
           ),
           body: Stack(
             children: [
@@ -275,21 +277,21 @@ class _MyAppState extends State<MyApp>
     if (_isCurrentColorBlue) {
       _defaultLocationIndicator?.setHaloColor(
           _defaultLocationIndicator!.locationIndicatorStyle,
-          Color.fromRGBO(255, 255, 0, 0.30)); // Yellow with 30% opacity
+          const Color.fromRGBO(255, 255, 0, 0.30)); // Yellow with 30% opacity
 
       _customLocationIndicator?.setHaloColor(
           _customLocationIndicator!.locationIndicatorStyle,
-          Color.fromRGBO(255, 255, 0, 0.30));
+          const Color.fromRGBO(255, 255, 0, 0.30));
 
       _isCurrentColorBlue = false;
     } else {
       _defaultLocationIndicator?.setHaloColor(
           _defaultLocationIndicator!.locationIndicatorStyle,
-          Color.fromRGBO(0, 0, 255, 0.30)); // Blue with 30% opacity
+          const Color.fromRGBO(0, 0, 255, 0.30)); // Blue with 30% opacity
 
       _customLocationIndicator?.setHaloColor(
           _customLocationIndicator!.locationIndicatorStyle,
-          Color.fromRGBO(0, 0, 255, 0.30));
+          const Color.fromRGBO(0, 0, 255, 0.30));
 
       _isCurrentColorBlue = true;
     }
@@ -383,7 +385,7 @@ class _MyAppState extends State<MyApp>
             orientationUpdate,
             mapMeasure,
             bowFactor,
-            Duration(seconds: 3));
+            const Duration(seconds: 3));
     _hereMapController!.camera.startAnimationWithListener(animation, this);
   }
 
@@ -408,7 +410,7 @@ class _MyAppState extends State<MyApp>
             orientationUpdate,
             mapMeasure,
             bowFactor,
-            Duration(seconds: 3));
+            const Duration(seconds: 3));
     _hereMapController!.camera.startAnimation(animation);
   }
 
@@ -458,7 +460,7 @@ class _MyAppState extends State<MyApp>
 
     VisualNavigatorColors visualNavigatorColors =
         VisualNavigatorColors.dayColors();
-    RouteProgressColors routeProgressColors = new RouteProgressColors(
+    RouteProgressColors routeProgressColors = RouteProgressColors(
         routeAheadColor,
         routeBehindColor,
         routeAheadOutlineColor,
@@ -520,7 +522,7 @@ class _MyAppState extends State<MyApp>
           foregroundColor: Colors.white,
         ),
         onPressed: () => callbackFunction(),
-        child: Text(buttonLabel, style: TextStyle(fontSize: 20)),
+        child: Text(buttonLabel, style: const TextStyle(fontSize: 20)),
       ),
     );
   }

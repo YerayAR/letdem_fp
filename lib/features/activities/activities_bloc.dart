@@ -90,7 +90,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       emit(ActivitiesError(error: err.message));
       (Toast.showError(err.message));
     } catch (err) {
-      emit(ActivitiesError(error: "Unable to take space"));
+      emit(const ActivitiesError(error: "Unable to take space"));
 
       Toast.showError("Unable to take space");
     }

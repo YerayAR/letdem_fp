@@ -116,7 +116,7 @@ void main() async {
           create: (_) {
             const fallbackLocale = Locale('es');
             final resolvedLocale = (languageCode != null)
-                ? Locale(languageCode!)
+                ? Locale(languageCode)
                 : (L10n.all.contains(Locale(defaultLocale))
                     ? Locale(defaultLocale)
                     : fallbackLocale);
@@ -239,8 +239,8 @@ void main() async {
                 ),
               ),
             ],
-            child: AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle.dark, child: const LetDemApp())),
+            child: const AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiOverlayStyle.dark, child: LetDemApp())),
       ),
     ),
   );
@@ -261,7 +261,7 @@ class LetDemApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: [
+          supportedLocales: const [
             Locale('en'), // English
             Locale('es'), // Spanish
           ],
