@@ -46,297 +46,296 @@ class ProfileView extends StatelessWidget {
         child: StyledBody(
           isBottomPadding: false,
           children: [
-            StyledAppBar(
-              onTap: () {
-                NavigatorHelper.to(const NotificationsView());
-              },
-              title: context.l10n.profile,
-              suffix: context.userProfile!.notificationsCount == 0
-                  ? null
-                  : CircleAvatar(
-                      radius: 8,
-                      backgroundColor: AppColors.red500,
-                      child: Text(
-                        context.userProfile!.notificationsCount.toString(),
-                        style: Typo.smallBody.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )),
-              icon: Iconsax.notification5,
-            ),
+            _ProfileAppBar(),
             BlocConsumer<UserBloc, UserState>(
-              listener: (context, state) {
-                if (state is UserLoggedOutState) {
-                  NavigatorHelper.popAll();
-                  NavigatorHelper.replaceAll(const LoginView());
-                }
-                if (state is UserInfoChanged) {
-                  context.read<UserBloc>().add(FetchUserInfoEvent());
-                }
-                // TODO: implement listener
-              },
+              listener: _userBlocListener,
               builder: (context, state) {
                 if (state is UserLoaded) {
                   return Expanded(
-                    child: ListView(children: <Widget>[
-                      ProfileSection(
-                        child: [
-                          SettingsContainer(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        state.user.firstName.isEmpty &&
-                                                state.user.lastName.isEmpty
-                                            ? ""
-                                                "Name not provided"
-                                            : "${state.user.firstName} ${state.user.lastName}",
-                                        style: Typo.largeBody.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                        )),
-                                    Text(
-                                      state.user.email,
-                                      style: Typo.mediumBody.copyWith(
-                                        color: AppColors.neutral400,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 27,
-                                        backgroundColor: AppColors.secondary50,
-                                        child: Icon(
-                                          Iconsax.cup5,
-                                          color: AppColors.secondary500,
-                                          size: 27,
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: -17,
-                                        child: DecoratedChip(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 4,
-                                          ),
-                                          textStyle: Typo.smallBody.copyWith(
-                                            color: Colors.white,
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                          text:
-                                              '${state.user.totalPoints}\nLetDem Points',
-                                          color: Colors.white,
-                                          backgroundColor:
-                                              AppColors.secondary600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      ProfileSection(
-                        child: [
-                          SettingsContainer(
-                              child: Column(
-                            children: [
-                              SettingsRow(
-                                icon: IconlyLight.star,
-                                text: context.l10n.contributions,
-                                onTap: () {
-                                  NavigatorHelper.to(const ViewAllView());
-                                },
-                              ),
-                              SettingsRow(
-                                icon: IconlyLight.time_circle,
-                                text: context.l10n.scheduledNotifications,
-                                onTap: () {
-                                  NavigatorHelper.to(
-                                      const ScheduledNotificationsView());
-                                },
-                              ),
-                              SettingsRow(
-                                icon: Iconsax.card,
-                                text: context.l10n.paymentMethods,
-                                onTap: () {
-                                  NavigatorHelper.to(const PaymentMethodsScreen());
-                                },
-                              ),
-                              SettingsRow(
-                                leading: context.userProfile!.earningAccount !=
-                                            null &&
-                                        context.userProfile!.earningAccount!
-                                                .status ==
-                                            EarningStatus.accepted
-                                    ? null
-                                    : DecoratedChip(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 4,
-                                        ),
-                                        backgroundColor: context.userProfile!
-                                                    .earningAccount ==
-                                                null
-                                            ? AppColors.green600
-                                            : context
-                                                        .userProfile!
-                                                        .earningAccount!
-                                                        .status ==
-                                                    EarningStatus.missingInfo
-                                                ? Colors.red
-                                                : AppColors.red500,
-                                        textStyle: Typo.smallBody.copyWith(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                        text: context.userProfile!
-                                                    .earningAccount ==
-                                                null
-                                            ? context.l10n.connectAccount
-                                            : getStatusString(context
-                                                .userProfile!
-                                                .earningAccount!
-                                                .status),
-                                        color: context.userProfile!
-                                                    .earningAccount ==
-                                                null
-                                            ? AppColors.green600
-                                            : context
-                                                        .userProfile!
-                                                        .earningAccount!
-                                                        .status ==
-                                                    EarningStatus.missingInfo
-                                                ? Colors.red
-                                                : AppColors.red500,
-                                      ),
-                                icon: IconlyLight.wallet,
-                                text: context.l10n.earnings,
-                                showDivider: false,
-                                onTap: () {
-                                  if (context.userProfile!.earningAccount !=
-                                          null &&
-                                      context.userProfile!.earningAccount!
-                                              .status ==
-                                          EarningStatus.accepted) {
-                                    NavigatorHelper.to(const WalletScreen());
-                                    return;
-                                  }
-
-                                  if (context.userProfile!.earningAccount ==
-                                      null) {
-                                    AppPopup.showBottomSheet(context,
-                                        MoneyLaundryPopup(
-                                      onContinue: () {
-                                        NavigatorHelper.to(ProfileOnboardingApp(
-                                          remainingStep: context.userProfile!
-                                              .earningAccount?.step,
-                                          status: context.userProfile!
-                                              .earningAccount?.status,
-                                        ));
-                                      },
-                                    ));
-                                  } else {
-                                    NavigatorHelper.to(ProfileOnboardingApp(
-                                      remainingStep: context
-                                          .userProfile!.earningAccount!.step,
-                                      status: context
-                                          .userProfile!.earningAccount!.status,
-                                    ));
-                                  }
-                                },
-                              ),
-                            ],
-                          ))
-                        ],
-                      ),
-                      ProfileSection(
-                        child: [
-                          SettingsContainer(
-                            child: Column(
-                              children: [
-                                SettingsRow(
-                                  icon: IconlyLight.user,
-                                  text: context.l10n.basicInformation,
-                                  onTap: () {
-                                    NavigatorHelper.to(const EditBasicInfoView());
-                                  },
-                                ),
-                                SettingsRow(
-                                  icon: IconlyLight.filter,
-                                  text: context.l10n.preferences,
-                                  onTap: () {
-                                    NavigatorHelper.to(const PreferencesView());
-                                  },
-                                ),
-                                // language
-                                SettingsRow(
-                                  icon: Iconsax.global,
-                                  text: "Language",
-                                  onTap: () {
-                                    NavigatorHelper.to(const ChangeLanguageView());
-                                  },
-                                ),
-                                SettingsRow(
-                                  icon: IconlyLight.lock,
-                                  text: context.l10n.security,
-                                  showDivider: false,
-                                  onTap: () {
-                                    NavigatorHelper.to(const SecurityView());
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      InkWell(
-                        onTap: () {
-                          BlocProvider.of<UserBloc>(context)
-                              .add(UserLoggedOutEvent());
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                CupertinoIcons.power,
-                                color: AppColors.primary500,
-                                size: 23,
-                              ),
-                              Dimens.space(1),
-                              Text(
-                                context.l10n.logout,
-                                style: Typo.largeBody.copyWith(
-                                  color: AppColors.primary500,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ]),
+                    child: ListView(
+                      children: [
+                        _ProfileHeader(user: state.user),
+                        _MainActionsSection(user: state.user),
+                        _AccountSettingsSection(),
+                        const _LogoutButton(),
+                      ],
+                    ),
                   );
                 }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const Center(child: CircularProgressIndicator());
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _userBlocListener(BuildContext context, UserState state) {
+    if (state is UserLoggedOutState) {
+      NavigatorHelper.popAll();
+      NavigatorHelper.replaceAll(const LoginView());
+    }
+    if (state is UserInfoChanged) {
+      context.read<UserBloc>().add(FetchUserInfoEvent());
+    }
+  }
+}
+
+class _ProfileAppBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final notificationCount = context.userProfile?.notificationsCount ?? 0;
+    return StyledAppBar(
+      onTap: () => NavigatorHelper.to(const NotificationsView()),
+      title: context.l10n.profile,
+      suffix: notificationCount == 0
+          ? null
+          : CircleAvatar(
+              radius: 8,
+              backgroundColor: AppColors.red500,
+              child: Text(
+                '$notificationCount',
+                style: Typo.smallBody.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              )),
+      icon: Iconsax.notification5,
+    );
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  final LetDemUser user;
+
+  const _ProfileHeader({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final fullName = '${user.firstName} ${user.lastName}'.trim();
+    return ProfileSection(
+      child: [
+        SettingsContainer(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildUserInfo(user, fullName),
+              _buildUserPoints(user),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserInfo(LetDemUser user, String fullName) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          fullName.isEmpty ? "Name not provided" : fullName,
+          style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+        ),
+        Text(
+          user.email,
+          style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserPoints(LetDemUser user) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          CircleAvatar(
+            radius: 27,
+            backgroundColor: AppColors.secondary50,
+            child: Icon(Iconsax.cup5, color: AppColors.secondary500, size: 27),
+          ),
+          Positioned(
+            bottom: -17,
+            child: DecoratedChip(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              textStyle: Typo.smallBody.copyWith(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.w800,
+              ),
+              text: '${user.totalPoints}\nLetDem Points',
+              backgroundColor: AppColors.secondary600,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MainActionsSection extends StatelessWidget {
+  final LetDemUser user;
+
+  const _MainActionsSection({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileSection(
+      child: [
+        SettingsContainer(
+          child: Column(
+            children: [
+              _settingsRow(context.l10n.contributions, IconlyLight.star, () {
+                NavigatorHelper.to(const ViewAllView());
+              }),
+              _settingsRow(
+                  context.l10n.scheduledNotifications, IconlyLight.time_circle,
+                  () {
+                NavigatorHelper.to(const ScheduledNotificationsView());
+              }),
+              _settingsRow(context.l10n.paymentMethods, Iconsax.card, () {
+                NavigatorHelper.to(const PaymentMethodsScreen());
+              }),
+              _buildEarningsRow(context, user),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _settingsRow(String text, IconData icon, VoidCallback onTap) {
+    return SettingsRow(icon: icon, text: text, onTap: onTap);
+  }
+
+  Widget _buildEarningsRow(BuildContext context, LetDemUser user) {
+    final earningAccount = user.earningAccount;
+    final status = earningAccount?.status;
+    final isAccepted = status == EarningStatus.accepted;
+
+    return SettingsRow(
+      icon: IconlyLight.wallet,
+      text: context.l10n.earnings,
+      showDivider: false,
+      leading: isAccepted ? null : _statusChip(context, earningAccount),
+      onTap: () {
+        if (isAccepted) {
+          NavigatorHelper.to(const WalletScreen());
+        } else {
+          AppPopup.showBottomSheet(
+            context,
+            MoneyLaundryPopup(onContinue: () {
+              NavigatorHelper.to(ProfileOnboardingApp(
+                remainingStep: earningAccount?.step,
+                status: status,
+              ));
+            }),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _statusChip(BuildContext context, EarningAccount? account) {
+    final color = account == null
+        ? AppColors.green600
+        : account.status == EarningStatus.missingInfo
+            ? Colors.red
+            : AppColors.red500;
+    final text = account == null
+        ? context.l10n.connectAccount
+        : getStatusString(account.status);
+    return DecoratedChip(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      backgroundColor: color,
+      textStyle: Typo.smallBody.copyWith(
+        color: Colors.white,
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+      ),
+      text: text,
+      color: color,
+    );
+  }
+}
+
+class _AccountSettingsSection extends StatelessWidget {
+  const _AccountSettingsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileSection(
+      child: [
+        SettingsContainer(
+          child: Column(
+            children: [
+              SettingsRow(
+                icon: IconlyLight.user,
+                text: context.l10n.basicInformation,
+                onTap: () {
+                  NavigatorHelper.to(const EditBasicInfoView());
+                },
+              ),
+              SettingsRow(
+                icon: IconlyLight.filter,
+                text: context.l10n.preferences,
+                onTap: () {
+                  NavigatorHelper.to(const PreferencesView());
+                },
+              ),
+              SettingsRow(
+                icon: Iconsax.global,
+                text: "Language", // Or: context.l10n.language if localized
+                onTap: () {
+                  NavigatorHelper.to(const ChangeLanguageView());
+                },
+              ),
+              SettingsRow(
+                icon: IconlyLight.lock,
+                text: context.l10n.security,
+                showDivider: false,
+                onTap: () {
+                  NavigatorHelper.to(const SecurityView());
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        BlocProvider.of<UserBloc>(context).add(UserLoggedOutEvent());
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.power,
+              color: AppColors.primary500,
+              size: 23,
+            ),
+            Dimens.space(1),
+            Text(
+              context.l10n.logout,
+              style: Typo.largeBody.copyWith(
+                color: AppColors.primary500,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
