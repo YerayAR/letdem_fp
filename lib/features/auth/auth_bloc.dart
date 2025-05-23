@@ -173,7 +173,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(RegisterLoading());
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      var lang = await prefs.getString("locale");
+      var lang = prefs.getString("locale");
       await authRepository.register(RegisterDTO(
         email: event.email,
         password: event.password,

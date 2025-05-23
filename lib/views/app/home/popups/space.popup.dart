@@ -83,7 +83,7 @@ class SpacePopupSheet extends StatelessWidget {
     return Row(
       children: [
         SvgPicture.asset(getSpaceTypeIcon(space.type), width: 20, height: 20),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             getSpaceAvailabilityMessage(space.type),
@@ -130,8 +130,9 @@ class SpacePopupSheet extends StatelessWidget {
   }
 
   Widget _buildExpirationBadge() {
-    if (!space.isPremium || space.expirationDate == null)
-      return SizedBox.shrink();
+    if (!space.isPremium || space.expirationDate == null) {
+      return const SizedBox.shrink();
+    }
 
     return DecoratedChip(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -168,7 +169,7 @@ class SpacePopupSheet extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w600),
                 ),
-                Spacer(),
+                const Spacer(),
                 GestureDetector(
                   onTap: () => NavigatorHelper.to(const PaymentMethodsScreen()),
                   child: Icon(Icons.keyboard_arrow_right_sharp,
@@ -177,7 +178,7 @@ class SpacePopupSheet extends StatelessWidget {
               ],
             )
           : GestureDetector(
-              onTap: () => NavigatorHelper.to(AddPaymentMethod()),
+              onTap: () => NavigatorHelper.to(const AddPaymentMethod()),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -227,7 +228,7 @@ class SpacePopupSheet extends StatelessWidget {
           onTap: () {
             if (space.isPremium) {
               if (context.userProfile!.defaultPaymentMethod == null) {
-                NavigatorHelper.to(AddPaymentMethod());
+                NavigatorHelper.to(const AddPaymentMethod());
               } else {
                 context.read<ActivitiesBloc>().add(
                       ReserveSpaceEvent(

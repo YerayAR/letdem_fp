@@ -171,9 +171,9 @@ class CountrySelectionPage extends StatelessWidget {
   final VoidCallback onNext;
 
   const CountrySelectionPage({
-    Key? key,
+    super.key,
     required this.onNext,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +205,7 @@ class CountrySelectionPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
             ),
             child: ListTile(
-              leading: Icon(Iconsax.location),
+              leading: const Icon(Iconsax.location),
               title: Text(
                 'Spain',
                 style: Typo.mediumBody.copyWith(
@@ -213,7 +213,7 @@ class CountrySelectionPage extends StatelessWidget {
                   color: AppColors.neutral600,
                 ),
               ),
-              trailing: Icon(Icons.keyboard_arrow_down),
+              trailing: const Icon(Icons.keyboard_arrow_down),
             ),
           ),
           const Spacer(),
@@ -246,7 +246,7 @@ class IpApiResponse {
 
 class PersonalInfoPage extends StatefulWidget {
   final VoidCallback onNext;
-  const PersonalInfoPage({Key? key, required this.onNext}) : super(key: key);
+  const PersonalInfoPage({super.key, required this.onNext});
 
   @override
   State<PersonalInfoPage> createState() => _PersonalInfoPageState();
@@ -400,7 +400,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
 class BankInfoView extends StatefulWidget {
   final VoidCallback onNext;
-  const BankInfoView({Key? key, required this.onNext}) : super(key: key);
+  const BankInfoView({super.key, required this.onNext});
 
   @override
   State<BankInfoView> createState() => _BankInfoViewState();
@@ -505,7 +505,7 @@ class _BankInfoViewState extends State<BankInfoView> {
 
 class AddressInfoPage extends StatefulWidget {
   final VoidCallback onNext;
-  const AddressInfoPage({Key? key, required this.onNext}) : super(key: key);
+  const AddressInfoPage({super.key, required this.onNext});
 
   @override
   State<AddressInfoPage> createState() => _AddressInfoPageState();

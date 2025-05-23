@@ -211,7 +211,7 @@ class WalletActionsRow extends StatelessWidget {
           icon: IconlyBold.swap,
           label: 'Payouts',
           onTap: () {
-            NavigatorHelper.to(PayoutMethodsScreen());
+            NavigatorHelper.to(const PayoutMethodsScreen());
           },
         ),
       ],
@@ -314,7 +314,7 @@ class TransactionList extends StatelessWidget {
 
           return Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(19)),
             ),
@@ -323,7 +323,7 @@ class TransactionList extends StatelessWidget {
               padding: EdgeInsets.zero,
               itemCount: transactions.length,
               itemBuilder: (context, index) {
-                final tx = transactions[index] as Transaction;
+                final tx = transactions[index];
                 return Column(
                   children: [
                     Row(

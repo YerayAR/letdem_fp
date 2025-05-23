@@ -301,7 +301,7 @@ class CustomCheckbox extends StatefulWidget {
   final EdgeInsets padding;
 
   const CustomCheckbox({
-    Key? key,
+    super.key,
     required this.value,
     required this.onChanged,
     this.activeColor = Colors.blue,
@@ -312,7 +312,7 @@ class CustomCheckbox extends StatefulWidget {
     this.borderWidth = 2.0,
     this.label,
     this.padding = const EdgeInsets.symmetric(vertical: 8.0),
-  }) : super(key: key);
+  });
 
   @override
   State<CustomCheckbox> createState() => _CustomCheckboxState();
@@ -383,7 +383,7 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
 
 // Example usage:
 class CheckboxExample extends StatefulWidget {
-  const CheckboxExample({Key? key}) : super(key: key);
+  const CheckboxExample({super.key});
 
   @override
   State<CheckboxExample> createState() => _CheckboxExampleState();

@@ -58,7 +58,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                   Expanded(
                     child: state is PayoutMethodLoading ||
                             state is PayoutMethodInitial
-                        ? Center(
+                        ? const Center(
                             child: CupertinoActivityIndicator(),
                           )
                         : state is PayoutMethodFailure
@@ -102,7 +102,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                                       }
 
                                       final method =
-                                          (state as PayoutMethodSuccess)
+                                          (state)
                                               .methods[index];
                                       return Padding(
                                         padding:
@@ -195,7 +195,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
       background: AppColors.primary500,
       textColor: Colors.white,
       onTap: () {
-        NavigatorHelper.to(AddPayoutMethodView());
+        NavigatorHelper.to(const AddPayoutMethodView());
         // Handle add payout method logic
       },
     );
@@ -327,12 +327,12 @@ class OptionItem extends StatelessWidget {
   final bool? isSelected;
 
   const OptionItem({
-    Key? key,
+    super.key,
     required this.method,
     this.isSelectable = false,
     this.isSelected,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -366,7 +366,7 @@ class OptionItem extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
@@ -420,7 +420,7 @@ class OptionItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${method.accountHolderName}',
+                      method.accountHolderName,
                       style:
                           Typo.smallBody.copyWith(color: AppColors.neutral300),
                     ),

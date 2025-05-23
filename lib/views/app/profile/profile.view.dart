@@ -172,7 +172,7 @@ class ProfileView extends StatelessWidget {
                                 icon: Iconsax.card,
                                 text: context.l10n.paymentMethods,
                                 onTap: () {
-                                  NavigatorHelper.to(PaymentMethodsScreen());
+                                  NavigatorHelper.to(const PaymentMethodsScreen());
                                 },
                               ),
                               SettingsRow(
@@ -272,7 +272,7 @@ class ProfileView extends StatelessWidget {
                                   icon: IconlyLight.user,
                                   text: context.l10n.basicInformation,
                                   onTap: () {
-                                    NavigatorHelper.to(EditBasicInfoView());
+                                    NavigatorHelper.to(const EditBasicInfoView());
                                   },
                                 ),
                                 SettingsRow(
@@ -287,7 +287,7 @@ class ProfileView extends StatelessWidget {
                                   icon: Iconsax.global,
                                   text: "Language",
                                   onTap: () {
-                                    NavigatorHelper.to(ChangeLanguageView());
+                                    NavigatorHelper.to(const ChangeLanguageView());
                                   },
                                 ),
                                 SettingsRow(

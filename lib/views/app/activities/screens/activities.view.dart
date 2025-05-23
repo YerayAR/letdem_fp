@@ -41,11 +41,11 @@ class _ActivitiesViewState extends State<ActivitiesView> {
           return StyledBody(
             isBottomPadding: false,
             children: [
-              NotificationAppBar(),
-              CarSection(),
-              ActiveReservationSection(),
+              const NotificationAppBar(),
+              const CarSection(),
+              const ActiveReservationSection(),
               Dimens.space(2),
-              Expanded(
+              const Expanded(
                 child: ContributionsSection(),
               )
             ],

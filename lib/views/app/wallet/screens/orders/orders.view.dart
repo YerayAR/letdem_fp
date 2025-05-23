@@ -73,10 +73,11 @@ class OrdersListView extends StatefulWidget {
 class _OrdersListViewState extends State<OrdersListView> {
   // Mock data
 
+  @override
   initState() {
     super.initState();
     // Simulate fetching orders
-    BlocProvider.of<UserBloc>(context).add(LoadOrdersEvent());
+    BlocProvider.of<UserBloc>(context).add(const LoadOrdersEvent());
   }
 
   @override

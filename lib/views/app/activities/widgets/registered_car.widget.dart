@@ -173,7 +173,7 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
   @override
   Widget build(BuildContext context) {
     return widget.lastParked == null
-        ? SizedBox()
+        ? const SizedBox()
         : Container(
             width: double.infinity,
             decoration: BoxDecoration(

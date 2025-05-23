@@ -25,6 +25,7 @@ final class TakeSpaceEvent extends ActivitiesEvent {
   });
 
   // TODO: implement props
+  @override
   List<Object?> get props => [spaceID, type];
 }
 
@@ -59,7 +60,7 @@ final class ReserveSpaceEvent extends ActivitiesEvent {
   final String spaceID;
   final String paymentMethodID;
 
-  ReserveSpaceEvent({required this.spaceID, required this.paymentMethodID});
+  const ReserveSpaceEvent({required this.spaceID, required this.paymentMethodID});
 
   @override
   // TODO: implement props

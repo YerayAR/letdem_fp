@@ -138,8 +138,9 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
   }
 
   Widget _buildSearchResults() {
-    if (_searchResults.isEmpty || _controller.text.isEmpty)
+    if (_searchResults.isEmpty || _controller.text.isEmpty) {
       return const SizedBox();
+    }
     return Column(
       children: _searchResults
           .map((place) => SavedAddressComponent(

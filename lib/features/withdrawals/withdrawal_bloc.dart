@@ -47,6 +47,7 @@ class WithdrawalBloc extends Bloc<WithdrawalEvent, WithdrawalState> {
 }
 
 class WithdrawalRepository extends WithdrawalInterface {
+  @override
   Future<List<Withdrawal>> fetchWithdrawals({String? methodId}) async {
     var res = await ApiService.sendRequest(endpoint: EndPoints.getWithdrawals);
 

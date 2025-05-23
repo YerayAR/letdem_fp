@@ -149,7 +149,7 @@ class _NavigationViewState extends State<NavigationView> {
       top: MediaQuery.of(context).padding.top + 120,
       right: _mapPadding,
       child: Container(
-        padding: EdgeInsets.all(6),
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(16),
@@ -158,7 +158,7 @@ class _NavigationViewState extends State<NavigationView> {
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 4,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -167,7 +167,7 @@ class _NavigationViewState extends State<NavigationView> {
           children: [
             // Current maximum speed indicator
             Container(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 13),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
               decoration: BoxDecoration(
                 color: Colors.orange.shade50,
                 borderRadius: BorderRadius.circular(8),
@@ -803,7 +803,7 @@ class _NavigationViewState extends State<NavigationView> {
               space.location.point.lat, space.location.point.lng),
           mapImage,
         );
-        marker.fadeDuration = Duration(seconds: 2);
+        marker.fadeDuration = const Duration(seconds: 2);
 
         _hereMapController?.mapScene.addMapMarker(marker);
         _eventMarkers[marker] = space;
@@ -819,7 +819,7 @@ class _NavigationViewState extends State<NavigationView> {
               space.location.point.lat, space.location.point.lng),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
-        marker.fadeDuration = Duration(seconds: 2);
+        marker.fadeDuration = const Duration(seconds: 2);
 
         _hereMapController?.mapScene.addMapMarker(marker);
         _spaceMarkers[marker] = space;
@@ -931,7 +931,7 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       _nextManuoverDistance = routeProgress
-          .maneuverProgress.first!.remainingDistanceInMeters!
+          .maneuverProgress.first.remainingDistanceInMeters
           .floor();
 
       final remainingDistanceInMeters =
@@ -1054,7 +1054,7 @@ class _NavigationViewState extends State<NavigationView> {
         eventText.maneuverNotificationDetails!.maneuver,
       );
 
-      debugPrint("🗣️ Voice maneuver text: ${streetName}");
+      debugPrint("🗣️ Voice maneuver text: $streetName");
       if (mounted) {
         setState(() {
           _navigationInstruction = streetName;
@@ -1104,7 +1104,7 @@ class _NavigationViewState extends State<NavigationView> {
         currentGeoCoordinates.latitude,
         currentGeoCoordinates.longitude,
       );
-      debugPrint('📏 Calculated deviation: ${distanceInMeters} meters');
+      debugPrint('📏 Calculated deviation: $distanceInMeters meters');
 
       final now = DateTime.now().millisecondsSinceEpoch;
 
@@ -1144,10 +1144,12 @@ class _NavigationViewState extends State<NavigationView> {
         });
       } else {
         debugPrint('✅ No reroute needed at this time.');
-        if (!isFarEnoughFromDestination)
+        if (!isFarEnoughFromDestination) {
           debugPrint('🏁 Already close to destination.');
-        if (!isTimeElapsedSinceLastReroute)
+        }
+        if (!isTimeElapsedSinceLastReroute) {
           debugPrint('⌛ Too soon since last reroute.');
+        }
       }
     });
   }
@@ -1172,9 +1174,7 @@ class _NavigationViewState extends State<NavigationView> {
       carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
 
       // Check if routing engine is still valid
-      if (_routingEngine == null) {
-        _routingEngine = HERE.RoutingEngine();
-      }
+      _routingEngine ??= HERE.RoutingEngine();
 
       _routingEngine!.calculateCarRoute(
         [startWaypoint, destinationWaypoint],
@@ -1652,9 +1652,9 @@ extension TimeFormatter on int {
     String minutesStr = minutes.toString().padLeft(2, '0');
     String secondsStr = seconds.toString().padLeft(2, '0');
 
-    return "${minutesStr} min".startsWith("00")
-        ? "${secondsStr} sec"
-        : "${minutesStr} min";
+    return "$minutesStr min".startsWith("00")
+        ? "$secondsStr sec"
+        : "$minutesStr min";
   }
 
 //   format meters to km
@@ -1662,7 +1662,7 @@ extension TimeFormatter on int {
     if (this >= 1000) {
       return "${(this / 1000).toStringAsFixed(1)} km";
     } else {
-      return "${this} m";
+      return "$this m";
     }
   }
 }
@@ -1672,8 +1672,7 @@ class ParkingRatingWidget extends StatefulWidget {
 
   final String spaceID;
   const ParkingRatingWidget(
-      {Key? key, required this.onSubmit, required this.spaceID})
-      : super(key: key);
+      {super.key, required this.onSubmit, required this.spaceID});
 
   @override
   _ParkingRatingWidgetState createState() => _ParkingRatingWidgetState();
@@ -1777,7 +1776,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                 Dimens.space(3),
                 // Location icon
                 Container(
-                  padding: EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     color: AppColors.primary500.withOpacity(0.1),
                     shape: BoxShape.circle,
@@ -1788,7 +1787,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                       color: AppColors.primary500,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.location_on,
                       color: Colors.white,
                       size: 32,
@@ -1871,7 +1870,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

@@ -88,9 +88,9 @@ Future<Duration?> showMMSSPicker({
                   ],
                 ),
               ),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Expanded(
                     child: Text('MIN', textAlign: TextAlign.center),
                   ),

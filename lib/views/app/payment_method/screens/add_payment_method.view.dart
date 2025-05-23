@@ -11,6 +11,8 @@ import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 
 class AddPaymentMethod extends StatefulWidget {
+  const AddPaymentMethod({super.key});
+
   @override
   _AddPaymentMethodState createState() => _AddPaymentMethodState();
 }
@@ -59,7 +61,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                 Divider(height: 1, color: Colors.grey.shade300),
                 Dimens.space(2),
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
                       // CardField(
@@ -70,7 +72,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                       //     hintStyle: TextStyle(color: Colors.grey.shade400),
                       //   ),
                       // ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Icon(
@@ -82,7 +84,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                                 : Colors.grey,
                             size: 16,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             controller.complete
                                 ? 'Valid card'
@@ -110,7 +112,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                     isLoading: _isLoading,
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -146,8 +148,8 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
               AddPaymentMethodDTO(
                 paymentMethodId: paymentMethod.id,
                 holderName: billingDetails.name ?? 'Unknown',
-                last4: paymentMethod.card?.last4 ?? '****',
-                brand: paymentMethod.card?.brand ?? 'unknown',
+                last4: paymentMethod.card.last4 ?? '****',
+                brand: paymentMethod.card.brand ?? 'unknown',
                 isDefault: true,
               ),
             ),
