@@ -406,6 +406,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                 placeHolder: "MM",
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d{0,2}')),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -414,6 +416,58 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                 },
                                 inputType: TextFieldType.number,
                                 prefixIcon: Iconsax.clock5,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 25,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      AppPopup.showDialogSheet(
+                                        context,
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text(
+                                              "Waiting Time",
+                                              style: Typo.heading4,
+                                            ),
+                                            Dimens.space(2),
+                                            const Text(
+                                              "This is the maximum amount of time the publisher can wait before they leave, and after this time elapses, the published space will expire.",
+                                              style: Typo.mediumBody,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            Dimens.space(2),
+                                            PrimaryButton(
+                                              onTap: () {
+                                                NavigatorHelper.pop();
+                                              },
+                                              text: "Got it",
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width:
+                                          MediaQuery.of(context).size.width / 2,
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          "What’s this?",
+                                          style: Typo.smallBody.copyWith(
+                                            color: AppColors.secondary600,
+                                            fontSize: 12,
+                                            decorationColor:
+                                                AppColors.secondary600,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                               TextInputField(
                                 label: "Price",

@@ -217,23 +217,20 @@ class _NotificationsViewState extends State<NotificationsView> {
           Dimens.space(2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: context.read<NotificationsBloc>().state
-                        is NotificationsLoading ||
-                    context.read<NotificationsBloc>().state
-                            is NotificationsLoaded &&
-                        (context.read<NotificationsBloc>().state
-                                as NotificationsLoaded)
-                            .notifications
-                            .results
-                            .isEmpty
-                ? []
-                : [
-                    Spacer(),
+            children: context.watch<NotificationsBloc>().state
+                        is NotificationsLoaded &&
+                    (context.read<NotificationsBloc>().state
+                            as NotificationsLoaded)
+                        .notifications
+                        .results
+                        .isNotEmpty
+                ? [
+                    const Spacer(),
                     GestureDetector(
                       onTap: () {
-                        context.read<NotificationsBloc>().add(
-                              ClearNotificationsEvent(),
-                            );
+                        context
+                            .read<NotificationsBloc>()
+                            .add(ClearNotificationsEvent());
                         context.read<UserBloc>().add(FetchUserInfoEvent());
                       },
                       child: Text(
@@ -246,7 +243,8 @@ class _NotificationsViewState extends State<NotificationsView> {
                         ),
                       ),
                     ),
-                  ],
+                  ]
+                : [],
           ),
           Dimens.space(2),
           BlocConsumer<NotificationsBloc, NotificationsState>(
@@ -634,11 +632,13 @@ class NotificationItem extends StatelessWidget {
                             Dimens.space(2),
                             DecoratedChip(
                               onTap: () {
-                                NavigatorHelper.to(TrafficRouteLineExample(
-                                  lat: notificationObject.location.point.lat,
-                                  lng: notificationObject.location.point.lng,
+                                NavigatorHelper.to(NavigationMapScreen(
+                                  latitude:
+                                      notificationObject.location.point.lat,
+                                  longitude:
+                                      notificationObject.location.point.lng,
                                   hideToggle: false,
-                                  streetName:
+                                  destinationStreetName:
                                       notificationObject.location.streetName,
                                 ));
                               },

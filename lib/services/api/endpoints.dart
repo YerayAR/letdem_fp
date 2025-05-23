@@ -13,6 +13,7 @@ import 'package:letdem/features/payout_methods/repository/payout.repository.dart
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
+import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
 enum Environment { STG, PROD, DEV }
@@ -27,12 +28,24 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
+  // getOrdersEndpoint
+  static Endpoint getOrdersEndpoint = Endpoint(
+    url: "/credits/orders?page_size=100&page=1",
+    method: HTTPMethod.GET,
+  );
+
   // /v1/spaces/9d4d174c1edd4e53ad2e6aa58694eb83/reserve
 
   static Endpoint<ReserveSpaceDTO> reserveSpace(String id) => Endpoint(
         url: "/spaces/$id/reserve",
         method: HTTPMethod.POST,
       );
+
+  // withdrawals
+  static Endpoint getWithdrawals = Endpoint(
+    url: "/credits/withdrawals",
+    method: HTTPMethod.GET,
+  );
 
   static Endpoint<LoginDTO> loginEndpoint = Endpoint(
     url: "/auth/login",
@@ -42,6 +55,12 @@ class EndPoints {
   static Endpoint getPayoutMethods = Endpoint(
     url: "/credits/payout-methods",
     method: HTTPMethod.GET,
+    isProtected: true,
+  );
+
+  static Endpoint<WithdrawMoneyDTO> withdrawMoney = Endpoint(
+    url: "/credits/withdrawals",
+    method: HTTPMethod.POST,
     isProtected: true,
   );
 

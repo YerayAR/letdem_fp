@@ -14,8 +14,10 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/views/app/wallet/screens/orders/orders.view.dart';
 import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
 import 'package:letdem/views/app/wallet/screens/payout/withdraw.view.dart';
+import 'package:letdem/views/app/wallet/screens/withdrawals.view.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -189,12 +191,24 @@ class WalletActionsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const _ActionButton(icon: IconlyBold.location, label: 'Orders'),
-        const SizedBox(width: 16),
-        const _ActionButton(icon: Iconsax.card5, label: 'Withdrawals'),
+        _ActionButton(
+          icon: IconlyBold.location,
+          label: 'Orders',
+          onTap: () {
+            NavigatorHelper.to(const OrdersListView());
+          },
+        ),
         const SizedBox(width: 16),
         _ActionButton(
-          icon: Iconsax.bank,
+          icon: Iconsax.card5,
+          label: 'Withdrawals',
+          onTap: () {
+            NavigatorHelper.to(const WithdrawListView());
+          },
+        ),
+        const SizedBox(width: 16),
+        _ActionButton(
+          icon: IconlyBold.swap,
           label: 'Payouts',
           onTap: () {
             NavigatorHelper.to(PayoutMethodsScreen());
@@ -392,6 +406,7 @@ class EmptyTransactionsView extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
               'No Transactions Yet',

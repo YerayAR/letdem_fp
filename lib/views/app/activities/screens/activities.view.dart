@@ -23,14 +23,13 @@ import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dar
 import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
 import 'package:letdem/views/app/activities/widgets/no_contribution.widget.dart';
 import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
+import 'package:letdem/views/app/home/views/reserved_space.view.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
 import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
-
-import '../../home/home.view.dart';
 
 class ConfirmedSpaceReviewView extends StatefulWidget {
   final ReservedSpacePayload payload;
@@ -424,12 +423,12 @@ class ActiveReservationView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 5,
-                      backgroundColor: payload.space == "RESERVED"
+                      backgroundColor: payload.status == "RESERVED"
                           ? AppColors.green500
                           : AppColors.red500,
                     ),
                     Dimens.space(1),
-                    Text('Active',
+                    Text(payload.status,
                         style: Typo.mediumBody.copyWith(
                           fontWeight: FontWeight.w700,
                         )),

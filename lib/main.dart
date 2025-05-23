@@ -43,6 +43,7 @@ import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/repository/transaction.repository.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
+import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
@@ -66,8 +67,8 @@ Future _initializeHERESDK() async {
   try {
     print("HERE SDK init starting...");
     SdkContext.init(IsolateOrigin.main);
-    Stripe.publishableKey =
-        'pk_test_51RDvqzPEUIIf4s33G882VANwPqFFwMpBq5i7cNy3qtYlqBwYNaUNgmzuX1RbGqDhdlSmFoD4uaONs0KSvoYpagnm00ldkkhPFt'; // Use your real Stripe publishable key
+
+    Stripe.publishableKey = AppCredentials.stripePublishableKey;
 
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
@@ -92,10 +93,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initializeHERESDK();
   MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-    print("FlutterError: ${details.exception}");
-  };
   OneSignal.initialize(AppCredentials.oneSignalAppId);
   final String defaultLocale =
       Platform.localeName; // Returns locale string in the form 'en_US'
@@ -151,6 +148,9 @@ void main() async {
           RepositoryProvider<EarningsRepository>(
             create: (_) => EarningsRepository(),
           ),
+          RepositoryProvider<WithdrawalRepository>(
+            create: (_) => WithdrawalRepository(),
+          ),
           RepositoryProvider(
             create: (_) => SearchLocationRepository(),
           ),
@@ -173,6 +173,11 @@ void main() async {
                 create: (context) => PayoutMethodBloc(
                   payoutMethodRepository:
                       context.read<PayoutMethodRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => WithdrawalBloc(
+                  withdrawalRepository: context.read<WithdrawalRepository>(),
                 ),
               ),
               BlocProvider(
