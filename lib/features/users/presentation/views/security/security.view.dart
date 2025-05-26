@@ -4,16 +4,16 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
+import 'package:letdem/features/users/presentation/views/security/change_password.view.dart';
+import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/profile/screens/security/change_password.view.dart';
-import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
-import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 
 class SecurityView extends StatelessWidget {
   const SecurityView({super.key});

@@ -14,6 +14,8 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
+import 'package:letdem/features/users/presentation/views/scheduled_notifications/scheduled_notifications.view.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/button.dart';
@@ -26,8 +28,6 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/maps/navigate.view.dart';
-import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 
 class NavigationMapScreen extends StatefulWidget {
   final double latitude;

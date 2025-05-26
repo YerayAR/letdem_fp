@@ -39,6 +39,8 @@ import 'package:letdem/features/scheduled_notifications/repository/schedule_noti
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
+import 'package:letdem/features/users/presentation/views/scheduled_notifications/scheduled_notifications.view.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/repository/transaction.repository.dart';
@@ -53,8 +55,6 @@ import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/app/profile/screens/scheduled_notifications/scheduled_notifications.view.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/welcome/views/splash.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';

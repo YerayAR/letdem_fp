@@ -9,6 +9,13 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
+import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
+import 'package:letdem/features/users/presentation/views/connect_account/connect_account.view.dart';
+import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
+import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
+import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
@@ -19,18 +26,11 @@ import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/activities/screens/view_all.view.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
 import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
-import 'package:letdem/views/app/profile/popups/connect_account/money_laundry.popup.dart';
-import 'package:letdem/views/app/profile/screens/connect_account/connect_account.view.dart';
-import 'package:letdem/views/app/profile/screens/edit/edit_basic_info.view.dart';
-import 'package:letdem/views/app/profile/screens/language/change_language.view.dart';
-import 'package:letdem/views/app/profile/screens/security/security.view.dart';
-import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
-import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 import 'package:letdem/views/app/wallet/screens/wallet.view.dart';
 
-import 'screens/preferences/preferences.view.dart';
-import 'screens/scheduled_notifications/scheduled_notifications.view.dart';
+import 'preferences/preferences.view.dart';
+import 'scheduled_notifications/scheduled_notifications.view.dart';
+import 'security/security.view.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});

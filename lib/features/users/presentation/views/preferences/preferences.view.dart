@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/extenstions/user.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
-import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 
 class PreferencesView extends StatefulWidget {
   const PreferencesView({super.key});
