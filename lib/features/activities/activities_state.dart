@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:letdem/models/activities/activity.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/features/activities/models/activity.model.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 
 sealed class ActivitiesState extends Equatable {
   const ActivitiesState();

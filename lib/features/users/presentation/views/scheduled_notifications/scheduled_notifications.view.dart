@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/appbar.dart';
@@ -18,7 +19,6 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
-import 'package:letdem/views/app/notifications/views/notification.view.dart';
 
 class ScheduledNotificationsView extends StatefulWidget {
   const ScheduledNotificationsView({super.key});

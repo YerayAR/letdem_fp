@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:here_sdk/core.dart' as HERE;
 import 'package:here_sdk/core.engine.dart';
@@ -11,7 +10,6 @@ import 'package:here_sdk/routing.dart' as HERE;
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
@@ -250,27 +248,6 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
-
-  void _addMapMarkers(List<Space> spaces) {
-    for (var space in spaces) {
-      try {
-        Uint8List imageData = _assetsProvider.getImageForType(space.type);
-
-        MapImage mapImage =
-            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
-
-        final marker = MapMarker(
-          HERE.GeoCoordinates(
-              space.location.point.lat, space.location.point.lng),
-          mapImage,
-        );
-
-        _hereMapController?.mapScene.addMapMarker(marker);
-      } catch (e) {
-        print("Error adding space marker: $e");
-      }
-    }
-  }
 
   // Track distance changes and trigger events every 50m
   void _checkDistanceTrigger(double latitude, double longitude) {

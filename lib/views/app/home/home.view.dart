@@ -7,10 +7,11 @@ import 'package:here_sdk/core.dart';
 import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
+import 'package:letdem/features/auth/models/map_options.model.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart'
+    hide Location;
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/models/auth/map/map_options.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart' hide Location;
 import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/views/app/home/popups/event.popup.dart';
 import 'package:letdem/views/app/home/popups/space.popup.dart';

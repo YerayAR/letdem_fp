@@ -1,4 +1,4 @@
-import 'package:letdem/models/activities/activity.model.dart';
+import 'package:letdem/features/activities/models/activity.model.dart';
 
 class ActivityResponse {
   final int count;

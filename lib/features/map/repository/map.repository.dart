@@ -1,6 +1,6 @@
+import 'package:letdem/features/auth/models/map_options.model.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/repository/map.interface.dart';
-import 'package:letdem/models/auth/map/map_options.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/endpoint.dart';

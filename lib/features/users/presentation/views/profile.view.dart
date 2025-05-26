@@ -10,6 +10,7 @@ import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
+import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/connect_account/connect_account.view.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
@@ -24,7 +25,6 @@ import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/notifications/views/notification.view.dart';
 import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
 import 'package:letdem/views/app/wallet/screens/wallet.view.dart';
 

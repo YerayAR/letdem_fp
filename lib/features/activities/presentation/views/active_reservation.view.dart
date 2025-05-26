@@ -6,7 +6,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/confirmed_space_detail.view.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/views/reserved_space.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';

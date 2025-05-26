@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
-import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/models/payment/payment.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';

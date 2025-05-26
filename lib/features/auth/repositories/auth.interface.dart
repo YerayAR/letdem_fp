@@ -4,7 +4,7 @@ import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
 import 'package:letdem/features/auth/dto/token.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/models/auth/tokens.model.dart';
+import 'package:letdem/features/auth/models/tokens.model.dart';
 
 abstract class AuthInterface {
   Future<Tokens> login(LoginDTO loginDTO);

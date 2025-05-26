@@ -1,5 +1,5 @@
+import 'package:letdem/features/notifications/models/notification.model.dart';
 import 'package:letdem/features/notifications/repository/notification.interface.dart';
-import 'package:letdem/models/notification/notification.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/endpoint.dart';

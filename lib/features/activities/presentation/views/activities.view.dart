@@ -12,11 +12,11 @@ import 'package:letdem/features/activities/presentation/widgets/contribution_ite
 import 'package:letdem/features/activities/presentation/widgets/no_contribution.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/registered_car.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
+import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/notifications/views/notification.view.dart';
 
 import '../widgets/no_car_registered.widget.dart';
 
