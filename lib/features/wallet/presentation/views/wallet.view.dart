@@ -11,13 +11,13 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
+import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
+import 'package:letdem/features/withdrawals/presentation/views/withdraw.view.dart';
+import 'package:letdem/features/withdrawals/presentation/views/withdrawals.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/transactions/transactions.model.dart';
-import 'package:letdem/views/app/wallet/screens/orders/orders.view.dart';
-import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
-import 'package:letdem/views/app/wallet/screens/payout/withdraw.view.dart';
-import 'package:letdem/views/app/wallet/screens/withdrawals.view.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});

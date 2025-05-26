@@ -13,6 +13,7 @@ import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
+import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
 import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/connect_account/connect_account.view.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
@@ -22,9 +23,8 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
-import 'package:letdem/views/app/wallet/screens/wallet.view.dart';
 
 import '../../../../common/popups/popup.dart';
 import '../../../../common/widgets/appbar.dart';

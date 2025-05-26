@@ -16,7 +16,7 @@ import 'package:letdem/features/payout_methods/repository/payout.repository.dart
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
-import '../../../../../common/widgets/textfield.dart';
+import '../../../../common/widgets/textfield.dart';
 
 class PayoutMethodsScreen extends StatefulWidget {
   const PayoutMethodsScreen({super.key});

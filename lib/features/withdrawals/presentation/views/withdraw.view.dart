@@ -7,15 +7,15 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
+import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
-import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
 
-import '../../../../../common/popups/popup.dart';
-import '../../../../../common/widgets/appbar.dart';
-import '../../../../../common/widgets/button.dart';
-import '../../../../../infrastructure/services/res/navigator.dart';
-import '../../../../../infrastructure/toast/toast/toast.dart';
+import '../../../../common/popups/popup.dart';
+import '../../../../common/widgets/appbar.dart';
+import '../../../../common/widgets/button.dart';
+import '../../../../infrastructure/services/res/navigator.dart';
+import '../../../../infrastructure/toast/toast/toast.dart';
 
 class AmountInputCard extends StatefulWidget {
   final Function(String)? onChange;

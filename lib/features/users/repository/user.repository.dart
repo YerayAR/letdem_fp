@@ -5,13 +5,13 @@ import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
+import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 import 'package:letdem/models/payment/payment.model.dart';
-import 'package:letdem/views/app/wallet/screens/orders/orders.view.dart';
 
 enum EarningStatus {
   missingInfo,
