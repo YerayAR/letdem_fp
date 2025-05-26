@@ -14,9 +14,9 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 

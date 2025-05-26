@@ -1,5 +1,5 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:letdem/views/app/maps/route.view.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 
 class NotificationResult {
   final String id;

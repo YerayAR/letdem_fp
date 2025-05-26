@@ -8,10 +8,10 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/LetDemLocationType.dart';
+import 'package:letdem/features/activities/presentation/widgets/search/add_location.widget.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/views/app/home/widgets/search/add_location.widget.dart';
 
 class SavedAddressComponent extends StatelessWidget {
   final bool showDivider;

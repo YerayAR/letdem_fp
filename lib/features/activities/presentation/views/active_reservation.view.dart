@@ -5,11 +5,11 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/features/activities/presentation/views/confirmed_space_detail.view.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
+import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/home/views/reserved_space.view.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class ActiveReservationView extends StatelessWidget {
   final ReservedSpacePayload payload;

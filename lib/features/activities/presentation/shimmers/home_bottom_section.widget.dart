@@ -14,12 +14,12 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
+import 'package:letdem/features/activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
-import 'package:letdem/views/app/home/widgets/search/search_bottom_sheet.widget.dart';
 
-import '../../../../../infrastructure/services/mapbox_search/models/service.dart';
-import '../../../publish_space/screens/publish_space.view.dart';
+import '../../../../infrastructure/services/mapbox_search/models/service.dart';
+import '../../../map/presentation/views/publish_space/publish_space.view.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
   const HomeMapBottomSection({super.key});

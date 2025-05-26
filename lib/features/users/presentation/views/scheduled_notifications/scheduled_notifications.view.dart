@@ -13,11 +13,11 @@ import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/views/app/maps/route.view.dart';
 
 import '../../../../../common/widgets/body.dart';
 

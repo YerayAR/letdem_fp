@@ -9,11 +9,11 @@ import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/notifications/models/notification.model.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:shimmer/shimmer.dart';
 
 enum NotificationType {

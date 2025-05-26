@@ -16,8 +16,8 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
-import '../../../../../../common/popups/popup.dart';
-import '../../../../../../infrastructure/services/location/location.service.dart';
+import '../../../../common/popups/popup.dart';
+import '../../../../infrastructure/services/location/location.service.dart';
 
 class AddEventBottomSheet extends StatefulWidget {
   const AddEventBottomSheet({super.key});

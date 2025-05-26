@@ -5,16 +5,16 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/views/app/maps/route.view.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
+import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../common/widgets/appbar.dart';
-import '../../../../common/widgets/body.dart';
-import '../../../../common/widgets/button.dart';
-import '../../../../features/auth/models/nearby_payload.model.dart';
-import '../../../../infrastructure/services/res/navigator.dart';
-import '../../../../infrastructure/toast/toast/toast.dart';
+import '../../../../../common/widgets/appbar.dart';
+import '../../../../../common/widgets/body.dart';
+import '../../../../../common/widgets/button.dart';
+import '../../../../../infrastructure/services/res/navigator.dart';
+import '../../../../../infrastructure/toast/toast/toast.dart';
+import '../../../../auth/models/nearby_payload.model.dart';
 
 class ReservedSpaceDetailView extends StatelessWidget {
   final ReservedSpacePayload details;

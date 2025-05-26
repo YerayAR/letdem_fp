@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 enum ReservedStatus {
   confirmed,

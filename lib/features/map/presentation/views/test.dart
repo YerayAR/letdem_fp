@@ -10,8 +10,8 @@ import 'package:here_sdk/routing.dart' as HERE;
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 
 class NavigationView extends StatefulWidget {
   final double destinationLat;

@@ -8,10 +8,10 @@ import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/features/activities/presentation/widgets/search/address_component.widget.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/model.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';

@@ -27,20 +27,20 @@ import 'package:letdem/core/enums/EventTypes.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
-import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
-import 'package:letdem/views/app/maps/route.view.dart';
 
-import '../../../common/popups/success_dialog.dart';
-import '../publish_space/screens/publish_space.view.dart';
+import '../../../../common/popups/success_dialog.dart';
+import 'publish_space/publish_space.view.dart';
 
 class NavigationView extends StatefulWidget {
   final double destinationLat;

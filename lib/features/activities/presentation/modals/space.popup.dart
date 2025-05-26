@@ -14,16 +14,16 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
+import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/views/app/home/views/reserved_space.view.dart';
-import 'package:letdem/views/app/maps/route.view.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 import '../../../../common/widgets/chip.dart';
-import '../../../../features/auth/models/nearby_payload.model.dart';
+import '../../../auth/models/nearby_payload.model.dart';
 
 class SpacePopupSheet extends StatelessWidget {
   final Space space;

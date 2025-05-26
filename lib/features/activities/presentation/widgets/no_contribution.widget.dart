@@ -11,8 +11,8 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class NoContributionsWidget extends StatelessWidget {
   const NoContributionsWidget({super.key});
