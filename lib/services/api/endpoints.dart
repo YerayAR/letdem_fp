@@ -13,7 +13,7 @@ import 'package:letdem/features/payout_methods/repository/payout.repository.dart
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
-import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
+import 'package:letdem/features/withdrawals/dto/withdraw.dto.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 
 enum Environment { STG, PROD, DEV }

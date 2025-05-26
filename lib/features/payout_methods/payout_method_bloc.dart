@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
+import 'package:letdem/models/withdrawals/withdrawal.bloc.dart';
 import 'package:letdem/services/api/models/error.dart';
 import 'package:letdem/services/toast/toast.dart';
 

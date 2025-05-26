@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/wallet/repository/transaction.repository.dart';
+import 'package:letdem/models/transactions/transactions.model.dart';
 
 part 'wallet_event.dart';
 part 'wallet_state.dart';

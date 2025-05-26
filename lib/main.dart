@@ -43,6 +43,7 @@ import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/repository/transaction.repository.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
+import 'package:letdem/features/withdrawals/repository/withdrawal.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
 import 'package:letdem/global/widgets/button.dart';
