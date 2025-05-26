@@ -8,7 +8,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
-import '../../../features/auth/presentation/views/onboard/register.view.dart';
+import 'register.view.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});

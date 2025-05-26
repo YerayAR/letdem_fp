@@ -3,11 +3,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/core/base.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/base.dart';
 
 class RequestPermissionView extends StatefulWidget {
   const RequestPermissionView({super.key});

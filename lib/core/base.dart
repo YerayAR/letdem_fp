@@ -8,7 +8,7 @@ import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 import 'package:letdem/features/users/presentation/views/profile.view.dart';
 
-import '../../features/map/presentation/views/home.view.dart';
+import '../features/map/presentation/views/home.view.dart';
 
 class BaseView extends StatefulWidget {
   const BaseView({super.key});

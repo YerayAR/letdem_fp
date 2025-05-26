@@ -4,15 +4,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/core/base.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/features/auth/presentation/views/onboard/welcome.view.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/views/app/base.dart';
-import 'package:letdem/views/welcome/views/welcome.view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});

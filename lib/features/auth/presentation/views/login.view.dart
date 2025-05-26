@@ -14,9 +14,9 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/presentation/views/forgot_password/request_forgot_password.view.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/register.view.dart';
+import 'package:letdem/features/auth/presentation/views/onboard/splash.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/views/welcome/views/splash.view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
