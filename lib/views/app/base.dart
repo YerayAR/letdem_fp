@@ -5,8 +5,8 @@ import 'package:iconly/iconly.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
+import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 import 'package:letdem/features/users/presentation/views/profile.view.dart';
-import 'package:letdem/views/app/activities/screens/activities.view.dart';
 
 import 'home/home.view.dart';
 

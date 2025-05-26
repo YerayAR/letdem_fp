@@ -5,9 +5,9 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/views/activities.view.dart';
+import 'package:letdem/features/activities/presentation/widgets/contribution_item.widget.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/activities/screens/activities.view.dart';
-import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dart';
 
 import '../../../../global/widgets/appbar.dart';
 

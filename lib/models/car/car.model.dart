@@ -1,5 +1,5 @@
 import 'package:letdem/enums/CarTagType.dart';
-import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
+import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 
 class Car {
   final String id;

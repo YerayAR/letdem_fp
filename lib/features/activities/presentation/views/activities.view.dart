@@ -7,17 +7,18 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/views/active_reservation.view.dart';
+import 'package:letdem/features/activities/presentation/widgets/contribution_item.widget.dart';
+import 'package:letdem/features/activities/presentation/widgets/no_contribution.widget.dart';
+import 'package:letdem/features/activities/presentation/widgets/registered_car.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/activities/screens/active_reservation.view.dart';
-import 'package:letdem/views/app/activities/widgets/contribution_item.widget.dart';
-import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
-import 'package:letdem/views/app/activities/widgets/no_contribution.widget.dart';
-import 'package:letdem/views/app/activities/widgets/registered_car.widget.dart';
 import 'package:letdem/views/app/notifications/views/notification.view.dart';
+
+import '../widgets/no_car_registered.widget.dart';
 
 enum ContributionType {
   space,

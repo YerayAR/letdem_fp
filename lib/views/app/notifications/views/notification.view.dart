@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/widgets/appbar.dart';
@@ -12,7 +13,6 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/notification/notification.model.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/activities/screens/view_all.view.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:shimmer/shimmer.dart';
 

@@ -7,11 +7,11 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/CarTagType.dart';
+import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/car/car.model.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/app/activities/widgets/no_car_registered.widget.dart';
 import 'package:letdem/views/app/maps/test.dart';
 
 class RegisteredCarWidget extends StatelessWidget {
