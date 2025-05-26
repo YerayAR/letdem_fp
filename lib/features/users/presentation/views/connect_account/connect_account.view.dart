@@ -18,10 +18,10 @@ import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/global/models/country_codes.model.dart';
 import 'package:letdem/infrastructure/services/file_picker/file_picker.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/models/country_codes.model.dart';
 
 // import 'package:letdem/features/users/user_bloc.dart';
 
