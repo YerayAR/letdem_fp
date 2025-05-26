@@ -24,6 +24,7 @@ import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
@@ -37,7 +38,6 @@ import 'package:letdem/services/toast/tone.dart';
 import 'package:letdem/services/tts/tts.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 import '../../../enums/EventTypes.dart';
 import '../publish_space/screens/publish_space.view.dart';

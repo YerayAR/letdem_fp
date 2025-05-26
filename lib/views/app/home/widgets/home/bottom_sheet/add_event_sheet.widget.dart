@@ -10,12 +10,12 @@ import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 import '../../../../../../enums/EventTypes.dart';
 

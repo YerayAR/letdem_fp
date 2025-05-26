@@ -8,15 +8,16 @@ import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
+import 'package:letdem/features/auth/presentation/views/login.view.dart';
+import 'package:letdem/features/auth/presentation/views/onboard/basic_info.view.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/login.view.dart';
-import 'package:letdem/views/auth/views/onboard/basic_info.view.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
+
+import 'verify_account.view.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});

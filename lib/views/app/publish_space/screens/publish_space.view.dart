@@ -24,7 +24,8 @@ import 'package:letdem/models/auth/map/map_options.model.dart';
 import 'package:letdem/services/location/location.service.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
+
+import '../../../../global/popups/success_dialog.dart';
 
 enum PublishSpaceType {
   free,

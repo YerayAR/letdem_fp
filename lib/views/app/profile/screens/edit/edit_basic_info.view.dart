@@ -5,13 +5,13 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 class EditBasicInfoView extends StatefulWidget {
   const EditBasicInfoView({super.key});

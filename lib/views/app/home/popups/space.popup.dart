@@ -12,6 +12,7 @@ import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/models/auth/map/nearby_payload.model.dart' hide Location;
@@ -22,7 +23,6 @@ import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/app/payment_method/screens/add_payment_method.view.dart';
 import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 class SpacePopupSheet extends StatelessWidget {
   final Space space;

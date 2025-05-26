@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/services/api/endpoints.dart';
 import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/error.dart';
@@ -12,7 +13,6 @@ import 'package:letdem/services/api/models/response.model.dart';
 import 'package:letdem/services/api/sub/base.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/login.view.dart';
 
 class ApiService extends BaseApiService {
   static final Dio _dio = Dio(

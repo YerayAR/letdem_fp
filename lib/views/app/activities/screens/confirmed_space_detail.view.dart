@@ -10,13 +10,13 @@ import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart'; // Ensure these imports are correct
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 

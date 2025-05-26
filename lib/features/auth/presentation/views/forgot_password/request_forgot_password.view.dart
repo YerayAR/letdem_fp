@@ -12,7 +12,8 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/forgot_password/verify_forgot_password_email.view.dart';
+
+import 'verify_forgot_password_email.view.dart';
 
 class RequestForgotPasswordView extends StatefulWidget {
   const RequestForgotPasswordView({super.key});

@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/views/auth/views/login.view.dart';
-import 'package:letdem/views/auth/views/onboard/register.view.dart';
 
 import '../../../constants/ui/typo.dart';
+import '../../../features/auth/presentation/views/onboard/register.view.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});

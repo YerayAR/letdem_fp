@@ -8,6 +8,7 @@ import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
+import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
@@ -27,7 +28,6 @@ import 'package:letdem/views/app/profile/widgets/profile_section.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_container.widget.dart';
 import 'package:letdem/views/app/profile/widgets/settings_row.widget.dart';
 import 'package:letdem/views/app/wallet/screens/wallet.view.dart';
-import 'package:letdem/views/auth/views/login.view.dart';
 
 import 'screens/preferences/preferences.view.dart';
 import 'screens/scheduled_notifications/scheduled_notifications.view.dart';

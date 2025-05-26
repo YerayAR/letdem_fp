@@ -8,6 +8,7 @@ import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
@@ -15,7 +16,6 @@ import 'package:letdem/global/widgets/chip.dart';
 import 'package:letdem/global/widgets/textfield.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 class PayoutMethodsScreen extends StatefulWidget {
   const PayoutMethodsScreen({super.key});
@@ -101,9 +101,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                                         );
                                       }
 
-                                      final method =
-                                          (state)
-                                              .methods[index];
+                                      final method = (state).methods[index];
                                       return Padding(
                                         padding:
                                             const EdgeInsets.only(bottom: 8),

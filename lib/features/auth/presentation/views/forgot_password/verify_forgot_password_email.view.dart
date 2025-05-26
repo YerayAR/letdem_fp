@@ -12,10 +12,11 @@ import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/views/auth/views/forgot_password/reset_password.view.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
+
+import 'reset_password.view.dart';
 
 class VerifyForgotPasswordEmailView extends StatefulWidget {
   final String email;

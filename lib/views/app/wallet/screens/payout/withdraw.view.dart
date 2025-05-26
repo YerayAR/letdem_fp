@@ -8,13 +8,13 @@ import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/global/popups/popup.dart';
+import 'package:letdem/global/popups/success_dialog.dart';
 import 'package:letdem/global/widgets/appbar.dart';
 import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/global/widgets/button.dart';
 import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
-import 'package:letdem/views/auth/views/onboard/verify_account.view.dart';
 
 class AmountInputCard extends StatefulWidget {
   final Function(String)? onChange;

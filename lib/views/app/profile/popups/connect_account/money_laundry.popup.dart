@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/features/auth/presentation/views/onboard/register.view.dart';
 import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/views/auth/views/onboard/register.view.dart';
 
 class MoneyLaundryPopup extends StatefulWidget {
   final VoidCallback onContinue;
