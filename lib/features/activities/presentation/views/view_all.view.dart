@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 import 'package:letdem/features/activities/presentation/widgets/contribution_item.widget.dart';
-import 'package:letdem/services/res/navigator.dart';
-
-import '../../../../global/widgets/appbar.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 enum ViewAllType {
   all,

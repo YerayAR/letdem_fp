@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/global/widgets/button.dart';
 
 class NoMapPermissionSection extends StatelessWidget {
   const NoMapPermissionSection({super.key});

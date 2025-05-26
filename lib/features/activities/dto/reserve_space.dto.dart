@@ -1,4 +1,4 @@
-import 'package:letdem/services/api/models/endpoint.dart';
+import '../../../infrastructure/api/api/models/endpoint.dart';
 
 class ReserveSpaceDTO extends DTO {
   final String paymentMethodID;

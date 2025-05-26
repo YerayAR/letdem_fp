@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/CarTagType.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/car/car.model.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 
 class NoCarRegisteredWidget extends StatelessWidget {
   const NoCarRegisteredWidget({super.key});

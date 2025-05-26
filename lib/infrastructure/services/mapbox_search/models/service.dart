@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
 import 'package:letdem/extenstions/location.dart';
-import 'package:letdem/services/mapbox_search/models/model.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 
 class MapboxSearchApiService {
   static final MapboxSearchApiService _instance =

@@ -16,6 +16,10 @@ import 'package:here_sdk/routing.dart' as HERE;
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/common/popups/multi_selector.popup.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -25,20 +29,16 @@ import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/popups/success_dialog.dart';
-import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/map/map_asset_provider.service.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
-import 'package:letdem/services/toast/tone.dart';
-import 'package:letdem/services/tts/tts.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/infrastructure/toast/toast/tone.dart';
+import 'package:letdem/infrastructure/tts/tts/tts.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 
+import '../../../common/popups/success_dialog.dart';
 import '../../../enums/EventTypes.dart';
 import '../publish_space/screens/publish_space.view.dart';
 
@@ -1512,10 +1512,10 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   Widget _buildLoadingIndicator() {
-    return const Center(
-      child: Card(
+    return Center(
+      child: Container(
         color: Colors.white,
-        child: Padding(
+        child: const Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1532,7 +1532,7 @@ class _NavigationViewState extends State<NavigationView> {
 
   Widget _buildErrorMessage() {
     return Center(
-      child: Card(
+      child: Container(
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),

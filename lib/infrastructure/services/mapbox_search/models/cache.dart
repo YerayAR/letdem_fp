@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:letdem/services/mapbox_search/models/model.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 

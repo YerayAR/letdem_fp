@@ -55,7 +55,7 @@ class EditBasicInfoEvent extends UserEvent {
 class UpdateEarningAccountEvent extends UserEvent {
   final EarningAccount account;
 
-  UpdateEarningAccountEvent({required this.account});
+  const UpdateEarningAccountEvent({required this.account});
 
   @override
   List<Object?> get props => [account];

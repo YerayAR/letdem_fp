@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/scheduled_notifications/repository/schedule_notifications.repository.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
-import 'package:letdem/services/api/models/error.dart';
-import 'package:letdem/services/toast/toast.dart';
 
 part 'schedule_notifications_event.dart';
 part 'schedule_notifications_state.dart';

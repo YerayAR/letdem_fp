@@ -8,8 +8,8 @@ import 'package:letdem/features/auth/dto/token.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/features/auth/models/tokens.model.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
-import 'package:letdem/services/api/models/error.dart';
-import 'package:letdem/services/google/google.service.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/infrastructure/services/google/google.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'auth_event.dart';

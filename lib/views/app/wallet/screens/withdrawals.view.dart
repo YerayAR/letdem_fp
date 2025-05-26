@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
-import 'package:letdem/global/widgets/body.dart';
 import 'package:letdem/models/withdrawals/withdrawal.bloc.dart';
 
 class WithdrawListView extends StatefulWidget {

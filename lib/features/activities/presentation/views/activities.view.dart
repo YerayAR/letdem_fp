@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/appbar.dart';
+import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -14,9 +16,7 @@ import 'package:letdem/features/activities/presentation/widgets/registered_car.w
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
-import 'package:letdem/global/widgets/appbar.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 import '../widgets/no_car_registered.widget.dart';
 
@@ -33,6 +33,7 @@ class ActivitiesView extends StatefulWidget {
 }
 
 class _ActivitiesViewState extends State<ActivitiesView> {
+  @override
   initState() {
     super.initState();
     context.read<ActivitiesBloc>().add(GetActivitiesEvent());
@@ -54,7 +55,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               Expanded(
                 child: state is ActivitiesLoaded
                     ? const ContributionsSection()
-                    : Center(
+                    : const Center(
                         child: CircularProgressIndicator(),
                       ),
               )

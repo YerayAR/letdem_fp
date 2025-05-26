@@ -1,5 +1,5 @@
 import 'package:letdem/enums/LetDemLocationType.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
 class PostLetDemoLocationDTO extends DTO {
   final String name;

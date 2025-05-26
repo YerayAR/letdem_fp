@@ -1,8 +1,8 @@
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/features/withdrawals/dto/withdraw.dto.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/models/withdrawals/withdrawal.bloc.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
 
 import 'withdrawel.interface.dart';
 

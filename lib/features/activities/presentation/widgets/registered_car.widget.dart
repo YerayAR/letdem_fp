@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/mapview.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/CarTagType.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/car/car.model.dart';
-import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/maps/test.dart';
 
 class RegisteredCarWidget extends StatelessWidget {

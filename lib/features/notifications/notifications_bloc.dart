@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
-import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 part 'notifications_event.dart';
 part 'notifications_state.dart';
@@ -39,7 +39,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         ));
       }
     } catch (err) {
-      emit(NotificationsError(error: "Unable to clear notifications"));
+      emit(const NotificationsError(error: "Unable to clear notifications"));
     }
   }
 
@@ -49,7 +49,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       await notificationRepository.markNotificationAsRead(event.id);
       //   remove notification from the list
     } catch (err) {
-      emit(NotificationsError(error: "Unable to mark notification as read"));
+      emit(const NotificationsError(
+          error: "Unable to mark notification as read"));
     }
   }
 
@@ -84,7 +85,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       ));
     } catch (err, st) {
       print(st);
-      emit(NotificationsError(error: "Unable to load notifications"));
+      emit(const NotificationsError(error: "Unable to load notifications"));
     }
   }
 }

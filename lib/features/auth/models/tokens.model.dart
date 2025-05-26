@@ -1,4 +1,4 @@
-import 'package:letdem/services/storage/storage.service.dart';
+import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 
 class Tokens {
   final String accessToken;

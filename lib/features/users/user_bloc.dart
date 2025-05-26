@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:letdem/extenstions/location.dart';
 import 'package:letdem/features/auth/models/tokens.model.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
-import 'package:letdem/services/api/models/error.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/views/app/wallet/screens/orders/orders.view.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 

@@ -7,6 +7,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/popups/success_dialog.dart';
+import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/assets.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
@@ -17,15 +22,9 @@ import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/models/country_codes.model.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/textfield.dart';
-import 'package:letdem/services/location/location.service.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
-
-import '../../../../global/popups/success_dialog.dart';
+import 'package:letdem/infrastructure/services/location/location.service.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 enum PublishSpaceType {
   free,

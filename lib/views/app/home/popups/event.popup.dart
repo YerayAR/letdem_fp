@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/services/map/map_asset_provider.service.dart';
-import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/views/app/maps/navigate.view.dart';
+
+import '../../../../common/popups/popup.dart';
+import '../../../../infrastructure/services/res/navigator.dart';
 
 class EventPopupSheet extends StatelessWidget {
   final Event event;

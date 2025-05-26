@@ -1,10 +1,10 @@
 import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/search/repository/search_location.interface.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/response.model.dart';
 
 class SearchLocationRepository extends ILocationSearchRepository {
   @override

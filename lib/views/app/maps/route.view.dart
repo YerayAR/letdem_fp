@@ -10,6 +10,7 @@ import 'package:here_sdk/navigation.dart' as navigation;
 import 'package:here_sdk/routing.dart' as routing;
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -17,17 +18,17 @@ import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/users/presentation/views/scheduled_notifications/scheduled_notifications.view.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/popups/success_dialog.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/chip.dart';
+import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
-import 'package:letdem/services/location/location.service.dart';
-import 'package:letdem/services/map/map_asset_provider.service.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/views/app/maps/navigate.view.dart';
+
+import '../../../common/popups/success_dialog.dart';
+import '../../../common/widgets/button.dart';
+import '../../../common/widgets/chip.dart';
+import '../../../infrastructure/services/location/location.service.dart';
+import '../../../infrastructure/toast/toast/toast.dart';
 
 class NavigationMapScreen extends StatefulWidget {
   final double latitude;
@@ -108,7 +109,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 
     _hereMapController!.mapScene.loadSceneForMapScheme(
       MapScheme.normalDay,
-      (MapError? error) {
+      (error) {
         if (error != null) {
           print('Map scene loading failed: $error');
           return;

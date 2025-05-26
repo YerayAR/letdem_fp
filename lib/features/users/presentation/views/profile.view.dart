@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -20,14 +22,12 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/widgets/appbar.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/views/app/payment_method/screens/payment_methods.view.dart';
 import 'package:letdem/views/app/wallet/screens/wallet.view.dart';
 
+import '../../../../common/popups/popup.dart';
+import '../../../../common/widgets/appbar.dart';
 import 'preferences/preferences.view.dart';
 import 'scheduled_notifications/scheduled_notifications.view.dart';
 import 'security/security.view.dart';
@@ -56,7 +56,7 @@ class ProfileView extends StatelessWidget {
                       children: [
                         _ProfileHeader(user: state.user),
                         _MainActionsSection(user: state.user),
-                        _AccountSettingsSection(),
+                        const _AccountSettingsSection(),
                         const _LogoutButton(),
                       ],
                     ),
@@ -264,7 +264,7 @@ class _MainActionsSection extends StatelessWidget {
 }
 
 class _AccountSettingsSection extends StatelessWidget {
-  const _AccountSettingsSection({super.key});
+  const _AccountSettingsSection();
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +311,7 @@ class _AccountSettingsSection extends StatelessWidget {
 }
 
 class _LogoutButton extends StatelessWidget {
-  const _LogoutButton({super.key});
+  const _LogoutButton();
 
   @override
   Widget build(BuildContext context) {

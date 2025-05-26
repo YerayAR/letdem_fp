@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/views/app/base.dart';
 
 class RequestPermissionView extends StatefulWidget {

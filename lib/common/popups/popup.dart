@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:letdem/global/popups/popup_container.dart';
+import 'package:letdem/common/popups/popup_container.dart';
 
 class AppPopup {
   static Future showDialogSheet(BuildContext context, Widget child) {

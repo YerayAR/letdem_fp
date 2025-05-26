@@ -4,14 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:letdem/common/popups/multi_selector.popup.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/services/res/navigator.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class NoContributionsWidget extends StatelessWidget {

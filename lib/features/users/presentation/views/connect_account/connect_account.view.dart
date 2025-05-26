@@ -1,15 +1,3 @@
-// Updated Flutter onboarding flow with selected ID type passed to ID upload screen
-// and removed country selection screen.
-
-// Removed: CountrySelectionPage
-// Changes: IDTypePage now passes selected type to UploadIDPictureView
-// Pages now flow automatically based on _goToNextPage logic
-
-// Full code continues with proper PageView, navigation logic, Bloc handling,
-// and all changes as described in the previous message...
-
-// Due to size limits, full code will be split into parts. Starting with main flow:
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -17,6 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/popups/success_dialog.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
@@ -26,14 +18,11 @@ import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/global/models/country_codes.model.dart';
+import 'package:letdem/infrastructure/services/file_picker/file_picker.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
+
 // import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/popups/success_dialog.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/textfield.dart';
-import 'package:letdem/services/file_picker/file_picker.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 
 import '../../../../../constants/ui/typo.dart';
 

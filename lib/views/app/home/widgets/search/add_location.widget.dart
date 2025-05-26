@@ -4,16 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
-import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/services/mapbox_search/models/model.dart';
-import 'package:letdem/services/mapbox_search/models/service.dart';
-import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
+
+import '../../../../../infrastructure/services/mapbox_search/models/model.dart';
+import '../../../../../infrastructure/services/res/navigator.dart';
 
 class AddLocationBottomSheet extends StatefulWidget {
   final String title;

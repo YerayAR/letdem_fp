@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/constants/credentials.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
-import 'package:letdem/services/api/models/response.model.dart';
 
 class CurrentLocationPayload {
   final double latitude;

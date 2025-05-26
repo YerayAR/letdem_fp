@@ -7,11 +7,11 @@ import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/repositories/activity.repository.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/error.dart';
-import 'package:letdem/services/image/compressor.dart';
-import 'package:letdem/services/location/location.service.dart';
-import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/infrastructure/services/image/compressor.dart';
+import 'package:letdem/infrastructure/services/location/location.service.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 part 'activities_event.dart';
 

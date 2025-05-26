@@ -5,16 +5,16 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/global/widgets/appbar.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../common/widgets/appbar.dart';
+import '../../../../common/widgets/body.dart';
+import '../../../../common/widgets/button.dart';
 import '../../../../features/auth/models/nearby_payload.model.dart';
+import '../../../../infrastructure/services/res/navigator.dart';
+import '../../../../infrastructure/toast/toast/toast.dart';
 
 class ReservedSpaceDetailView extends StatelessWidget {
   final ReservedSpacePayload details;

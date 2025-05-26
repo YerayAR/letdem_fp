@@ -7,7 +7,7 @@ import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
 import 'package:letdem/features/users/presentation/views/connect_account/connect_account.view.dart';
-import 'package:letdem/services/api/models/error.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
 
 import 'earning_account_event.dart';
 

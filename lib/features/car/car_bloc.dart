@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:letdem/enums/CarTagType.dart';
 import 'package:letdem/features/car/dto/create_car.dto.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/models/car/car.model.dart';
-import 'package:letdem/services/api/models/error.dart';
 
 part 'car_event.dart';
 part 'car_state.dart';

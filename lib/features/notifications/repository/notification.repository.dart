@@ -1,9 +1,9 @@
 import 'package:letdem/features/notifications/models/notification.model.dart';
 import 'package:letdem/features/notifications/repository/notification.interface.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
-import 'package:letdem/services/api/models/response.model.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 
 class NotificationRepository implements INotificationRepository {
   @override

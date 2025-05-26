@@ -1,10 +1,10 @@
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/repository/map.interface.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
-import 'package:letdem/services/api/models/response.model.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 
 class MapRepository extends IMapRepository {
   @override

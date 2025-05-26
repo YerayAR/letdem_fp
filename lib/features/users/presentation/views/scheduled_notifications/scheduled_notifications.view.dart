@@ -6,19 +6,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/widgets/appbar.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/widgets/appbar.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
+
+import '../../../../../common/widgets/body.dart';
 
 class ScheduledNotificationsView extends StatefulWidget {
   const ScheduledNotificationsView({super.key});

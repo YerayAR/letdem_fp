@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:letdem/services/api/models/error.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/storage/storage.service.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 
 class BaseApiService {
   static Future<Map<String, String>> getHeaders(

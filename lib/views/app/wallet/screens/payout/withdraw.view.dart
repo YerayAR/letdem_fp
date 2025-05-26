@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:letdem/common/popups/success_dialog.dart';
+import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
@@ -7,14 +9,13 @@ import 'package:letdem/extenstions/user.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/popups/success_dialog.dart';
-import 'package:letdem/global/widgets/appbar.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
 import 'package:letdem/views/app/wallet/screens/payout/payout.view.dart';
+
+import '../../../../../common/popups/popup.dart';
+import '../../../../../common/widgets/appbar.dart';
+import '../../../../../common/widgets/button.dart';
+import '../../../../../infrastructure/services/res/navigator.dart';
+import '../../../../../infrastructure/toast/toast/toast.dart';
 
 class AmountInputCard extends StatefulWidget {
   final Function(String)? onChange;

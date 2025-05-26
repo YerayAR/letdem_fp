@@ -11,13 +11,14 @@ import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart'
     hide Location;
 import 'package:letdem/features/map/map_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/services/map/map_asset_provider.service.dart';
 import 'package:letdem/views/app/home/popups/event.popup.dart';
 import 'package:letdem/views/app/home/popups/space.popup.dart';
 import 'package:letdem/views/app/home/widgets/home/home_bottom_section.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/no_connection.widget.dart';
 import 'package:letdem/views/app/home/widgets/home/shimmers/home_page_shimmer.widget.dart';
+
+import '../../../common/popups/popup.dart';
+import '../../../infrastructure/services/map/map_asset_provider.service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});

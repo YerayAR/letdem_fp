@@ -1,9 +1,9 @@
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 import 'package:letdem/models/payment/payment.model.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/response.model.dart';
 
+import '../../../infrastructure/api/api/endpoints.dart';
 import 'payment.interface.dart';
 
 class PaymentMethodRepository implements IPaymentMethodRepository {

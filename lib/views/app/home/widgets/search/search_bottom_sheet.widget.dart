@@ -5,23 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/shimmers/location_bar.shimmer.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/shimmers/location_bar.shimmer.dart';
-import 'package:letdem/global/widgets/textfield.dart';
+import 'package:letdem/infrastructure/services/location/location.service.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/services/location/location.service.dart';
-import 'package:letdem/services/mapbox_search/models/cache.dart';
-import 'package:letdem/services/mapbox_search/models/model.dart';
-import 'package:letdem/services/mapbox_search/models/service.dart';
-import 'package:letdem/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/search/add_location.widget.dart';
 import 'package:letdem/views/app/home/widgets/search/address_component.widget.dart';
 import 'package:letdem/views/app/maps/route.view.dart';
+
+import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
+import '../../../../../infrastructure/services/mapbox_search/models/model.dart';
+import '../../../../../infrastructure/services/res/navigator.dart';
 
 class MapSearchBottomSheet extends StatefulWidget {
   const MapSearchBottomSheet({super.key});

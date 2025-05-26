@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:letdem/common/widgets/appbar.dart';
+import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/extenstions/locale.dart';
-import 'package:letdem/global/widgets/appbar.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
-import 'package:letdem/services/res/navigator.dart';
 import 'package:provider/provider.dart';
 
 class Language {
@@ -26,12 +26,11 @@ class ChangeLanguageView extends StatefulWidget {
 }
 
 class _ChangeLanguageViewState extends State<ChangeLanguageView> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Padding(
-        padding:  EdgeInsets.all(Dimens.defaultMargin),
+        padding: EdgeInsets.all(Dimens.defaultMargin),
         child: SafeArea(
           child: PrimaryButton(
             text: context.l10n.save,
@@ -42,42 +41,40 @@ class _ChangeLanguageViewState extends State<ChangeLanguageView> {
           ),
         ),
       ),
-      body: Consumer<LocaleProvider>(
-        builder: (context, snapshot , _) {
-          return StyledBody(
-            children: [
-              StyledAppBar(
-                title: context.l10n.language,
-                onTap: () {
-                  NavigatorHelper.pop();
-                },
-                icon: Icons.close,
+      body: Consumer<LocaleProvider>(builder: (context, snapshot, _) {
+        return StyledBody(
+          children: [
+            StyledAppBar(
+              title: context.l10n.language,
+              onTap: () {
+                NavigatorHelper.pop();
+              },
+              icon: Icons.close,
+            ),
+            Dimens.space(3),
+            Expanded(
+              child: ListView(
+                children: [
+                  Column(
+                    children: L10n.all.map((language) {
+                      return LanguageOption(
+                        flag: "",
+                        name: language == const Locale('en')
+                            ? 'English'
+                            : 'Español',
+                        isSelected: snapshot.defaultLocale == language,
+                        onTap: () {
+                          context.read<LocaleProvider>().setLocale(language);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
-              Dimens.space(3),
-              Expanded(
-                child: ListView(
-                  children: [
-                    Column(
-                        children: L10n.all.map((language) {
-                          return LanguageOption(
-                            flag: "",
-                            name: language ==  const Locale('en') ? 'English' : 'Español',
-                            isSelected: snapshot.defaultLocale == language, onTap: () {
-                            context.read<LocaleProvider>().setLocale(language);
-                          },
-
-                          );
-                        }).toList(),
-                      ),
-
-
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-      ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }
@@ -119,13 +116,13 @@ class LanguageOption extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
           child: Row(
             children: [
-
               Expanded(
                 child: Text(
                   name,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? AppColors.primary500
                         : Theme.of(context).textTheme.bodyLarge?.color,
@@ -137,9 +134,8 @@ class LanguageOption extends StatelessWidget {
                   width: 25,
                   height: 25,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: AppColors.primary500
-                  ),
+                      borderRadius: BorderRadius.circular(14),
+                      color: AppColors.primary500),
                   child: const Icon(
                     Icons.check,
                     color: Colors.white,

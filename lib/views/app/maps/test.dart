@@ -7,11 +7,10 @@ import 'package:here_sdk/location.dart' as HERE;
 import 'package:here_sdk/mapview.dart';
 import 'package:here_sdk/navigation.dart' as HERE;
 import 'package:here_sdk/routing.dart' as HERE;
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/services/map/map_asset_provider.service.dart';
-import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 
 class NavigationView extends StatefulWidget {
@@ -246,8 +245,6 @@ class _NavigationViewState extends State<NavigationView> {
       });
     }
   }
-
-  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
 
   // Track distance changes and trigger events every 50m
   void _checkDistanceTrigger(double latitude, double longitude) {

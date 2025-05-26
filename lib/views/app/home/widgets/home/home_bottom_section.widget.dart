@@ -5,21 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:letdem/common/popups/multi_selector.popup.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/extenstions/locale.dart';
 import 'package:letdem/extenstions/user.dart';
-import 'package:letdem/global/popups/popup.dart';
-import 'package:letdem/global/popups/widgets/multi_selector.popup.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/services/mapbox_search/models/service.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/tts/tts.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.widget.dart';
 import 'package:letdem/views/app/home/widgets/search/search_bottom_sheet.widget.dart';
 
-import '../../../../../global/widgets/textfield.dart';
+import '../../../../../infrastructure/services/mapbox_search/models/service.dart';
 import '../../../publish_space/screens/publish_space.view.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
@@ -75,9 +74,7 @@ class HomeMapBottomSection extends StatelessWidget {
             ),
             Dimens.space(2),
             GestureDetector(
-              onTap: () {
-                SpeechService().speak("Esto es tan genial que me gusta mucho");
-              },
+              onTap: () {},
               child: Text(
                 context.l10n.whatDoYouWantToDo,
                 style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),

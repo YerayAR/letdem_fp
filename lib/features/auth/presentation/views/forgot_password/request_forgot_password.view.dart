@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
+import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/constants/ui/colors.dart';
 import 'package:letdem/constants/ui/dimens.dart';
 import 'package:letdem/constants/ui/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
-import 'package:letdem/global/widgets/body.dart';
-import 'package:letdem/global/widgets/button.dart';
-import 'package:letdem/global/widgets/chip.dart';
-import 'package:letdem/global/widgets/textfield.dart';
-import 'package:letdem/services/res/navigator.dart';
-import 'package:letdem/services/toast/toast.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
+import '../../../../../infrastructure/services/res/navigator.dart';
 import 'verify_forgot_password_email.view.dart';
 
 class RequestForgotPasswordView extends StatefulWidget {
