@@ -2,21 +2,9 @@ import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
+import 'package:letdem/features/auth/dto/token.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/models/auth/tokens.model.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
-
-class TokenDTO extends DTO {
-  final String token;
-
-  TokenDTO({required this.token});
-
-  @override
-  Map<String, dynamic> toMap() {
-    return {'token': token, 'device_id': OneSignal.User.pushSubscription.id};
-  }
-}
 
 abstract class AuthInterface {
   Future<Tokens> login(LoginDTO loginDTO);

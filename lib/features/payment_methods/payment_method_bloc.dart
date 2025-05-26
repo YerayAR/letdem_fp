@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
-import 'package:letdem/features/payment_methods/repository/payments.repository.dart';
+import 'package:letdem/features/payment_methods/repository/payment.interface.dart';
+import 'package:letdem/models/payment/payment.model.dart';
 
 part 'payment_method_event.dart';
 part 'payment_method_state.dart';

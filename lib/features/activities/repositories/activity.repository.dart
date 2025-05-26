@@ -1,13 +1,13 @@
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
+import 'package:letdem/features/activities/dto/reserve_space.dto.dart';
 import 'package:letdem/features/activities/repositories/activity.interface..dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/models/activities/activities_response.dto.dart';
 import 'package:letdem/models/activities/activity.model.dart';
 import 'package:letdem/services/api/api.service.dart';
 import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:letdem/services/api/models/response.model.dart';
 
 class ActivityRepository extends IActivityRepository {
@@ -37,18 +37,6 @@ class ActivityRepository extends IActivityRepository {
     );
     return ActivityResponse.fromJson(response.data);
     // return response.data.map((e) => Activity.fromMap(e)).toList();
-  }
-
-  @override
-  Future<Activity> getActivity(String id) {
-    // TODO: implement getActivity
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> updateActivity(Activity activity) {
-    // TODO: implement updateActivity
-    throw UnimplementedError();
   }
 
   @override
@@ -107,18 +95,5 @@ class ActivityRepository extends IActivityRepository {
       endpoint:
           EndPoints.confirmReservation(spaceID).copyWithDTO(confirmationCode),
     );
-  }
-}
-
-class ReserveSpaceDTO extends DTO {
-  final String paymentMethodID;
-
-  ReserveSpaceDTO({required this.paymentMethodID});
-
-  @override
-  Map<String, dynamic> toMap() {
-    return {
-      "payment_method_id": paymentMethodID,
-    };
   }
 }

@@ -1,12 +1,12 @@
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
-import 'package:letdem/features/activities/repositories/activity.repository.dart';
+import 'package:letdem/features/activities/dto/reserve_space.dto.dart';
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
 import 'package:letdem/features/auth/dto/register.dto.dart';
+import 'package:letdem/features/auth/dto/token.dto.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/features/auth/repositories/auth.interface.dart';
 import 'package:letdem/features/car/dto/create_car.dto.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
