@@ -1,5 +1,6 @@
-import 'package:letdem/enums/EventTypes.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
+
+import '../../../core/enums/EventTypes.dart';
 
 class MapNearbyPayload {
   final List<Space> spaces;

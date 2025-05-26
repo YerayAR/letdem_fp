@@ -3,9 +3,9 @@ import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/chip.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 

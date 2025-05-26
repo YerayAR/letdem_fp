@@ -7,10 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:letdem/common/popups/multi_selector.popup.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/extenstions/locale.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 

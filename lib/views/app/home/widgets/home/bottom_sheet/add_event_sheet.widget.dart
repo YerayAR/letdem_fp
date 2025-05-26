@@ -4,9 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/button.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/enums/EventTypes.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
@@ -16,7 +17,6 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 import '../../../../../../common/popups/popup.dart';
-import '../../../../../../enums/EventTypes.dart';
 import '../../../../../../infrastructure/services/location/location.service.dart';
 
 class AddEventBottomSheet extends StatefulWidget {

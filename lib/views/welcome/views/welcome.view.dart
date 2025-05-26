@@ -1,13 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:letdem/common/widgets/button.dart';
-import 'package:letdem/constants/ui/assets.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/assets.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
-import '../../../constants/ui/typo.dart';
 import '../../../features/auth/presentation/views/onboard/register.view.dart';
 
 class WelcomeView extends StatelessWidget {

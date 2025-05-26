@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:letdem/extenstions/location.dart';
+import 'package:letdem/core/extensions/location.dart';
 import 'package:letdem/features/auth/models/tokens.model.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';

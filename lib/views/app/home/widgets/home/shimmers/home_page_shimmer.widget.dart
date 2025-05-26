@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomePageShimmer extends StatelessWidget {

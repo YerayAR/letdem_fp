@@ -6,9 +6,9 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/common/widgets/textfield.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:letdem/constants/credentials.dart';
-import 'package:letdem/extenstions/location.dart';
+import 'package:letdem/core/constants/credentials.dart';
+import 'package:letdem/core/extensions/location.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 
 class MapboxSearchApiService {

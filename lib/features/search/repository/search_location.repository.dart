@@ -1,4 +1,4 @@
-import 'package:letdem/enums/LetDemLocationType.dart';
+import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/search/repository/search_location.interface.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';

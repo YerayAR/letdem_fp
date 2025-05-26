@@ -20,10 +20,11 @@ import 'package:letdem/common/popups/multi_selector.popup.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/constants/ui/typo.dart';
-import 'package:letdem/extenstions/user.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/enums/EventTypes.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
@@ -39,7 +40,6 @@ import 'package:letdem/views/app/home/widgets/home/bottom_sheet/add_event_sheet.
 import 'package:letdem/views/app/maps/route.view.dart';
 
 import '../../../common/popups/success_dialog.dart';
-import '../../../enums/EventTypes.dart';
 import '../publish_space/screens/publish_space.view.dart';
 
 class NavigationView extends StatefulWidget {

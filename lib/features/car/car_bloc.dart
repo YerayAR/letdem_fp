@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:letdem/enums/CarTagType.dart';
+import 'package:letdem/core/enums/CarTagType.dart';
 import 'package:letdem/features/car/dto/create_car.dto.dart';
 import 'package:letdem/features/car/repository/car.repository.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';

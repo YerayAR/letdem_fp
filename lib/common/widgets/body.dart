@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/dimens.dart';
 
 class StyledBody extends StatelessWidget {
   final List<Widget> children;

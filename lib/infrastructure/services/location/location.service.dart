@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:letdem/constants/credentials.dart';
+import 'package:letdem/core/constants/credentials.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';

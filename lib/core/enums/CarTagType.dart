@@ -1,4 +1,4 @@
-import 'package:letdem/constants/ui/assets.dart';
+import 'package:letdem/core/constants/assets.dart';
 
 enum CarTagType {
   zero,

@@ -3,8 +3,8 @@ import 'dart:math'; // Import for random number generation
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:letdem/common/widgets/loader.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
 
 class PrimaryButton extends StatelessWidget {
   final Color? color;

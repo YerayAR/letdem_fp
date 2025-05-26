@@ -9,8 +9,9 @@ import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
-import 'package:letdem/constants/ui/colors.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
@@ -23,8 +24,6 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 // import 'package:letdem/features/users/user_bloc.dart';
-
-import '../../../../../constants/ui/typo.dart';
 
 class ProfileOnboardingApp extends StatefulWidget {
   final EarningStatus? status;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:letdem/constants/ui/dimens.dart';
-import 'package:letdem/constants/ui/typo.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
 
 class DecoratedChip extends StatelessWidget {
   final String text;

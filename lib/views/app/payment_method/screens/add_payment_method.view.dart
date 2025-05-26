@@ -4,7 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/textfield.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';

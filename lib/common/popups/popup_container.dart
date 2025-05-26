@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:letdem/constants/ui/dimens.dart';
+import 'package:letdem/core/constants/dimens.dart';
 
 class PopupContainer extends StatelessWidget {
   final Widget child;
@@ -24,7 +24,7 @@ class PopupContainer extends StatelessWidget {
                 ? const EdgeInsets.all(0)
                 : EdgeInsets.all(smallPadding
                     ? Dimens.defaultMargin / 15
-                    : Dimens.defaultMargin ),
+                    : Dimens.defaultMargin),
             child: Container(
               padding: bottomSheet
                   ? EdgeInsets.symmetric(

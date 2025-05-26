@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:letdem/constants/ui/colors.dart';
+import 'package:letdem/core/constants/colors.dart';
 
 class SettingsContainer extends StatelessWidget {
   final Widget child;

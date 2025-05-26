@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:letdem/constants/ui/assets.dart';
-import 'package:letdem/enums/EventTypes.dart';
+import 'package:letdem/core/constants/assets.dart';
+import 'package:letdem/core/enums/EventTypes.dart';
 import 'package:letdem/views/app/publish_space/screens/publish_space.view.dart';
 
 class MapAssetsProvider {
