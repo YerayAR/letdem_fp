@@ -1,11 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:letdem/enums/LetDemLocationType.dart';
+import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/cache.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/services/mapbox_search/models/cache.dart';
-import 'package:letdem/services/mapbox_search/models/model.dart';
 
 part 'search_location_event.dart';
 part 'search_location_state.dart';

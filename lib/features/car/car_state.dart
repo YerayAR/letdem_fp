@@ -24,7 +24,7 @@ final class CarLoaded extends CarState {
 
 final class CarError extends CarState {
   final String message;
-  CarError(this.message);
+  const CarError(this.message);
 
   @override
   List<Object> get props => [message];

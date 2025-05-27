@@ -6,10 +6,29 @@ import 'package:http/http.dart' as http;
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
-import 'package:letdem/services/api/models/error.dart';
-import 'package:letdem/views/app/profile/screens/connect_account/connect_account.view.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
 
 import 'earning_account_event.dart';
+
+class IpApiResponse {
+  final String ip;
+  final String countryName;
+  final String countryCode;
+
+  IpApiResponse({
+    required this.ip,
+    required this.countryName,
+    required this.countryCode,
+  });
+
+  factory IpApiResponse.fromJson(Map<String, dynamic> json) {
+    return IpApiResponse(
+      ip: json['ip'] ?? '',
+      countryName: json['country'] ?? '',
+      countryCode: json['country_code'] ?? '',
+    );
+  }
+}
 
 String getCountryCodeFromLocale() {
   return ui.window.locale.countryCode ?? "ES";

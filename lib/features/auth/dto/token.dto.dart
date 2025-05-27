@@ -1,6 +1,5 @@
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-
-import '../../../services/api/models/endpoint.dart';
 
 class TokenDTO extends DTO {
   final String token;

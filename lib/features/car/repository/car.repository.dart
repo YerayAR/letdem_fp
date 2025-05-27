@@ -1,9 +1,9 @@
 import 'package:letdem/features/car/dto/create_car.dto.dart';
 import 'package:letdem/features/car/repository/car.interface.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 import 'package:letdem/models/car/car.model.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/response.model.dart';
 
 class CarRepository extends ICarRepository {
   @override

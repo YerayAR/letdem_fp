@@ -1,9 +1,9 @@
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/repository/earning.interface.dart';
-import 'package:letdem/features/users/repository/user.repository.dart';
-import 'package:letdem/services/api/api.service.dart';
-import 'package:letdem/services/api/endpoints.dart';
-import 'package:letdem/services/api/models/response.model.dart';
+import 'package:letdem/infrastructure/api/api/api.service.dart';
+import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/response.model.dart';
+import 'package:letdem/models/earnings_account/earning_account.model.dart';
 
 class EarningsRepository extends IEarningsRepository {
   @override

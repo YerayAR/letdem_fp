@@ -1,0 +1,706 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:here_sdk/animation.dart' as an;
+import 'package:here_sdk/core.dart';
+import 'package:here_sdk/mapview.dart';
+import 'package:here_sdk/navigation.dart' as navigation;
+import 'package:here_sdk/routing.dart' as routing;
+import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
+import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
+import 'package:letdem/features/map/presentation/views/navigate.view.dart';
+import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
+import 'package:letdem/features/users/presentation/views/scheduled_notifications/scheduled_notifications.view.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
+import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/models/map/coordinate.model.dart';
+
+import '../../../../common/popups/success_dialog.dart';
+import '../../../../common/widgets/button.dart';
+import '../../../../common/widgets/chip.dart';
+import '../../../../infrastructure/services/location/location.service.dart';
+import '../../../../infrastructure/toast/toast/toast.dart';
+
+class NavigationMapScreen extends StatefulWidget {
+  final double latitude;
+  final double longitude;
+  final String? destinationStreetName;
+  final bool hideToggle;
+  final Space? spaceDetails;
+
+  const NavigationMapScreen({
+    super.key,
+    required this.latitude,
+    required this.longitude,
+    required this.hideToggle,
+    required this.destinationStreetName,
+    this.spaceDetails,
+  });
+
+  @override
+  State<NavigationMapScreen> createState() => _NavigationMapScreenState();
+}
+
+class _NavigationMapScreenState extends State<NavigationMapScreen> {
+  final List<MapMarker> _mapMarkers = [];
+  final List<MapPolyline> _mapPolylines = [];
+  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+  late RouteInfo _routeInfo;
+  late geolocator.Position _currentLocation;
+  routing.Route? _currentRoute;
+  HereMapController? _hereMapController;
+  routing.RoutingEngine? _routingEngine;
+  navigation.VisualNavigator? _visualNavigator;
+  bool _isLoading = true;
+  List<routing.Waypoint> _waypoints = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeRouting();
+  }
+
+  void _initializeRouting() async {
+    _routingEngine = routing.RoutingEngine();
+    await _loadMapData();
+  }
+
+  @override
+  void dispose() {
+    _visualNavigator?.stopRendering();
+    _clearMapResources();
+    super.dispose();
+  }
+
+  Future<void> _loadMapData() async {
+    setState(() => _isLoading = true);
+    try {
+      await _assetsProvider.loadAssets();
+
+      final currentPosition = await geolocator.Geolocator.getCurrentPosition();
+      _currentLocation = currentPosition;
+
+      _routeInfo = await MapboxService.getRoutes(
+        currentPointLatitude: currentPosition.latitude,
+        currentPointLongitude: currentPosition.longitude,
+        destinationLatitude: widget.latitude,
+        destinationLongitude: widget.longitude,
+        destination: widget.destinationStreetName,
+      );
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      print("Error loading map data: $e");
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _onMapCreated(HereMapController controller) {
+    _hereMapController = controller;
+
+    _hereMapController!.mapScene.loadSceneForMapScheme(
+      MapScheme.normalDay,
+      (error) {
+        if (error != null) {
+          print('Map scene loading failed: $error');
+          return;
+        }
+
+        _hereMapController!.camera.lookAtPointWithMeasure(
+          GeoCoordinates(_currentLocation.latitude, _currentLocation.longitude),
+          MapMeasure(MapMeasureKind.distanceInMeters, 1000),
+        );
+
+        _buildRoute();
+      },
+    );
+  }
+
+  Future<void> _buildRoute() async {
+    _clearMapResources();
+
+    final start =
+        GeoCoordinates(_currentLocation.latitude, _currentLocation.longitude);
+    final end = GeoCoordinates(widget.latitude, widget.longitude);
+
+    _waypoints = [
+      routing.Waypoint.withDefaults(start),
+      routing.Waypoint.withDefaults(end),
+    ];
+
+    try {
+      _addMarker(start, _assetsProvider.currentLocationMarker);
+      _addMarker(end, _assetsProvider.destinationMarker);
+      _calculateRoute(_waypoints);
+    } catch (e) {
+      print("Error building route: $e");
+    }
+  }
+
+  void _calculateRoute(List<routing.Waypoint> waypoints) {
+    if (_routingEngine == null) return;
+
+    final carOptions = routing.CarOptions()
+      ..routeOptions.enableTolls = true
+      ..routeOptions.enableRouteHandle = true
+      ..routeOptions.trafficOptimizationMode =
+          routing.TrafficOptimizationMode.timeDependent;
+
+    _routingEngine!.calculateCarRoute(waypoints, carOptions,
+        (routing.RoutingError? error, List<routing.Route>? routes) {
+      if (error == null && routes != null && routes.isNotEmpty) {
+        _currentRoute = routes.first;
+        _renderRoute(_currentRoute!);
+      } else {
+        print(
+            "Route calculation failed: ${error?.toString() ?? 'Unknown error'}");
+        if (error == routing.RoutingError.noRouteFound) {
+          print("No route found between given points.");
+        }
+      }
+    });
+  }
+
+  void _renderRoute(routing.Route route) {
+    _displayRoutePolyline(route);
+    _zoomToRoute(route);
+  }
+
+  void _displayRoutePolyline(routing.Route route) {
+    if (_hereMapController == null) return;
+
+    try {
+      final polyline = MapPolyline.withRepresentation(
+        route.geometry,
+        MapPolylineSolidRepresentation(
+          MapMeasureDependentRenderSize.withSingleSize(
+              RenderSizeUnit.pixels, 20),
+          AppColors.primary300,
+          LineCap.round,
+        ),
+      );
+
+      _hereMapController!.mapScene.addMapPolyline(polyline);
+      _mapPolylines.add(polyline);
+    } catch (e) {
+      print("Polyline rendering error: $e");
+    }
+  }
+
+  void _zoomToRoute(routing.Route route) {
+    if (_hereMapController == null) return;
+
+    try {
+      final update =
+          MapCameraUpdateFactory.lookAtAreaWithGeoOrientationAndViewRectangle(
+        route.boundingBox,
+        GeoOrientationUpdate(0, 0),
+        Rectangle2D(
+          Point2D(50, 50),
+          Size2D(_hereMapController!.viewportSize.width - 100,
+              _hereMapController!.viewportSize.height - 100),
+        ),
+      );
+
+      final animation =
+          MapCameraAnimationFactory.createAnimationFromUpdateWithEasing(
+        update,
+        const Duration(milliseconds: 3000),
+        an.Easing(an.EasingFunction.inCubic),
+      );
+
+      _hereMapController!.camera.startAnimation(animation);
+    } catch (e) {
+      print("Error zooming to route: $e");
+    }
+  }
+
+  void _addMarker(GeoCoordinates coordinates, Uint8List icon) {
+    if (_hereMapController == null) return;
+
+    try {
+      final marker = MapMarker(
+        coordinates,
+        MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+      );
+      _hereMapController!.mapScene.addMapMarker(marker);
+      _mapMarkers.add(marker);
+    } catch (e) {
+      print("Marker addition failed: $e");
+    }
+  }
+
+  void _clearMapResources() {
+    _mapMarkers.forEach(_hereMapController!.mapScene.removeMapMarker);
+    _mapMarkers.clear();
+
+    _mapPolylines.forEach(_hereMapController!.mapScene.removeMapPolyline);
+    _mapPolylines.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        leading: const SizedBox(),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            child: IconButton(
+              icon: const Icon(Icons.close, size: 20),
+              onPressed: () => NavigatorHelper.pop(),
+            ),
+          ),
+          Dimens.space(2),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: _isLoading
+                ? const Center(child: CupertinoActivityIndicator())
+                : HereMap(
+                    key: UniqueKey(),
+                    onMapCreated: _onMapCreated,
+                  ),
+          ),
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: _isLoading
+                  ? Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      child: const HomePageShimmer(),
+                    )
+                  : NavigateNotificationCard(
+                      spaceInfo: widget.spaceDetails,
+                      hideToggle: widget.hideToggle,
+                      routeInfo: _routeInfo,
+                      notification: ScheduledNotification(
+                        id: "1",
+                        startsAt: DateTime.now(),
+                        endsAt: DateTime.now(),
+                        isExpired: false,
+                        location: LocationData(
+                          streetName: widget.destinationStreetName ?? '',
+                          point: CoordinatesData(
+                            latitude: widget.latitude,
+                            longitude: widget.longitude,
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NavigateNotificationCard extends StatefulWidget {
+  final ScheduledNotification notification;
+  final RouteInfo routeInfo;
+  final bool hideToggle;
+  final Space? spaceInfo;
+
+  const NavigateNotificationCard({
+    super.key,
+    required this.notification,
+    required this.hideToggle,
+    required this.routeInfo,
+    this.spaceInfo,
+  });
+
+  @override
+  State<NavigateNotificationCard> createState() =>
+      _NavigateNotificationCardState();
+}
+
+class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
+  bool notifyAvailableSpace = false;
+  bool isNotificationScheduled = false;
+  bool isLocationAvailable = false;
+
+  double radius = 100;
+  TimeOfDay _fromTime = TimeOfDay.now();
+  TimeOfDay _toTime = TimeOfDay.now();
+  DateTime _fromDate = DateTime.now();
+  DateTime _toDate = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ScheduleNotificationsBloc, ScheduleNotificationsState>(
+      listener: (context, state) {
+        if (state is ScheduleNotificationCreated) {
+          setState(() => isNotificationScheduled = true);
+          AppPopup.showDialogSheet(
+            context,
+            SuccessDialog(
+              title: "Notification Scheduled",
+              subtext:
+                  "You will be notified when a space is available in this area",
+              onProceed: () => Navigator.pop(context),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        final routeInfo = widget.routeInfo;
+        final location = widget.notification.location;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: _buildContent(context, routeInfo, location, state),
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, RouteInfo routeInfo,
+      LocationData location, ScheduleNotificationsState state) {
+    if (routeInfo.distance < 500) {
+      return _buildTooCloseMessage();
+    }
+
+    if (isLocationAvailable) {
+      return const SizedBox(
+        height: 100,
+        child: Center(child: CupertinoActivityIndicator()),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildRouteDetails(routeInfo),
+        const SizedBox(height: 22),
+        _buildLocationInfo(location),
+        const SizedBox(height: 16),
+        _buildArrivalInfo(routeInfo),
+        const SizedBox(height: 16),
+        Divider(color: Colors.grey.withOpacity(0.2)),
+        const SizedBox(height: 16),
+        _buildNotificationOptions(),
+        const SizedBox(height: 24),
+        _buildPrimaryActionButton(state),
+        Dimens.space(2),
+      ],
+    );
+  }
+
+  Widget _buildTooCloseMessage() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Dimens.space(4),
+          CircleAvatar(
+            radius: 43,
+            backgroundColor: AppColors.green50,
+            child:
+                Icon(IconlyBold.location, color: AppColors.green600, size: 36),
+          ),
+          Dimens.space(2),
+          const Text("Close to Location", style: Typo.heading4),
+          const SizedBox(height: 8),
+          const Text(
+            "You are close to the location, Please select a different location",
+            style: Typo.mediumBody,
+            textAlign: TextAlign.center,
+          ),
+          Dimens.space(4),
+          PrimaryButton(
+            onTap: () => Navigator.pop(context),
+            text: "Close",
+          ),
+          Dimens.space(4),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRouteDetails(RouteInfo routeInfo) {
+    return Row(
+      children: [
+        Text(
+          "${parseHours(routeInfo.duration)} (${parseMeters(routeInfo.distance)})",
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const Spacer(),
+        Row(
+          children: [
+            const Text("Traffic Level", style: TextStyle(fontSize: 14)),
+            const SizedBox(width: 8),
+            DecoratedChip(
+              text: toBeginningOfSentenceCase(routeInfo.tafficLevel) ?? "--",
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary500,
+              ),
+              color: AppColors.primary500,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationInfo(LocationData location) {
+    return Row(
+      children: [
+        const Icon(IconlyLight.location, color: Colors.grey),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            location.streetName,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArrivalInfo(RouteInfo routeInfo) {
+    return Row(
+      children: [
+        const Icon(IconlyLight.time_circle, color: Colors.grey),
+        const SizedBox(width: 8),
+        Text(
+          "To Arrive by ${DateFormat('HH:mm').format(routeInfo.arrivingAt.toLocal())}",
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNotificationOptions() {
+    if (isNotificationScheduled || widget.hideToggle) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Icon(IconlyLight.notification, color: Colors.grey),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                "Notify me of available space in this area",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ),
+            ToggleSwitch(
+              value: notifyAvailableSpace,
+              onChanged: (value) =>
+                  setState(() => notifyAvailableSpace = value),
+            ),
+          ],
+        ),
+        if (notifyAvailableSpace) _buildNotificationForm(),
+      ],
+    );
+  }
+
+  Widget _buildNotificationForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Divider(color: Colors.grey.withOpacity(0.2)),
+        Dimens.space(1),
+        const Text("Date & Time"),
+        Dimens.space(3),
+        Row(
+          children: [
+            PlatformDatePickerButton(
+              initialDate: _fromDate,
+              onDateSelected: (date) => setState(() => _fromDate = date),
+            ),
+            PlatformTimePickerButton(
+              initialTime: _fromTime,
+              onTimeSelected: (time) => setState(() => _fromTime = time),
+            ),
+          ],
+        ),
+        Dimens.space(1),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            PlatformDatePickerButton(
+              initialDate: _toDate,
+              onDateSelected: (date) => setState(() => _toDate = date),
+            ),
+            PlatformTimePickerButton(
+              initialTime: _toTime,
+              onTimeSelected: (time) => setState(() => _toTime = time),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildRadiusSlider(),
+      ],
+    );
+  }
+
+  Widget _buildRadiusSlider() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Text("Receive notifications up to (meters)",
+                style: TextStyle(fontSize: 14)),
+            const Spacer(),
+            Text(radius.toStringAsFixed(0),
+                style:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: Colors.purple,
+            inactiveTrackColor: Colors.purple.withOpacity(0.2),
+            thumbColor: Colors.white,
+            overlayColor: Colors.purple.withOpacity(0.2),
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+          ),
+          child: Slider(
+            value: radius,
+            min: 100,
+            max: 9000,
+            onChanged: (value) => setState(() => radius = value),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrimaryActionButton(ScheduleNotificationsState state) {
+    final isLoading = state is ScheduleNotificationsLoading;
+    final shouldSchedule = notifyAvailableSpace && !isNotificationScheduled;
+
+    return PrimaryButton(
+      isLoading: isLoading,
+      onTap: () => shouldSchedule
+          ? _handleScheduleNotification()
+          : _navigateToDestination(),
+      icon: !shouldSchedule ? IconlyBold.location : null,
+      text: shouldSchedule ? "Save" : "Start Route",
+    );
+  }
+
+  void _handleScheduleNotification() {
+    final start = DateTime(_fromDate.year, _fromDate.month, _fromDate.day,
+        _fromTime.hour, _fromTime.minute);
+    final end = DateTime(
+        _toDate.year, _toDate.month, _toDate.day, _toTime.hour, _toTime.minute);
+
+    if (!validateDateTime(start, end)) return;
+    if (radius < 100) {
+      Toast.showError('Radius cannot be less than 100 meters');
+      return;
+    }
+
+    context
+        .read<ScheduleNotificationsBloc>()
+        .add(CreateScheduledNotificationEvent(
+          startsAt: start,
+          endsAt: end,
+          radius: radius,
+          location: widget.notification.location,
+        ));
+  }
+
+  void _navigateToDestination() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NavigationView(
+          parkingSpaceID: widget.spaceInfo?.id,
+          isNavigatingToParking: widget.spaceInfo != null,
+          destinationLat: widget.notification.location.point.latitude,
+          destinationLng: widget.notification.location.point.longitude,
+        ),
+      ),
+    );
+  }
+}
+
+String parseMeters(double distance) {
+  if (distance < 1000) {
+    return "${distance.toStringAsFixed(0)}m";
+  } else {
+    return "${(distance / 1000).toStringAsFixed(1)}km";
+  }
+
+//   if
+}
+
+parseHours(int min) {
+  if (min < 60) {
+    return "$min mins";
+  } else {
+    return "${(min / 60).toStringAsFixed(0)} hrs";
+  }
+}
+
+bool validateDateTime(DateTime? start, DateTime? end) {
+  DateTime now = DateTime.now();
+
+  if (start == null || end == null) {
+    Toast.showError('Start and end times are required');
+    return false;
+  }
+
+  if (start.isAfter(end) || start.isAtSameMomentAs(end)) {
+    Toast.showError('Start time should be before end time');
+    return false;
+  }
+
+  if (start.isBefore(now) || end.isBefore(now)) {
+    Toast.showError(
+        'Start and end times should be greater than the current time');
+    return false;
+  }
+
+  // Ensure difference is not greater than 5 days (including milliseconds rounding)
+  if (end.difference(start).inMilliseconds >
+      const Duration(days: 5).inMilliseconds) {
+    Toast.showError('You can only schedule up to 5 days');
+    return false;
+  }
+
+  return true;
+}

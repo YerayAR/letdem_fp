@@ -1,5 +1,5 @@
-import 'package:letdem/models/auth/map/map_options.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
+import 'package:letdem/features/auth/models/map_options.model.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 
 abstract class IMapRepository {
   Future<MapNearbyPayload> getNearbyPlaces({

@@ -1,8 +1,8 @@
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
+import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/models/activities/activity.model.dart';
 
 abstract class IActivityRepository {
   Future<void> addActivity(Activity activity);

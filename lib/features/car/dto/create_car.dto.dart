@@ -1,5 +1,5 @@
-import 'package:letdem/enums/CarTagType.dart';
-import 'package:letdem/services/api/models/endpoint.dart';
+import 'package:letdem/core/enums/CarTagType.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
 class CreateCartDTO extends DTO {
   final String brand;

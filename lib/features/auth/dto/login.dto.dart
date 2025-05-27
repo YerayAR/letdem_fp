@@ -1,4 +1,4 @@
-import 'package:letdem/services/api/models/endpoint.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class LoginDTO extends DTO {

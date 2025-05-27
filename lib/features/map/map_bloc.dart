@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/features/auth/models/map_options.model.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
-import 'package:letdem/models/auth/map/map_options.model.dart';
-import 'package:letdem/models/auth/map/nearby_payload.model.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';

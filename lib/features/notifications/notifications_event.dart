@@ -21,7 +21,7 @@ class ClearNotificationsEvent extends NotificationsEvent {
 class LoadNotificationsEvent extends NotificationsEvent {
   final bool showUnread;
 
-  LoadNotificationsEvent({this.showUnread = false});
+  const LoadNotificationsEvent({this.showUnread = false});
   @override
   List<Object> get props => [showUnread];
 }
@@ -29,7 +29,7 @@ class LoadNotificationsEvent extends NotificationsEvent {
 class ReadNotificationEvent extends NotificationsEvent {
   final String id;
 
-  ReadNotificationEvent({required this.id});
+  const ReadNotificationEvent({required this.id});
 
   @override
   List<Object> get props => [id];
@@ -39,7 +39,7 @@ class ReadNotificationEvent extends NotificationsEvent {
 class FilterNotificationsEvent extends NotificationsEvent {
   final bool showUnread;
 
-  FilterNotificationsEvent({required this.showUnread});
+  const FilterNotificationsEvent({required this.showUnread});
 
   @override
   List<Object> get props => [showUnread];

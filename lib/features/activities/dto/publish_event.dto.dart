@@ -1,5 +1,6 @@
-import 'package:letdem/services/api/models/endpoint.dart';
-import 'package:letdem/services/api/models/error.dart';
+
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
 
 class PublishRoadEventDTO extends DTO {
   final String? type;

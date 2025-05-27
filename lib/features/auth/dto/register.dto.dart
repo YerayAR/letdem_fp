@@ -1,5 +1,6 @@
-import 'package:letdem/services/api/models/endpoint.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+
+import '../../../infrastructure/api/api/models/endpoint.dart';
 
 class RegisterDTO extends DTO {
   final String email;
