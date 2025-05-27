@@ -272,13 +272,14 @@ class LetDemApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           debugShowMaterialGrid: false,
           home: const AnnotatedRegion<SystemUiOverlayStyle>(
-              value: SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: Brightness.dark,
-                systemNavigationBarColor: Colors.black54,
-                systemNavigationBarIconBrightness: Brightness.dark,
-              ),
-              child: SplashView())),
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.dark,
+              systemNavigationBarColor: Colors.black54,
+              systemNavigationBarIconBrightness: Brightness.dark,
+            ),
+            child: SplashView(),
+          )),
     );
   }
 }
