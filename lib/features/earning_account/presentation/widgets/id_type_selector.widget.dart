@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
-import 'package:letdem/features/users/presentation/views/connect_account/connect_account.view.dart';
+import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 
 class IDTypePage extends StatefulWidget {
   final Function(String pass) onNext;

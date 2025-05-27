@@ -12,6 +12,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
+import 'package:letdem/features/payment_methods/presentation/empty_states/empty_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
@@ -361,47 +362,6 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class EmptyPaymentMethodView extends StatelessWidget {
-  const EmptyPaymentMethodView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Iconsax.card5, // Alternatively: Iconsax.card, Iconsax.money
-              size: 40,
-              color: AppColors.primary500,
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'No Payment Methods Added',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'You haven’t added any payment methods yet.\nAdd one to make payments easily.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.neutral400,
             ),
           ),
         ],
