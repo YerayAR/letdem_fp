@@ -10,6 +10,7 @@ import 'package:here_sdk/navigation.dart' as navigation;
 import 'package:here_sdk/routing.dart' as routing;
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/common/popups/date_time_picker.widget.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
@@ -18,7 +19,6 @@ import 'package:letdem/features/activities/presentation/shimmers/home_page_shimm
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
-import 'package:letdem/features/users/presentation/views/scheduled_notifications/scheduled_notifications.view.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';

@@ -17,9 +17,8 @@ class BaseApiService {
 
     if (mustAuthenticated) {
       try {
-        // Retrieve the authentication token from secure storage
-        SecureStorageHelper secureStorage = SecureStorageHelper();
-        String? token = await secureStorage.read(tokenKey ?? 'access_token');
+        String? token =
+            await SecureStorageHelper().read(tokenKey ?? 'access_token');
         if (token == null || token.isEmpty) {
           throw ApiError(
               message: 'Token not found', status: ErrorStatus.unauthorized);
@@ -31,7 +30,6 @@ class BaseApiService {
         rethrow;
       }
     }
-    // print(headers);
     return headers;
   }
 }

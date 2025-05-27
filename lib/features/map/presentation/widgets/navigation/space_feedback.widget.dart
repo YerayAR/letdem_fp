@@ -7,7 +7,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/features/activities/dto/take_space.dto.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 class ParkingRatingWidget extends StatefulWidget {

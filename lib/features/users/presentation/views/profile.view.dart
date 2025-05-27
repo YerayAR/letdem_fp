@@ -30,8 +30,8 @@ import 'package:letdem/models/earnings_account/earning_account.model.dart';
 
 import '../../../../common/popups/popup.dart';
 import '../../../../common/widgets/appbar.dart';
+import '../../../scheduled_notifications/presentation/views/scheduled_notifications.view.dart';
 import 'preferences/preferences.view.dart';
-import 'scheduled_notifications/scheduled_notifications.view.dart';
 import 'security/security.view.dart';
 
 class ProfileView extends StatelessWidget {
