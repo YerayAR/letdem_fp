@@ -9,7 +9,7 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/EventTypes.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
-import 'package:letdem/features/map/presentation/views/navigate.view.dart';
+import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 
 import '../../../../common/popups/popup.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:letdem/features/users/repository/user.repository.dart';
+import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 
 extension UserBlocExtension on BuildContext {

@@ -1,6 +1,5 @@
-import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
-
-import '../../../core/enums/EventTypes.dart';
+import 'package:letdem/core/enums/EventTypes.dart';
+import 'package:letdem/core/enums/PublishSpaceType.dart';
 
 class MapNearbyPayload {
   final List<Space> spaces;

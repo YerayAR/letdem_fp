@@ -4,8 +4,8 @@ import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 

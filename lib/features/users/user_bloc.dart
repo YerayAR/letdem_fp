@@ -4,11 +4,12 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/core/extensions/location.dart';
 import 'package:letdem/features/auth/models/tokens.model.dart';
-import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
-import 'package:letdem/features/users/repository/user.repository.dart';
-import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
+import 'package:letdem/features/users/models/user.modelort 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/models/earnings_account/earning_account.model.dart';
+import 'package:letdem/models/orders/order.model.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 part 'user_event.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/enums/EventTypes.dart';
-import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
+import 'package:letdem/core/enums/PublishSpaceType.dart';
 
 class MapAssetsProvider {
   late Uint8List freeMarker,

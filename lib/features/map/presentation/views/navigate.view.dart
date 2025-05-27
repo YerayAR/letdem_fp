@@ -24,6 +24,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/EventTypes.dart';
+import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
@@ -40,7 +41,6 @@ import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
 
 import '../../../../common/popups/success_dialog.dart';
-import 'publish_space/publish_space.view.dart';
 
 class NavigationView extends StatefulWidget {
   final double destinationLat;
