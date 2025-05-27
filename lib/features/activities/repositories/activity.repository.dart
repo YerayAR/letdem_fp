@@ -1,7 +1,9 @@
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/dto/event_feedback.dto.dart';
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/dto/reserve_space.dto.dart';
+import 'package:letdem/features/activities/dto/take_space.dto.dart';
 import 'package:letdem/features/activities/models/activities_response.dto.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/activities/repositories/activity.interface..dart';

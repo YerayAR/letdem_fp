@@ -1,6 +1,8 @@
+import 'package:letdem/features/activities/dto/event_feedback.dto.dart';
 import 'package:letdem/features/activities/dto/publish_event.dto.dart';
 import 'package:letdem/features/activities/dto/publish_space.dto.dart';
 import 'package:letdem/features/activities/dto/reserve_space.dto.dart';
+import 'package:letdem/features/activities/dto/take_space.dto.dart';
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
@@ -28,20 +30,16 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
-  // getOrdersEndpoint
   static Endpoint getOrdersEndpoint = Endpoint(
     url: "/credits/orders?page_size=100&page=1",
     method: HTTPMethod.GET,
   );
-
-  // /v1/spaces/9d4d174c1edd4e53ad2e6aa58694eb83/reserve
 
   static Endpoint<ReserveSpaceDTO> reserveSpace(String id) => Endpoint(
         url: "/spaces/$id/reserve",
         method: HTTPMethod.POST,
       );
 
-  // withdrawals
   static Endpoint getWithdrawals = Endpoint(
     url: "/credits/withdrawals",
     method: HTTPMethod.GET,
@@ -69,8 +67,6 @@ class EndPoints {
     method: HTTPMethod.POST,
     isProtected: true,
   );
-
-  // {{BASE_URI}}/v1/spaces/9cdf9787a5a84cf9bfd4b37fe8b50ae5/confirm-reservation
 
   static Endpoint<ConfirmationCodeDTO> confirmReservation(String id) =>
       Endpoint(
@@ -208,7 +204,6 @@ class EndPoints {
     method: HTTPMethod.GET,
   );
 
-//   reset password
   static Endpoint<ChangePasswordDTO> changePassword = Endpoint(
     url: "/users/me/change-password",
     method: HTTPMethod.PUT,
@@ -225,8 +220,6 @@ class EndPoints {
     url: "/users/me/preferences",
     method: HTTPMethod.PUT,
   );
-
-  // language
 
   static Endpoint updateLanguageEndpoint = Endpoint(
     url: "/users/me/language",
@@ -250,7 +243,6 @@ class EndPoints {
       method: HTTPMethod.DELETE,
     );
   }
-//   users/me/scheduled-notifications/e0739c1015dc4135b80c42a7a8485995
 
   static Endpoint<CreateScheduledNotificationDTO> updateScheduleNotification(
       String id) {
@@ -259,7 +251,6 @@ class EndPoints {
       method: HTTPMethod.PUT,
     );
   }
-  // {{BASE_URI}}/v1/maps/routes?current-point=40.2811896,-3.7873749&destination-address=Sol, Pasaje de la Caja de Ahorros, 28013 Madrid, Spain
 
   static Endpoint getRoute = Endpoint(
     url: "/maps/routes",
@@ -341,38 +332,4 @@ class EndPoints {
         url: "/events/$id/feedback",
         method: HTTPMethod.POST,
       );
-}
-
-enum TakeSpaceType { TAKE_IT, IN_USE, NOT_USEFUL, PROHIBITED }
-
-class EventFeedBackDTO extends DTO {
-  final bool isThere;
-
-  EventFeedBackDTO({required this.isThere});
-
-  @override
-  Map<String, dynamic> toMap() {
-    return {
-      "type": isThere ? "IS_THERE" : "NOT_THERE",
-    };
-  }
-}
-
-class TakeSpaceDTO extends DTO {
-  final TakeSpaceType type;
-
-  TakeSpaceDTO({required this.type});
-
-  Map<String, dynamic> toJson() {
-    return {
-      "type": type.name.toUpperCase(),
-    };
-  }
-
-  @override
-  Map<String, dynamic> toMap() {
-    return {
-      "type": type.name.toUpperCase(),
-    };
-  }
 }
