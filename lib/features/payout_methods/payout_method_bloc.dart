@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/models/withdrawals/withdrawal.bloc.dart';
+import 'package:letdem/models/withdrawals/withdrawal.model.dart';
 
 part 'payout_method_event.dart';
 part 'payout_method_state.dart';

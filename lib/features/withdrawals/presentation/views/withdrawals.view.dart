@@ -4,7 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
-import 'package:letdem/models/withdrawals/withdrawal.bloc.dart';
+import 'package:letdem/models/withdrawals/withdrawal.model.dart';
 
 class WithdrawListView extends StatefulWidget {
   const WithdrawListView({super.key});
