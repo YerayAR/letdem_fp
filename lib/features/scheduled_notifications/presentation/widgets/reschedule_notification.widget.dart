@@ -50,24 +50,12 @@ class _RescheduleNotificationCardState
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
 
-  // RouteInfo? routeInfo;
-
   void getDistance() async {
-    // Check if location services are enabled
     setState(() {
       isLocationAvailable = true;
     });
 
-    // var currentLocation = await Geolocator.getCurrentPosition(
-    //     desiredAccuracy: LocationAccuracy.best);
-
-    // var routeInfoData = await MapboxService.getRoutes(
-    //     currentPointLatitude: currentLocation.latitude,
-    //     currentPointLongitude: currentLocation.longitude,
-    //     destination: widget.notification.location.streetName);
-
     setState(() {
-      // routeInfo = routeInfoData;
       isLocationAvailable = false;
     });
   }

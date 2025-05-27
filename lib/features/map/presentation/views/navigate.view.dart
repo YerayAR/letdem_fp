@@ -23,12 +23,14 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/time.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/features/map/presentation/views/test.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
@@ -1621,29 +1623,5 @@ class _NavigationViewState extends State<NavigationView> {
         );
       },
     );
-  }
-}
-
-// Extension to parse seconds to minutes and seconds
-extension TimeFormatter on int {
-  String toFormattedTime() {
-    int minutes = this ~/ 60;
-    int seconds = this % 60;
-
-    String minutesStr = minutes.toString().padLeft(2, '0');
-    String secondsStr = seconds.toString().padLeft(2, '0');
-
-    return "$minutesStr min".startsWith("00")
-        ? "$secondsStr sec"
-        : "$minutesStr min";
-  }
-
-//   format meters to km
-  String toFormattedDistance() {
-    if (this >= 1000) {
-      return "${(this / 1000).toStringAsFixed(1)} km";
-    } else {
-      return "$this m";
-    }
   }
 }
