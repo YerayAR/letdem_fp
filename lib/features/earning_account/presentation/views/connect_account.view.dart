@@ -8,24 +8,24 @@ import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/enums/EarningStep.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
-import 'package:letdem/features/users/presentation/widgets/earnings_acocunt/address_info.widget.dart';
-import 'package:letdem/features/users/presentation/widgets/earnings_acocunt/bank_info.widget.dart';
-import 'package:letdem/features/users/presentation/widgets/earnings_acocunt/id_selector.widget.dart';
-import 'package:letdem/features/users/presentation/widgets/earnings_acocunt/id_type_selector.widget.dart';
-import 'package:letdem/features/users/presentation/widgets/earnings_acocunt/personal_info.widget.dart';
+import 'package:letdem/features/earning_account/presentation/widgets/address_info.widget.dart';
+import 'package:letdem/features/earning_account/presentation/widgets/bank_info.widget.dart';
+import 'package:letdem/features/earning_account/presentation/widgets/id_selector.widget.dart';
+import 'package:letdem/features/earning_account/presentation/widgets/id_type_selector.widget.dart';
+import 'package:letdem/features/earning_account/presentation/widgets/personal_info.widget.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
-class ProfileOnboardingApp extends StatefulWidget {
+class ConnectAccountView extends StatefulWidget {
   final EarningStatus? status;
   final EarningStep? remainingStep;
-  const ProfileOnboardingApp(
+  const ConnectAccountView(
       {super.key, required this.status, required this.remainingStep});
 
   @override
-  State<ProfileOnboardingApp> createState() => _ProfileOnboardingAppState();
+  State<ConnectAccountView> createState() => _ConnectAccountViewState();
 }
 
-class _ProfileOnboardingAppState extends State<ProfileOnboardingApp> {
+class _ConnectAccountViewState extends State<ConnectAccountView> {
   final PageController _pageController = PageController();
   late final List<Widget> _pages;
   int _currentPage = 0;
