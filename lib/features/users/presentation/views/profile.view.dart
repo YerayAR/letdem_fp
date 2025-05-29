@@ -231,7 +231,7 @@ class _MainActionsSection extends StatelessWidget {
           AppPopup.showBottomSheet(
             context,
             MoneyLaundryPopup(onContinue: () {
-              NavigatorHelper.to(ProfileOnboardingApp(
+              NavigatorHelper.to(ConnectAccountView(
                 remainingStep: earningAccount?.step,
                 status: status,
               ));

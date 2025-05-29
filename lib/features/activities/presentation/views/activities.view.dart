@@ -34,9 +34,19 @@ class ActivitiesView extends StatefulWidget {
 
 class _ActivitiesViewState extends State<ActivitiesView> {
   @override
-  initState() {
+  void initState() {
     super.initState();
-    context.read<ActivitiesBloc>().add(GetActivitiesEvent());
+    // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
+  }
+
+  Widget _buildFooter(ActivitiesState state) {
+    bool isActiveReservation = context.userProfile?.activeReservation != null;
+
+    Widget item = ContributionsSection();
+
+    print("isActiveReservation: $isActiveReservation");
+
+    return item;
   }
 
   @override
@@ -45,22 +55,30 @@ class _ActivitiesViewState extends State<ActivitiesView> {
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {},
         builder: (context, state) {
-          return StyledBody(
+          var w = StyledBody(
             isBottomPadding: false,
-            children: [
-              const NotificationAppBar(),
-              const CarSection(),
-              const ActiveReservationSection(),
-              Dimens.space(2),
-              Expanded(
-                child: state is ActivitiesLoaded
-                    ? const ContributionsSection()
-                    : const Center(
-                        child: CircularProgressIndicator(),
+            children: context.userProfile?.activeReservation != null
+                ? [
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          const NotificationAppBar(),
+                          const CarSection(),
+                          const ActiveReservationSection(),
+                          _buildFooter(state),
+                        ],
                       ),
-              )
-            ],
+                    ),
+                  ]
+                : [
+                    const NotificationAppBar(),
+                    const CarSection(),
+                    const ActiveReservationSection(),
+                    Expanded(child: _buildFooter(state)),
+                  ],
           );
+
+          return w;
         },
       ),
     );
@@ -72,14 +90,18 @@ class NotificationAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fix: Add null safety check for userProfile
+    final userProfile = context.userProfile;
+    final notificationCount = userProfile?.notificationsCount ?? 0;
+
     return StyledAppBar(
-      suffix: context.userProfile!.notificationsCount == 0
+      suffix: notificationCount == 0
           ? null
           : CircleAvatar(
               radius: 8,
               backgroundColor: AppColors.red500,
               child: Text(
-                context.userProfile!.notificationsCount.toString(),
+                notificationCount.toString(),
                 style: Typo.smallBody.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -137,33 +159,99 @@ class ContributionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contributions =
-        (context.read<ActivitiesBloc>().state as ActivitiesLoaded).activities;
-    final isEmpty = contributions.isEmpty;
+    return BlocBuilder<ActivitiesBloc, ActivitiesState>(
+      builder: (context, state) {
+        // Fix: Better state handling and null safety
+        // if (state is! ActivitiesLoaded) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(Dimens.defaultRadius),
-          topRight: Radius.circular(Dimens.defaultRadius),
-        ),
-      ),
-      child: isEmpty
-          ? const NoContributionsWidget()
-          : Column(
-              children: contributions.map((activity) {
-                return ContributionItem(
-                  showDivider: contributions.last != activity,
-                  type: activity.type.toLowerCase() == "space"
-                      ? ContributionType.space
-                      : ContributionType.event,
-                  activity: activity,
-                );
-              }).toList(),
+        final contributions = context.userProfile!.contributions;
+        final isEmpty = contributions.isEmpty;
+
+        return Container(
+          height: context.userProfile?.activeReservation != null ? 400 : null,
+          width: double.infinity,
+          // Fix: Add constraints to prevent unbounded height issues
+          constraints: const BoxConstraints(
+            minHeight: 200,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimens.defaultRadius),
+              topRight: Radius.circular(Dimens.defaultRadius),
             ),
+          ),
+          child: isEmpty
+              ? const NoContributionsWidget()
+              : Column(
+                  // Fix: Prevent overflow in column
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Fix: Use Flexible or shrinkWrap for ListView if many items
+                    ...contributions.map((activity) {
+                      return ContributionItem(
+                        showDivider: contributions.last != activity,
+                        type: activity.type.toLowerCase() == "space"
+                            ? ContributionType.space
+                            : ContributionType.event,
+                        activity: activity,
+                      );
+                    }).toList(),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+}
+
+// Alternative ContributionsSection if you have many contribution items
+class ContributionsSectionWithListView extends StatelessWidget {
+  const ContributionsSectionWithListView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ActivitiesBloc, ActivitiesState>(
+      builder: (context, state) {
+        if (state is! ActivitiesLoaded) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final contributions = state.activities;
+        final isEmpty = contributions.isEmpty;
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimens.defaultRadius),
+              topRight: Radius.circular(Dimens.defaultRadius),
+            ),
+          ),
+          child: isEmpty
+              ? const NoContributionsWidget()
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: contributions.length,
+                  itemBuilder: (context, index) {
+                    final activity = contributions[index];
+                    return ContributionItem(
+                      showDivider: index < contributions.length - 1,
+                      type: activity.type.toLowerCase() == "space"
+                          ? ContributionType.space
+                          : ContributionType.event,
+                      activity: activity,
+                    );
+                  },
+                ),
+        );
+      },
     );
   }
 }

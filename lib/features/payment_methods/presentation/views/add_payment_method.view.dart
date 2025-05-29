@@ -5,9 +5,11 @@ import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 import '../../../../common/widgets/button.dart';
 
@@ -65,14 +67,14 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      // CardField(
-                      //   controller: controller,
-                      //   decoration: InputDecoration(
-                      //     border: InputBorder.none,
-                      //     hintText: 'Card number',
-                      //     hintStyle: TextStyle(color: Colors.grey.shade400),
-                      //   ),
-                      // ),
+                      CardField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Card number',
+                          hintStyle: TextStyle(color: Colors.grey.shade400),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -108,7 +110,11 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                   child: PrimaryButton(
                     onTap: controller.complete && !_isLoading
                         ? _handlePayPress
-                        : null,
+                        : () {
+                            Toast.showError(
+                              'Please complete the card details',
+                            );
+                          },
                     text: 'Next',
                     isLoading: _isLoading,
                   ),
@@ -130,7 +136,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
     try {
       // Billing details (replace email with user's actual email if needed)
       final billingDetails = BillingDetails(
-        email: 'email@stripe.com',
+        email: context.userProfile!.email,
         name: _nameController.text.trim(),
       );
 
@@ -158,9 +164,9 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
 
       Navigator.of(context).pop();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      // Handle errors
+      print('Error creating payment method: $e');
+      Toast.showError('Failed to add payment method. Please try again.');
     } finally {
       setState(() => _isLoading = false);
     }

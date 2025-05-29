@@ -66,10 +66,10 @@ class NoContributionsWidget extends StatelessWidget {
                           }
                         },
                       ),
-                      const Divider(color: Colors.grey, height: 1),
+                      Divider(color: AppColors.neutral50, height: 1),
                       MultiSelectItem(
                         backgroundColor: AppColors.secondary50,
-                        icon: Icons.close,
+                        icon: Iconsax.money,
                         iconColor: AppColors.secondary600,
                         text: "Paid Space",
                         onTap: () async {
