@@ -161,11 +161,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                           width: 70,
                           height: 8,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: _selectedPage == 0
-                                ? AppColors.secondary500
-                                : AppColors.secondary500.withOpacity(0.3),
-                          ),
+                              borderRadius: BorderRadius.circular(5),
+                              color: AppColors.secondary500),
                         ),
                         const SizedBox(width: 8), // consistent spacing
                         AnimatedContainer(
@@ -189,6 +186,12 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                 ),
                 body: PageView(
                   onPageChanged: (int page) {
+                    // if user already selected first page and is paid space then don't allow to change page
+                    if (widget.isPaid &&
+                        _pageController.page == 0 &&
+                        page == 1) {
+                      return;
+                    }
                     setState(() {
                       _selectedPage = page;
                     });

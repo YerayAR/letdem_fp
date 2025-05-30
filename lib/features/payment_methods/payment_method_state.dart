@@ -44,3 +44,8 @@ final class PaymentMethodError extends PaymentMethodState {
   @override
   List<Object> get props => [message];
 }
+
+class PaymentMethodLoading extends PaymentMethodState {
+  @override
+  List<Object> get props => [];
+}

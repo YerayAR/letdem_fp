@@ -5,6 +5,8 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/register.view.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MoneyLaundryPopup extends StatefulWidget {
   final VoidCallback onContinue;
@@ -121,7 +123,17 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
                             decoration: TextDecoration.underline,
                           ),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () {
+                            ..onTap = () async {
+                              if (await canLaunchUrl(Uri.parse(
+                                  "https://stripe.com/gb/legal/connect-account"))) {
+                                await launchUrl(Uri.parse(
+                                    "https://stripe.com/gb/legal/connect-account"));
+                              } else {
+                                Toast.showError(
+                                  'Could not open Terms & Conditions link',
+                                );
+                                // handle error
+                              }
                               // handle tap here (e.g. open a web page or navigate to terms screen)
                             },
                         ),

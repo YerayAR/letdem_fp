@@ -21,6 +21,7 @@ class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
   Future<void> _onFetchPaymentMethods(
       FetchPaymentMethods event, Emitter<PaymentMethodState> emit) async {
     try {
+      emit(PaymentMethodLoading());
       final methods = await repository.getPaymentMethods();
       emit(PaymentMethodLoaded(paymentMethods: methods));
     } catch (_) {
@@ -31,10 +32,12 @@ class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
   Future<void> _onRegisterPaymentMethod(
       RegisterPaymentMethod event, Emitter<PaymentMethodState> emit) async {
     try {
+      emit(PaymentMethodLoading());
       await repository.addPaymentMethod(event.dto);
       add(const FetchPaymentMethods());
     } catch (_) {
       emit(const PaymentMethodError("Failed to register payment method."));
+      add(const FetchPaymentMethods());
     }
   }
 
@@ -48,6 +51,7 @@ class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
         add(const FetchPaymentMethods());
       } catch (_) {
         emit(const PaymentMethodError("Failed to remove payment method."));
+        add(const FetchPaymentMethods());
       }
     }
   }

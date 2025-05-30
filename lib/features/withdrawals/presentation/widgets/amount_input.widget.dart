@@ -105,7 +105,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
           Dimens.space(1),
           Text(
             _errorText ??
-                '€${context.userProfile!.earningAccount?.pendingBalance ?? 0} Pending to be cleared',
+                '€${context.userProfile!.earningAccount?.pendingBalance.toStringAsFixed(2)} Pending to be cleared',
             style: Typo.mediumBody.copyWith(
               fontSize: 11,
               color:

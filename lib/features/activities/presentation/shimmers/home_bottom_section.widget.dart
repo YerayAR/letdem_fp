@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +17,8 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
+import 'package:letdem/features/car/car_bloc.dart';
+import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 import '../../../../infrastructure/services/mapbox_search/models/service.dart';
@@ -120,6 +123,91 @@ class HomeMapBottomSection extends StatelessWidget {
                                 iconColor: AppColors.secondary600,
                                 text: "Paid Space",
                                 onTap: () async {
+                                  bool isCarExist = context
+                                          .read<CarBloc>()
+                                          .state is CarLoaded &&
+                                      (context.read<CarBloc>().state
+                                                  as CarLoaded)
+                                              .car !=
+                                          null;
+
+                                  if (!isCarExist) {
+                                    AppPopup.showBottomSheet(
+                                        context,
+                                        SizedBox(
+                                          child: Container(
+                                            padding: EdgeInsets.all(
+                                                Dimens.defaultMargin),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // Alert icon in purple circle
+                                                Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.primary500
+                                                        .withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.all(22),
+                                                  child: Container(
+                                                    width: 70,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.primary500,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.priority_high,
+                                                        color: Colors.white,
+                                                        size: 32,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 24),
+
+                                                // Important Notice text
+                                                Text(
+                                                  'Important Notice',
+                                                  style: Typo.heading4.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+
+                                                // Description text
+                                                Text(
+                                                  'You need to create a car profile to publish a paid space. Please create a car profile first.',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      Typo.mediumBody.copyWith(
+                                                    color: AppColors.neutral500,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 32),
+
+                                                // Continue button
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: PrimaryButton(
+                                                    onTap: () {
+                                                      NavigatorHelper.pop();
+                                                    },
+                                                    text: 'Continue',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                                    return;
+                                  }
+
                                   var isPaidAccountExist =
                                       context.userProfile!.earningAccount !=
                                           null;
@@ -190,6 +278,12 @@ class HomeMapBottomSection extends StatelessWidget {
                                                   child: PrimaryButton(
                                                     onTap: () {
                                                       NavigatorHelper.pop();
+                                                      NavigatorHelper.to(
+                                                        const ConnectAccountView(
+                                                          status: null,
+                                                          remainingStep: null,
+                                                        ),
+                                                      );
                                                     },
                                                     text: 'Continue',
                                                   ),

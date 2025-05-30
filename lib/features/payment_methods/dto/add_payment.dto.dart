@@ -7,12 +7,15 @@ class AddPaymentMethodDTO extends DTO {
   final String brand;
   final bool isDefault;
 
+  final String expirationDate;
+
   AddPaymentMethodDTO({
     required this.paymentMethodId,
     required this.holderName,
     required this.last4,
     required this.brand,
     required this.isDefault,
+    required this.expirationDate,
   });
 
   @override
@@ -21,6 +24,7 @@ class AddPaymentMethodDTO extends DTO {
       'payment_method_id': paymentMethodId,
       'holder_name': holderName,
       'last4': last4,
+      'expiration_date': expirationDate,
       'brand': brand,
       'is_default': isDefault,
     };
