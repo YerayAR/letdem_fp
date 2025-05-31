@@ -1,8 +1,16 @@
 class ErrorMessageHelper {
-  static String getMessage(String code, {bool isSpanish = false}) {
+  static String getMessage(String code,
+      {bool isSpanish = false, String serverMessage = ""}) {
     final messages = isSpanish ? _spanishMessages : _englishMessages;
-    return messages[code] ??
-        (isSpanish ? "Error desconocido" : "Unknown error");
+
+    if (messages.containsKey(code)) {
+      return '${messages[code]!} $serverMessage';
+    } else {
+      if (serverMessage.isNotEmpty) {
+        return serverMessage;
+      }
+      return 'An unexpected error occurred. Please try again later.';
+    }
   }
 
   static const Map<String, String> _englishMessages = {

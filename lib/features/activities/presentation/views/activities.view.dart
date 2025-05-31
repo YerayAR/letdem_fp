@@ -52,17 +52,17 @@ class _ActivitiesViewState extends State<ActivitiesView> {
 
   Widget _buidShowAllButton(ActivitiesState state) {
     print("state: $state");
-    if (state is ActivitiesLoaded && state.activities.isNotEmpty) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Contributions',
-            style: Typo.mediumBody.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Contributions',
+          style: Typo.mediumBody.copyWith(
+            fontWeight: FontWeight.w600,
           ),
-          Dimens.space(1),
+        ),
+        if (state is ActivitiesLoaded && state.activities.isNotEmpty)
           TextButton(
             onPressed: () {
               NavigatorHelper.to(const ViewAllView());
@@ -76,10 +76,8 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               ),
             ),
           ),
-        ],
-      );
-    }
-    return const SizedBox(); // Return an empty widget if no contributions
+      ],
+    );
   }
 
   @override

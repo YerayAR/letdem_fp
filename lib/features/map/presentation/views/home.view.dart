@@ -7,7 +7,6 @@ import 'package:here_sdk/core.dart';
 import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
-import 'package:letdem/features/activities/presentation/modals/event.popup.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_bottom_section.widget.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
@@ -16,6 +15,7 @@ import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart'
     hide Location;
 import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 
 import '../../../../common/popups/popup.dart';
 import '../../../../infrastructure/services/map/map_asset_provider.service.dart';
@@ -354,7 +354,22 @@ class _HomeViewState extends State<HomeView>
   }) {
     AppPopup.showBottomSheet(
       context,
-      EventPopupSheet(event: event, currentPosition: _currentPosition!),
+      EventFeedback(event: event, currentDistance: _distanceToEvent(event)),
+    );
+  }
+
+  double _distanceToEvent(Event event) {
+    if (_currentPosition == null) return 0.0;
+
+    final eventCoords = GeoCoordinates(
+      event.location.point.lat,
+      event.location.point.lng,
+    );
+    return geolocator.Geolocator.distanceBetween(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+      eventCoords.latitude,
+      eventCoords.longitude,
     );
   }
 

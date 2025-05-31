@@ -17,7 +17,7 @@ import 'package:letdem/infrastructure/services/map/map_asset_provider.service.da
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
-class EventFeedback extends StatelessWidget {
+class EventFeedback extends StatefulWidget {
   final Event event;
   final double currentDistance;
   final VoidCallback? onSubmit;
@@ -27,6 +27,17 @@ class EventFeedback extends StatelessWidget {
       required this.event,
       this.onSubmit,
       required this.currentDistance});
+
+  @override
+  State<EventFeedback> createState() => _EventFeedbackState();
+}
+
+class _EventFeedbackState extends State<EventFeedback> {
+  // check event owner is current user
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +50,7 @@ class EventFeedback extends StatelessWidget {
               children: [
                 Image(
                   image: AssetImage(
-                    MapAssetsProvider.getAssetEvent(event.type),
+                    MapAssetsProvider.getAssetEvent(widget.event.type),
                   ),
                   height: 40,
                 ),
@@ -51,7 +62,7 @@ class EventFeedback extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          getEventMessage(event.type),
+                          getEventMessage(widget.event.type),
                           style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700, fontSize: 18),
                         ),
@@ -59,7 +70,7 @@ class EventFeedback extends StatelessWidget {
                         DecoratedChip(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 5),
-                          text: '${currentDistance.floor()}m away',
+                          text: '${widget.currentDistance.floor()}m away',
                           textStyle: Typo.smallBody.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.green600,
@@ -70,7 +81,7 @@ class EventFeedback extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      event.location.streetName,
+                      widget.event.location.streetName,
                       style: Typo.largeBody.copyWith(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
@@ -98,7 +109,7 @@ class EventFeedback extends StatelessWidget {
                     onTap: () {
                       AppPopup.showBottomSheet(
                         context,
-                        FeedbackForm(eventID: event.id),
+                        FeedbackForm(eventID: widget.event.id),
                       );
                     },
                     background: AppColors.primary50,

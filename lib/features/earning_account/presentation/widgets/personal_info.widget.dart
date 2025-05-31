@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
@@ -66,9 +67,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       child: Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: EdgeInsets.symmetric(horizontal: Dimens.defaultMargin),
+          child: ListView(
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Your personal information',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -149,7 +150,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 },
                 initialValue: '',
               ),
-              const Spacer(),
+              Dimens.space(3),
               BlocBuilder<EarningsBloc, EarningsState>(
                 builder: (context, state) {
                   return PrimaryButton(

@@ -83,6 +83,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
             SizedBox(
               width: double.infinity,
               child: PrimaryButton(
+                isDisabled: !_isChecked,
                 onTap: widget.onContinue,
                 text: 'Continue',
               ),
@@ -142,18 +143,6 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
                   ),
                 ),
               ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Bottom handle indicator
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                borderRadius: BorderRadius.circular(2),
-              ),
             ),
           ],
         ),
