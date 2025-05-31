@@ -53,4 +53,11 @@ class AppAssets {
   static String carTagNone = 'assets/icon/car_tags/none.svg';
 
   static String destinationMapMarker = 'assets/icon/destination_pin.png';
+
+//
+
+//   location
+  static String location = 'assets/icon/Location.svg';
+  static String card = 'assets/icon/card.svg';
+  static String bank = 'assets/icon/bank.svg';
 }

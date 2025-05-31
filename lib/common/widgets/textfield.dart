@@ -110,7 +110,7 @@ class TextInputFieldState extends State<TextInputField> {
         case TextFieldType.email:
           return TextInputType.emailAddress;
         case TextFieldType.number:
-          return TextInputType.number;
+          return TextInputType.numberWithOptions(signed: false, decimal: true);
         default:
           return TextInputType.multiline;
       }

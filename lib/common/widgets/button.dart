@@ -1,5 +1,3 @@
-import 'dart:math'; // Import for random number generation
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:letdem/common/widgets/loader.dart';
@@ -51,41 +49,41 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> loadingTexts = [
-      'Loading...',
-      'Please wait...',
-      'Almost there...',
-      'Hang tight...',
-      'Processing...',
-      'Getting things ready...',
-      'Just a moment...',
-      'We’re on it...',
-      'Fetching data...',
-      'Hold tight...',
-      'Preparing things...',
-      'Stay tuned...',
-      'Working on it...',
-      'We’ll be right with you...',
-      'One moment please...',
-      'Making magic happen...',
-      'Crunching the numbers...',
-      'Loading your experience...',
-      'Putting the pieces together...',
-      'Warming things up...',
-      'Good things take time...',
-      'Hang on, we’re close...',
-      'Checking the details...',
-      'Things are moving...',
-      'Preparing the next step...',
-      'Processing your request...',
-      'Bringing everything together...',
-      'Finalizing things...',
-      'Getting your data ready...',
-      'Almost done...',
-    ];
+    // final List<String> loadingTexts = [
+    //   'Loading...',
+    //   'Please wait...',
+    //   'Almost there...',
+    //   'Hang tight...',
+    //   'Processing...',
+    //   'Getting things ready...',
+    //   'Just a moment...',
+    //   'We’re on it...',
+    //   'Fetching data...',
+    //   'Hold tight...',
+    //   'Preparing things...',
+    //   'Stay tuned...',
+    //   'Working on it...',
+    //   'We’ll be right with you...',
+    //   'One moment please...',
+    //   'Making magic happen...',
+    //   'Crunching the numbers...',
+    //   'Loading your experience...',
+    //   'Putting the pieces together...',
+    //   'Warming things up...',
+    //   'Good things take time...',
+    //   'Hang on, we’re close...',
+    //   'Checking the details...',
+    //   'Things are moving...',
+    //   'Preparing the next step...',
+    //   'Processing your request...',
+    //   'Bringing everything together...',
+    //   'Finalizing things...',
+    //   'Getting your data ready...',
+    //   'Almost done...',
+    // ];
 
-    final randomLoadingText =
-        loadingTexts[Random().nextInt(loadingTexts.length)];
+    // final randomLoadingText =
+    //     loadingTexts[Random().nextInt(loadingTexts.length)];
 
     return InkWell(
       highlightColor: Colors.white.withOpacity(0.1),
@@ -132,15 +130,15 @@ class PrimaryButton extends StatelessWidget {
                     LoadingIndicator(
                       color: loadingIndicatorColor ?? Colors.white,
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      randomLoadingText,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.5),
-                      ),
-                    ),
+                    // const SizedBox(width: 10),
+                    // Text(
+                    //   randomLoadingText,
+                    //   style: TextStyle(
+                    //     fontSize: 14,
+                    //     fontWeight: FontWeight.w600,
+                    //     color: Colors.white.withOpacity(0.5),
+                    //   ),
+                    // ),
                   ],
                 )
               : Row(

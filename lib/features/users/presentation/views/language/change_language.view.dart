@@ -59,9 +59,9 @@ class _ChangeLanguageViewState extends State<ChangeLanguageView> {
                     children: L10n.all.map((language) {
                       return LanguageOption(
                         flag: "",
-                        name: language == const Locale('en')
-                            ? 'English'
-                            : 'Español',
+                        name: language.languageCode == "en"
+                            ? context.l10n.english
+                            : context.l10n.spanish,
                         isSelected: snapshot.defaultLocale == language,
                         onTap: () {
                           context.read<LocaleProvider>().setLocale(language);

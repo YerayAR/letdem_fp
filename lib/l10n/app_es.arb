@@ -20,9 +20,8 @@
   "privacyPolicy": "Política de privacidad",
   "termsOfUse": "Términos de uso",
   "logout": "Cerrar sesión",
-  "language": "Idioma",
-    "save": "Guardar",
-    "english": "Inglés",
-    "spanish": "Español"
+  "english": "Inglés",
+  "spanish": "Español"
+
 
 }

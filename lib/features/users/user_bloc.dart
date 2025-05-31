@@ -8,6 +8,7 @@ import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/repository/user.repository.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/cache.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
@@ -276,6 +277,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> _onUserLoggedOut(
       UserLoggedOutEvent event, Emitter<UserState> emit) async {
     await Tokens.delete();
+    DatabaseHelper().deleteAllPlaces();
     emit(UserLoggedOutState());
   }
 
