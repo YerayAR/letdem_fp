@@ -10,6 +10,7 @@ import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/active_reservation.view.dart';
+import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/activities/presentation/widgets/contribution_item.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_contribution.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/registered_car.widget.dart';
@@ -49,6 +50,38 @@ class _ActivitiesViewState extends State<ActivitiesView> {
     return item;
   }
 
+  Widget _buidShowAllButton(ActivitiesState state) {
+    print("state: $state");
+    if (state is ActivitiesLoaded && state.activities.isNotEmpty) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Contributions',
+            style: Typo.mediumBody.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Dimens.space(1),
+          TextButton(
+            onPressed: () {
+              NavigatorHelper.to(const ViewAllView());
+            },
+            child: Text(
+              'Show All',
+              style: Typo.smallBody.copyWith(
+                color: AppColors.primary500,
+                fontWeight: FontWeight.w600,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+    return const SizedBox(); // Return an empty widget if no contributions
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +98,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                           const NotificationAppBar(),
                           const CarSection(),
                           const ActiveReservationSection(),
+                          _buidShowAllButton(state),
                           _buildFooter(state),
                         ],
                       ),
@@ -74,6 +108,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                     const NotificationAppBar(),
                     const CarSection(),
                     const ActiveReservationSection(),
+                    _buidShowAllButton(state),
                     Expanded(child: _buildFooter(state)),
                   ],
           );

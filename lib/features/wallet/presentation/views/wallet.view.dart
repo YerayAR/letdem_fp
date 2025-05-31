@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/appbar.dart';
@@ -230,7 +229,7 @@ class WalletActionsRow extends StatelessWidget {
     return Row(
       children: [
         _ActionButton(
-          icon: IconlyBold.location,
+          icon: AppAssets.location,
           label: 'Orders',
           onTap: () {
             NavigatorHelper.to(const OrdersListView());
@@ -238,7 +237,7 @@ class WalletActionsRow extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         _ActionButton(
-          icon: Iconsax.card5,
+          icon: AppAssets.card,
           label: 'Withdrawals',
           onTap: () {
             NavigatorHelper.to(const WithdrawListView());
@@ -246,7 +245,7 @@ class WalletActionsRow extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         _ActionButton(
-          icon: IconlyBold.swap,
+          icon: AppAssets.bank,
           label: 'Payouts',
           onTap: () {
             NavigatorHelper.to(const PayoutMethodsScreen());
@@ -258,7 +257,7 @@ class WalletActionsRow extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  final IconData icon;
+  final String icon;
   final String label;
 
   final VoidCallback? onTap;
@@ -281,7 +280,7 @@ class _ActionButton extends StatelessWidget {
               CircleAvatar(
                 radius: 25,
                 backgroundColor: AppColors.neutral50,
-                child: Icon(icon, color: Colors.blueGrey.shade700, size: 24),
+                child: SvgPicture.asset(icon, color: Colors.blueGrey.shade700),
               ),
               const SizedBox(height: 15),
               Text(label,
@@ -458,15 +457,6 @@ class EmptyTransactionsView extends StatelessWidget {
                 color: Colors.grey.shade600,
                 fontSize: 14,
                 height: 1.5,
-              ),
-            ),
-            const Spacer(),
-            Container(
-              width: 40,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2.5),
               ),
             ),
           ],

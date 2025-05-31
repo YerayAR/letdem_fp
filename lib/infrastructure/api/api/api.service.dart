@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:letdem/core/utils/errors.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
@@ -113,6 +114,13 @@ class ApiService extends BaseApiService {
       }
 
       // Failed response
+
+      // get the status key from response
+      if (response.data is Map<String, dynamic> &&
+          response.data.containsKey('error_code')) {
+        String status = response.data['error_code'];
+        throw ApiError(message: ErrorMessageHelper.getMessage(status));
+      }
       String err =
           response.data['message'] ?? response.data['error'] ?? 'Unknown error';
       throw ApiError(message: err);
@@ -274,6 +282,13 @@ ${response.data}
 """);
     }
     debugPrint('Dio error occurred: ${e.message}');
+
+    if (e.response!.data is Map<String, dynamic> &&
+        e.response!.data.containsKey('error_code')) {
+      String status = e.response!.data['error_code'];
+      throw ApiError(message: ErrorMessageHelper.getMessage(status));
+    }
+
     var message = e.response == null
         ? "Unknown error"
         : e.response!.data?['message'] ?? "Unknown error";

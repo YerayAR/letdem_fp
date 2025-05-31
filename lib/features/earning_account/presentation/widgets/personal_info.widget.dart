@@ -115,7 +115,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                                 initialDateTime:
                                     _dateOfBirth ?? DateTime(1990, 1, 1),
                                 minimumDate: DateTime(1900),
-                                maximumDate: DateTime.now(),
+                                // maximumDate for age 18
+                                maximumDate: DateTime.now()
+                                    .subtract(const Duration(days: 365 * 18)),
                                 onDateTimeChanged: (DateTime date) {
                                   setState(() {
                                     _dateOfBirth = date;

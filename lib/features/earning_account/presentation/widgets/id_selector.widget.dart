@@ -29,6 +29,7 @@ class UploadIDPictureView extends StatefulWidget {
 class _UploadIDPictureViewState extends State<UploadIDPictureView> {
   Widget _buildIDTypeOption({
     required String title,
+    required String successText,
     required String subtitle,
     required File? file,
     required bool isSelected,
@@ -70,7 +71,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    file != null ? file.path.split('/').last : subtitle,
+                    successText,
                     style: TextStyle(fontSize: 12, color: AppColors.neutral600),
                   ),
                 ],
@@ -218,6 +219,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
           ),
           const SizedBox(height: 30),
           _buildIDTypeOption(
+            successText: 'front-side.png',
             onDelete: () {
               setState(() {
                 _fileFront = null;
@@ -236,6 +238,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
           ),
           const SizedBox(height: 16),
           _buildIDTypeOption(
+            successText: 'back-side.png',
             file: _fileBack,
             onDelete: () {
               setState(() {

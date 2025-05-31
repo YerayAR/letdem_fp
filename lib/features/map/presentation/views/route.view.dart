@@ -599,6 +599,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           child: Slider(
             value: radius,
             min: 100,
+            divisions: 100,
             max: 9000,
             onChanged: (value) => setState(() => radius = value),
           ),
