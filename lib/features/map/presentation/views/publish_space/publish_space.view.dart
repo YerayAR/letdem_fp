@@ -369,7 +369,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                 },
                               ),
                               Dimens.space(2),
-                              TSLPhoneField(
+                              PhoneField(
                                 label: "Phone Number",
                                 onChanged: (String text, String code) {
                                   setState(() {
@@ -562,7 +562,7 @@ class PaidSpaceForm extends StatelessWidget {
             onChanged: (value) {},
           ),
           Dimens.space(2),
-          TSLPhoneField(
+          PhoneField(
             label: "Phone Number",
             onChanged: (String text, String countryCode) {},
             initialValue: '',

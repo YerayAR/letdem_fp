@@ -143,7 +143,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              TSLPhoneField(
+              PhoneField(
                 label: 'Enter phone number',
                 onChanged: (String text, String countryCode) {
                   _phoneController.text = "$countryCode$text";

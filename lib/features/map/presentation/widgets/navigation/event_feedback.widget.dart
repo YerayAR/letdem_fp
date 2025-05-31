@@ -33,7 +33,6 @@ class EventFeedback extends StatefulWidget {
 }
 
 class _EventFeedbackState extends State<EventFeedback> {
-  // check event owner is current user
   @override
   void initState() {
     super.initState();

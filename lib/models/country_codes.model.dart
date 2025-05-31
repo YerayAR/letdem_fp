@@ -217,7 +217,7 @@ class CountryCode {
   ];
 }
 
-class TSLPhoneField extends StatefulWidget {
+class PhoneField extends StatefulWidget {
   final String? label;
   final String? prefixText;
   final String? countryPrefix;
@@ -232,7 +232,7 @@ class TSLPhoneField extends StatefulWidget {
 
   final Function(String text, String countryCode)? onChanged;
 
-  const TSLPhoneField({
+  const PhoneField({
     super.key,
     this.isRequired = true,
     this.label,
@@ -247,10 +247,10 @@ class TSLPhoneField extends StatefulWidget {
   });
 
   @override
-  State<TSLPhoneField> createState() => _TSLFieldState();
+  State<PhoneField> createState() => _TSLFieldState();
 }
 
-class _TSLFieldState extends State<TSLPhoneField> {
+class _TSLFieldState extends State<PhoneField> {
   late FocusNode focusNode;
   late CountryCode selectedCode;
 
@@ -289,8 +289,6 @@ class _TSLFieldState extends State<TSLPhoneField> {
 
   @override
   Widget build(BuildContext context) {
-    var currentLocale = Localizations.localeOf(context).toString();
-
     return Padding(
       padding: EdgeInsets.symmetric(vertical: Dimens.baseSize / 2),
       child: GestureDetector(
