@@ -358,11 +358,7 @@ class EmptyWithdrawalView extends StatelessWidget {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.white,
-            child: Icon(
-              Iconsax.bank,
-              size: 40,
-              color: Colors.blue[600],
-            ),
+            child: Icon(Iconsax.bank, size: 40, color: AppColors.primary500),
           ),
           const SizedBox(height: 20),
           const Text(

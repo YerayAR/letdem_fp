@@ -110,6 +110,8 @@ class Space {
 class Event {
   final String id;
   final EventTypes type;
+
+  final bool isOwner;
   final Location location;
   final DateTime created;
 
@@ -117,12 +119,14 @@ class Event {
     required this.id,
     required this.type,
     required this.location,
+    required this.isOwner,
     required this.created,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json['id'],
+      isOwner: json['is_owner'] ?? false,
       type: getEventEnumFromText(json['type']),
       location: Location.fromJson(json['location']),
       created: DateTime.parse(json['created']),
