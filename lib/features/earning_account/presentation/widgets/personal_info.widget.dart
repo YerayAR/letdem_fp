@@ -77,14 +77,14 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 30),
               TextInputField(
-                label: 'Enter first name',
-                placeHolder: 'Eg. John',
+                label: 'First name',
+                placeHolder: 'Enter first name',
                 controller: _firstNameController,
               ),
               const SizedBox(height: 16),
               TextInputField(
-                label: 'Enter last name',
-                placeHolder: 'Eg. Doe',
+                label: 'Last name',
+                placeHolder: 'Enter last name',
                 controller: _lastNameController,
               ),
               const SizedBox(height: 16),
@@ -135,16 +135,16 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 child: AbsorbPointer(
                   child: TextInputField(
                     mustValidate: false,
-                    label: 'Select date of birth',
+                    label: 'Date of Birth',
                     placeHolder: _dateOfBirth != null
                         ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}'
-                        : 'Eg. 01/01/1990',
+                        : 'YYYY/MM/DD',
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               PhoneField(
-                label: 'Enter phone number',
+                label: 'Phone number',
                 onChanged: (String text, String countryCode) {
                   _phoneController.text = "$countryCode$text";
                 },

@@ -425,7 +425,7 @@ class _TSLFieldState extends State<PhoneField> {
                   ),
                 ),
                 hintStyle: TextStyle(color: AppColors.neutral100),
-                hintText: "XXX-XXXX-XXXX",
+                hintText: "000 000 000",
                 focusedErrorBorder: !widget.enableBorder
                     ? InputBorder.none
                     : OutlineInputBorder(
