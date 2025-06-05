@@ -210,12 +210,11 @@ class _RescheduleNotificationCardState
                       child: Slider(
                         value: radius,
                         min: 100,
-                        divisions: 100,
                         max: 9000,
+                        divisions: 89, // (9000 - 100) / 100 = 89 divisions
                         onChanged: (value) {
-                          setState(() {
-                            radius = value;
-                          });
+                          final roundedValue = (value / 100).round() * 100;
+                          setState(() => radius = roundedValue.toDouble());
                         },
                       ),
                     ),

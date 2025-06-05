@@ -276,6 +276,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   Future<void> _onUserLoggedOut(
       UserLoggedOutEvent event, Emitter<UserState> emit) async {
+    await DatabaseHelper().clearAll();
     await Tokens.delete();
     DatabaseHelper().deleteAllPlaces();
     emit(UserLoggedOutState());
