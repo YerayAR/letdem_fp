@@ -191,7 +191,9 @@ class ContributionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ActivitiesBloc, ActivitiesState>(
       builder: (context, state) {
-        final contributions = context.userProfile!.contributions;
+        final contributions = context.userProfile == null
+            ? []
+            : context.userProfile!.contributions;
         final isEmpty = contributions.isEmpty;
 
         return Container(
