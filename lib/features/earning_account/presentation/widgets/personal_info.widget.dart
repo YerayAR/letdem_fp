@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
@@ -66,9 +67,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       child: Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: EdgeInsets.symmetric(horizontal: Dimens.defaultMargin),
+          child: ListView(
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Your personal information',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -76,14 +77,14 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 30),
               TextInputField(
-                label: 'Enter first name',
-                placeHolder: 'Eg. John',
+                label: 'First name',
+                placeHolder: 'Enter first name',
                 controller: _firstNameController,
               ),
               const SizedBox(height: 16),
               TextInputField(
-                label: 'Enter last name',
-                placeHolder: 'Eg. Doe',
+                label: 'Last name',
+                placeHolder: 'Enter last name',
                 controller: _lastNameController,
               ),
               const SizedBox(height: 16),
@@ -134,22 +135,22 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 child: AbsorbPointer(
                   child: TextInputField(
                     mustValidate: false,
-                    label: 'Select date of birth',
+                    label: 'Date of Birth',
                     placeHolder: _dateOfBirth != null
                         ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}'
-                        : 'Eg. 01/01/1990',
+                        : 'YYYY/MM/DD',
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              TSLPhoneField(
-                label: 'Enter phone number',
+              PhoneField(
+                label: 'Phone number',
                 onChanged: (String text, String countryCode) {
                   _phoneController.text = "$countryCode$text";
                 },
                 initialValue: '',
               ),
-              const Spacer(),
+              Dimens.space(3),
               BlocBuilder<EarningsBloc, EarningsState>(
                 builder: (context, state) {
                   return PrimaryButton(

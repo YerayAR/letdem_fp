@@ -41,19 +41,15 @@ class _ActivitiesViewState extends State<ActivitiesView> {
   }
 
   Widget _buildFooter(ActivitiesState state) {
-    bool isActiveReservation = context.userProfile?.activeReservation != null;
-
-    Widget item = ContributionsSection();
-
-    print("isActiveReservation: $isActiveReservation");
+    Widget item = const ContributionsSection();
 
     return item;
   }
 
   Widget _buidShowAllButton(ActivitiesState state) {
-    print("state: $state");
-    if (state is ActivitiesLoaded && state.activities.isNotEmpty) {
-      return Row(
+    return Padding(
+      padding: const EdgeInsets.only(top: 0),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
@@ -62,24 +58,23 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          Dimens.space(1),
-          TextButton(
-            onPressed: () {
-              NavigatorHelper.to(const ViewAllView());
-            },
-            child: Text(
-              'Show All',
-              style: Typo.smallBody.copyWith(
-                color: AppColors.primary500,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.underline,
+          if (state is ActivitiesLoaded && state.activities.isNotEmpty)
+            TextButton(
+              onPressed: () {
+                NavigatorHelper.to(const ViewAllView());
+              },
+              child: Text(
+                'Show All',
+                style: Typo.smallBody.copyWith(
+                  color: AppColors.primary500,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
-          ),
         ],
-      );
-    }
-    return const SizedBox(); // Return an empty widget if no contributions
+      ),
+    );
   }
 
   @override
@@ -196,15 +191,13 @@ class ContributionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ActivitiesBloc, ActivitiesState>(
       builder: (context, state) {
-        // Fix: Better state handling and null safety
-        // if (state is! ActivitiesLoaded) {
-        //   return const Center(child: CircularProgressIndicator());
-        // }
-
-        final contributions = context.userProfile!.contributions;
+        final contributions = context.userProfile == null
+            ? []
+            : context.userProfile!.contributions;
         final isEmpty = contributions.isEmpty;
 
         return Container(
+          margin: const EdgeInsets.only(top: 5),
           height: context.userProfile?.activeReservation != null ? 400 : null,
           width: double.infinity,
           // Fix: Add constraints to prevent unbounded height issues

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
@@ -225,6 +226,89 @@ class _MainActionsSection extends StatelessWidget {
       showDivider: false,
       leading: isAccepted ? null : _statusChip(context, earningAccount),
       onTap: () {
+        if (earningAccount != null &&
+            earningAccount.status == EarningStatus.pending) {
+          AppPopup.showBottomSheet(
+            context,
+            Padding(
+              padding: EdgeInsets.all(Dimens.defaultMargin),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 37,
+                    backgroundColor: AppColors.secondary50,
+                    child: Icon(
+                      Icons.info,
+                      color: AppColors.secondary500,
+                      size: 50,
+                    ),
+                  ),
+                  Dimens.space(3),
+                  Text(
+                    'Connection Pending',
+                    style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Dimens.space(1),
+                  Text(
+                    "Your account connection is still pending, you will be notified when the connection is complete",
+                    textAlign: TextAlign.center,
+                    style:
+                        Typo.mediumBody.copyWith(color: AppColors.neutral600),
+                  ),
+                  Dimens.space(2),
+                  PrimaryButton(
+                    text: "Go Back",
+                    onTap: () {
+                      NavigatorHelper.pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+          return;
+        }
+        if (earningAccount != null &&
+            (earningAccount?.status == EarningStatus.rejected ||
+                earningAccount?.status == EarningStatus.rejected)) {
+          AppPopup.showBottomSheet(
+            context,
+            Padding(
+              padding: EdgeInsets.all(Dimens.defaultMargin),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.info,
+                    color: AppColors.red500,
+                    size: 55,
+                  ),
+                  Dimens.space(3),
+                  Text(
+                    'Something went wrong',
+                    style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Dimens.space(1),
+                  Text(
+                    "There seems to be an issue with your account. Please contact support for assistance.",
+                    textAlign: TextAlign.center,
+                    style:
+                        Typo.mediumBody.copyWith(color: AppColors.neutral600),
+                  ),
+                  Dimens.space(2),
+                  PrimaryButton(
+                    text: "Go Back",
+                    onTap: () {
+                      NavigatorHelper.pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+          return;
+        }
         if (isAccepted) {
           NavigatorHelper.to(const WalletScreen());
         } else {

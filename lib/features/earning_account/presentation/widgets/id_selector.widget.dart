@@ -71,7 +71,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    successText,
+                    !isSelected ? subtitle : successText,
                     style: TextStyle(fontSize: 12, color: AppColors.neutral600),
                   ),
                 ],

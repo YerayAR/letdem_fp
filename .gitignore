@@ -1,4 +1,4 @@
-# Miscellaneous
+# ___ Miscellaneous ___
 *.class
 *.log
 *.pyc
@@ -9,23 +9,23 @@
 .buildlog/
 .history
 .svn/
+
+# Plugins locales (si acaso) y migración
 plugins/
 /plugins/
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ / Android Studio
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# VSCode (normalmente lo mantienes, así que lo dejamos comentado)
 #.vscode/
 
-# Flutter/Dart/Pub related
+# ___ Flutter/Dart/Pub related ___
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
@@ -33,15 +33,23 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+build/
 
-# Symbolication related
+# Símbolos y mapas de ofuscación
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android Studio: artefactos de build adicionales
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ___ Archivos generados de plugins por plataforma ___
+**/linux/flutter/generated_plugin_registrant.*
+**/linux/flutter/generated_plugins.cmake
+**/windows/flutter/generated_plugin_registrant.*
+**/windows/flutter/generated_plugins.cmake
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# ___ Ignorar carpeta .cxx de compilación NDK ___
+android/app/.cxx/

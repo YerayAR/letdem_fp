@@ -58,7 +58,7 @@ class Space {
   final String id;
   final PublishSpaceType type;
   final String image;
-
+  final bool isOwner;
   final String? price;
   final Location location;
   final DateTime created;
@@ -74,6 +74,7 @@ class Space {
     required this.image,
     required this.location,
     this.expirationDate,
+    this.isOwner = false,
     required this.created,
     this.price,
     this.isPremium = false,
@@ -85,6 +86,7 @@ class Space {
         id: json['id'],
         type: getEnumFromText(json['type'], json['resourcetype'] ?? ""),
         image: json['image'],
+        isOwner: json['is_owner'] ?? false,
         location: Location.fromJson(json['location']),
         price: json['price']?.toString(),
         created: DateTime.parse(json['created']),
@@ -110,6 +112,8 @@ class Space {
 class Event {
   final String id;
   final EventTypes type;
+
+  final bool isOwner;
   final Location location;
   final DateTime created;
 
@@ -117,12 +121,14 @@ class Event {
     required this.id,
     required this.type,
     required this.location,
+    required this.isOwner,
     required this.created,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json['id'],
+      isOwner: json['is_owner'] ?? false,
       type: getEventEnumFromText(json['type']),
       location: Location.fromJson(json['location']),
       created: DateTime.parse(json['created']),

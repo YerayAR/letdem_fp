@@ -39,8 +39,10 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       );
       emit(const ActivitiesPublished(totalPointsEarned: 0));
     } on ApiError catch (err) {
+      Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
     } catch (err) {
+      Toast.showError("Unable to confirm space reservation");
       emit(const ActivitiesError(error: "Unable to confirm space reservation"));
     }
   }

@@ -94,14 +94,14 @@ class _BasicInfoViewState extends State<BasicInfoView> {
                       prefixIcon: Iconsax.user,
                       label: 'First Name',
                       controller: _firstNameCTRL,
-                      placeHolder: 'Eg. John',
+                      placeHolder: 'Enter your first name',
                     ),
                     Dimens.space(1),
                     TextInputField(
                       prefixIcon: Iconsax.user,
                       controller: _lastNameCTRL,
                       label: 'Last Name',
-                      placeHolder: 'Eg. Doe',
+                      placeHolder: 'Enter your last name',
                     ),
 
                     Dimens.space(2),
