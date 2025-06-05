@@ -23,8 +23,8 @@ class AppAssets {
 
   // paid map markers
 
-  static String paidFreeMapMarker = 'assets/icon/map_pin_free.png';
-  static String paidDisabledMapMarker = 'assets/icon/map_pin_disabled.png';
+  static String paidFreeMapMarker = 'assets/icon/map_pin_free_paid.png';
+  static String paidDisabledMapMarker = 'assets/icon/map_pin_disabled_paid.png';
   static String paidGreenMapMarker = 'assets/icon/map_pin_green_paid.png';
   static String paidBlueMapMarker = 'assets/icon/map_pin_blue_paid.png';
 

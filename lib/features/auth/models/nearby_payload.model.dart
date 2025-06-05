@@ -58,7 +58,7 @@ class Space {
   final String id;
   final PublishSpaceType type;
   final String image;
-
+  final bool isOwner;
   final String? price;
   final Location location;
   final DateTime created;
@@ -74,6 +74,7 @@ class Space {
     required this.image,
     required this.location,
     this.expirationDate,
+    this.isOwner = false,
     required this.created,
     this.price,
     this.isPremium = false,
@@ -85,6 +86,7 @@ class Space {
         id: json['id'],
         type: getEnumFromText(json['type'], json['resourcetype'] ?? ""),
         image: json['image'],
+        isOwner: json['is_owner'] ?? false,
         location: Location.fromJson(json['location']),
         price: json['price']?.toString(),
         created: DateTime.parse(json['created']),
