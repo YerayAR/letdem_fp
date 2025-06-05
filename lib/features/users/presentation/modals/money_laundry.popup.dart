@@ -110,7 +110,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
                     text: TextSpan(
                       children: [
                         const TextSpan(
-                          text: 'By continuing, I agree to LetDem ',
+                          text: 'By continuing, I agree to Payment Providers ',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 13,

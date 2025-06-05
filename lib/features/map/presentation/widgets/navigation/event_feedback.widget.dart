@@ -94,6 +94,7 @@ class _EventFeedbackState extends State<EventFeedback> {
             Row(
               children: <Widget>[
                 Flexible(
+                  flex: widget.event.isOwner ? 1 : 2,
                   child: PrimaryButton(
                     onTap: () {
                       NavigatorHelper.pop();
@@ -101,21 +102,25 @@ class _EventFeedbackState extends State<EventFeedback> {
                     text: 'Got it, Thank you',
                   ),
                 ),
-                Dimens.space(1),
+                Dimens.space(widget.event.isOwner ? 0 : 2),
                 Flexible(
-                  child: PrimaryButton(
-                    outline: true,
-                    onTap: () {
-                      AppPopup.showBottomSheet(
-                        context,
-                        FeedbackForm(eventID: widget.event.id),
-                      );
-                    },
-                    background: AppColors.primary50,
-                    borderColor: Colors.transparent,
-                    color: AppColors.primary500,
-                    text: 'Feedback',
-                  ),
+                  flex: widget.event.isOwner ? 0 : 1,
+                  child: widget.event.isOwner
+                      ? const SizedBox()
+                      : PrimaryButton(
+                          outline: true,
+                          onTap: () {
+                            if (widget.event.isOwner) {}
+                            AppPopup.showBottomSheet(
+                              context,
+                              FeedbackForm(eventID: widget.event.id),
+                            );
+                          },
+                          background: AppColors.primary50,
+                          borderColor: Colors.transparent,
+                          color: AppColors.primary500,
+                          text: 'Feedback',
+                        ),
                 )
               ],
             ),

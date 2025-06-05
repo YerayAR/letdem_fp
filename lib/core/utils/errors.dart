@@ -72,7 +72,8 @@ class ErrorMessageHelper {
     'SPACE_OWNER_CANNOT_SEND_FEEDBACK': 'Space owners cannot send feedback.',
     'SPACE_INVALID_PRICE':
         'The price set for the space is invalid. Space price should be in range of 3 - 20',
-    'SPACE_INVALID_TIME_TO_WAIT': 'The waiting time specified is invalid.',
+    'SPACE_INVALID_TIME_TO_WAIT':
+        'The waiting time specified is invalid. Should be in range of 20 - 60',
   };
 
   static const Map<String, String> _spanishMessages = {

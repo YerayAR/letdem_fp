@@ -70,7 +70,7 @@ class EndPoints {
 
   static Endpoint<ConfirmationCodeDTO> confirmReservation(String id) =>
       Endpoint(
-        url: "/spaces/$id/confirm-reservation",
+        url: "/reservations/$id/confirm",
         method: HTTPMethod.POST,
       );
 

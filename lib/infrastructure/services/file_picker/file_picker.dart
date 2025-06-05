@@ -17,7 +17,7 @@ class FileService {
 
   final ImagePicker _imagePicker = ImagePicker();
 
-  static const int maxFileSizeInBytes = 2 * 1024 * 1024; // 2 MB
+  static const int maxFileSizeInBytes = 6 * 1024 * 1024; // 2 MB
 
   Future<File?> pickFile(FileSourceOption source) async {
     try {
@@ -46,7 +46,7 @@ class FileService {
       if (file != null) {
         final int size = await file.length();
         if (size > maxFileSizeInBytes) {
-          Toast.showError('File is larger than 2 MB');
+          Toast.showError('File is larger than 6 MB');
           return null;
         }
         return file;

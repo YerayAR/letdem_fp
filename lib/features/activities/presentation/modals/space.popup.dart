@@ -19,6 +19,7 @@ import 'package:letdem/features/activities/presentation/views/spaces/reserved_sp
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
@@ -202,6 +203,7 @@ class SpacePopupSheet extends StatelessWidget {
     return BlocConsumer<ActivitiesBloc, ActivitiesState>(
       listener: (context, state) {
         if (state is SpaceReserved) {
+          context.read<UserBloc>().add(FetchUserInfoEvent());
           AppPopup.showDialogSheet(
             context,
             SuccessDialog(

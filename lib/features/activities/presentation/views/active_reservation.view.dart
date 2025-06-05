@@ -55,6 +55,7 @@ class ActiveReservationView extends StatelessWidget {
     return GestureDetector(
       onTap: () => _navigateToDetails(context),
       child: Container(
+        margin: EdgeInsets.only(bottom: 16),
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           vertical: Dimens.defaultMargin,
