@@ -7,6 +7,7 @@ import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
@@ -78,9 +79,9 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                     ),
                     Dimens.space(2),
                     TextInputField(
-                      label: 'Cardholder Name',
+                      label: context.l10n.cardholderName,
                       controller: _nameController,
-                      placeHolder: 'Enter your name',
+                      placeHolder: context.l10n.enterYourName,
                     ),
                     Dimens.space(3),
                     Divider(height: 1, color: Colors.grey.shade300),

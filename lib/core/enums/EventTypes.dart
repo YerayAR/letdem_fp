@@ -1,4 +1,6 @@
 import 'package:letdem/core/constants/assets.dart';
+import 'package:flutter/material.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 enum EventTypes {
   police,
@@ -7,27 +9,27 @@ enum EventTypes {
   accident
 }
 
-String getEventMessage(EventTypes eventType) {
+String getEventMessage(EventTypes eventType, BuildContext context) {
   switch (eventType) {
     case EventTypes.police:
-      return 'Police ahead';
+      return context.l10n.policeAhead;
     case EventTypes.closeRoad:
-      return 'Road closed ahead';
+      return context.l10n.roadClosedAhead;
     case EventTypes.accident:
-      return 'Accident ahead';
+      return context.l10n.accidentAhead;
     default:
-      return 'Unknown event ahead';
+      return context.l10n.unknownEventAhead;
   }
 }
 
-String eventTypeToString(EventTypes type) {
+String eventTypeToString(EventTypes type, BuildContext context) {
   switch (type) {
     case EventTypes.police:
-      return "Police";
+      return context.l10n.police;
     case EventTypes.closeRoad:
-      return "Closed Road";
+      return context.l10n.closedRoad;
     case EventTypes.accident:
-      return "Accident";
+      return context.l10n.accident;
   }
 }
 

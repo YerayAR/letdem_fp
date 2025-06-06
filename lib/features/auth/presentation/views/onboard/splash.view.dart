@@ -8,6 +8,7 @@ import 'package:letdem/core/base.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/welcome.view.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
@@ -59,13 +60,15 @@ class _SplashViewState extends State<SplashView> {
                       size: 50,
                     ),
                     Dimens.space(2),
-                    const Text("Something went wrong",
-                        style: TextStyle(
+                    Text(context.l10n.somethingWentWrong,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 23,
                         )),
                     Text(
-                      'We were unable to process your request. Please try again later. The error is: ${state.apiError != null ? state.apiError!.message : state.error}',
+                      context.l10n.unableToProcessRequest(state.apiError != null
+                          ? state.apiError!.message
+                          : state.error),
                       style: TextStyle(
                         color: AppColors.neutral400,
                         fontWeight: FontWeight.w500,
@@ -77,7 +80,7 @@ class _SplashViewState extends State<SplashView> {
                       onTap: () {
                         context.read<UserBloc>().add(FetchUserInfoEvent());
                       },
-                      text: "Retry",
+                      text: context.l10n.retry,
                     )
                   ],
                 ),

@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 enum TextFieldType { email, password, number, text }
 
@@ -149,29 +150,29 @@ class TextInputFieldState extends State<TextInputField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return 'Please enter${widget.label?.toLowerCase().replaceAll("enter", "")}';
+                  return '${context.l10n.pleaseEnter}${widget.label?.toLowerCase().replaceAll("enter", "")}';
                 }
                 if (widget.inputType == TextFieldType.password &&
                     value.length < 8) {
-                  return 'Password must be at least 8 characters';
+                  return context.l10n.passwordMinLength;
                 }
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[0-9]').hasMatch(value)) {
-                  return 'Password must contain at least one number';
+                  return context.l10n.passwordRequireNumber;
                 }
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]')
                         .hasMatch(value)) {
-                  return 'Password must contain at least one special character';
+                  return context.l10n.passwordRequireSpecial;
                 }
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[A-Z]').hasMatch(value)) {
-                  return 'Password must contain at least one uppercase letter';
+                  return context.l10n.passwordRequireUppercase;
                 }
 
                 if (widget.inputType == TextFieldType.email &&
                     !value.isValidEmail()) {
-                  return 'Please enter valid email';
+                  return context.l10n.pleaseEnterValidEmail;
                 }
                 return null;
               },

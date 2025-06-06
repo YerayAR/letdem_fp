@@ -5,6 +5,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
@@ -103,7 +104,7 @@ class ActiveReservationView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusInfo() {
+  Widget _buildStatusInfo(BuildContext context) {
     final isReserved = payload.status == "RESERVED";
     return Row(
       children: [
@@ -113,31 +114,35 @@ class ActiveReservationView extends StatelessWidget {
         ),
         Dimens.space(1),
         Text(
-          payload.status,
+          isReserved ? context.l10n.reserved : context.l10n.waiting,
           style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );
   }
 
-  Widget _buildDetailsRow() {
+  Widget _buildDetailsRow(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: Row(
             children: [
               _buildIconText(
-                  Iconsax.clock5, getTimeRemaining(payload.expireAt)),
+                Iconsax.clock5, 
+                getTimeRemaining(payload.expireAt)
+              ),
               Dimens.space(3),
               _buildIconText(
                 Iconsax.money5,
-                payload.price == null ? "Free" : "${payload.price}€",
+                payload.price == null 
+                    ? context.l10n.free 
+                    : "${payload.price}${context.l10n.currency}",
               ),
             ],
           ),
         ),
         Text(
-          "View details",
+          context.l10n.viewDetails,
           style: Typo.mediumBody.copyWith(
             fontWeight: FontWeight.w400,
             color: AppColors.primary400,

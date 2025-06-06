@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -58,7 +59,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   Widget _buildAppBar(BuildContext context) {
     return StyledAppBar(
-      title: 'Reserved Space',
+      title: context.l10n.reservedSpace,
       onTap: () => NavigatorHelper.pop(),
       icon: Iconsax.close_circle5,
     );
@@ -81,7 +82,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // Confirmation Card
   // ---------------------------------------------------------------------------
-  Widget _buildConfirmationCard() {
+  Widget _buildConfirmationCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: _cardDecoration(),
@@ -89,7 +90,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
         children: [
           const Center(
             child: Text(
-              'Confirmation Code',
+              context.l10n.confirmationCodeTitle,
               style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
@@ -107,7 +108,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildShareNote() {
+  Widget _buildShareNote(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
@@ -115,19 +116,19 @@ class ReservedSpaceDetailView extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        'Share this code with the parking space owner',
+        context.l10n.shareCodeOwner,
         style: TextStyle(color: AppColors.secondary600, fontSize: 16),
         textAlign: TextAlign.center,
       ),
     );
   }
 
-  Widget _buildOwnerPlate() {
+  Widget _buildOwnerPlate(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
-          'The Owner\'s Plate Number: ',
+          context.l10n.ownerPlateNumber,
           style: TextStyle(fontSize: 16, color: Colors.black54),
         ),
         Text(
@@ -207,16 +208,16 @@ class ReservedSpaceDetailView extends StatelessWidget {
           longitude: space.location.point.lng,
         ));
       },
-      text: 'Navigate to Space',
+      text: context.l10n.navigateToSpace,
     );
   }
 
-  Widget _buildCallButton() {
+  Widget _buildCallButton(BuildContext context) {
     return PrimaryButton(
       onTap: () async {
         Uri url = Uri.parse('tel:${details.phone}');
         if (!await launchUrl(url)) {
-          Toast.showError("Could not launch dialer");
+          Toast.showError(context.l10n.couldNotLaunchDialer);
         } else {
           print("Dialer launched successfully");
         }
@@ -225,7 +226,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
       background: Colors.white,
       textColor: AppColors.neutral500,
       icon: IconlyBold.call,
-      text: 'Call Space Owner',
+      text: context.l10n.callSpaceOwner
     );
   }
 

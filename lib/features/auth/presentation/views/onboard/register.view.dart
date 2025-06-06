@@ -11,6 +11,7 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/basic_info.view.dart';
@@ -66,18 +67,17 @@ class _RegisterViewState extends State<RegisterView> {
                 onTap: () {
                   if (_formKey.currentState!.validate()) {
                     if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
-                      Toast.showError('Passwords do not match');
+                      Toast.showError(context.l10n.passwordsDoNotMatch);
                       return;
                     }
                     if (_passwordCTRL.text.length < 8) {
-                      Toast.showError('Password must be at least 8 characters');
+                      Toast.showError(context.l10n.passwordMinLength);
                       return;
                     }
-                    print(_repeatPasswordCTRL.text);
+
                     if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
                         .hasMatch(_repeatPasswordCTRL.text)) {
-                      Toast.showError(
-                          'Password must contain at least one special character');
+                      Toast.showError(context.l10n.passwordRequireSpecial);
                       return;
                     }
 
@@ -86,15 +86,14 @@ class _RegisterViewState extends State<RegisterView> {
                   }
                 },
                 isDisabled: !isChecked,
-                text: 'Continue',
+                text: context.l10n.continuee,
               ),
               Dimens.space(1),
-
               PrimaryButton(
                 outline: true,
                 onTap: () {
                   if (!isChecked) {
-                    Toast.showError('Please accept the terms and conditions');
+                    Toast.showError(context.l10n.pleaseAcceptTerms);
                     return;
                   }
                   context.read<AuthBloc>().add(const GoogleRegisterEvent());
@@ -103,7 +102,7 @@ class _RegisterViewState extends State<RegisterView> {
                 widgetImage: SvgPicture.asset(AppAssets.google),
                 textColor: const Color(0xFF344054),
                 borderColor: AppColors.neutral50,
-                text: 'Sign up with Google',
+                text: context.l10n.signUpWithGoogle,
               ),
               Dimens.space(1),
 
@@ -126,15 +125,15 @@ class _RegisterViewState extends State<RegisterView> {
                     child: RichText(
                       text: TextSpan(
                         children: [
-                          const TextSpan(
-                            text: 'By continuing, I agree to LetDem ',
-                            style: TextStyle(
+                          TextSpan(
+                            text: context.l10n.agreeToTerms,
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 13,
                             ),
                           ),
                           TextSpan(
-                            text: 'Terms & Conditions',
+                            text: context.l10n.termsAndConditions,
                             style: TextStyle(
                               color: AppColors.primary500,
                               fontSize: 13,
@@ -142,7 +141,7 @@ class _RegisterViewState extends State<RegisterView> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                // handle tap here (e.g. open a web page or navigate to terms screen)
+                                // handle tap here
                               },
                           ),
                         ],
@@ -176,7 +175,7 @@ class _RegisterViewState extends State<RegisterView> {
               return;
             }
             if (state is ResendVerificationCodeError) {
-              Toast.showError("Unable to resend verification code");
+              Toast.showError(context.l10n.unableToResendVerification);
               return;
             }
             if (state is RegisterSuccess) {
@@ -197,7 +196,7 @@ class _RegisterViewState extends State<RegisterView> {
                       children: [
                         DecoratedChip(
                           backgroundColor: AppColors.secondary50,
-                          text: 'CREATE NEW ACCOUNT',
+                          text: context.l10n.createNewAccount,
                           color: AppColors.secondary600,
                         ),
                         SizedBox(
@@ -217,19 +216,19 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     Dimens.space(1),
                     Text(
-                      'Get Started',
+                      context.l10n.getStarted,
                       style:
                           Typo.heading4.copyWith(color: AppColors.neutral600),
                     ),
                     Dimens.space(1),
                     Text.rich(
                       TextSpan(
-                        text: 'Already have an account? ',
+                        text: context.l10n.alreadyHaveAccount,
                         // Default style for this text
                         style: Typo.largeBody.copyWith(),
                         children: [
                           TextSpan(
-                            text: 'Login here',
+                            text: context.l10n.loginHere,
                             style: Typo.largeBody.copyWith(
                               color: AppColors.primary400,
                               decoration: TextDecoration.underline,
@@ -247,31 +246,31 @@ class _RegisterViewState extends State<RegisterView> {
                     Dimens.space(5),
                     TextInputField(
                       prefixIcon: Iconsax.sms,
-                      label: 'Email Address',
-                      placeHolder: 'Enter your email address',
+                      label: context.l10n.emailAddress,
+                      placeHolder: context.l10n.enterEmailAddress,
                       controller: _emailCTRL,
                     ),
                     Dimens.space(1),
                     TextInputField(
                       prefixIcon: Iconsax.lock,
-                      label: 'Password',
+                      label: context.l10n.password,
                       controller: _passwordCTRL,
                       inputType: TextFieldType.password,
                       showPasswordStrengthIndicator: true,
-                      placeHolder: 'Enter your password',
+                      placeHolder: context.l10n.enterPassword,
                     ),
                     Dimens.space(1),
                     TextInputField(
                       prefixIcon: Iconsax.lock,
                       controller: _repeatPasswordCTRL,
-                      label: 'Repeat Password',
+                      label: context.l10n.repeatPassword,
                       showPasswordStrengthIndicator: true,
                       inputType: TextFieldType.password,
-                      placeHolder: 'Enter your password',
+                      placeHolder: context.l10n.enterPassword,
                     ),
                     Dimens.space(2),
                     Text(
-                      "Ensure to use at least 8 characters, with a number and a special character and uppercase letter",
+                      context.l10n.passwordRequirements,
                       style: Typo.smallBody.copyWith(
                         color: AppColors.neutral400,
                         fontSize: 14,

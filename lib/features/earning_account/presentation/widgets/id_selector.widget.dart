@@ -7,6 +7,7 @@ import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
@@ -66,7 +67,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    !isSelected ? title : 'Upload completed',
+                    !isSelected ? title : context.l10n.uploadCompleted,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
@@ -107,7 +108,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Select upload type",
+                context.l10n.selectUploadType,
                 style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
               ),
               IconButton(
@@ -145,7 +146,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                 ),
                 Dimens.space(2),
                 Text(
-                  'Open Camera',
+                  context.l10n.openCamera,
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
@@ -184,7 +185,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                 ),
                 Dimens.space(2),
                 Text(
-                  'Upload',
+                  context.l10n.upload,
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
@@ -209,17 +210,17 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Upload ID Card',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Text(
+            context.l10n.uploadIDCard,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           Text(
-            'Upload your ID card both sides',
+            context.l10n.uploadIDDescription,
             style: TextStyle(fontSize: 14, color: AppColors.neutral600),
           ),
           const SizedBox(height: 30),
           _buildIDTypeOption(
-            successText: 'front-side.png',
+            successText: context.l10n.frontSideFilename,
             onDelete: () {
               setState(() {
                 _fileFront = null;
@@ -227,8 +228,8 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
             }, // Delete Notification
 
             file: _fileFront,
-            title: 'Tap to upload ID Card Front',
-            subtitle: 'Only images supported Max: 2MB',
+            title: context.l10n.uploadIDFront,
+            subtitle: context.l10n.imageSizeLimit,
             isSelected: _fileFront != null,
             onTap: () => inIDTypeSelected(true, (file) {
               setState(() {
@@ -238,15 +239,15 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
           ),
           const SizedBox(height: 16),
           _buildIDTypeOption(
-            successText: 'back-side.png',
+            successText: context.l10n.backSideFilename,
             file: _fileBack,
             onDelete: () {
               setState(() {
                 _fileBack = null;
               });
             },
-            title: 'Tap to upload ID Card Back',
-            subtitle: 'Only images supported Max: 2MB',
+            title: context.l10n.uploadIDBack,
+            subtitle: context.l10n.imageSizeLimit,
             isSelected: _fileBack != null,
             onTap: () => inIDTypeSelected(false, (file) {
               setState(() {
@@ -282,7 +283,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
                           ),
                         );
                   } else {
-                    Toast.showError("Please upload both sides of your ID");
+                    Toast.showError(context.l10n.pleaseUploadBothSides);
                   }
                 },
               );

@@ -8,6 +8,7 @@ import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/presentation/views/permissions/request_permission.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -66,7 +67,7 @@ class _BasicInfoViewState extends State<BasicInfoView> {
                       children: [
                         DecoratedChip(
                           backgroundColor: AppColors.secondary50,
-                          text: 'CREATE NEW ACCOUNT',
+                          text: context.l10n.createNewAccount,
                           color: AppColors.secondary600,
                         ),
                         IconButton(
@@ -80,28 +81,28 @@ class _BasicInfoViewState extends State<BasicInfoView> {
                     ),
                     Dimens.space(3),
                     Text(
-                      'Personal Information',
+                      context.l10n.personalInformation,
                       style:
                           Typo.heading4.copyWith(color: AppColors.neutral600),
                     ),
                     Dimens.space(1),
 
-                    Text('Enter your full name to proceed',
+                    Text(context.l10n.enterFullName,
                         style: Typo.largeBody.copyWith()),
 
                     Dimens.space(5),
                     TextInputField(
                       prefixIcon: Iconsax.user,
-                      label: 'First Name',
+                      label: context.l10n.firstName,
                       controller: _firstNameCTRL,
-                      placeHolder: 'Enter your first name',
+                      placeHolder: context.l10n.enterFirstName,
                     ),
                     Dimens.space(1),
                     TextInputField(
                       prefixIcon: Iconsax.user,
                       controller: _lastNameCTRL,
-                      label: 'Last Name',
-                      placeHolder: 'Enter your last name',
+                      label: context.l10n.lastName,
+                      placeHolder: context.l10n.enterLastName,
                     ),
 
                     Dimens.space(2),
@@ -119,7 +120,7 @@ class _BasicInfoViewState extends State<BasicInfoView> {
                               ),
                             );
                       },
-                      text: 'Continue',
+                      text: context.l10n.continuee,
                     ),
                   ],
                 ),

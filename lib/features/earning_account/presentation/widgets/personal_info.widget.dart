@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
@@ -37,14 +39,14 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       if (_dateOfBirth == null) {
-        Toast.showError("Please select your date of birth");
+        Toast.showError(context.l10n.selectDateOfBirth);
         return;
       }
       context.read<EarningsBloc>().add(SubmitEarningsAccount(
             legalFirstName: _firstNameController.text.trim(),
             legalLastName: _lastNameController.text.trim(),
             phone: _phoneController.text.trim().replaceAll("-", ""),
-            birthday: '1999-01-01', // Replace with actual date of birth
+            birthday: DateFormat('yyyy-MM-dd').format(_dateOfBirth!)
           ));
     }
   }
@@ -71,20 +73,20 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           child: ListView(
             // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Your personal information',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text('Input your personal details as it is on your ID Card',
+              Text(context.l10n.personalInfoTitle,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(context.l10n.personalInfoDescription,
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 30),
               TextInputField(
-                label: 'First name',
-                placeHolder: 'Enter first name',
+                label: context.l10n.firstName,
+                placeHolder: context.l10n.enterFirstName,
                 controller: _firstNameController,
               ),
               const SizedBox(height: 16),
               TextInputField(
-                label: 'Last name',
-                placeHolder: 'Enter last name',
+                label: context.l10n.lastName,
+                placeHolder: context.l10n.enterLastName,
                 controller: _lastNameController,
               ),
               const SizedBox(height: 16),
@@ -107,7 +109,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
-                                child: const Text('Done'),
+                                child: Text(context.l10n.done),
                               ),
                             ),
                             Expanded(
@@ -135,16 +137,16 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 child: AbsorbPointer(
                   child: TextInputField(
                     mustValidate: false,
-                    label: 'Date of Birth',
+                    label: context.l10n.dateOfBirth,
                     placeHolder: _dateOfBirth != null
-                        ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}'
-                        : 'YYYY/MM/DD',
+                        ? DateFormat('dd/MM/yyyy').format(_dateOfBirth!)
+                        : context.l10n.dateFormat,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               PhoneField(
-                label: 'Phone number',
+                label: context.l10n.phoneNumber,
                 onChanged: (String text, String countryCode) {
                   _phoneController.text = "$countryCode$text";
                 },
@@ -156,7 +158,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   return PrimaryButton(
                     onTap: state is EarningsLoading ? null : _submitForm,
                     isLoading: state is EarningsLoading,
-                    text: "Next",
+                    text: context.l10n.next,
                   );
                 },
               ),

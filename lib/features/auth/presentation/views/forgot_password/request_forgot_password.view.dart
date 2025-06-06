@@ -9,6 +9,7 @@ import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
@@ -72,7 +73,7 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
                         email: _emailCTRL.text,
                       ));
                 },
-                text: 'Proceed',
+                text: context.l10n.proceed,
               ),
             ),
           ),
@@ -103,19 +104,19 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
                             ),
                             DecoratedChip(
                               backgroundColor: AppColors.secondary50,
-                              text: 'Get Help',
+                              text: context.l10n.getHelp,
                               color: AppColors.secondary600,
                             ),
                           ],
                         ),
                         Dimens.space(3),
                         Text(
-                          'Forgot Password',
+                          context.l10n.forgotPassword,
                           style: Typo.heading4
                               .copyWith(color: AppColors.neutral600),
                         ),
                         Dimens.space(1),
-                        Text("Enter your email address below to proceed with",
+                        Text(context.l10n.enterEmailToReset,
                             style: Typo.largeBody
                                 .copyWith(color: AppColors.neutral500)),
                         Dimens.space(5),
@@ -123,8 +124,8 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
                           prefixIcon: Iconsax.sms,
                           controller: _emailCTRL,
                           inputType: TextFieldType.email,
-                          label: 'Email Address',
-                          placeHolder: 'Enter your email address',
+                          label: context.l10n.emailAddress,
+                          placeHolder: context.l10n.enterEmailAddress,
                         ),
                       ],
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 Future<Duration?> showMMSSPicker({
   required BuildContext context,
@@ -26,18 +27,18 @@ Future<Duration?> showMMSSPicker({
                   children: [
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      child: const Text('Cancel'),
+                      child: Text(context.l10n.cancel),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
-                    const Text(
-                      'Select Duration',
+                    Text(
+                      context.l10n.selectDuration,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      child: const Text('Done'),
+                      child: Text(context.l10n.done),
                       onPressed: () {
                         Navigator.of(context).pop(
                           Duration(minutes: minutes, seconds: seconds),
@@ -88,14 +89,14 @@ Future<Duration?> showMMSSPicker({
                   ],
                 ),
               ),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Text('MIN', textAlign: TextAlign.center),
+                    child: Text(context.l10n.minutes, textAlign: TextAlign.center),
                   ),
                   Expanded(
-                    child: Text('SEC', textAlign: TextAlign.center),
+                    child: Text(context.l10n.seconds, textAlign: TextAlign.center),
                   ),
                 ],
               ),

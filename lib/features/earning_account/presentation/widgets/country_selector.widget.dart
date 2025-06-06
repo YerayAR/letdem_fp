@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 
 class CountrySelectionPage extends StatelessWidget {
@@ -19,18 +20,27 @@ class CountrySelectionPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select Country',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Text(
+            context.l10n.selectCountry,
+            style: Typo.heading4.copyWith(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           Text(
-            'Select your country of residence to continue',
-            style: TextStyle(fontSize: 14, color: AppColors.neutral600),
+            context.l10n.selectCountryDescription,
+            style: Typo.mediumBody.copyWith(
+              fontSize: 14,
+              color: AppColors.neutral600,
+            ),
           ),
           const SizedBox(height: 30),
           Text(
-            'Select Country',
-            style: TextStyle(fontSize: 16, color: AppColors.neutral600),
+            context.l10n.selectCountryLabel,
+            style: Typo.mediumBody.copyWith(
+              fontSize: 16,
+              color: AppColors.neutral600,
+            ),
           ),
           const SizedBox(height: 8),
           Container(
@@ -44,7 +54,7 @@ class CountrySelectionPage extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Iconsax.location),
               title: Text(
-                'Spain',
+                context.l10n.spain,
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.neutral600,

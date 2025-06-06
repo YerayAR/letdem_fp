@@ -100,7 +100,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                 backgroundColor: AppColors.primary50,
                                 icon: Iconsax.location,
                                 iconColor: AppColors.primary500,
-                                text: "Regular Space",
+                                text: context.l10n.regularSpace,
                                 onTap: () async {
                                   XFile? image = kDebugMode
                                       ? await imagePicker.pickImage(
@@ -121,7 +121,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                 backgroundColor: AppColors.secondary50,
                                 icon: Iconsax.money,
                                 iconColor: AppColors.secondary600,
-                                text: "Paid Space",
+                                text: context.l10n.paidSpace,
                                 onTap: () async {
                                   bool isCarExist = context
                                           .read<CarBloc>()
@@ -173,7 +173,7 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                                 // Important Notice text
                                                 Text(
-                                                  'Important Notice',
+                                                  context.l10n.importantNotice,
                                                   style: Typo.heading4.copyWith(
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -182,7 +182,7 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                                 // Description text
                                                 Text(
-                                                  'You need to create a car profile to publish a paid space. Please create a car profile first.',
+                                                  context.l10n.createCarProfileFirst,
                                                   textAlign: TextAlign.center,
                                                   style:
                                                       Typo.mediumBody.copyWith(
@@ -198,7 +198,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                                     onTap: () {
                                                       NavigatorHelper.pop();
                                                     },
-                                                    text: 'Continue',
+                                                    text: context.l10n.continuee,
                                                   ),
                                                 ),
                                               ],
@@ -254,7 +254,7 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                                 // Important Notice text
                                                 Text(
-                                                  'Important Notice',
+                                                  context.l10n.importantNotice,
                                                   style: Typo.heading4.copyWith(
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -263,7 +263,7 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                                 // Description text
                                                 Text(
-                                                  'You need to create an earning account to publish a paid space. Please create an earning account first.',
+                                                  context.l10n.createEarningAccountFirst,
                                                   textAlign: TextAlign.center,
                                                   style:
                                                       Typo.mediumBody.copyWith(
@@ -285,7 +285,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                                         ),
                                                       );
                                                     },
-                                                    text: 'Continue',
+                                                    text: context.l10n.continuee,
                                                   ),
                                                 ),
                                               ],

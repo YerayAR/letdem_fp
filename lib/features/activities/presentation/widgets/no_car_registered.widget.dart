@@ -9,6 +9,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/CarTagType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -28,14 +29,14 @@ class NoCarRegisteredWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "No Car Registered",
+                context.l10n.noCarRegistered,
                 style: Typo.largeBody.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Dimens.space(2),
               Text(
-                "Register your car with the car details\nfor safety and accessibility",
+                context.l10n.registerCarDetails,
                 style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
                 textAlign: TextAlign.center,
               ),
@@ -45,14 +46,15 @@ class NoCarRegisteredWidget extends StatelessWidget {
                   NavigatorHelper.to(const RegisterCarView());
                 },
                 child: Center(
-                    child: Text(
-                  "Tap to Register Car",
-                  style: Typo.mediumBody.copyWith(
-                    color: AppColors.primary400,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
+                  child: Text(
+                    context.l10n.tapToRegisterCar,
+                    style: Typo.mediumBody.copyWith(
+                      color: AppColors.primary400,
+                      fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
-                )),
+                ),
               )
             ],
           ),
@@ -61,6 +63,7 @@ class NoCarRegisteredWidget extends StatelessWidget {
     );
   }
 }
+
 
 CarTagType fromJsonToTag(String tagType) {
   switch (tagType.toLowerCase()) {
@@ -146,13 +149,15 @@ class _RegisterCarViewState extends State<RegisterCarView> {
                         );
                   }
                 },
-                text: widget.car != null ? "Update" : "Register",
+                text: widget.car != null ? context.l10n.update : context.l10n.register,
               ),
             ),
           ),
           appBar: AppBar(
             title: Text(
-              widget.car != null ? "Update Car Details" : "Register Car",
+              widget.car != null 
+                  ? context.l10n.updateCarDetails 
+                  : context.l10n.registerCar,
             ),
           ),
           body: Form(
@@ -161,19 +166,19 @@ class _RegisterCarViewState extends State<RegisterCarView> {
               children: [
                 TextInputField(
                   controller: _brandCTRL,
-                  label: "Brand",
-                  placeHolder: 'Enter Car Brand',
+                  label: context.l10n.brand,
+                  placeHolder: context.l10n.enterCarBrand,
                 ),
                 TextInputField(
                   controller: _plateNumberCTRL,
-                  label: "Plate Number",
-                  placeHolder: 'Enter plate number',
+                  label: context.l10n.plateNumber,
+                  placeHolder: context.l10n.enterPlateNumber,
                 ),
                 Dimens.space(2),
                 Row(
                   children: [
                     Text(
-                      "Select Tag",
+                      context.l10n.selectTag,
                       style: Typo.mediumBody.copyWith(
                         color: AppColors.neutral400,
                       ),
@@ -187,7 +192,7 @@ class _RegisterCarViewState extends State<RegisterCarView> {
                         );
                       },
                       child: Text(
-                        "What’s this?",
+                        context.l10n.whatIsThis,
                         style: Typo.mediumBody.copyWith(
                           color: AppColors.secondary600,
                           decoration: TextDecoration.underline,
@@ -262,11 +267,11 @@ class EmissionsTagScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 0, bottom: 0),
+            Padding(
+              padding: const EdgeInsets.only(top: 0, bottom: 0),
               child: Text(
-                'What Tag Means',
-                style: TextStyle(
+                context.l10n.whatTagMeans,
+                style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF3A4556),
@@ -279,42 +284,42 @@ class EmissionsTagScreen extends StatelessWidget {
                 // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildCategorySection(
-                    title: 'Eco Label',
-                    items: const [
-                      'Plug-in hybrids with an electric range of less than 40 km.',
-                      'Non-plug-in hybrids (HEV).',
-                      'Gas-powered vehicles (LPG, CNG, or LNG).',
+                    title: context.l10n.ecoLabel,
+                    items: [
+                      context.l10n.ecoLabelPluginHybrids,
+                      context.l10n.ecoLabelNonPluginHybrids,
+                      context.l10n.ecoLabelGasPowered,
                     ],
                   ),
                   _buildCategorySection(
-                    title: 'Zero Emmission Label',
-                    items: const [
-                      '100% electric vehicles (BEV).',
-                      'Plug-in hybrids (PHEV) with an electric range of more than 40 km.',
-                      'Hydrogen-powered vehicles.',
+                    title: context.l10n.zeroEmissionLabel,
+                    items: [
+                      context.l10n.zeroLabelElectric,
+                      context.l10n.zeroLabelPluginHybrids,
+                      context.l10n.zeroLabelHydrogen,
                     ],
                   ),
                   _buildCategorySection(
-                    title: 'B Label Yellow',
-                    items: const [
-                      'Petrol cars and vans registered from January 2001 onwards.',
-                      'Diesel cars and vans registered from January 2006 onwards.',
-                      'Industrial vehicles and buses registered from 2005 onwards.',
+                    title: context.l10n.bLabelYellow,
+                    items: [
+                      context.l10n.bLabelPetrol,
+                      context.l10n.bLabelDiesel,
+                      context.l10n.bLabelIndustrial,
                     ],
                   ),
                   _buildCategorySection(
-                    title: 'C Label Green',
-                    items: const [
-                      'Petrol cars and vans registered from January 2006 onwards.',
-                      'Diesel cars and vans registered from September 2015 onwards.',
-                      'Industrial vehicles and buses registered from 2014 onwards.',
+                    title: context.l10n.cLabelGreen,
+                    items: [
+                      context.l10n.cLabelPetrol,
+                      context.l10n.cLabelDiesel,
+                      context.l10n.cLabelIndustrial,
                     ],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
-                      'No Label',
-                      style: TextStyle(
+                      context.l10n.noLabel,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -327,7 +332,7 @@ class EmissionsTagScreen extends StatelessWidget {
             ),
             Dimens.space(2),
             PrimaryButton(
-              text: 'Got it',
+              text: context.l10n.gotIt,
               onTap: () {
                 NavigatorHelper.pop();
               },
@@ -338,29 +343,31 @@ class EmissionsTagScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategorySection(
-      {required String title, required List<String> items}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+Widget _buildCategorySection({
+  required String title,
+  required List<String> items,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
-          ...items.map((item) => _buildBulletPoint(item)),
-        ],
-      ),
-    );
-  }
+        ),
+        ...items.map((item) => _buildBulletPoint(item)),
+      ],
+    ),
+  );
+}
 
   Widget _buildBulletPoint(String text) {
     return Padding(

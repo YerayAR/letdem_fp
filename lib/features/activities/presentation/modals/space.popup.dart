@@ -12,6 +12,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
@@ -102,7 +103,7 @@ class SpacePopupSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildStreetAndDistance() {
+  Widget _buildStreetAndDistance(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,7 +119,7 @@ class SpacePopupSheet extends StatelessWidget {
         ),
         DecoratedChip(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          text: '${_distanceToSpace()} away',
+          text: '${_distanceToSpace()} ${context.l10n.away}',
           textStyle: Typo.smallBody.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.green600,
@@ -166,7 +167,7 @@ class SpacePopupSheet extends StatelessWidget {
                 Image.asset(getCardIcon(method.brand), width: 40, height: 40),
                 Dimens.space(1),
                 Text(
-                  '${method.brand}  ending with ${method.last4}',
+                  context.l10n.cardEndingWith(method.brand, method.last4),
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w600),
                 ),
@@ -184,7 +185,7 @@ class SpacePopupSheet extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Add payment method',
+                    context.l10n.addPaymentMethod,
                     style: Typo.mediumBody.copyWith(
                       color: AppColors.primary500,
                       decoration: TextDecoration.underline,
@@ -211,10 +212,9 @@ class SpacePopupSheet extends StatelessWidget {
                   details: state.spaceID,
                 ));
               },
-              title: 'Payment Successful',
-              subtext:
-                  'You have successfully reserved a paid space. You can get the details by clicking below.',
-              buttonText: 'Get Details of space',
+              title: context.l10n.paymentSuccessful,
+              subtext: context.l10n.spaceReservedSuccess,
+              buttonText: context.l10n.getSpaceDetails,
             ),
           );
         } else if (state is ActivitiesError) {
@@ -225,7 +225,9 @@ class SpacePopupSheet extends StatelessWidget {
         return PrimaryButton(
           icon: space.isPremium ? null : Iconsax.location5,
           isLoading: state is ActivitiesLoading,
-          text: space.isPremium ? 'Reserve space' : 'Navigate to space',
+          text: space.isPremium 
+              ? context.l10n.reserveSpace 
+              : context.l10n.navigateToSpace,
           onTap: () {
             if (space.isPremium) {
               if (context.userProfile!.defaultPaymentMethod == null) {

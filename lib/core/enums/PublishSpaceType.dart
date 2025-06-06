@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:letdem/core/constants/assets.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 enum PublishSpaceType {
   free,
@@ -12,45 +14,46 @@ enum PublishSpaceType {
   paidGreenZone,
 }
 
-String getSpaceTypeText(PublishSpaceType type) {
+String getSpaceTypeText(PublishSpaceType type, BuildContext context) {
   switch (type) {
     case PublishSpaceType.free:
-      return 'Free';
+      return context.l10n.freeSpace;
     case PublishSpaceType.blueZone:
-      return 'Blue Zone';
+      return context.l10n.blueZone;
     case PublishSpaceType.disabled:
-      return 'Disabled';
+      return context.l10n.disabledSpace;
     case PublishSpaceType.greenZone:
-      return 'Green';
+      return context.l10n.greenZone;
     case PublishSpaceType.paidFree:
-      return 'Paid Free';
+      return context.l10n.paidFreeSpace;
     case PublishSpaceType.paidBlue:
-      return 'Paid Blue Zone';
+      return context.l10n.paidBlueZone;
     case PublishSpaceType.paidDisabled:
-      return 'Paid Disabled';
+      return context.l10n.paidDisabledSpace;
     case PublishSpaceType.paidGreenZone:
-      return 'Paid Green Zone';
+      return context.l10n.paidGreenZone;
   }
 }
 
-String getSpaceAvailabilityMessage(PublishSpaceType spaceType) {
+
+String getSpaceAvailabilityMessage(PublishSpaceType spaceType, BuildContext context) {
   switch (spaceType) {
     case PublishSpaceType.free:
-      return 'Free';
+      return context.l10n.freeSpace;
     case PublishSpaceType.blueZone:
-      return 'Blue Zone';
+      return context.l10n.blueZone;
     case PublishSpaceType.disabled:
-      return 'Disabled';
+      return context.l10n.disabledSpace;
     case PublishSpaceType.greenZone:
-      return 'Green Zone';
+      return context.l10n.greenZone;
     case PublishSpaceType.paidFree:
-      return 'Free';
+      return context.l10n.freeSpace;
     case PublishSpaceType.paidBlue:
-      return 'Blue Zone';
+      return context.l10n.blueZone;
     case PublishSpaceType.paidDisabled:
-      return 'Disabled';
+      return context.l10n.disabledSpace;
     case PublishSpaceType.paidGreenZone:
-      return 'Green Zone';
+      return context.l10n.greenZone;
   }
 }
 

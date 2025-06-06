@@ -6,6 +6,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
@@ -57,7 +58,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Contributions',
+          context.l10n.contributions,
           style: Typo.mediumBody.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -68,7 +69,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
               NavigatorHelper.to(const ViewAllView());
             },
             child: Text(
-              'Show All',
+              context.l10n.showAll,
               style: Typo.smallBody.copyWith(
                 color: AppColors.primary500,
                 fontWeight: FontWeight.w600,
@@ -141,7 +142,7 @@ class NotificationAppBar extends StatelessWidget {
                 ),
               ),
             ),
-      title: 'Activities',
+      title: context.l10n.activities,
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       icon: Iconsax.notification5,
     );
