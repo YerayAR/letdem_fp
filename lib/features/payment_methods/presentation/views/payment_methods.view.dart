@@ -66,6 +66,8 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                               return _buildCardItem(
                                 cardId: paymentMethod.paymentMethodId,
                                 last4: paymentMethod.last4,
+                                expireDate:
+                                    '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
                                 cardType: paymentMethod.brand,
                                 holderName: paymentMethod.holderName,
                                 isDefault: paymentMethod.isDefault,
@@ -105,6 +107,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     required String holderName,
     required String cardId,
     required bool isDefault,
+    required String expireDate,
     required String last4,
     required VoidCallback onMenuTap,
   }) {
@@ -162,7 +165,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             ],
           ),
           Text(
-            'Expire Date: March, 2026',
+            'Expire Date: $expireDate',
             style: Typo.smallBody.copyWith(
                 fontWeight: FontWeight.w500, color: AppColors.neutral400),
           ),
@@ -249,120 +252,58 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             color: AppColors.neutral50,
           ),
           Dimens.space(1),
-          GestureDetector(
-            onTap: () {
-              context.read<PaymentMethodBloc>().add(
-                    RemovePaymentMethod(cardId),
-                  );
+          BlocConsumer<PaymentMethodBloc, PaymentMethodState>(
+            listener: (context, state) {
+              if (state is PaymentMethodError) {
+                Toast.showError(state.message);
+              }
+              if (state is PaymentMethodLoaded && !(state.isDeleting)) {
+                Navigator.of(context).pop();
+              }
+              // TODO: implement listener
             },
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 17,
-                  backgroundColor: AppColors.red50,
-                  child: Icon(
-                    Iconsax.trash,
-                    color: AppColors.red500,
-                    size: 17,
-                  ),
+            builder: (context, state) {
+              return GestureDetector(
+                onTap: () {
+                  context.read<PaymentMethodBloc>().add(
+                        RemovePaymentMethod(cardId),
+                      );
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 17,
+                      backgroundColor: AppColors.red50,
+                      child: Icon(
+                        Iconsax.trash,
+                        color: AppColors.red500,
+                        size: 17,
+                      ),
+                    ),
+                    Dimens.space(2),
+                    Text("Delete",
+                        style: Typo.largeBody.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.neutral600,
+                        )),
+                    if (context.read<PaymentMethodBloc>().state
+                            is PaymentMethodLoaded &&
+                        (context.read<PaymentMethodBloc>().state
+                                as PaymentMethodLoaded)
+                            .isDeleting)
+                      Row(
+                        children: [
+                          Dimens.space(1),
+                          const CupertinoActivityIndicator(
+                            radius: 8,
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-                Dimens.space(2),
-                Text("Delete",
-                    style: Typo.largeBody.copyWith(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.neutral600,
-                    )),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDeleteConfirmationDialog() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.warning_amber_rounded,
-              size: 32,
-              color: Colors.amber.shade600,
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Confirm Delete Card',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Are you sure you want to delete Card ending with 0967? This action cannot be undone.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                showDeleteConfirmation = false;
-              });
+              );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'No, Keep Card',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                showDeleteConfirmation = false;
-              });
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-              minimumSize: const Size(double.infinity, 50),
-            ),
-            child: const Text(
-              'Yes, Delete Card',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ),
         ],
       ),

@@ -27,7 +27,7 @@ final class PaymentMethodLoaded extends PaymentMethodState {
   }) {
     return PaymentMethodLoaded(
       paymentMethods: paymentMethods ?? this.paymentMethods,
-      isDeleting: isDeleting ?? this.isDeleting,
+      isDeleting: isDeleting != null ? isDeleting : this.isDeleting,
       isSettingDefault: isSettingDefault ?? this.isSettingDefault,
     );
   }

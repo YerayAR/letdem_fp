@@ -94,22 +94,10 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return Container(
-                        height: 300,
+                        height: 400,
                         color: Colors.white,
                         child: Column(
                           children: [
-                            // Done button
-                            Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Done'),
-                              ),
-                            ),
                             Expanded(
                               child: CupertinoDatePicker(
                                 mode: CupertinoDatePickerMode.date,
@@ -126,6 +114,20 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                                 },
                               ),
                             ),
+                            SafeArea(
+                              child: Material(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 0),
+                                  child: PrimaryButton(
+                                    text: 'Done',
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       );
@@ -134,6 +136,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 },
                 child: AbsorbPointer(
                   child: TextInputField(
+                    placeholderColor: AppColors.neutral600,
                     mustValidate: false,
                     label: 'Date of Birth',
                     placeHolder: _dateOfBirth != null

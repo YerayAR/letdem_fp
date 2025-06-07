@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/features/users/user_bloc.dart';
@@ -378,9 +378,10 @@ class EmptyOrdersView extends StatelessWidget {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.white,
-            child: Icon(
-              Iconsax.notification5,
-              size: 40,
+            child: SvgPicture.asset(
+              AppAssets.location,
+              width: 40,
+              height: 40,
               color: AppColors.primary500,
             ),
           ),

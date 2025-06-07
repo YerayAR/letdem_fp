@@ -49,6 +49,9 @@ class ErrorMessageHelper {
     'BALANCE_LOWER_THAN_MINIMUM':
         'Your balance is below the minimum payout threshold.',
     'PAYOUT_METHOD_NOT_FOUND': 'Payout method not found.',
+    'PAYMENT_REQUIRES_ACTION':
+        'Payment requires additional action. Please check your payment method.',
+    'PAYMENT_FAILED': 'Payment failed. Please try again later.',
 
     // Events
     'EVENT_PUBLICATION_ERROR': 'An error occurred while publishing the event.',
@@ -82,6 +85,7 @@ class ErrorMessageHelper {
     'INVALID_CURRENT_PASSWORD': 'La contraseña actual es incorrecta.',
     'REPEATED_PASSWORD':
         'La nueva contraseña no puede ser igual a la anterior.',
+
     'INACTIVE_ACCOUNT': 'Tu cuenta está inactiva.',
     'EMAIL_ALREADY_EXISTS': 'Este correo electrónico ya está registrado.',
     'INVALID_SOCIAL_TOKEN': 'Token de inicio de sesión social inválido.',
@@ -114,6 +118,9 @@ class ErrorMessageHelper {
     'BALANCE_LOWER_THAN_MINIMUM':
         'Tu saldo está por debajo del mínimo para retiros.',
     'PAYOUT_METHOD_NOT_FOUND': 'Método de retiro no encontrado.',
+    'PAYMENT_REQUIRES_ACTION':
+        'El pago requiere una acción adicional. Verifica tu método de pago.',
+    'PAYMENT_FAILED': 'El pago falló. Intenta nuevamente más tarde.',
 
     // Events
     'EVENT_PUBLICATION_ERROR': 'Error al publicar el evento.',

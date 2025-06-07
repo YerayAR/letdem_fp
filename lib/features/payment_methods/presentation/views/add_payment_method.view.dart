@@ -86,13 +86,33 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                     Divider(height: 1, color: Colors.grey.shade300),
                     Dimens.space(2),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(1),
                       child: Column(
                         children: [
                           CardField(
                             controller: controller,
                             decoration: InputDecoration(
-                              border: InputBorder.none,
+                              disabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade300.withOpacity(0.2),
+                                  width: 1,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400.withOpacity(0.6),
+                                  width: 1,
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade300.withOpacity(0.2),
+                                  width: 1,
+                                ),
+                              ),
                               hintText: 'Card number',
                               hintStyle: TextStyle(color: Colors.grey.shade400),
                             ),
@@ -140,7 +160,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                                   'Please complete the card details',
                                 );
                               },
-                        text: 'Next',
+                        text: 'Create',
                       ),
                     ),
                     const SizedBox(height: 24),

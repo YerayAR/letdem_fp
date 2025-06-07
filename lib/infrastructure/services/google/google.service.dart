@@ -8,6 +8,7 @@ class GoogleAuthService {
     try {
       // logout user
 
+      await _googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
 
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();

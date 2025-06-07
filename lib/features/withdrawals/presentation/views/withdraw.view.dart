@@ -5,6 +5,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/presentation/empty_states/empty_payout.view.dart';
 import 'package:letdem/features/payout_methods/presentation/views/add/add_payout.view.dart';
@@ -177,6 +178,13 @@ class _WithdrawViewState extends State<WithdrawView> {
                 isLoading:
                     context.watch<WithdrawalBloc>().state is WithdrawalLoading,
                 onTap: () {
+                  if (context.userProfile!.earningAccount!.availableBalance <=
+                      0) {
+                    Toast.showError(
+                        'You do not have enough balance to withdraw');
+                    return;
+                  }
+
                   context
                       .read<WithdrawalBloc>()
                       .add(WithdrawMoneyEvent(selectedMethod!, amount));

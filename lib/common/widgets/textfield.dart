@@ -32,9 +32,12 @@ class TextInputField extends StatefulWidget {
   final bool showDeleteIcon;
 
   final Widget? child;
+
+  final Color? placeholderColor;
   const TextInputField({
     super.key,
     this.controller,
+    this.placeholderColor,
     this.inputFormatters,
     required this.label,
     this.isEnabled = true,
@@ -213,7 +216,7 @@ class TextInputFieldState extends State<TextInputField> {
                             ),
                   hintText: widget.placeHolder,
                   hintStyle: Typo.largeBody.copyWith(
-                    color: AppColors.neutral300,
+                    color: widget.placeholderColor ?? AppColors.neutral300,
                     fontWeight: FontWeight.w500,
                   ),
                   errorStyle: Typo.smallBody.copyWith(
