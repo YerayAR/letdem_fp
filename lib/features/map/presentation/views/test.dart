@@ -10,6 +10,7 @@ import 'package:here_sdk/routing.dart' as HERE;
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
@@ -103,7 +104,7 @@ class _NavigationViewState extends State<NavigationView> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         setState(() {
-          _errorMessage = "Location permission denied";
+          _errorMessage = context.l10n.locationPermissionDenied;
           _isLoading = false;
         });
         return;
@@ -112,8 +113,7 @@ class _NavigationViewState extends State<NavigationView> {
 
     if (permission == LocationPermission.deniedForever) {
       setState(() {
-        _errorMessage =
-            "Location permissions permanently denied, please enable in settings";
+        _errorMessage = context.l10n.locationPermissionPermanentlyDenied;
         _isLoading = false;
       });
       return;
@@ -140,7 +140,7 @@ class _NavigationViewState extends State<NavigationView> {
         if (error != null) {
           debugPrint('❌ Map scene not loaded. MapError: ${error.toString()}');
           setState(() {
-            _errorMessage = "Failed to load map";
+            _errorMessage = context.l10n.failedToLoadMap;
             _isLoading = false;
           });
           return;
@@ -200,7 +200,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of LocationEngine failed.');
       setState(() {
-        _errorMessage = "Failed to initialize location services";
+        _errorMessage = context.l10n.failedToInitializeLocationServices;
         _isLoading = false;
       });
     }
@@ -240,7 +240,7 @@ class _NavigationViewState extends State<NavigationView> {
     } catch (e) {
       debugPrint('❌ Error getting current location: $e');
       setState(() {
-        _errorMessage = "Failed to get current location";
+        _errorMessage = context.l10n.failedToGetCurrentLocation;
         _isLoading = false;
       });
     }
@@ -278,7 +278,7 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _showDistanceTriggerToast() {
     Toast.show(
-      "You have traveled $_distanceTraveled meters",
+      context.l10n.youHaveTraveled(_distanceTraveled),
     );
 
     debugPrint('🚶 Distance trigger: $_distanceTraveled meters traveled');
@@ -323,7 +323,7 @@ class _NavigationViewState extends State<NavigationView> {
     } catch (e) {
       debugPrint('❌ Failed to set up location simulation: $e');
       setState(() {
-        _errorMessage = "Failed to start navigation simulation";
+        _errorMessage = context.l10n.failedToStartNavigationSimulation;
         _isLoading = false;
       });
     }
@@ -339,7 +339,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of RoutingEngine failed.');
       setState(() {
-        _errorMessage = "Failed to initialize routing";
+        _errorMessage = context.l10n.failedToInitializeRouting;
         _isLoading = false;
       });
       return;
@@ -374,7 +374,7 @@ class _NavigationViewState extends State<NavigationView> {
           final error = routingError?.toString() ?? "Unknown error";
           debugPrint('❌ Error while calculating route: $error');
           setState(() {
-            _errorMessage = "Could not calculate route. Please try again.";
+            _errorMessage = context.l10n.couldNotCalculateRoute;
             _isLoading = false;
           });
         }
@@ -392,7 +392,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of VisualNavigator failed.');
       setState(() {
-        _errorMessage = "Failed to initialize navigation";
+        _errorMessage = context.l10n.failedToInitializeNavigation;
         _isNavigating = false;
       });
       return;
@@ -573,14 +573,13 @@ class _NavigationViewState extends State<NavigationView> {
           child: Column(
             children: [
               Text(
-                "${(_totalRouteTime.toFormattedTime())} ($_totalRouteDistance m)",
+                "${(_totalRouteTime.toFormattedTime(context))} ($_totalRouteDistance m)",
                 style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
-                semanticsLabel:
-                    "Estimated arrival in ${_totalRouteTime.toFormattedTime()} with $_totalRouteDistance meters remaining",
+                semanticsLabel: context.l10n.estimatedArrival(_totalRouteTime.toFormattedTime(context), _totalRouteDistance),
               ),
             ],
           ),
@@ -594,7 +593,7 @@ class _NavigationViewState extends State<NavigationView> {
           backgroundColor: AppColors.red500,
           child: IconButton(
             icon: const Icon(Icons.add, color: Colors.white),
-            tooltip: "Add event",
+            tooltip: context.l10n.addEvent,
             onPressed: () {
               AppPopup.showBottomSheet(context, const AddEventBottomSheet());
             },
@@ -623,7 +622,7 @@ class _NavigationViewState extends State<NavigationView> {
           ],
         ),
         child: Text(
-          "Distance traveled: $_distanceTraveled m",
+          context.l10n.distanceTraveled(_distanceTraveled),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
@@ -634,17 +633,17 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   Widget _buildLoadingIndicator() {
-    return const Center(
+    return Center(
       child: Card(
         color: Colors.white,
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text("Preparing your navigation..."),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(context.l10n.preparingYourNavigation),
             ],
           ),
         ),
@@ -673,7 +672,7 @@ class _NavigationViewState extends State<NavigationView> {
                   });
                   _startNavigation();
                 },
-                child: const Text("Try Again"),
+                child: Text(context.l10n.tryAgain),
               ),
             ],
           ),
@@ -727,17 +726,25 @@ class _NavigationViewState extends State<NavigationView> {
 
 // Extension to parse seconds to minutes and seconds
 extension TimeFormatter on int {
-  String toFormattedTime() {
+  String toFormattedTime(BuildContext context) {
     if (this < 60) {
-      return "$this seconds";
+      return context.l10n.seconds(this);
     } else if (this < 3600) {
       final minutes = (this / 60).floor();
       final seconds = this % 60;
-      return seconds > 0 ? "$minutes min $seconds sec" : "$minutes minutes";
+      if (seconds > 0) {
+        return context.l10n.minutesAndSeconds(minutes, seconds);
+      } else {
+        return context.l10n.minutesOnly(minutes);
+      }
     } else {
       final hours = (this / 3600).floor();
       final minutes = ((this % 3600) / 60).floor();
-      return minutes > 0 ? "$hours hr $minutes min" : "$hours hours";
+      if (minutes > 0) {
+        return context.l10n.hoursAndMinutes(hours, minutes);
+      } else {
+        return context.l10n.hoursOnly(hours);
+      }
     }
   }
 }

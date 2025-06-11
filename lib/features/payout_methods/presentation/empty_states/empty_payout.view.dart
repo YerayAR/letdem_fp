@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 class EmptyPayoutMethodView extends StatelessWidget {
   const EmptyPayoutMethodView({super.key});
@@ -22,16 +23,16 @@ class EmptyPayoutMethodView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No Payout Methods Yet',
-            style: TextStyle(
+          Text(
+            context.l10n.noPayoutMethodsYet,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'Your added payout methods will appear\nhere once you set them up in your profile',
+            context.l10n.payoutMethodsDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

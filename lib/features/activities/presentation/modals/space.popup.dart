@@ -69,9 +69,9 @@ class SpacePopupSheet extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTypeRow(),
+              _buildTypeRow(context),
               Dimens.space(1),
-              _buildStreetAndDistance(),
+              _buildStreetAndDistance(context),
               Dimens.space(1),
               _buildExpirationBadge(),
             ],
@@ -81,14 +81,14 @@ class SpacePopupSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeRow() {
+  Widget _buildTypeRow(BuildContext context) {
     return Row(
       children: [
         SvgPicture.asset(getSpaceTypeIcon(space.type), width: 20, height: 20),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            getSpaceAvailabilityMessage(space.type),
+            getSpaceAvailabilityMessage(space.type, context),
             style: Typo.largeBody.copyWith(fontWeight: FontWeight.w800),
             overflow: TextOverflow.ellipsis,
           ),
@@ -119,7 +119,7 @@ class SpacePopupSheet extends StatelessWidget {
         ),
         DecoratedChip(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          text: '${_distanceToSpace()} ${context.l10n.away}',
+          text: '${_distanceToSpace(context)} ${context.l10n.away}',
           textStyle: Typo.smallBody.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.green600,
@@ -258,7 +258,7 @@ class SpacePopupSheet extends StatelessWidget {
     );
   }
 
-  String _distanceToSpace() {
+  String _distanceToSpace(BuildContext context) {
     return parseMeters(geolocator.Geolocator.distanceBetween(
       currentPosition.latitude,
       currentPosition.longitude,

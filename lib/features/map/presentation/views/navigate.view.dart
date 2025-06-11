@@ -23,6 +23,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/time.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
@@ -180,7 +181,7 @@ class _NavigationViewState extends State<NavigationView> {
                     ),
                   ),
                   Text(
-                    "Km/h",
+                    context.l10n.kmPerHour,
                     style: TextStyle(
                       color: Colors.grey.shade700,
                       fontSize: 10,
@@ -235,8 +236,8 @@ class _NavigationViewState extends State<NavigationView> {
 
     AlertHelper.showWarning(
       context: context,
-      title: 'Speed Limit Alert',
-      subtext: 'You are driving at speed limit, slow down',
+      title: context.l10n.speedLimitAlert,
+      subtext: context.l10n.speedLimitWarning,
     );
 
     // Optionally use text-to-speech for alert
@@ -314,7 +315,7 @@ class _NavigationViewState extends State<NavigationView> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         setState(() {
-          _errorMessage = "Location permission denied";
+          _errorMessage = context.l10n.locationPermissionDenied;
           _isLoading = false;
         });
         return;
@@ -323,8 +324,7 @@ class _NavigationViewState extends State<NavigationView> {
 
     if (permission == LocationPermission.deniedForever) {
       setState(() {
-        _errorMessage =
-            "Location permissions permanently denied, please enable in settings";
+        _errorMessage = context.l10n.locationPermissionDeniedPermanently;
         _isLoading = false;
       });
       return;
@@ -434,7 +434,7 @@ class _NavigationViewState extends State<NavigationView> {
         if (error != null) {
           debugPrint('❌ Map scene not loaded. MapError: ${error.toString()}');
           setState(() {
-            _errorMessage = "Failed to load map";
+            _errorMessage = context.l10n.failedToLoadMap;
             _isLoading = false;
           });
           return;
@@ -513,7 +513,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of LocationEngine failed.');
       setState(() {
-        _errorMessage = "Failed to initialize location services";
+        _errorMessage = context.l10n.failedToInitializeLocation;
         _isLoading = false;
       });
     }
@@ -656,7 +656,7 @@ class _NavigationViewState extends State<NavigationView> {
                               ),
                               Dimens.space(1),
                               Text(
-                                getSpaceAvailabilityMessage(space.type),
+                                getSpaceAvailabilityMessage(space.type, context),
                                 style: Typo.largeBody
                                     .copyWith(fontWeight: FontWeight.w800),
                               ),
@@ -694,7 +694,7 @@ class _NavigationViewState extends State<NavigationView> {
                 Dimens.space(2),
                 PrimaryButton(
                   icon: IconlyBold.location,
-                  text: 'Navigate to Space',
+                  text: context.l10n.navigateToSpaceButton,
                   onTap: () {
                     // Close the popup first
                     Navigator.pop(context);
@@ -724,7 +724,7 @@ class _NavigationViewState extends State<NavigationView> {
                               space.location.point.lng));
 
                       // Show toast notification
-                      _showToast("Navigating to parking space",
+                      _showToast(context.l10n.navigatingToParking,
                           backgroundColor: AppColors.primary500);
                     }
                   },
@@ -870,7 +870,7 @@ class _NavigationViewState extends State<NavigationView> {
           final error = routingError?.toString() ?? "Unknown error";
           debugPrint('❌ Error while calculating route: $error');
           setState(() {
-            _errorMessage = "Could not calculate route. Please try again.";
+            _errorMessage = context.l10n.navigationError;
             _isLoading = false;
           });
         }
@@ -891,7 +891,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of VisualNavigator failed.');
       setState(() {
-        _errorMessage = "Failed to initialize navigation";
+        _errorMessage = context.l10n.failedToInitNavigation;
         _isNavigating = false;
       });
       return;
@@ -1005,14 +1005,12 @@ class _NavigationViewState extends State<NavigationView> {
             _hasShownFatigueAlert = true;
             AlertHelper.showWarning(
               context: context,
-              title: 'Fatigue Alert',
-              subtext:
-                  'You have been driving for 3 hours. Please consider taking a break.',
+              title: context.l10n.fatigueAlertTitle,
+              subtext: context.l10n.fatigueAlertMessage,
             );
 
             if (!_isMuted) {
-              speech.speak(
-                  "You have been driving for three hours. Please take a rest.");
+              speech.speak(context.l10n.fatigueAlertVoice);
             }
           }
         }
@@ -1127,7 +1125,7 @@ class _NavigationViewState extends State<NavigationView> {
 
         // Show toast to inform user
         _showToast(
-          "Recalculating route...",
+          context.l10n.recalculatingRoute,
           backgroundColor: AppColors.red500,
         );
 
@@ -1207,7 +1205,7 @@ class _NavigationViewState extends State<NavigationView> {
 
             // Show error toast
             _showToast(
-              "Could not recalculate route",
+              context.l10n.couldNotRecalculateRoute,
               backgroundColor: AppColors.red500,
             );
           }
@@ -1229,7 +1227,7 @@ class _NavigationViewState extends State<NavigationView> {
     // Fallback to current road name if next is unavailable
     name ??= maneuver.roadTexts.names.getDefaultValue();
 
-    return name ?? 'Unnamed Road';
+    return name ?? context.l10n.unnamedRoad;
   }
 
   void _setupLocationSource(
@@ -1290,7 +1288,7 @@ class _NavigationViewState extends State<NavigationView> {
     } catch (e) {
       debugPrint('❌ Failed to set up location simulation: $e');
       setState(() {
-        _errorMessage = "Failed to start navigation visualization";
+        _errorMessage = context.l10n.failedToStartNavigation;
         _isNavigating = false;
         _isLoading = false;
       });
@@ -1382,7 +1380,7 @@ class _NavigationViewState extends State<NavigationView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${_nextManuoverDistance.toFormattedDistance()} ahead',
+                      '${_nextManuoverDistance.toFormattedDistance()} ${context.l10n.ahead}',
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -1464,7 +1462,7 @@ class _NavigationViewState extends State<NavigationView> {
             child: Column(
               children: [
                 Text(
-                  "${(_totalRouteTime.toFormattedTime())} (${_distanceNotifier.value.toFormattedDistance()})",
+                  "${(_totalRouteTime.toFormattedTime(context))} (${_distanceNotifier.value.toFormattedDistance()})",
                   style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -1484,7 +1482,7 @@ class _NavigationViewState extends State<NavigationView> {
           backgroundColor: AppColors.red500,
           child: IconButton(
             icon: const Icon(Icons.add, color: Colors.white),
-            tooltip: "Add event",
+            tooltip: context.l10n.addEvent,
             onPressed: () {
               AppPopup.showBottomSheet(context, const AddEventBottomSheet());
             },
@@ -1498,14 +1496,14 @@ class _NavigationViewState extends State<NavigationView> {
     return Center(
       child: Container(
         color: Colors.white,
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text("Preparing your navigation..."),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(context.l10n.preparingNavigation),
             ],
           ),
         ),
@@ -1534,7 +1532,7 @@ class _NavigationViewState extends State<NavigationView> {
                   });
                   _startNavigation();
                 },
-                child: const Text("Try Again"),
+                child: Text(context.l10n.tryAgain),
               ),
             ],
           ),
@@ -1555,10 +1553,12 @@ class _NavigationViewState extends State<NavigationView> {
             for (var alert in state.payload.alerts) {
               AlertHelper.showWarning(
                 context: context,
-                title: "${toBeginningOfSentenceCase(alert.type)} Alert",
+                title: alert.type.toLowerCase() == "camera"
+                    ? context.l10n.cameraAlertTitle
+                    : context.l10n.radarAlertTitle,
                 subtext: alert.type.toLowerCase() == "camera"
-                    ? "You are in a CCTV Camera surveillance zone "
-                    : "You are approaching a nearby radar zone",
+                    ? context.l10n.cameraAlertMessage
+                    : context.l10n.radarAlertMessage,
               );
             }
           }
@@ -1590,8 +1590,9 @@ class _NavigationViewState extends State<NavigationView> {
                             : Colors.grey,
                       ),
                       onPressed: _toggleCameraTracking,
-                      tooltip:
-                          _isCameraLocked ? "Free camera" : "Lock to position",
+                      tooltip: _isCameraLocked
+                          ? context.l10n.freeCameraMode
+                          : context.l10n.lockPositionMode,
                     ),
                   ),
                 ),

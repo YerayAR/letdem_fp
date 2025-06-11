@@ -63,7 +63,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   }
 
   Widget _buildAppBar() {
-    return const StyledAppBar(
+    return StyledAppBar(
       title: context.l10n.spaceDetails,
       onTap: NavigatorHelper.pop,
       icon: Iconsax.close_circle5,
@@ -102,7 +102,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           ),
           const SizedBox(height: 12),
           Text(
-            getSpaceAvailabilityMessage(widget.payload.space.type),
+            getSpaceAvailabilityMessage(widget.payload.space.type, context),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -212,7 +212,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
             NavigatorHelper.pop();
             AppPopup.showBottomSheet(
               context,
-              const SuccessDialog(
+              SuccessDialog(
                 title: context.l10n.spaceReserved,
                 subtext: context.l10n.spaceReservedSuccessfully,
                 onProceed: NavigatorHelper.popAll,

@@ -68,26 +68,26 @@ class ActiveReservationView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             Dimens.space(2),
-            _buildDetailsRow(),
+            _buildDetailsRow(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildTypeInfo(),
-        _buildStatusInfo(),
+        _buildTypeInfo(context),
+        _buildStatusInfo(context),
       ],
     );
   }
 
-  Widget _buildTypeInfo() {
+  Widget _buildTypeInfo(BuildContext context) {
     return Row(
       children: [
         SvgPicture.asset(
@@ -97,7 +97,7 @@ class ActiveReservationView extends StatelessWidget {
         ),
         Dimens.space(1),
         Text(
-          getSpaceAvailabilityMessage(payload.space.type),
+          getSpaceAvailabilityMessage(payload.space.type, context),
           style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
         ),
       ],

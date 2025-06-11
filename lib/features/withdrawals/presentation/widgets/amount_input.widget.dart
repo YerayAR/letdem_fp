@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 
 class AmountInputCard extends StatefulWidget {
@@ -34,7 +35,8 @@ class _AmountInputCardState extends State<AmountInputCard> {
     final entered = double.tryParse(value) ?? 0;
 
     if (entered > balance) {
-      setState(() => _errorText = 'Amount cannot exceed €$balance');
+      setState(() =>
+          _errorText = context.l10n.amountCannotExceed(balance.toString()));
       widget.onChange?.call('0');
       return;
     } else {
@@ -61,7 +63,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Amount to receive',
+            context.l10n.amountToReceive,
             style: Typo.mediumBody.copyWith(
               color: Colors.black.withOpacity(0.6),
             ),
@@ -105,7 +107,9 @@ class _AmountInputCardState extends State<AmountInputCard> {
           Dimens.space(1),
           Text(
             _errorText ??
-                '€${context.userProfile!.earningAccount?.pendingBalance.toStringAsFixed(2)} Pending to be cleared',
+                context.l10n.pendingToBeCleared(context
+                    .userProfile!.earningAccount!.pendingBalance
+                    .toStringAsFixed(2)),
             style: Typo.mediumBody.copyWith(
               fontSize: 11,
               color:

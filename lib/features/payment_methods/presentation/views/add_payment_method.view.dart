@@ -54,8 +54,8 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
               AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(
-                    title: 'Payment Method Added',
-                    subtext: 'Your payment method has been successfully added.',
+                    title: context.l10n.paymentMethodAdded,
+                    subtext: context.l10n.paymentMethodAddedDescription,
                     onProceed: () {
                       NavigatorHelper.pop();
                       NavigatorHelper.pop();
@@ -74,7 +74,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                   children: [
                     StyledAppBar(
                       onTap: () => NavigatorHelper.pop(),
-                      title: 'Add Payment Method',
+                      title: context.l10n.addPaymentMethod,
                       icon: Icons.close,
                     ),
                     Dimens.space(2),
@@ -94,7 +94,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                             controller: controller,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Card number',
+                              hintText: context.l10n.cardNumber,
                               hintStyle: TextStyle(color: Colors.grey.shade400),
                             ),
                           ),
@@ -113,8 +113,8 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                               const SizedBox(width: 8),
                               Text(
                                 controller.complete
-                                    ? 'Valid card'
-                                    : 'Enter card details',
+                                    ? context.l10n.validCard
+                                    : context.l10n.enterCardDetails,
                                 style: TextStyle(
                                   color: controller.complete
                                       ? Colors.green
@@ -138,10 +138,10 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                             ? _handlePayPress
                             : () {
                                 Toast.showError(
-                                  'Please complete the card details',
+                                  context.l10n.pleaseCompleteCardDetails,
                                 );
                               },
-                        text: 'Next',
+                        text: context.l10n.next,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -193,7 +193,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
     } catch (e) {
       // Handle errors
       print('Error creating payment method: $e');
-      Toast.showError('Failed to add payment method. Please try again.');
+      Toast.showError(context.l10n.failedToAddPaymentMethod);
     } finally {
       setState(() => _isLoading = false);
     }
