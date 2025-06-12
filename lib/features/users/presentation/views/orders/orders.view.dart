@@ -121,7 +121,7 @@ class OrderCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      order.price,
+                      getSpaceTypeText(order.type, context),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
