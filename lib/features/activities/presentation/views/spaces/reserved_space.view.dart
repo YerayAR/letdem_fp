@@ -186,7 +186,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            '€${details.price.toStringAsFixed(2)}',
+            '${details.price.toStringAsFixed(2)} €',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],

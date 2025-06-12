@@ -151,7 +151,7 @@ class OrderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '€${double.parse(order.price).toStringAsFixed(2)}',
+                '${double.parse(order.price).toStringAsFixed(2)} €',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

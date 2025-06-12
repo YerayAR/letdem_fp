@@ -199,7 +199,7 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
       duration: const Duration(seconds: 1),
       builder: (context, value, _) {
         return Text(
-          '€${value.toStringAsFixed(2)}',
+          '${value.toStringAsFixed(2)} €',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 36,
@@ -408,8 +408,8 @@ class TransactionList extends StatelessWidget {
                         ),
                         Text(
                           tx.amount > 0
-                              ? '+€${tx.amount.toStringAsFixed(2)}'
-                              : '-€${(-tx.amount).toStringAsFixed(2)}',
+                              ? '+ ${tx.amount.toStringAsFixed(2)} €'
+                              : '- ${(-tx.amount).toStringAsFixed(2)} €',
                           style: TextStyle(
                             color: tx.amount > 0
                                 ? const Color(0xFF00A86B)

@@ -670,7 +670,7 @@
   "failed": "Fallido",
   "noWithdrawalsYet": "Aún No Hay Retiros",
   "withdrawalHistoryMessage": "Tu historial de retiros aparecerá aquí\ncuando realices un retiro",
-  "amountCannotExceed": "El monto no puede exceder €{balance}",
+  "amountCannotExceed": "El monto no puede exceder {balance} €",
   "@amountCannotExceed": {
     "placeholders": {
       "balance": {
@@ -679,7 +679,7 @@
     }
   },
   "amountToReceive": "Monto a recibir",
-  "pendingToBeCleared": "€{amount} Pendiente de ser liberado",
+  "pendingToBeCleared": "{amount} € Pendiente de ser liberado",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {

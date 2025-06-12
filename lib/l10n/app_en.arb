@@ -671,7 +671,7 @@
   "failed": "Failed",
   "noWithdrawalsYet": "No Withdrawals Yet",
   "withdrawalHistoryMessage": "Your withdrawal history will appear here\nwhenever you make a withdrawal",
-  "amountCannotExceed": "Amount cannot exceed €{balance}",
+  "amountCannotExceed": "Amount cannot exceed {balance} €",
   "@amountCannotExceed": {
     "placeholders": {
       "balance": {
@@ -680,7 +680,7 @@
     }
   },
   "amountToReceive": "Amount to receive",
-  "pendingToBeCleared": "€{amount} Pending to be cleared",
+  "pendingToBeCleared": "{amount} € Pending to be cleared",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {

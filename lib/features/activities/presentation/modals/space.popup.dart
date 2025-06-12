@@ -96,7 +96,7 @@ class SpacePopupSheet extends StatelessWidget {
         Dimens.space(2),
         if (space.isPremium)
           Text(
-            "€${space.price}",
+            "${space.price} €",
             style: Typo.largeBody.copyWith(fontWeight: FontWeight.w800),
           ),
       ],

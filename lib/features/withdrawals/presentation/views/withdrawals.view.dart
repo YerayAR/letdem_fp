@@ -157,7 +157,7 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '€${withdrawal.amount.toStringAsFixed(1)}',
+                '${withdrawal.amount.toStringAsFixed(1)} €',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
