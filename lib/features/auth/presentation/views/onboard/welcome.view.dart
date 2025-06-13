@@ -5,6 +5,7 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
@@ -31,7 +32,7 @@ class WelcomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                'Find & Share Parking Spaces near you',
+                context.l10n.findShareParking,
                 textAlign: TextAlign.center,
                 style: Typo.heading3.copyWith(
                   color: Colors.white,
@@ -39,7 +40,7 @@ class WelcomeView extends StatelessWidget {
               ),
               Dimens.space(1),
               Text(
-                'Get access to wide range of parking spaces within your location and beyond',
+                context.l10n.parkingDescription,
                 textAlign: TextAlign.center,
                 style: Typo.largeBody.copyWith(
                   color: AppColors.neutral300,
@@ -51,18 +52,18 @@ class WelcomeView extends StatelessWidget {
                   NavigatorHelper.to(const RegisterView());
                 },
                 iconRight: Icons.arrow_forward,
-                text: 'Get Started',
+                text: context.l10n.getStarted,
               ),
               Dimens.space(2),
               Text.rich(
                 TextSpan(
-                  text: 'Already a user? ', // Default style for this text
+                  text: context.l10n.alreadyHaveAccount,
                   style: Typo.largeBody.copyWith(
                     color: AppColors.neutral300,
                   ),
                   children: [
                     TextSpan(
-                      text: 'Login here', // Styled differently
+                      text: context.l10n.loginHere,
                       style: Typo.largeBody.copyWith(
                         color: AppColors.primary400,
                         decoration: TextDecoration.underline,

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 class PlatformTimePickerButton extends StatefulWidget {
   final TimeOfDay initialTime;
@@ -85,15 +86,15 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
-                      child: const Text('Cancel'),
+                      child: Text(context.l10n.cancel),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
                     ),
                     CupertinoButton(
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(color: CupertinoColors.activeBlue),
+                      child: Text(
+                        context.l10n.done,
+                        style: const TextStyle(color: CupertinoColors.activeBlue),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -284,15 +285,15 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
-                      child: const Text('Cancel'),
+                      child: Text(context.l10n.cancel),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
                     ),
                     CupertinoButton(
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(color: CupertinoColors.activeBlue),
+                      child: Text(
+                        context.l10n.done,
+                        style: const TextStyle(color: CupertinoColors.activeBlue),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();

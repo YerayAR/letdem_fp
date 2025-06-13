@@ -4,6 +4,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/register.view.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -62,7 +63,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
 
             // Important Notice text
             Text(
-              'Important Notice',
+              context.l10n.importantNotice,
               style: Typo.heading4.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -71,7 +72,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
 
             // Description text
             Text(
-              'The Anti-money Laundering Directive forces us to verify your identity in order to receive payment for your online sales. You will only need to verify yourself once.',
+              context.l10n.antiMoneyLaunderingMessage,
               textAlign: TextAlign.center,
               style: Typo.mediumBody.copyWith(
                 color: AppColors.neutral500,
@@ -85,7 +86,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
               child: PrimaryButton(
                 isDisabled: !_isChecked,
                 onTap: widget.onContinue,
-                text: 'Continue',
+                text: context.l10n.continuee,
               ),
             ),
             const SizedBox(height: 16),
@@ -109,15 +110,15 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
                   child: RichText(
                     text: TextSpan(
                       children: [
-                        const TextSpan(
-                          text: 'By continuing, I agree to Payment Providers ',
-                          style: TextStyle(
+                        TextSpan(
+                          text: context.l10n.agreeToTerms,
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 13,
                           ),
                         ),
                         TextSpan(
-                          text: 'Terms & Conditions',
+                          text: context.l10n.termsAndConditions,
                           style: TextStyle(
                             color: AppColors.primary500,
                             fontSize: 13,
@@ -131,7 +132,7 @@ class _MoneyLaundryPopupState extends State<MoneyLaundryPopup> {
                                     "https://stripe.com/gb/legal/connect-account"));
                               } else {
                                 Toast.showError(
-                                  'Could not open Terms & Conditions link',
+                                  context.l10n.couldNotOpenTermsAndConditions,
                                 );
                                 // handle error
                               }
@@ -189,17 +190,17 @@ class _AgreementTextState extends State<_AgreementText> {
                 color: Colors.black87,
               ),
               children: [
-                const TextSpan(text: 'By continuing, I agree to the '),
+                TextSpan(text: context.l10n.byAgreementStripe),
                 TextSpan(
-                  text: 'Stripe Connected Account Agreement',
+                  text: context.l10n.stripeConnectedAccountAgreement,
                   style: TextStyle(
                     color: Colors.purple.shade500,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const TextSpan(text: ' and '),
+                TextSpan(text: context.l10n.and),
                 TextSpan(
-                  text: 'Stripe Terms of Service',
+                  text: context.l10n.stripeTermsOfService,
                   style: TextStyle(
                     color: Colors.purple.shade500,
                     fontWeight: FontWeight.w500,

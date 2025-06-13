@@ -100,7 +100,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                 backgroundColor: AppColors.primary50,
                                 icon: Iconsax.location,
                                 iconColor: AppColors.primary500,
-                                text: "Regular Space",
+                                text: context.l10n.regularSpace,
                                 onTap: () async {
                                   XFile? image = kDebugMode
                                       ? await imagePicker.pickImage(
@@ -121,7 +121,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                 backgroundColor: AppColors.secondary50,
                                 icon: Iconsax.money,
                                 iconColor: AppColors.secondary600,
-                                text: "Paid Space",
+                                text: context.l10n.paidSpace,
                                 onTap: () async {
                                   bool isCarExist = context
                                           .read<CarBloc>()
@@ -130,6 +130,85 @@ class HomeMapBottomSection extends StatelessWidget {
                                                   as CarLoaded)
                                               .car !=
                                           null;
+
+                                  if (!isCarExist) {
+                                    AppPopup.showBottomSheet(
+                                        context,
+                                        SizedBox(
+                                          child: Container(
+                                            padding: EdgeInsets.all(
+                                                Dimens.defaultMargin),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // Alert icon in purple circle
+                                                Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.primary500
+                                                        .withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.all(22),
+                                                  child: Container(
+                                                    width: 70,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.primary500,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.priority_high,
+                                                        color: Colors.white,
+                                                        size: 32,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 24),
+
+                                                // Important Notice text
+                                                Text(
+                                                  context.l10n.importantNotice,
+                                                  style: Typo.heading4.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+
+                                                // Description text
+                                                Text(
+                                                  context.l10n
+                                                      .createCarProfileFirst,
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      Typo.mediumBody.copyWith(
+                                                    color: AppColors.neutral500,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 32),
+
+                                                // Continue button
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: PrimaryButton(
+                                                    onTap: () {
+                                                      NavigatorHelper.pop();
+                                                    },
+                                                    text:
+                                                        context.l10n.continuee,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                                    return;
+                                  }
 
                                   var isPaidAccountExist =
                                       context.userProfile!.earningAccount !=
@@ -177,7 +256,7 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                                 // Important Notice text
                                                 Text(
-                                                  'Important Notice',
+                                                  context.l10n.importantNotice,
                                                   style: Typo.heading4.copyWith(
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -186,7 +265,8 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                                 // Description text
                                                 Text(
-                                                  'You need to create an earning account to publish a paid space. Please create an earning account first.',
+                                                  context.l10n
+                                                      .createEarningAccountFirst,
                                                   textAlign: TextAlign.center,
                                                   style:
                                                       Typo.mediumBody.copyWith(
@@ -208,7 +288,8 @@ class HomeMapBottomSection extends StatelessWidget {
                                                         ),
                                                       );
                                                     },
-                                                    text: 'Continue',
+                                                    text:
+                                                        context.l10n.continuee,
                                                   ),
                                                 ),
                                               ],

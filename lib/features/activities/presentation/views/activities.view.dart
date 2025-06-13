@@ -6,6 +6,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
@@ -49,34 +50,28 @@ class _ActivitiesViewState extends State<ActivitiesView> {
   }
 
   Widget _buidShowAllButton(ActivitiesState state) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Contributions',
-            style: Typo.mediumBody.copyWith(
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(
+        context.l10n.contributions,
+        style: Typo.mediumBody.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      if (state is ActivitiesLoaded && state.activities.isNotEmpty)
+        TextButton(
+          onPressed: () {
+            NavigatorHelper.to(const ViewAllView());
+          },
+          child: Text(
+            context.l10n.showAll,
+            style: Typo.smallBody.copyWith(
+              color: AppColors.primary500,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
             ),
           ),
-          if (state is ActivitiesLoaded && state.activities.isNotEmpty)
-            TextButton(
-              onPressed: () {
-                NavigatorHelper.to(const ViewAllView());
-              },
-              child: Text(
-                'Show All',
-                style: Typo.smallBody.copyWith(
-                  color: AppColors.primary500,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
+        ),
+    ]);
   }
 
   @override
@@ -140,7 +135,7 @@ class NotificationAppBar extends StatelessWidget {
                 ),
               ),
             ),
-      title: 'Activities',
+      title: context.l10n.activities,
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       icon: Iconsax.notification5,
     );

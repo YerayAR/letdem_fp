@@ -12,6 +12,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
@@ -73,8 +74,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
           Dimens.space(4),
           _buildHeader(context),
           Dimens.space(3),
-          _buildPaymentCard(context),
-          _buildReserveButton(context),
+          _buildPaymentCard(context, _selectedPaymentMethod),
+          _buildReserveButton(context, widget.space),
         ],
       ),
     );
@@ -97,9 +98,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTypeRow(),
+              _buildTypeRow(context),
               Dimens.space(1),
-              _buildStreetAndDistance(),
+              _buildStreetAndDistance(context),
               Dimens.space(1),
               _buildExpirationBadge(),
             ],
@@ -109,7 +110,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     );
   }
 
-  Widget _buildTypeRow() {
+  Widget _buildTypeRow(BuildContext context) {
     return Row(
       children: [
         SvgPicture.asset(getSpaceTypeIcon(widget.space.type),
@@ -117,7 +118,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            getSpaceAvailabilityMessage(widget.space.type),
+            getSpaceAvailabilityMessage(widget.space.type, context),
             style: Typo.largeBody.copyWith(fontWeight: FontWeight.w800),
             overflow: TextOverflow.ellipsis,
           ),
@@ -132,7 +133,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     );
   }
 
-  Widget _buildStreetAndDistance() {
+  Widget _buildStreetAndDistance(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -148,7 +149,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         ),
         DecoratedChip(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          text: '${_distanceToSpace()} away',
+          text: '${_distanceToSpace(context)} ${context.l10n.away}',
           textStyle: Typo.smallBody.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.green600,
@@ -177,7 +178,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     );
   }
 
-  Widget _buildPaymentCard(BuildContext context) {
+  Widget _buildPaymentCard(BuildContext context, PaymentMethodModel? method) {
     if (!widget.space.isPremium) return const SizedBox();
 
     return Container(
@@ -188,14 +189,14 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.neutral50),
       ),
-      child: _selectedPaymentMethod != null
+      child: method != null
           ? Row(
               children: [
                 Image.asset(getCardIcon(_selectedPaymentMethod!.brand),
                     width: 40, height: 40),
                 Dimens.space(1),
                 Text(
-                  '${_selectedPaymentMethod!.brand} ending with ${_selectedPaymentMethod!.last4}',
+                  context.l10n.cardEndingWith(method.brand, method.last4),
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w600),
                 ),
@@ -219,7 +220,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Add payment method',
+                    context.l10n.addPaymentMethod,
                     style: Typo.mediumBody.copyWith(
                       color: AppColors.primary500,
                       decoration: TextDecoration.underline,
@@ -233,7 +234,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     );
   }
 
-  Widget _buildReserveButton(BuildContext context) {
+  Widget _buildReserveButton(BuildContext context, Space space) {
     return BlocConsumer<ActivitiesBloc, ActivitiesState>(
       listener: (context, state) {
         if (state is SpaceReserved) {
@@ -247,10 +248,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   details: state.spaceID,
                 ));
               },
-              title: 'Payment Successful',
-              subtext:
-                  'You have successfully reserved a paid space. You can get the details by clicking below.',
-              buttonText: 'Get Details of space',
+              title: context.l10n.paymentSuccessful,
+              subtext: context.l10n.spaceReservedSuccess,
+              buttonText: context.l10n.getSpaceDetails,
             ),
           );
         } else if (state is ActivitiesError) {
@@ -261,7 +261,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         return PrimaryButton(
           icon: widget.space.isPremium ? null : Iconsax.location5,
           isLoading: state is ActivitiesLoading,
-          text: widget.space.isPremium ? 'Reserve space' : 'Navigate to space',
+          text: space.isPremium
+              ? context.l10n.reserveSpace
+              : context.l10n.navigateToSpace,
           onTap: () {
             if (widget.space.isPremium) {
               if (context.userProfile!.defaultPaymentMethod == null) {
@@ -292,7 +294,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     );
   }
 
-  String _distanceToSpace() {
+  String _distanceToSpace(BuildContext context) {
     return parseMeters(geolocator.Geolocator.distanceBetween(
       widget.currentPosition.latitude,
       widget.currentPosition.longitude,

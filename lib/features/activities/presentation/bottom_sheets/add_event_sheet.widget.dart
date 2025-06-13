@@ -8,6 +8,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/EventTypes.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
@@ -62,9 +63,8 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                 AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(
-                    title: "Event Published\nSuccessfully",
-                    subtext:
-                        "Your event have been published successfully, people can now see this event on map.",
+                    title: context.l10n.eventPublishedTitle,
+                    subtext: context.l10n.eventPublishedSubtext,
                     onProceed: () {
                       NavigatorHelper.pop();
                     },
@@ -82,7 +82,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Select Event type",
+                          context.l10n.selectEventType,
                           style: Typo.largeBody
                               .copyWith(fontWeight: FontWeight.w700),
                         ),
@@ -138,7 +138,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                                         ),
                                         Dimens.space(2),
                                         Text(
-                                          eventTypeToString(e),
+                                          eventTypeToString(e, context),
                                           style: Typo.smallBody.copyWith(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
@@ -170,7 +170,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
                           ),
                         );
                       },
-                      text: 'Publish',
+                      text: context.l10n.publishButtonText,
                     ),
                     Dimens.space(6),
                   ],

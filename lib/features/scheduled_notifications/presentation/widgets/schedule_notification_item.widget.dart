@@ -9,6 +9,7 @@ import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/scheduled_notifications/presentation/widgets/reschedule_notification.widget.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -71,7 +72,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Space Reminder",
+                      context.l10n.spaceReminder,
                       style:
                           Typo.largeBody.copyWith(fontWeight: FontWeight.bold),
                     ),
@@ -86,7 +87,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     Text(
-                                      'Space Reminder',
+                                      context.l10n.spaceReminder,
                                       style: Typo.heading1.copyWith(
                                         fontSize: 20,
                                       ),
@@ -120,7 +121,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                                     ),
                                     Dimens.space(2),
                                     Text(
-                                      'Reschedule Reminder',
+                                      context.l10n.rescheduleReminder,
                                       style: Typo.mediumBody.copyWith(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16,
@@ -156,7 +157,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                                     ),
                                     Dimens.space(2),
                                     Text(
-                                      'Delete Reminder',
+                                      context.l10n.deleteReminder,
                                       style: Typo.mediumBody.copyWith(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16,
@@ -193,8 +194,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                       color: AppColors.neutral500,
                     ),
                     children: [
-                      const TextSpan(
-                          text: "You have a reminder for a space at "),
+                      TextSpan(text: context.l10n.youHaveReminderForSpace),
                       TextSpan(
                         text: notification.location.streetName,
                         style: Typo.mediumBody.copyWith(
@@ -219,7 +219,9 @@ class ScheduleNotificationItem extends StatelessWidget {
                       ),
                     ),
                     DecoratedChip(
-                      text: notification.isExpired ? 'Expired' : 'Active',
+                      text: notification.isExpired
+                          ? context.l10n.expired
+                          : context.l10n.active,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 15,
                         vertical: 6,

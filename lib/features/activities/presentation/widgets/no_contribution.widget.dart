@@ -24,14 +24,14 @@ class NoContributionsWidget extends StatelessWidget {
       children: [
         const Spacer(),
         Text(
-          "No Contributions Yet",
+          context.l10n.noContributions,
           style: Typo.largeBody.copyWith(
             fontWeight: FontWeight.w700,
           ),
         ),
         Dimens.space(2),
         Text(
-          "Your Contributions history will appear\nhere, Publish to see them",
+          context.l10n.noContributionsDescription,
           style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
           textAlign: TextAlign.center,
         ),
@@ -51,7 +51,7 @@ class NoContributionsWidget extends StatelessWidget {
                         backgroundColor: AppColors.green50,
                         icon: Icons.done,
                         iconColor: AppColors.green500,
-                        text: "Regular Space",
+                        text: context.l10n.regularSpace,
                         onTap: () async {
                           XFile? image = kDebugMode
                               ? await imagePicker.pickImage(
@@ -71,7 +71,7 @@ class NoContributionsWidget extends StatelessWidget {
                         backgroundColor: AppColors.secondary50,
                         icon: Iconsax.money,
                         iconColor: AppColors.secondary600,
-                        text: "Paid Space",
+                        text: context.l10n.paidSpace,
                         onTap: () async {
                           XFile? image = kDebugMode
                               ? await imagePicker.pickImage(
@@ -90,7 +90,7 @@ class NoContributionsWidget extends StatelessWidget {
                   ));
             },
             icon: Iconsax.location5,
-            text: 'Publish Space',
+            text: context.l10n.publishSpace,
           ),
         ),
         Dimens.space(1),

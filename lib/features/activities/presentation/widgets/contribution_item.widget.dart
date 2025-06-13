@@ -6,6 +6,7 @@ import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 
@@ -63,8 +64,8 @@ class ContributionItem extends StatelessWidget {
                         children: [
                           Text(
                             type == ContributionType.space
-                                ? "Space Published"
-                                : "Event Published",
+                                ? context.l10n.spacePublished
+                                : context.l10n.eventPublished,
                             style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
@@ -103,7 +104,7 @@ class ContributionItem extends StatelessWidget {
                 ),
                 DecoratedChip(
                   backgroundColor: AppColors.secondary50,
-                  text: '+${activity.points} Pts',
+                  text: context.l10n.pointsEarned(activity.points as String),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
                   textStyle: Typo.smallBody.copyWith(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/scheduled_notifications/presentation/widgets/schedule_notification_item.widget.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
@@ -36,7 +37,7 @@ class _ScheduledNotificationsViewState
           onTap: () {
             NavigatorHelper.pop();
           },
-          title: 'Scheduled Notifications',
+          title: context.l10n.scheduledNotifications,
           icon: Icons.close,
         ),
         Dimens.space(3),

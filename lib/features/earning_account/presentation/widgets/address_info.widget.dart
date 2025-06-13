@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
@@ -65,26 +66,26 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Your address information',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text('Input your full address and location of residence',
+              Text(context.l10n.addressInformationTitle,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(context.l10n.addressInformationDescription,
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 30),
               TextInputField(
-                label: 'Enter your address',
-                placeHolder: 'Eg. Calle de Olivos 3, 46',
+                label: context.l10n.address,
+                placeHolder: context.l10n.enterAddress,
                 controller: _addressController,
               ),
               const SizedBox(height: 16),
               TextInputField(
-                label: 'Enter postal code',
-                placeHolder: 'Eg. 28944',
+                label: context.l10n.postalCode,
+                placeHolder: context.l10n.enterPostalCode,
                 controller: _postalController,
               ),
               const SizedBox(height: 16),
               TextInputField(
-                label: 'Enter city',
-                placeHolder: 'Eg. Fuenlabrada',
+                label: context.l10n.city,
+                placeHolder: context.l10n.enterCity,
                 controller: _cityController,
               ),
               const Spacer(),
@@ -93,7 +94,7 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
                   return PrimaryButton(
                     isLoading: state is EarningsLoading,
                     onTap: state is EarningsLoading ? null : _submit,
-                    text: "Next",
+                    text: context.l10n.next,
                   );
                 },
               ),

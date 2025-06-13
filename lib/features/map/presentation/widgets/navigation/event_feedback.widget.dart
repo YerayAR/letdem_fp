@@ -10,6 +10,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/EventTypes.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
@@ -61,7 +62,7 @@ class _EventFeedbackState extends State<EventFeedback> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          getEventMessage(widget.event.type),
+                          getEventMessage(widget.event.type, context),
                           style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700, fontSize: 18),
                         ),
@@ -69,7 +70,8 @@ class _EventFeedbackState extends State<EventFeedback> {
                         DecoratedChip(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 5),
-                          text: '${widget.currentDistance.floor()} meters away',
+                          text: context.l10n
+                              .metersAway(widget.currentDistance.floor()),
                           textStyle: Typo.smallBody.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.green600,
@@ -99,7 +101,7 @@ class _EventFeedbackState extends State<EventFeedback> {
                     onTap: () {
                       NavigatorHelper.pop();
                     },
-                    text: 'Got it, Thank you',
+                    text: context.l10n.gotItThankYou,
                   ),
                 ),
                 Dimens.space(widget.event.isOwner ? 0 : 2),
@@ -110,7 +112,6 @@ class _EventFeedbackState extends State<EventFeedback> {
                       : PrimaryButton(
                           outline: true,
                           onTap: () {
-                            if (widget.event.isOwner) {}
                             AppPopup.showBottomSheet(
                               context,
                               FeedbackForm(eventID: widget.event.id),
@@ -119,7 +120,7 @@ class _EventFeedbackState extends State<EventFeedback> {
                           background: AppColors.primary50,
                           borderColor: Colors.transparent,
                           color: AppColors.primary500,
-                          text: 'Feedback',
+                          text: context.l10n.feedbackButton,
                         ),
                 )
               ],
@@ -142,8 +143,8 @@ class FeedbackForm extends StatelessWidget {
           AppPopup.showDialogSheet(
             context,
             SuccessDialog(
-              title: "Your feedback has been submitted",
-              subtext: "Thank you for your input!",
+              title: context.l10n.feedbackSubmitted,
+              subtext: context.l10n.thankYouForInput,
               onProceed: () {
                 NavigatorHelper.pop();
                 NavigatorHelper.pop();
@@ -161,14 +162,14 @@ class FeedbackForm extends StatelessWidget {
       },
       builder: (context, state) {
         return MultiSelectPopup(
-          title: "Event Feedback",
+          title: context.l10n.eventFeedback,
           isLoading: state is ActivitiesLoading,
           items: [
             MultiSelectItem(
               backgroundColor: AppColors.green50,
               icon: Icons.done,
               iconColor: AppColors.green500,
-              text: "It’s still there",
+              text: context.l10n.stillThere,
               onTap: () {
                 context.read<ActivitiesBloc>().add(
                       EventFeedBackEvent(
@@ -183,7 +184,7 @@ class FeedbackForm extends StatelessWidget {
               backgroundColor: AppColors.secondary50,
               icon: Icons.close,
               iconColor: AppColors.secondary600,
-              text: "It’s not there",
+              text: context.l10n.notThere,
               onTap: () {
                 context.read<ActivitiesBloc>().add(
                       EventFeedBackEvent(

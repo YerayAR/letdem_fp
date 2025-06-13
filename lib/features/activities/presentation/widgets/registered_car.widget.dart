@@ -9,6 +9,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/CarTagType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/models/car/car.model.dart';
 
@@ -41,7 +42,7 @@ class RegisteredCarWidget extends StatelessWidget {
               children: [
                 // Your Car Details
                 Text(
-                  "Your Car Details",
+                  context.l10n.yourCarDetails,
                   style: Typo.smallBody.copyWith(
                     color: AppColors.neutral500,
                     fontWeight: FontWeight.w700,
@@ -84,7 +85,7 @@ class RegisteredCarWidget extends StatelessWidget {
                   },
                   child: DecoratedChip(
                     backgroundColor: AppColors.primary50,
-                    text: 'Edit Details',
+                    text: context.l10n.editDetails,
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                       horizontal: 14,
@@ -192,7 +193,7 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Last place Parked",
+                            context.l10n.lastPlaceParked,
                             style: Typo.smallBody.copyWith(
                               color: AppColors.neutral500,
                               fontWeight: FontWeight.w700,
@@ -200,7 +201,7 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
                           ),
                           Dimens.space(1),
                           Text(
-                            widget.lastParked?.streetName ?? "Unknown",
+                            widget.lastParked?.streetName ?? context.l10n.unknown,
                             style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w500,
                             ),
@@ -216,7 +217,7 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
                                   destinationLng: widget.lastParked?.lng ?? 0,
                                 ));
                               },
-                              text: "Navigate to car",
+                              text: context.l10n.navigateToCar,
                               iconRight: Icons.arrow_forward,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 10,

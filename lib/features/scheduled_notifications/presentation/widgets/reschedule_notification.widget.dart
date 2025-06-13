@@ -6,6 +6,7 @@ import 'package:letdem/common/popups/date_time_picker.widget.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -65,7 +66,7 @@ class _RescheduleNotificationCardState
     return BlocConsumer<ScheduleNotificationsBloc, ScheduleNotificationsState>(
       listener: (context, state) {
         if (state is ScheduleNotificationCreated) {
-          Toast.show('Notification rescheduled successfully');
+          Toast.show(context.l10n.notificationRescheduledSuccessfully);
           context
               .read<ScheduleNotificationsBloc>()
               .add(const FetchScheduledNotificationsEvent());
@@ -100,7 +101,7 @@ class _RescheduleNotificationCardState
                     ),
                   ]
                 : [
-                    Text("Reschedule Notification",
+                    Text(context.l10n.rescheduleNotification,
                         style: Typo.heading1.copyWith(
                           fontSize: 20,
                         )),
@@ -129,7 +130,7 @@ class _RescheduleNotificationCardState
                     const SizedBox(height: 16),
 
                     Text(
-                      "Date & Time",
+                      context.l10n.dateAndTime,
                       style: Typo.mediumBody
                           .copyWith(color: Colors.black, fontSize: 16),
                     ),
@@ -181,9 +182,9 @@ class _RescheduleNotificationCardState
                     // Radius slider
                     Row(
                       children: [
-                        const Text(
-                          "Receive notifications up to (meters)",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.notificationRadius,
+                          style: const TextStyle(
                             fontSize: 14,
                           ),
                         ),
@@ -241,7 +242,7 @@ class _RescheduleNotificationCardState
                           _selectedEndTime.minute,
                         );
 
-                        if (!validateDateTime(start, end)) {
+                        if (!validateDateTime(context, start, end)) {
                           return;
                         }
 
@@ -258,7 +259,7 @@ class _RescheduleNotificationCardState
                         NavigatorHelper.pop();
                       },
                       isLoading: state is ScheduleNotificationsLoading,
-                      text: 'Reschedule',
+                      text: context.l10n.reschedule,
                     ),
                     Dimens.space(2)
                   ],

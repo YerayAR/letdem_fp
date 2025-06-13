@@ -123,8 +123,8 @@ class _ProfileHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildUserInfo(user, fullName),
-              _buildUserPoints(user),
+              _buildUserInfo(user, fullName, context),
+              _buildUserPoints(user, context),
             ],
           ),
         ),
@@ -132,12 +132,12 @@ class _ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildUserInfo(LetDemUser user, String fullName) {
+  Widget _buildUserInfo(LetDemUser user, String fullName, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          fullName.isEmpty ? "Name not provided" : fullName,
+          fullName.isEmpty ? context.l10n.nameNotProvided : fullName,
           style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
         ),
         Text(
@@ -148,7 +148,7 @@ class _ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildUserPoints(LetDemUser user) {
+  Widget _buildUserPoints(LetDemUser user, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Stack(
@@ -169,7 +169,7 @@ class _ProfileHeader extends StatelessWidget {
                 fontSize: 8,
                 fontWeight: FontWeight.w800,
               ),
-              text: '${user.totalPoints}\nLetDem Points',
+              text: '${user.totalPoints}\n${context.l10n.letdemPoints}',
               backgroundColor: AppColors.secondary600,
               color: Colors.white,
             ),
@@ -334,7 +334,7 @@ class _MainActionsSection extends StatelessWidget {
             : AppColors.red500;
     final text = account == null
         ? context.l10n.connectAccount
-        : getStatusString(account.status);
+        : getStatusString(account.status, context);
     return DecoratedChip(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       backgroundColor: color,
@@ -375,7 +375,7 @@ class _AccountSettingsSection extends StatelessWidget {
               ),
               SettingsRow(
                 icon: Iconsax.global,
-                text: "Language", // Or: context.l10n.language if localized
+                text: context.l10n.language,
                 onTap: () {
                   NavigatorHelper.to(const ChangeLanguageView());
                 },

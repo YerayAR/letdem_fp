@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:letdem/core/extensions/locale.dart';
+
 enum EarningStep {
   personalInfo,
   addressInfo,
@@ -6,18 +9,18 @@ enum EarningStep {
   submitted,
 }
 
-getStepString(EarningStep step) {
+getStepString(EarningStep step, BuildContext context) {
   switch (step) {
     case EarningStep.personalInfo:
-      return 'Personal Info';
+      return context.l10n.personalInfo;
     case EarningStep.addressInfo:
-      return 'Address Info';
+      return context.l10n.addressInfo;
     case EarningStep.documentUpload:
-      return 'Document Upload';
+      return context.l10n.documentUpload;
     case EarningStep.bankAccountInfo:
-      return 'Bank Account Info';
+      return context.l10n.bankAccountInfo;
     case EarningStep.submitted:
-      return 'Submitted';
+      return context.l10n.submitted;
   }
 }
 

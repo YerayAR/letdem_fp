@@ -9,6 +9,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
@@ -44,7 +45,7 @@ class _WalletScreenState extends State<WalletScreen> {
         isBottomPadding: false,
         children: [
           StyledAppBar(
-            title: 'Earnings',
+            title: context.l10n.earnings,
             onTap: () => Navigator.of(context).pop(),
             icon: Icons.close,
           ),
@@ -154,9 +155,9 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Wallet Balance',
-          style: TextStyle(
+        Text(
+          context.l10n.walletBalance,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -208,7 +209,7 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
       onTap: () {
         NavigatorHelper.to(const WithdrawView());
       },
-      text: 'Withdraw',
+      text: context.l10n.withdraw,
       background: AppColors.primary50,
       textColor: AppColors.primary500,
     );
@@ -224,7 +225,7 @@ class WalletActionsRow extends StatelessWidget {
       children: [
         _ActionButton(
           icon: AppAssets.location,
-          label: 'Orders',
+          label: context.l10n.orders,
           onTap: () {
             NavigatorHelper.to(const OrdersListView());
           },
@@ -232,7 +233,7 @@ class WalletActionsRow extends StatelessWidget {
         const SizedBox(width: 16),
         _ActionButton(
           icon: AppAssets.card,
-          label: 'Withdrawals',
+          label: context.l10n.withdrawals,
           onTap: () {
             NavigatorHelper.to(const WithdrawListView());
           },
@@ -240,7 +241,7 @@ class WalletActionsRow extends StatelessWidget {
         const SizedBox(width: 16),
         _ActionButton(
           icon: AppAssets.bank,
-          label: 'Payouts',
+          label: context.l10n.payouts,
           onTap: () {
             NavigatorHelper.to(const PayoutMethodsScreen());
           },
@@ -296,8 +297,8 @@ class TransactionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('Transaction History',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(context.l10n.transactionHistory,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         BlocBuilder<WalletBloc, WalletState>(
           builder: (context, state) {
             bool hasTransactions = false;
@@ -313,9 +314,9 @@ class TransactionHeader extends StatelessWidget {
                   minimumSize: const Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text(
-                  'See all',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.seeAll,
+                  style: const TextStyle(
                       color: Color(0xFF8A3FFC),
                       fontWeight: FontWeight.w500,
                       fontSize: 14),
@@ -439,13 +440,13 @@ class EmptyTransactionsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'No Transactions Yet',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              context.l10n.noTransactionsYet,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Text(
-              'Your transactions history will be listed here when you have any activity to show.',
+              context.l10n.transactionsHistoryMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey.shade600,
@@ -492,7 +493,7 @@ class LoadingTransactionsView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Loading Transactions',
+            context.l10n.loadingTransactions,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

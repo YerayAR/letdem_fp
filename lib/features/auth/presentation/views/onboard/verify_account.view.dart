@@ -13,6 +13,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/basic_info.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -79,9 +80,8 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
             AppPopup.showDialogSheet(
               context,
               SuccessDialog(
-                title: "Verification Success",
-                subtext:
-                    "Your account email has been verified successfully. You can proceed to the app.",
+                title: context.l10n.verificationSuccess,
+                subtext: context.l10n.verificationSuccessMessage,
                 isLoading: state is OTPVerificationLoading,
                 onProceed: () {
                   NavigatorHelper.replaceAll(const BasicInfoView());
@@ -100,7 +100,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
               children: [
                 StyledAppBar(
                   onTap: () => NavigatorHelper.pop(),
-                  title: 'Verify Account',
+                  title: context.l10n.verifyAccount,
                   icon: Icons.close,
                 ),
                 const Spacer(),
@@ -117,13 +117,13 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                     ),
                     Dimens.space(3),
                     Text(
-                      "We sent you an email",
+                      context.l10n.weWillSendOTP,
                       textAlign: TextAlign.center,
                       style:
                           Typo.heading4.copyWith(color: AppColors.neutral600),
                     ),
                     Text(
-                      "Kindly check the email you provided for an OTP to verify your email and enter it below",
+                      context.l10n.verificationInstructions,
                       textAlign: TextAlign.center,
                       style:
                           Typo.mediumBody.copyWith(color: AppColors.neutral400),
@@ -168,7 +168,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                           Center(
                             child: Text.rich(
                               TextSpan(
-                                text: 'Mail is sent to: ',
+                                text: context.l10n.mailSentTo,
                                 style: Typo.smallBody.copyWith(),
                                 children: [
                                   TextSpan(
@@ -188,12 +188,11 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                           Center(
                             child: Text.rich(
                               TextSpan(
-                                text:
-                                    'Not you? ', // Default style for this text
+                                text: context.l10n.notYou,
                                 style: Typo.smallBody.copyWith(),
                                 children: [
                                   TextSpan(
-                                    text: 'Change email', // Styled differently
+                                    text: context.l10n.changeEmail,
                                     style: Typo.smallBody.copyWith(
                                       color: AppColors.primary400,
                                       fontWeight: FontWeight.w600,
@@ -231,7 +230,7 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Resending",
+                            Text(context.l10n.resending,
                                 style: Typo.mediumBody
                                     .copyWith(color: AppColors.primary400)),
                             Dimens.space(1),
@@ -242,14 +241,13 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                         )
                       : Text.rich(
                           TextSpan(
-                            text:
-                                'Didn’t get OTP? ', // Default style for this text
+                           text: context.l10n.didntGetOtp,
                             style: Typo.mediumBody.copyWith(),
                             children: [
                               TextSpan(
                                 text: _isResendEnabled
-                                    ? "Tap to resend."
-                                    : ' Resend in 00:$_secondsRemaining',
+                                    ? context.l10n.tapToResend
+                                    : context.l10n.resendIn(_secondsRemaining.toString()),
                                 style: Typo.mediumBody.copyWith(
                                   color: AppColors.primary400,
                                   fontWeight: FontWeight.w600,
