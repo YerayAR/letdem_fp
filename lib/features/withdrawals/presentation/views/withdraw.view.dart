@@ -11,6 +11,7 @@ import 'package:letdem/features/payout_methods/presentation/empty_states/empty_p
 import 'package:letdem/features/payout_methods/presentation/views/add/add_payout.view.dart';
 import 'package:letdem/features/payout_methods/presentation/widgets/payout_item.widget.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/withdrawals/presentation/widgets/amount_input.widget.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 
@@ -151,22 +152,22 @@ class _WithdrawViewState extends State<WithdrawView> {
         Dimens.space(2),
         BlocConsumer<WithdrawalBloc, WithdrawalState>(
           listener: (context, state) {
+            print('Withdrawal state: $state');
             if (state is WithdrawalFailure) {
               Toast.showError(state.message);
             }
             if (state is WithdrawalSuccess) {
+              context.read<UserBloc>().add(FetchUserInfoEvent());
               AppPopup.showDialogSheet(
-                  context,
+                  NavigatorHelper.navigatorKey.currentContext!,
                   SuccessDialog(
                     title: 'Success',
                     subtext: 'Withdrawal request has been sent successfully.',
                     onProceed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
+                      NavigatorHelper.pop();
+                      NavigatorHelper.pop();
                     },
                   ));
-
-              Navigator.of(context).pop();
             }
 
             // TODO: implement listener

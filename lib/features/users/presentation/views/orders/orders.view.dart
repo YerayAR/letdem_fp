@@ -120,7 +120,7 @@ class OrderCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      order.price,
+                      getSpaceTypeText(order.type),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -164,26 +164,6 @@ class OrderCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _getIconBackgroundColor(Order order) {
-    switch (order.status) {
-      case ReservedStatus.canceled:
-        return AppColors.red50;
-      case ReservedStatus.pending:
-        return AppColors.neutral50;
-      case ReservedStatus.confirmed:
-        return AppColors.primary50;
-      case ReservedStatus.reserved:
-        return AppColors.red50;
-      case ReservedStatus.expired:
-        // TODO: Handle this case.
-        return AppColors.red50;
-    }
-  }
-
-  Color _getIconColor(Order order) {
-    return Colors.white;
   }
 
   Widget _buildStatusChip(ReservedStatus status) {

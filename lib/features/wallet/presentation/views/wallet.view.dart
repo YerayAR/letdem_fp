@@ -193,19 +193,13 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
       );
     }
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: widget.balance),
-      duration: const Duration(seconds: 1),
-      builder: (context, value, _) {
-        return Text(
-          '€${value.toStringAsFixed(2)}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-          ),
-        );
-      },
+    return Text(
+      '€${widget.balance.toStringAsFixed(2)}',
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 36,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
@@ -407,8 +401,8 @@ class TransactionList extends StatelessWidget {
                         ),
                         Text(
                           tx.amount > 0
-                              ? '+€${tx.amount.toStringAsFixed(2)}'
-                              : '-€${(-tx.amount).toStringAsFixed(2)}',
+                              ? '${tx.amount.toStringAsFixed(2)}€ +'
+                              : '${(-tx.amount).toStringAsFixed(2)}€ -',
                           style: TextStyle(
                             color: tx.amount > 0
                                 ? const Color(0xFF00A86B)

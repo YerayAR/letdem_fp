@@ -69,7 +69,7 @@ class _EventFeedbackState extends State<EventFeedback> {
                         DecoratedChip(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 5),
-                          text: '${widget.currentDistance.floor()}m away',
+                          text: '${widget.currentDistance.floor()} meters away',
                           textStyle: Typo.smallBody.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.green600,

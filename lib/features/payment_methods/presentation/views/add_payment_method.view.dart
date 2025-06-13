@@ -180,7 +180,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
     setState(() => _isLoading = true);
 
     try {
-      // Billing details (replace email with user's actual email if needed)
+      // Billing details (replace email with us,er's actual email if needed)
       final billingDetails = BillingDetails(
         email: context.userProfile!.email,
         name: _nameController.text.trim(),
@@ -194,6 +194,13 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
           ),
         ),
       );
+      print('Payment Method Created: ${paymentMethod.toJson()}');
+
+      if (paymentMethod.card.brand == "AmericanExpress") {
+        Toast.showError(
+            'American Express cards are not supported at this time.');
+        return;
+      }
 
       // Dispatch Bloc event
       context.read<PaymentMethodBloc>().add(

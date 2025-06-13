@@ -228,7 +228,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
 
             file: _fileFront,
             title: 'Tap to upload ID Card Front',
-            subtitle: 'Only images supported Max: 2MB',
+            subtitle: 'Only images supported Max: 6MB',
             isSelected: _fileFront != null,
             onTap: () => inIDTypeSelected(true, (file) {
               setState(() {
@@ -246,7 +246,7 @@ class _UploadIDPictureViewState extends State<UploadIDPictureView> {
               });
             },
             title: 'Tap to upload ID Card Back',
-            subtitle: 'Only images supported Max: 2MB',
+            subtitle: 'Only images supported Max: 6MB',
             isSelected: _fileBack != null,
             onTap: () => inIDTypeSelected(false, (file) {
               setState(() {

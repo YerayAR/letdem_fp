@@ -136,7 +136,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 },
                 child: AbsorbPointer(
                   child: TextInputField(
-                    placeholderColor: AppColors.neutral600,
+                    placeholderColor: _dateOfBirth != null
+                        ? AppColors.neutral600
+                        : AppColors.neutral300,
                     mustValidate: false,
                     label: 'Date of Birth',
                     placeHolder: _dateOfBirth != null

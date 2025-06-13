@@ -40,8 +40,10 @@ class _ActivitiesViewState extends State<ActivitiesView> {
     // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
   }
 
-  Widget _buildFooter(ActivitiesState state) {
-    Widget item = const ContributionsSection();
+  Widget _buildFooter(ActivitiesState state, bool isAllRouted) {
+    Widget item = ContributionsSection(
+      isAllRouted: isAllRouted,
+    );
 
     return item;
   }
@@ -94,7 +96,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                           const CarSection(),
                           const ActiveReservationSection(),
                           _buidShowAllButton(state),
-                          _buildFooter(state),
+                          _buildFooter(state, true),
                         ],
                       ),
                     ),
@@ -104,7 +106,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                     const CarSection(),
                     const ActiveReservationSection(),
                     _buidShowAllButton(state),
-                    Expanded(child: _buildFooter(state)),
+                    Expanded(child: _buildFooter(state, false)),
                   ],
           );
 
@@ -185,7 +187,8 @@ class ActiveReservationSection extends StatelessWidget {
 }
 
 class ContributionsSection extends StatelessWidget {
-  const ContributionsSection({super.key});
+  final bool isAllRouted;
+  const ContributionsSection({super.key, required this.isAllRouted});
 
   @override
   Widget build(BuildContext context) {
@@ -210,6 +213,12 @@ class ContributionsSection extends StatelessWidget {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimens.defaultRadius),
               topRight: Radius.circular(Dimens.defaultRadius),
+              bottomLeft: isAllRouted
+                  ? Radius.circular(Dimens.defaultRadius)
+                  : Radius.zero,
+              bottomRight: isAllRouted
+                  ? Radius.circular(Dimens.defaultRadius)
+                  : Radius.zero,
             ),
           ),
           child: isEmpty

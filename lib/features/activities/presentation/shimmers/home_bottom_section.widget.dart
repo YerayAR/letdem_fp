@@ -131,83 +131,6 @@ class HomeMapBottomSection extends StatelessWidget {
                                               .car !=
                                           null;
 
-                                  if (!isCarExist) {
-                                    AppPopup.showBottomSheet(
-                                        context,
-                                        SizedBox(
-                                          child: Container(
-                                            padding: EdgeInsets.all(
-                                                Dimens.defaultMargin),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                // Alert icon in purple circle
-                                                Container(
-                                                  width: 90,
-                                                  height: 90,
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.primary500
-                                                        .withOpacity(0.1),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  padding:
-                                                      const EdgeInsets.all(22),
-                                                  child: Container(
-                                                    width: 70,
-                                                    height: 70,
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.primary500,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: const Center(
-                                                      child: Icon(
-                                                        Icons.priority_high,
-                                                        color: Colors.white,
-                                                        size: 32,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 24),
-
-                                                // Important Notice text
-                                                Text(
-                                                  'Important Notice',
-                                                  style: Typo.heading4.copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 16),
-
-                                                // Description text
-                                                Text(
-                                                  'You need to create a car profile to publish a paid space. Please create a car profile first.',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      Typo.mediumBody.copyWith(
-                                                    color: AppColors.neutral500,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 32),
-
-                                                // Continue button
-                                                SizedBox(
-                                                  width: double.infinity,
-                                                  child: PrimaryButton(
-                                                    onTap: () {
-                                                      NavigatorHelper.pop();
-                                                    },
-                                                    text: 'Continue',
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ));
-                                    return;
-                                  }
-
                                   var isPaidAccountExist =
                                       context.userProfile!.earningAccount !=
                                           null;
@@ -284,6 +207,82 @@ class HomeMapBottomSection extends StatelessWidget {
                                                           remainingStep: null,
                                                         ),
                                                       );
+                                                    },
+                                                    text: 'Continue',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                                    return;
+                                  }
+                                  if (!isCarExist) {
+                                    AppPopup.showBottomSheet(
+                                        context,
+                                        SizedBox(
+                                          child: Container(
+                                            padding: EdgeInsets.all(
+                                                Dimens.defaultMargin),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // Alert icon in purple circle
+                                                Container(
+                                                  width: 90,
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.primary500
+                                                        .withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.all(22),
+                                                  child: Container(
+                                                    width: 70,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.primary500,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.priority_high,
+                                                        color: Colors.white,
+                                                        size: 32,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 24),
+
+                                                // Important Notice text
+                                                Text(
+                                                  'Important Notice',
+                                                  style: Typo.heading4.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+
+                                                // Description text
+                                                Text(
+                                                  'You need to create a car profile to publish a paid space. Please create a car profile first.',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      Typo.mediumBody.copyWith(
+                                                    color: AppColors.neutral500,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 32),
+
+                                                // Continue button
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: PrimaryButton(
+                                                    onTap: () {
+                                                      NavigatorHelper.pop();
                                                     },
                                                     text: 'Continue',
                                                   ),

@@ -122,10 +122,11 @@ class WithdrawalCard extends StatelessWidget {
           CircleAvatar(
             radius: 25,
             backgroundColor: AppColors.neutral50,
-            child: Icon(
-              Iconsax.card5,
+            child: SvgPicture.asset(
+              AppAssets.card,
+              width: 24,
+              height: 24,
               color: AppColors.neutral500,
-              size: 24,
             ),
           ),
           const SizedBox(width: 16),

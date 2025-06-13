@@ -14,11 +14,14 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
 import 'package:letdem/features/payment_methods/presentation/empty_states/empty_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/models/payment/payment.model.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {
-  const PaymentMethodsScreen({super.key});
+  final Function(PaymentMethodModel)? onPaymentMethodSelected;
+  const PaymentMethodsScreen({super.key, this.onPaymentMethodSelected});
 
   @override
   State<PaymentMethodsScreen> createState() => _PaymentMethodsScreenState();
@@ -42,7 +45,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           if (state is PaymentMethodError) {
             Toast.showError(state.message);
           }
-          // TODO: implement listener
+          if (state is PaymentMethodLoaded) {
+            context.read<UserBloc>().add(FetchUserInfoEvent());
+          }
         },
         builder: (context, state) {
           return StyledBody(
@@ -63,19 +68,30 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                             itemCount: state.paymentMethods.length,
                             itemBuilder: (context, index) {
                               final paymentMethod = state.paymentMethods[index];
-                              return _buildCardItem(
-                                cardId: paymentMethod.paymentMethodId,
-                                last4: paymentMethod.last4,
-                                expireDate:
-                                    '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
-                                cardType: paymentMethod.brand,
-                                holderName: paymentMethod.holderName,
-                                isDefault: paymentMethod.isDefault,
-                                onMenuTap: () {
-                                  setState(() {
-                                    showOptions = true;
-                                  });
+                              return InkWell(
+                                onTap: () {
+                                  if (widget.onPaymentMethodSelected != null) {
+                                    print(
+                                        'Selected payment method: ${paymentMethod.paymentMethodId}');
+                                    widget.onPaymentMethodSelected!(
+                                      paymentMethod,
+                                    );
+                                  }
                                 },
+                                child: _buildCardItem(
+                                  cardId: paymentMethod.paymentMethodId,
+                                  last4: paymentMethod.last4,
+                                  expireDate:
+                                      '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
+                                  cardType: paymentMethod.brand,
+                                  holderName: paymentMethod.holderName,
+                                  isDefault: paymentMethod.isDefault,
+                                  onMenuTap: () {
+                                    setState(() {
+                                      showOptions = true;
+                                    });
+                                  },
+                                ),
                               );
                             },
                           )

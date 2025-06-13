@@ -30,7 +30,6 @@ import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
-import 'package:letdem/features/map/presentation/views/test.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
@@ -455,40 +454,31 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _cleanupNavigation() {
-    debugPrint('🧹 Cleaning up navigation resources...');
+    _visualNavigator?.stopRendering();
+    _locationEngine?.stop();
 
-    // Stop visual rendering
-    if (_visualNavigator != null) {
-      _visualNavigator!.stopRendering();
-      _visualNavigator = null; // Explicitly clear reference
-    }
+    // Clear all listeners
+    _visualNavigator?.routeProgressListener = null;
+    _visualNavigator?.speedLimitListener = null;
+    _visualNavigator?.routeDeviationListener = null;
 
-    // Stop location engine
-    if (_locationEngine != null) {
-      _locationEngine!.stop();
-      _locationEngine = null; // Explicitly clear reference
-    }
-
-    // Clear route
+    // Nullify references
+    _visualNavigator = null;
+    _locationEngine = null;
     _routingEngine = null;
 
-    // Reset navigation state
-    setState(() {
-      _isNavigating = false;
-      _navigationInstruction = "";
-      _totalRouteTime = 0;
-      _errorMessage = "";
-      _navigationInstruction = "";
-      _isNavigating = false;
-      _isLoading = false;
-      _isMuted = false;
-      _hasShownFatigueAlert = false;
-      _currentSpeedLimit = null;
-      _isOverSpeedLimit = false;
-      _hasShownArrivalNotification = false;
-    });
-
-    debugPrint('✅ Navigation resources fully cleaned up.');
+    // Reset state
+    if(mounted) {
+      setState(() {
+        _isNavigating = false;
+        _isLoading = false;
+        _navigationInstruction = "";
+        _currentSpeedLimit = null;
+        _isOverSpeedLimit = false;
+        _currentSpace = null;
+        _hasShownArrivalNotification = false;
+      });
+    }
   }
 
   Future<bool> _handleBackPress() async {
@@ -1623,5 +1613,17 @@ class _NavigationViewState extends State<NavigationView> {
         );
       },
     );
+  }
+}
+
+class Debouncer {
+  final Duration delay;
+  Timer? _timer;
+
+  Debouncer({required this.delay});
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
   }
 }

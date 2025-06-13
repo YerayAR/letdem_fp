@@ -221,46 +221,6 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                     context
                         .read<AuthBloc>()
                         .add(VerifyEmailEvent(email: widget.email, code: otp!));
-                    // AppPopup.showDialogSheet(
-                    //   context,
-                    //   Column(
-                    //     children: <Widget>[
-                    //       CircleAvatar(
-                    //         radius: 45,
-                    //         backgroundColor: AppColors.green50,
-                    //         child: Icon(
-                    //           Icons.done,
-                    //           size: 45,
-                    //           color: AppColors.green600,
-                    //         ),
-                    //       ),
-                    //       Dimens.space(3),
-                    //       Text(
-                    //         "Verification Success",
-                    //         textAlign: TextAlign.center,
-                    //         style: Typo.heading4
-                    //             .copyWith(color: AppColors.neutral600),
-                    //       ),
-                    //       Text(
-                    //         "Your account email has been verified successfully you can proceed to the app.",
-                    //         textAlign: TextAlign.center,
-                    //         style: Typo.mediumBody
-                    //             .copyWith(color: AppColors.neutral400),
-                    //       ),
-                    //       Dimens.space(5),
-                    //       PrimaryButton(
-                    //         isLoading: state is OTPVerificationLoading,
-                    //         onTap: () {
-                    //           context.read<AuthBloc>().add(VerifyEmailEvent(
-                    //               email: widget.email, code: otp!));
-                    //         },
-                    //         text: 'Proceed',
-                    //       ),
-                    //     ],
-                    //   ),
-                    // );
-
-                    // NavigatorHelper.to(VerifyAccountView());
                   },
                   isLoading: state is OTPVerificationLoading,
                   text: 'Proceed',
