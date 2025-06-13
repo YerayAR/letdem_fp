@@ -16,6 +16,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
+import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
@@ -364,6 +365,9 @@ class HomeMapBottomSection extends StatelessWidget {
                                                   child: PrimaryButton(
                                                     onTap: () {
                                                       NavigatorHelper.pop();
+                                                      NavigatorHelper.to(
+                                                        const RegisterCarView(),
+                                                      );
                                                     },
                                                     text: 'Continue',
                                                   ),
@@ -380,6 +384,8 @@ class HomeMapBottomSection extends StatelessWidget {
                                       : await imagePicker.pickImage(
                                           source: ImageSource.camera);
                                   if (image != null) {
+                                    NavigatorHelper.pop();
+
                                     NavigatorHelper.to(
                                       PublishSpaceScreen(
                                           isPaid: true, file: File(image.path)),

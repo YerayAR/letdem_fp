@@ -145,14 +145,7 @@
       }
     }
   },
-  "location": "UBICACIÓN DE {type}",
-  "@location": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      }
-    }
-  },
+  "location": "Ubicación",
   "setLocation": "Establecer Ubicación de {type}",
   "@setLocation": {
     "placeholders": {
@@ -161,6 +154,10 @@
       }
     }
   },
+
+
+  "locationType": "Ubicación de {type}",
+  "spaceDetailsTitle": "Detalles del Espacio",
   "edit": "Editar",
   "delete": "Eliminar",
   "otherLocation": "Otra Ubicación",
@@ -267,7 +264,7 @@
   "termsAndConditions": "Términos y Condiciones",
   "pleaseAcceptTerms": "Por favor acepta los términos y condiciones",
   "password": "Contraseña",
-  "continue": "Continuar",
+  "continueText": "Continuar",
   "unableToResendVerification": "No se pudo reenviar el código de verificación",
   "somethingWentWrong": "Algo salió mal",
   "unableToProcessRequest": "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo más tarde. El error es: {error}",
@@ -392,6 +389,7 @@
   "cameraAlertMessage": "Estás en una zona de vigilancia con cámaras CCTV",
   "radarAlertMessage": "Te estás acercando a una zona con radar",
   "unnamedRoad": "Calle sin nombre",
+  "spaceOwnerCannotReserve": "El propietario del espacio no puede reservar su propio espacio",
   "couldNotRecalculateRoute": "No se pudo recalcular la ruta",
   "tooCloseToLocation": "Demasiado Cerca de la Ubicación",
   "closeToLocationDescription": "Estás cerca de la ubicación, por favor selecciona una ubicación diferente",

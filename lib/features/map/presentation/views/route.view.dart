@@ -432,7 +432,11 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                 Icon(IconlyBold.location, color: AppColors.green600, size: 36),
           ),
           Dimens.space(2),
-          Text(context.l10n.tooCloseToLocation, style: Typo.heading4),
+          Text(
+            context.l10n.tooCloseToLocation,
+            style: Typo.heading4,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 8),
           Text(
             context.l10n.closeToLocationDescription,

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/popup.dart';
@@ -69,11 +70,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                             itemCount: state.paymentMethods.length,
                             itemBuilder: (context, index) {
                               final paymentMethod = state.paymentMethods[index];
-                              return InkWell(
+                              return GestureDetector(
                                 onTap: () {
+                                  HapticFeedback.lightImpact();
                                   if (widget.onPaymentMethodSelected != null) {
-                                    print(
-                                        'Selected payment method: ${paymentMethod.paymentMethodId}');
                                     widget.onPaymentMethodSelected!(
                                       paymentMethod,
                                     );

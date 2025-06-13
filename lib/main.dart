@@ -59,6 +59,8 @@ Future _initializeHERESDK() async {
 
     Stripe.publishableKey = AppCredentials.stripePublishableKey;
 
+    await Stripe.instance.applySettings();
+
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
 

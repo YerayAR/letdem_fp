@@ -33,8 +33,8 @@ class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
       RegisterPaymentMethod event, Emitter<PaymentMethodState> emit) async {
     try {
       emit(PaymentMethodLoading());
-      await repository.addPaymentMethod(event.dto);
-      add(const FetchPaymentMethods());
+      var res = await repository.addPaymentMethod(event.dto);
+      emit(PaymentMethodAdded(res));
     } catch (_) {
       emit(const PaymentMethodError("Failed to register payment method."));
       add(const FetchPaymentMethods());

@@ -315,7 +315,7 @@ class EndPoints {
 
   static Endpoint setDefaultPaymentMethod(String id) {
     return Endpoint(
-      url: '/users/me/payment-methods/$id/default/',
+      url: '/credits/payment-methods/$id/mark-as-default',
       method: HTTPMethod.PUT,
     );
   }

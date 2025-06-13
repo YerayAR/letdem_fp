@@ -13,6 +13,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/presentation/views/withdraw.view.dart';
 import 'package:letdem/features/withdrawals/presentation/views/withdrawals.view.dart';
@@ -195,7 +196,7 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
     }
 
     return Text(
-      '€${widget.balance.toStringAsFixed(2)}',
+      '€${context.watch<UserBloc>().state is UserLoaded ? context.userProfile!.earningAccount!.availableBalance.toStringAsFixed(2) : widget.balance.toStringAsFixed(2)}',
       style: const TextStyle(
         color: Colors.white,
         fontSize: 36,

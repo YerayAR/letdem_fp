@@ -48,6 +48,11 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   @override
   void initState() {
     _selectedPaymentMethod = context.userProfile!.defaultPaymentMethod;
+
+    if (widget.space.isOwner) {
+      Toast.showError(context.l10n.spaceOwnerCannotReserve);
+      NavigatorHelper.pop();
+    }
     super.initState();
   }
 
@@ -62,7 +67,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Space Details',
+                context.l10n.spaceDetailsTitle,
                 style: Typo.largeBody.copyWith(fontWeight: FontWeight.w800),
               ),
               GestureDetector(
@@ -181,42 +186,52 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   Widget _buildPaymentCard(BuildContext context, PaymentMethodModel? method) {
     if (!widget.space.isPremium) return const SizedBox();
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.neutral50),
-      ),
-      child: method != null
-          ? Row(
-              children: [
-                Image.asset(getCardIcon(_selectedPaymentMethod!.brand),
-                    width: 40, height: 40),
-                Dimens.space(1),
-                Text(
-                  context.l10n.cardEndingWith(method.brand, method.last4),
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () => NavigatorHelper.to(const PaymentMethodsScreen()),
-                  child: Icon(Icons.keyboard_arrow_right_sharp,
-                      size: 25, color: AppColors.neutral100),
-                ),
-              ],
-            )
-          : GestureDetector(
-              onTap: () => NavigatorHelper.to(
-                  PaymentMethodsScreen(onPaymentMethodSelected: (event) {
-                NavigatorHelper.pop();
-                setState(() {
-                  _selectedPaymentMethod = event;
-                });
-              })),
-              child: Row(
+    return GestureDetector(
+      onTap: () {
+        if (context.userProfile!.defaultPaymentMethod == null) {
+          NavigatorHelper.to(AddPaymentMethod(
+              onPaymentMethodAdded: (e) => setState(() {
+                    _selectedPaymentMethod = e;
+                  })));
+        } else {
+          NavigatorHelper.to(
+              PaymentMethodsScreen(onPaymentMethodSelected: (event) {
+            NavigatorHelper.pop();
+            setState(() {
+              _selectedPaymentMethod = event;
+            });
+          }));
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 24),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.neutral50),
+        ),
+        child: method != null
+            ? Row(
+                children: [
+                  Image.asset(getCardIcon(_selectedPaymentMethod!.brand),
+                      width: 40, height: 40),
+                  Dimens.space(1),
+                  Text(
+                    context.l10n.cardEndingWith(method.brand, method.last4),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () =>
+                        NavigatorHelper.to(const PaymentMethodsScreen()),
+                    child: Icon(Icons.keyboard_arrow_right_sharp,
+                        size: 25, color: AppColors.neutral100),
+                  ),
+                ],
+              )
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -230,7 +245,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                       size: 18, color: AppColors.neutral100),
                 ],
               ),
-            ),
+      ),
     );
   }
 

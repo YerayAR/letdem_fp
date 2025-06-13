@@ -14,10 +14,10 @@ extension TimeFormatter on int {
 
   String toFormattedDistance() {
     if (this >= 1000) {
-      final km = (this / 1000).floor(); // remove decimal
+      final km = (this / 1000).round();
       return "$km km";
     } else {
-      return "$this m";
+      return "$this meters";
     }
   }
 }

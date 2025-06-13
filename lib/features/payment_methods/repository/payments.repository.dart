@@ -8,12 +8,13 @@ import 'payment.interface.dart';
 
 class PaymentMethodRepository implements IPaymentMethodRepository {
   @override
-  Future<void> addPaymentMethod(AddPaymentMethodDTO dto) async {
-    await ApiService.sendRequest(
+  Future<PaymentMethodModel> addPaymentMethod(AddPaymentMethodDTO dto) async {
+    var res = await ApiService.sendRequest(
       endpoint: EndPoints.addPaymentMethod.copyWithDTO(
         dto,
       ),
     );
+    return PaymentMethodModel.fromJson(res.data);
   }
 
   @override

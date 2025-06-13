@@ -167,6 +167,7 @@ class _WithdrawViewState extends State<WithdrawView> {
                     onProceed: () {
                       NavigatorHelper.pop();
                       NavigatorHelper.pop();
+                      NavigatorHelper.pop();
                     },
                   ));
             }

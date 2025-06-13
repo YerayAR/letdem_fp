@@ -72,11 +72,10 @@ dependencies:
   flutter_tts: ^4.2.2
   audioplayers: ^6.4.0
   file_picker: ^10.1.2
-  stripe_android: 11.3.0
 
 
   flag: ^7.0.0
-  flutter_stripe: ^11.3.0
+  flutter_stripe: ^11.4.0
   url_launcher: ^6.3.1
 dev_dependencies:
   flutter_test:

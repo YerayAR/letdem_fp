@@ -97,7 +97,7 @@
   "importantNotice": "Important Notice",
   "createCarProfileFirst": "You need to create a car profile to publish a paid space. Please create a car profile first.",
   "createEarningAccountFirst": "You need to create an earning account to publish a paid space. Please create an earning account first.",
-  "continue": "Continue",
+  "continueText": "Continue",
   "locationPermissionRequired": "Location Permission\nRequired",
   "locationPermissionDescription": "We need to get access to your location services to perform any action in the app",
   "openSystemSettings": "Open System Settings",
@@ -146,14 +146,11 @@
       }
     }
   },
-  "location": "{type} LOCATION",
-  "@location": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      }
-    }
-  },
+  "spaceOwnerCannotReserve": "Space owner cannot reserve their own space",
+  "location": "Location",
+  "spaceDetailsTitle": "Space Details",
+  "locationType": "{type} LOCATION",
+
   "setLocation": "Set {type} Location",
   "@setLocation": {
     "placeholders": {

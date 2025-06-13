@@ -9,6 +9,15 @@ final class PaymentMethodInitial extends PaymentMethodState {
   List<Object> get props => [];
 }
 
+final class PaymentMethodAdded extends PaymentMethodState {
+  final PaymentMethodModel paymentMethod;
+
+  const PaymentMethodAdded(this.paymentMethod);
+
+  @override
+  List<Object> get props => [paymentMethod];
+}
+
 final class PaymentMethodLoaded extends PaymentMethodState {
   final List<PaymentMethodModel> paymentMethods;
   final bool isDeleting;

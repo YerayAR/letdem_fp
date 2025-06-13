@@ -137,18 +137,22 @@ class SavedAddressComponent extends StatelessWidget {
                                                     ? context.l10n
                                                         .updatingLocation(
                                                             locationType.name)
+                                                        .toUpperCase()
                                                     : place != null ||
                                                             apiPlace != null
                                                         ? apiPlace != null
                                                             ? context.l10n
-                                                                .location(
+                                                                .locationType(
                                                                     locationType
                                                                         .name)
                                                             : place!
                                                                 .placeFormatted
                                                                 .toUpperCase()
-                                                        : context.l10n.location(
-                                                            locationType.name),
+                                                        : context.l10n
+                                                            .locationType(
+                                                                locationType
+                                                                    .name)
+                                                            .toUpperCase(),
                                                 style: Typo.smallBody.copyWith(
                                                   fontWeight: FontWeight.w400,
                                                   color: AppColors.neutral400,
@@ -320,7 +324,7 @@ class LocationBottomSheet extends StatelessWidget {
           Row(
             children: [
               Text(
-                context.l10n.location(type),
+                context.l10n.locationType(type).toUpperCase(),
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 17,

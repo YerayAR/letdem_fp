@@ -214,7 +214,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                         ),
                         Dimens.space(2),
                         PublishingLocationWidget(
-                          position: snapshot.data?.locationName,
+                          position: snapshot.data?.locationName ?? "",
                         ),
                         Dimens.space(2),
                         Row(
@@ -395,7 +395,9 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       text: (_pageController.hasClients &&
                               _pageController.page == 1)
                           ? context.l10n.publish
-                          : (widget.isPaid ? context.l10n.next : context.l10n.publish),
+                          : (widget.isPaid
+                              ? context.l10n.next
+                              : context.l10n.publish),
                     ),
                   ),
                 ),
@@ -435,7 +437,7 @@ class PublishingLocationWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(context.l10n.location as String, 
+                  Text(context.l10n.location,
                       style: Typo.smallBody.copyWith(
                         color: AppColors.neutral600,
                         fontSize: 14,

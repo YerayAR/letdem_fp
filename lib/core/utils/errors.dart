@@ -70,6 +70,7 @@ class ErrorMessageHelper {
     'SPACE_PUBLISHED_NEARBY_RECENTLY':
         'A space has been published nearby recently.',
     'SPACE_NOT_FUND': 'Space not found.',
+    'INVALID_PHONE': 'Invalid phone number.',
     'SPACE_FEEDBACK_ALREADY_CREATED':
         'Feedback has already been submitted for this space.',
     'SPACE_OWNER_CANNOT_SEND_FEEDBACK': 'Space owners cannot send feedback.',
@@ -118,6 +119,7 @@ class ErrorMessageHelper {
     'PAYMENT_METHOD_NOT_FOUND': 'Método de pago no encontrado.',
     'PAYMENT_METHOD_ALREADY_EXISTS': 'El método de pago ya existe.',
     'PAYOUT_METHOD_NOT_FOUND': 'Método de retiro no encontrado.',
+    'INVALID_PHONE': 'Número de teléfono inválido.',
     'PAYMENT_REQUIRES_ACTION':
         'El pago requiere una acción adicional. Verifica tu método de pago.',
     'PAYMENT_FAILED': 'El pago falló. Intenta nuevamente más tarde.',
