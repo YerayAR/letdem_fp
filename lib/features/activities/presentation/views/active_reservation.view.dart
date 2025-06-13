@@ -56,6 +56,7 @@ class ActiveReservationView extends StatelessWidget {
     return GestureDetector(
       onTap: () => _navigateToDetails(context),
       child: Container(
+        margin: EdgeInsets.only(bottom: 16),
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           vertical: Dimens.defaultMargin,
@@ -68,26 +69,26 @@ class ActiveReservationView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             Dimens.space(2),
-            _buildDetailsRow(),
+            _buildDetailsRow(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildTypeInfo(),
-        _buildStatusInfo(),
+        _buildTypeInfo(context),
+        _buildStatusInfo(context),
       ],
     );
   }
 
-  Widget _buildTypeInfo() {
+  Widget _buildTypeInfo(BuildContext context) {
     return Row(
       children: [
         SvgPicture.asset(
@@ -97,7 +98,7 @@ class ActiveReservationView extends StatelessWidget {
         ),
         Dimens.space(1),
         Text(
-          getSpaceAvailabilityMessage(payload.space.type),
+          getSpaceAvailabilityMessage(payload.space.type, context),
           style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
@@ -128,14 +129,12 @@ class ActiveReservationView extends StatelessWidget {
           child: Row(
             children: [
               _buildIconText(
-                Iconsax.clock5, 
-                getTimeRemaining(payload.expireAt)
-              ),
+                  Iconsax.clock5, getTimeRemaining(payload.expireAt)),
               Dimens.space(3),
               _buildIconText(
                 Iconsax.money5,
-                payload.price == null 
-                    ? context.l10n.free 
+                payload.price == null
+                    ? context.l10n.free
                     : "${payload.price}${context.l10n.currency}",
               ),
             ],

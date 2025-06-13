@@ -23,6 +23,8 @@ class ErrorMessageHelper {
     'INVALID_SOCIAL_TOKEN': 'Invalid social login token.',
     'INVALID_OTP': 'Invalid OTP code.',
     'ACCOUNT_ALREADY_ACTIVATED': 'Account is already activated.',
+    'BALANCE_LOWER_THAN_MINIMUM':
+        'Your balance is below the minimum payout threshold.',
     'EMAIL_NOT_FOUND': 'Email address not found.',
     'OTP_NOT_VALIDATED': 'OTP has not been validated.',
     'CAR_ALREADY_CREATED': 'You have already added a car.',
@@ -46,9 +48,10 @@ class ErrorMessageHelper {
         'This payout method is not available in your country.',
     'PAYMENT_METHOD_NOT_FOUND': 'Payment method not found.',
     'PAYMENT_METHOD_ALREADY_EXISTS': 'Payment method already exists.',
-    'BALANCE_LOWER_THAN_MINIMUM':
-        'Your balance is below the minimum payout threshold.',
     'PAYOUT_METHOD_NOT_FOUND': 'Payout method not found.',
+    'PAYMENT_REQUIRES_ACTION':
+        'Payment requires additional action. Please check your payment method.',
+    'PAYMENT_FAILED': 'Payment failed. Please try again later.',
 
     // Events
     'EVENT_PUBLICATION_ERROR': 'An error occurred while publishing the event.',
@@ -72,7 +75,8 @@ class ErrorMessageHelper {
     'SPACE_OWNER_CANNOT_SEND_FEEDBACK': 'Space owners cannot send feedback.',
     'SPACE_INVALID_PRICE':
         'The price set for the space is invalid. Space price should be in range of 3 - 20',
-    'SPACE_INVALID_TIME_TO_WAIT': 'The waiting time specified is invalid.',
+    'SPACE_INVALID_TIME_TO_WAIT':
+        'The waiting time specified is invalid. Should be in range of 20 - 60',
   };
 
   static const Map<String, String> _spanishMessages = {
@@ -81,6 +85,7 @@ class ErrorMessageHelper {
     'INVALID_CURRENT_PASSWORD': 'La contraseña actual es incorrecta.',
     'REPEATED_PASSWORD':
         'La nueva contraseña no puede ser igual a la anterior.',
+
     'INACTIVE_ACCOUNT': 'Tu cuenta está inactiva.',
     'EMAIL_ALREADY_EXISTS': 'Este correo electrónico ya está registrado.',
     'INVALID_SOCIAL_TOKEN': 'Token de inicio de sesión social inválido.',
@@ -101,6 +106,8 @@ class ErrorMessageHelper {
 
     // Credits
     'EARNING_ACCOUNT_ALREADY_EXISTS': 'La cuenta de ingresos ya existe.',
+    'BALANCE_LOWER_THAN_MINIMUM':
+        'Tu saldo está por debajo del mínimo para retiros.',
     'EARNING_ACCOUNT_REQUIRED': 'Se requiere una cuenta de ingresos.',
     'EARNING_ACCOUNT_IS_NOT_ACCEPTED': 'La cuenta de ingresos no es aceptada.',
     'COUNTRY_NOT_SUPPORTED': 'Este país no es compatible.',
@@ -110,9 +117,10 @@ class ErrorMessageHelper {
         'Este método de pago no está disponible en tu país.',
     'PAYMENT_METHOD_NOT_FOUND': 'Método de pago no encontrado.',
     'PAYMENT_METHOD_ALREADY_EXISTS': 'El método de pago ya existe.',
-    'BALANCE_LOWER_THAN_MINIMUM':
-        'Tu saldo está por debajo del mínimo para retiros.',
     'PAYOUT_METHOD_NOT_FOUND': 'Método de retiro no encontrado.',
+    'PAYMENT_REQUIRES_ACTION':
+        'El pago requiere una acción adicional. Verifica tu método de pago.',
+    'PAYMENT_FAILED': 'El pago falló. Intenta nuevamente más tarde.',
 
     // Events
     'EVENT_PUBLICATION_ERROR': 'Error al publicar el evento.',

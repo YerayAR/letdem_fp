@@ -262,7 +262,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                               ),
                                               Dimens.space(1),
                                               Text(
-                                                getSpaceTypeText(e),
+                                                getSpaceTypeText(e, context),
                                                 style: Typo.smallBody.copyWith(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,

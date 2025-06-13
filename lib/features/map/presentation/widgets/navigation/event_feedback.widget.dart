@@ -61,7 +61,7 @@ class _EventFeedbackState extends State<EventFeedback> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          getEventMessage(widget.event.type),
+                          getEventMessage(widget.event.type, context),
                           style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700, fontSize: 18),
                         ),
@@ -69,7 +69,7 @@ class _EventFeedbackState extends State<EventFeedback> {
                         DecoratedChip(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 5),
-                          text: '${widget.currentDistance.floor()}m away',
+                          text: '${widget.currentDistance.floor()} meters away',
                           textStyle: Typo.smallBody.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.green600,
@@ -94,6 +94,7 @@ class _EventFeedbackState extends State<EventFeedback> {
             Row(
               children: <Widget>[
                 Flexible(
+                  flex: widget.event.isOwner ? 1 : 2,
                   child: PrimaryButton(
                     onTap: () {
                       NavigatorHelper.pop();
@@ -101,21 +102,25 @@ class _EventFeedbackState extends State<EventFeedback> {
                     text: 'Got it, Thank you',
                   ),
                 ),
-                Dimens.space(1),
+                Dimens.space(widget.event.isOwner ? 0 : 2),
                 Flexible(
-                  child: PrimaryButton(
-                    outline: true,
-                    onTap: () {
-                      AppPopup.showBottomSheet(
-                        context,
-                        FeedbackForm(eventID: widget.event.id),
-                      );
-                    },
-                    background: AppColors.primary50,
-                    borderColor: Colors.transparent,
-                    color: AppColors.primary500,
-                    text: 'Feedback',
-                  ),
+                  flex: widget.event.isOwner ? 0 : 1,
+                  child: widget.event.isOwner
+                      ? const SizedBox()
+                      : PrimaryButton(
+                          outline: true,
+                          onTap: () {
+                            if (widget.event.isOwner) {}
+                            AppPopup.showBottomSheet(
+                              context,
+                              FeedbackForm(eventID: widget.event.id),
+                            );
+                          },
+                          background: AppColors.primary50,
+                          borderColor: Colors.transparent,
+                          color: AppColors.primary500,
+                          text: 'Feedback',
+                        ),
                 )
               ],
             ),

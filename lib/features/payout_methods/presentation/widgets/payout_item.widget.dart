@@ -108,8 +108,8 @@ class OptionItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       method.accountHolderName,
-                      style:
-                          Typo.smallBody.copyWith(color: AppColors.neutral300),
+                      style: Typo.smallBody
+                          .copyWith(color: AppColors.neutral400, fontSize: 15),
                     ),
                   ],
                 ),

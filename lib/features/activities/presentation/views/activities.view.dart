@@ -41,44 +41,37 @@ class _ActivitiesViewState extends State<ActivitiesView> {
     // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
   }
 
-  Widget _buildFooter(ActivitiesState state) {
-    bool isActiveReservation = context.userProfile?.activeReservation != null;
-
-    Widget item = ContributionsSection();
-
-    print("isActiveReservation: $isActiveReservation");
+  Widget _buildFooter(ActivitiesState state, bool isAllRouted) {
+    Widget item = ContributionsSection(
+      isAllRouted: isAllRouted,
+    );
 
     return item;
   }
 
   Widget _buidShowAllButton(ActivitiesState state) {
-    print("state: $state");
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          context.l10n.contributions,
-          style: Typo.mediumBody.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(
+        context.l10n.contributions,
+        style: Typo.mediumBody.copyWith(
+          fontWeight: FontWeight.w600,
         ),
-        if (state is ActivitiesLoaded && state.activities.isNotEmpty)
-          TextButton(
-            onPressed: () {
-              NavigatorHelper.to(const ViewAllView());
-            },
-            child: Text(
-              context.l10n.showAll,
-              style: Typo.smallBody.copyWith(
-                color: AppColors.primary500,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.underline,
-              ),
+      ),
+      if (state is ActivitiesLoaded && state.activities.isNotEmpty)
+        TextButton(
+          onPressed: () {
+            NavigatorHelper.to(const ViewAllView());
+          },
+          child: Text(
+            context.l10n.showAll,
+            style: Typo.smallBody.copyWith(
+              color: AppColors.primary500,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
             ),
           ),
-      ],
-    );
+        ),
+    ]);
   }
 
   @override
@@ -98,7 +91,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                           const CarSection(),
                           const ActiveReservationSection(),
                           _buidShowAllButton(state),
-                          _buildFooter(state),
+                          _buildFooter(state, true),
                         ],
                       ),
                     ),
@@ -108,7 +101,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                     const CarSection(),
                     const ActiveReservationSection(),
                     _buidShowAllButton(state),
-                    Expanded(child: _buildFooter(state)),
+                    Expanded(child: _buildFooter(state, false)),
                   ],
           );
 
@@ -189,21 +182,20 @@ class ActiveReservationSection extends StatelessWidget {
 }
 
 class ContributionsSection extends StatelessWidget {
-  const ContributionsSection({super.key});
+  final bool isAllRouted;
+  const ContributionsSection({super.key, required this.isAllRouted});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ActivitiesBloc, ActivitiesState>(
       builder: (context, state) {
-        // Fix: Better state handling and null safety
-        // if (state is! ActivitiesLoaded) {
-        //   return const Center(child: CircularProgressIndicator());
-        // }
-
-        final contributions = context.userProfile!.contributions;
+        final contributions = context.userProfile == null
+            ? []
+            : context.userProfile!.contributions;
         final isEmpty = contributions.isEmpty;
 
         return Container(
+          margin: const EdgeInsets.only(top: 5),
           height: context.userProfile?.activeReservation != null ? 400 : null,
           width: double.infinity,
           // Fix: Add constraints to prevent unbounded height issues
@@ -216,6 +208,12 @@ class ContributionsSection extends StatelessWidget {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimens.defaultRadius),
               topRight: Radius.circular(Dimens.defaultRadius),
+              bottomLeft: isAllRouted
+                  ? Radius.circular(Dimens.defaultRadius)
+                  : Radius.zero,
+              bottomRight: isAllRouted
+                  ? Radius.circular(Dimens.defaultRadius)
+                  : Radius.zero,
             ),
           ),
           child: isEmpty

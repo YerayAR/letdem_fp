@@ -664,7 +664,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 
 String parseMeters(double distance) {
   if (distance < 1000) {
-    return "${distance.toStringAsFixed(0)}m";
+    return "${distance.toStringAsFixed(0)} meters";
   } else {
     return "${(distance / 1000).toStringAsFixed(1)}km";
   }

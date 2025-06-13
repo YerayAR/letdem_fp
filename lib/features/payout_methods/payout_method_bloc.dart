@@ -36,7 +36,7 @@ class PayoutMethodBloc extends Bloc<PayoutMethodEvent, PayoutMethodState> {
     emit(PayoutMethodLoading());
     try {
       await payoutMethodRepository.addPayoutMethod(event.method);
-      add(FetchPayoutMethods());
+      emit(PayoutMethodAdded());
     } on ApiError catch (err) {
       Toast.showError(err.message);
       add(FetchPayoutMethods());

@@ -16,6 +16,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:otp_text_field/otp_text_field.dart';
@@ -38,32 +39,52 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StyledBody(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildAppBar(),
-          Dimens.space(2),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 40),
-              children: [
-                _buildImagePreview(),
-                const SizedBox(height: 24),
-                _buildInfoCards(),
-                Dimens.space(6),
-                _buildStatusStepper(),
-                Dimens.space(6),
-                _buildConfirmOrderButton(context),
-              ],
-            ),
-          ),
-        ],
+      body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
+        listener: (context, state) {
+          if (state is ActivitiesPublished) {
+            context.read<UserBloc>().add(FetchUserInfoEvent());
+            // Handle successful space reservation confirmation
+            AppPopup.showDialogSheet(
+              context,
+              const SuccessDialog(
+                title: "Action Successful",
+                subtext:
+                    "Your space was ordered successfully, we will update your account shortly.",
+                onProceed: NavigatorHelper.popAll,
+              ),
+            );
+          }
+          // TODO: implement listener
+        },
+        builder: (context, state) {
+          return StyledBody(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAppBar(),
+              Dimens.space(2),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.only(bottom: 40),
+                  children: [
+                    _buildImagePreview(),
+                    const SizedBox(height: 24),
+                    _buildInfoCards(),
+                    Dimens.space(6),
+                    _buildStatusStepper(),
+                    Dimens.space(6),
+                    _buildConfirmOrderButton(context),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildAppBar() {
-    return const StyledAppBar(
+    return StyledAppBar(
       title: context.l10n.spaceDetails,
       onTap: NavigatorHelper.pop,
       icon: Iconsax.close_circle5,
@@ -102,7 +123,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           ),
           const SizedBox(height: 12),
           Text(
-            getSpaceAvailabilityMessage(widget.payload.space.type),
+            getSpaceAvailabilityMessage(widget.payload.space.type, context),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -212,7 +233,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
             NavigatorHelper.pop();
             AppPopup.showBottomSheet(
               context,
-              const SuccessDialog(
+              SuccessDialog(
                 title: context.l10n.spaceReserved,
                 subtext: context.l10n.spaceReservedSuccessfully,
                 onProceed: NavigatorHelper.popAll,
@@ -249,6 +270,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           textAlign: TextAlign.center,
           style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
         ),
+        Dimens.space(4),
       ],
     );
   }

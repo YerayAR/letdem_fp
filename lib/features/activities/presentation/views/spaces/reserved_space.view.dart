@@ -39,13 +39,13 @@ class ReservedSpaceDetailView extends StatelessWidget {
               children: [
                 _buildImage(),
                 const SizedBox(height: 24),
-                _buildConfirmationCard(),
+                _buildConfirmationCard(context),
                 const SizedBox(height: 24),
-                _buildPropertiesRow(),
+                _buildPropertiesRow(context),
                 const SizedBox(height: 24),
                 _buildNavigateButton(context),
                 const SizedBox(height: 16),
-                _buildCallButton(),
+                _buildCallButton(context),
               ],
             ),
           ),
@@ -88,7 +88,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          const Center(
+          Center(
             child: Text(
               context.l10n.confirmationCodeTitle,
               style: TextStyle(fontSize: 16, color: Colors.black54),
@@ -100,9 +100,9 @@ class ReservedSpaceDetailView extends StatelessWidget {
             style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          _buildShareNote(),
+          _buildShareNote(context),
           Dimens.space(3),
-          _buildOwnerPlate(),
+          _buildOwnerPlate(context),
         ],
       ),
     );
@@ -127,7 +127,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           context.l10n.ownerPlateNumber,
           style: TextStyle(fontSize: 16, color: Colors.black54),
         ),
@@ -146,17 +146,17 @@ class ReservedSpaceDetailView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // Space Info Row
   // ---------------------------------------------------------------------------
-  Widget _buildPropertiesRow() {
+  Widget _buildPropertiesRow(context) {
     return Row(
       children: [
-        Expanded(child: _buildSpaceInfoCard()),
+        Expanded(child: _buildSpaceInfoCard(context)),
         const SizedBox(width: 16),
         Expanded(child: _buildPriceInfoCard()),
       ],
     );
   }
 
-  Widget _buildSpaceInfoCard() {
+  Widget _buildSpaceInfoCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: _cardDecoration(),
@@ -165,7 +165,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
           SvgPicture.asset(getSpaceTypeIcon(space.type), width: 60, height: 60),
           const SizedBox(height: 12),
           Text(
-            getSpaceAvailabilityMessage(space.type),
+            getSpaceAvailabilityMessage(space.type, context),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -214,20 +214,19 @@ class ReservedSpaceDetailView extends StatelessWidget {
 
   Widget _buildCallButton(BuildContext context) {
     return PrimaryButton(
-      onTap: () async {
-        Uri url = Uri.parse('tel:${details.phone}');
-        if (!await launchUrl(url)) {
-          Toast.showError(context.l10n.couldNotLaunchDialer);
-        } else {
-          print("Dialer launched successfully");
-        }
-      },
-      borderWidth: 1,
-      background: Colors.white,
-      textColor: AppColors.neutral500,
-      icon: IconlyBold.call,
-      text: context.l10n.callSpaceOwner
-    );
+        onTap: () async {
+          Uri url = Uri.parse('tel:${details.phone}');
+          if (!await launchUrl(url)) {
+            Toast.showError(context.l10n.couldNotLaunchDialer);
+          } else {
+            print("Dialer launched successfully");
+          }
+        },
+        borderWidth: 1,
+        background: Colors.white,
+        textColor: AppColors.neutral500,
+        icon: IconlyBold.call,
+        text: context.l10n.callSpaceOwner);
   }
 
   // ---------------------------------------------------------------------------

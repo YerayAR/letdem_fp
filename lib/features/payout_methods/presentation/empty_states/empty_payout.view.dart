@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 
 class EmptyPayoutMethodView extends StatelessWidget {
@@ -14,10 +15,10 @@ class EmptyPayoutMethodView extends StatelessWidget {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.white,
-            child: Icon(
-              Iconsax
-                  .card5, // You can use Iconsax.wallet or Iconsax.bank as well
-              size: 40,
+            child: SvgPicture.asset(
+              AppAssets.bank,
+              width: 40,
+              height: 40,
               color: AppColors.primary500,
             ),
           ),

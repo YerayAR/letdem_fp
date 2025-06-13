@@ -43,11 +43,10 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         return;
       }
       context.read<EarningsBloc>().add(SubmitEarningsAccount(
-            legalFirstName: _firstNameController.text.trim(),
-            legalLastName: _lastNameController.text.trim(),
-            phone: _phoneController.text.trim().replaceAll("-", ""),
-            birthday: DateFormat('yyyy-MM-dd').format(_dateOfBirth!)
-          ));
+          legalFirstName: _firstNameController.text.trim(),
+          legalLastName: _lastNameController.text.trim(),
+          phone: _phoneController.text.trim().replaceAll("-", ""),
+          birthday: DateFormat('yyyy-MM-dd').format(_dateOfBirth!)));
     }
   }
 
@@ -74,7 +73,8 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(context.l10n.personalInfoTitle,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.bold)),
               Text(context.l10n.personalInfoDescription,
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 30),
@@ -96,7 +96,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return Container(
-                        height: 300,
+                        height: 400,
                         color: Colors.white,
                         child: Column(
                           children: [
@@ -128,6 +128,20 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                                 },
                               ),
                             ),
+                            // SafeArea(
+                            //   child: Material(
+                            //     child: Padding(
+                            //       padding: const EdgeInsets.symmetric(
+                            //           horizontal: 16, vertical: 0),
+                            //       child: PrimaryButton(
+                            //         text: 'Done',
+                            //         onTap: () {
+                            //           Navigator.of(context).pop();
+                            //         },
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       );
@@ -136,6 +150,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 },
                 child: AbsorbPointer(
                   child: TextInputField(
+                    placeholderColor: _dateOfBirth != null
+                        ? AppColors.neutral600
+                        : AppColors.neutral300,
                     mustValidate: false,
                     label: context.l10n.dateOfBirth,
                     placeHolder: _dateOfBirth != null

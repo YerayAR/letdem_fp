@@ -68,7 +68,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
           ),
           Dimens.space(1),
           Text(
-            '€${(context.userProfile!.earningAccount?.balance ?? 0).toStringAsFixed(2)}',
+            '€${(context.userProfile!.earningAccount?.availableBalance ?? 0).toStringAsFixed(2)}',
             style: Typo.heading3.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 36,
@@ -107,7 +107,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
             _errorText ??
                 '€${context.userProfile!.earningAccount?.pendingBalance.toStringAsFixed(2)} Pending to be cleared',
             style: Typo.mediumBody.copyWith(
-              fontSize: 11,
+              fontSize: 13,
               color:
                   _errorText != null ? AppColors.red500 : AppColors.neutral300,
             ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/features/users/user_bloc.dart';
@@ -120,7 +120,7 @@ class OrderCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      order.price,
+                      getSpaceTypeText(order.type, context),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -164,26 +164,6 @@ class OrderCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _getIconBackgroundColor(Order order) {
-    switch (order.status) {
-      case ReservedStatus.canceled:
-        return AppColors.red50;
-      case ReservedStatus.pending:
-        return AppColors.neutral50;
-      case ReservedStatus.confirmed:
-        return AppColors.primary50;
-      case ReservedStatus.reserved:
-        return AppColors.red50;
-      case ReservedStatus.expired:
-        // TODO: Handle this case.
-        return AppColors.red50;
-    }
-  }
-
-  Color _getIconColor(Order order) {
-    return Colors.white;
   }
 
   Widget _buildStatusChip(ReservedStatus status) {
@@ -378,9 +358,10 @@ class EmptyOrdersView extends StatelessWidget {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.white,
-            child: Icon(
-              Iconsax.notification5,
-              size: 40,
+            child: SvgPicture.asset(
+              AppAssets.location,
+              width: 40,
+              height: 40,
               color: AppColors.primary500,
             ),
           ),

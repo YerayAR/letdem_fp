@@ -11,9 +11,10 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/CarTagType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
-import 'package:letdem/features/map/presentation/views/test.dart';
-import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/car/car.model.dart';
+
+import '../../../../infrastructure/services/res/navigator.dart';
+import '../../../map/presentation/views/navigate.view.dart';
 
 class RegisteredCarWidget extends StatelessWidget {
   final Car car;

@@ -46,7 +46,8 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
           if (state is PayoutMethodFailure) {
             Toast.showError(state.message);
           }
-          if (state is PayoutMethodSuccess) {
+          if (state is PayoutMethodAdded) {
+            context.read<PayoutMethodBloc>().add(FetchPayoutMethods());
             AppPopup.showDialogSheet(
                 context,
                 SuccessDialog(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/models/withdrawals/withdrawal.model.dart';
@@ -120,10 +122,11 @@ class WithdrawalCard extends StatelessWidget {
           CircleAvatar(
             radius: 25,
             backgroundColor: AppColors.neutral50,
-            child: Icon(
-              Iconsax.card5,
+            child: SvgPicture.asset(
+              AppAssets.card,
+              width: 24,
+              height: 24,
               color: AppColors.neutral500,
-              size: 24,
             ),
           ),
           const SizedBox(width: 16),
@@ -358,11 +361,8 @@ class EmptyWithdrawalView extends StatelessWidget {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.white,
-            child: Icon(
-              Iconsax.bank,
-              size: 40,
-              color: Colors.blue[600],
-            ),
+            child: SvgPicture.asset(AppAssets.card,
+                width: 40, height: 40, color: AppColors.primary500),
           ),
           const SizedBox(height: 20),
           const Text(
