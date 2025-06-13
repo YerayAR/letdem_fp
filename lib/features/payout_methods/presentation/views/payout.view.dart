@@ -9,6 +9,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/presentation/empty_states/empty_payout.view.dart';
 import 'package:letdem/features/payout_methods/presentation/views/add/add_payout.view.dart';
@@ -49,7 +50,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                 isBottomPadding: false,
                 children: [
                   StyledAppBar(
-                    title: 'Payout Methods',
+                    title: context.l10n.payoutMethods,
                     onTap: () => Navigator.of(context).pop(),
                     icon: Icons.close,
                   ),
@@ -133,7 +134,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                   Row(
                     children: [
                       Text(
-                        "Payout Method Options",
+                        context.l10n.payoutMethodOptions,
                         style: Typo.largeBody.copyWith(
                             fontWeight: FontWeight.w700, fontSize: 18),
                       ),
@@ -170,7 +171,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                           ),
                         ),
                         Dimens.space(1),
-                        Text("Delete",
+                        Text(context.l10n.delete,
                             style: Typo.largeBody.copyWith(
                               fontSize: 17,
                               fontWeight: FontWeight.w500,
@@ -188,7 +189,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
 
   Widget _buildAddPayoutMethodButton() {
     return PrimaryButton(
-      text: 'Add Payout Method',
+      text: context.l10n.addPayoutMethod,
       background: AppColors.primary500,
       textColor: Colors.white,
       onTap: () {

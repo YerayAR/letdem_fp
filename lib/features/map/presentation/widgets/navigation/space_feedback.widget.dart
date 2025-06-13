@@ -5,6 +5,7 @@ import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/dto/take_space.dto.dart';
@@ -24,11 +25,13 @@ class ParkingRatingWidget extends StatefulWidget {
 class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
   TakeSpaceType? _selectedOption;
   bool _submitted = false;
+  late List<Map<String, dynamic>> _options;
 
-  final List<Map<String, dynamic>> _options = [
+  void _inizializeOptions() {
+    _options = [
     {
       'id': 'take',
-      'label': "I'll take it",
+      'label': context.l10n.illTakeIt,
       'icon': Icons.thumb_up,
       'color': Colors.green.shade100,
       "enum": TakeSpaceType.TAKE_IT,
@@ -36,7 +39,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
     },
     {
       'id': 'inuse',
-      'label': "It's in use",
+      'label': context.l10n.itsInUse,
       'icon': Icons.directions_car,
       "enum": TakeSpaceType.IN_USE,
       'color': AppColors.primary500.withOpacity(0.1),
@@ -44,7 +47,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
     },
     {
       'id': 'notuseful',
-      'label': "Not useful",
+      'label': context.l10n.notUseful,
       "enum": TakeSpaceType.NOT_USEFUL,
       'icon': Icons.thumb_down,
       'color': Colors.amber.shade100,
@@ -52,13 +55,14 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
     },
     {
       'id': 'prohibited',
-      'label': "Prohibited",
+      'label': context.l10n.prohibited,
       "enum": TakeSpaceType.PROHIBITED,
       'icon': Icons.not_interested,
       'color': Colors.red.shade100,
       'iconColor': Colors.red
     },
   ];
+  }
 
   void _handleSubmit() {
     context.read<ActivitiesBloc>().add(
@@ -87,6 +91,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _inizializeOptions();
     return _buildRatingForm();
   }
 
@@ -98,8 +103,8 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
           AppPopup.showDialogSheet(
             context,
             SuccessDialog(
-              title: "Your feedback has been submitted",
-              subtext: "Thank you for your input!",
+              title: context.l10n.feedbackSubmitted,
+              subtext: context.l10n.thankYouForInput,
               onProceed: () {
                 NavigatorHelper.pop();
                 NavigatorHelper.pop();
@@ -149,7 +154,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                   child: Column(
                     children: [
                       Text(
-                        'You have arrived at your destination.',
+                        context.l10n.arrivedAtDestination,
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -158,9 +163,9 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        "How would you like to rate this parking space?",
-                        style: TextStyle(
+                      Text(
+                        context.l10n.rateThisParkingSpace,
+                        style: const TextStyle(
                           fontSize: 15,
                           color: Colors.black87,
                         ),
@@ -222,7 +227,7 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
 
                 // Submit Button
                 PrimaryButton(
-                  text: 'Done',
+                  text: context.l10n.done,
                   isLoading: state is ActivitiesLoading,
                   onTap: _submitted ? null : _handleSubmit,
                 ),

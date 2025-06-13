@@ -96,7 +96,7 @@ Future<Duration?> showMMSSPicker({
                     child: Text(context.l10n.minutes, textAlign: TextAlign.center),
                   ),
                   Expanded(
-                    child: Text(context.l10n.seconds, textAlign: TextAlign.center),
+                    child: Text(context.l10n.sec, textAlign: TextAlign.center),
                   ),
                 ],
               ),

@@ -11,6 +11,7 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
 import 'package:letdem/features/payment_methods/presentation/empty_states/empty_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
@@ -53,7 +54,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           return StyledBody(
             children: [
               StyledAppBar(
-                title: 'Payment Methods',
+                title: context.l10n.paymentMethods,
                 onTap: () {
                   NavigatorHelper.pop();
                 },
@@ -105,7 +106,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
               // Add New Card Button
               PrimaryButton(
-                text: 'Add New Card',
+                text: context.l10n.addNewCard,
                 onTap: () {
                   NavigatorHelper.to(const AddPaymentMethod());
                   // Add new card action
@@ -141,7 +142,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Visa ending with $last4',
+                context.l10n.cardEndingWith('Visa', last4),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -154,7 +155,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                     child: !isDefault
                         ? null
                         : DecoratedChip(
-                            text: 'Default',
+                            text: context.l10n.defaultt,
                             backgroundColor: AppColors.secondary50,
                             color: AppColors.secondary600,
                           ),
@@ -181,7 +182,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             ],
           ),
           Text(
-            'Expire Date: $expireDate',
+            context.l10n.expireDate(expireDate),
             style: Typo.smallBody.copyWith(
                 fontWeight: FontWeight.w500, color: AppColors.neutral400),
           ),
@@ -219,7 +220,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           Row(
             children: [
               Text(
-                "Payment method",
+                context.l10n.paymentMethod,
                 style: Typo.largeBody
                     .copyWith(fontWeight: FontWeight.w700, fontSize: 18),
               ),
@@ -254,7 +255,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                   ),
                 ),
                 Dimens.space(2),
-                Text("Make Default",
+                Text(context.l10n.makeDefault,
                     style: Typo.largeBody.copyWith(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
@@ -297,7 +298,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                       ),
                     ),
                     Dimens.space(2),
-                    Text("Delete",
+                    Text(context.l10n.delete,
                         style: Typo.largeBody.copyWith(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
@@ -320,6 +321,94 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 ),
               );
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeleteConfirmationDialog() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.warning_amber_rounded,
+              size: 32,
+              color: Colors.amber.shade600,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            context.l10n.confirmDeleteCard,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            context.l10n.deleteCardConfirmation('0967'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                showDeleteConfirmation = false;
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              context.l10n.noKeepCard,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                showDeleteConfirmation = false;
+              });
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+              minimumSize: const Size(double.infinity, 50),
+            ),
+            child: Text(
+              context.l10n.yesDeleteCard,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),

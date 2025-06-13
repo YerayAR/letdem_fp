@@ -27,6 +27,7 @@ import 'package:here_sdk/mapview.dart';
 import 'package:here_sdk/navigation.dart';
 import 'package:here_sdk/routing.dart' as HERE;
 import 'package:here_sdk/routing.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 void main() async {
   // Usually, you need to initialize the HERE SDK only once during the lifetime of an application.
@@ -122,7 +123,7 @@ class _MyAppState extends State<MyApp>
         onWillPop: _handleBackPress,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Custom Navigation'),
+            title: Text(context.l10n.customNavigation),
           ),
           body: Stack(
             children: [
@@ -130,10 +131,10 @@ class _MyAppState extends State<MyApp>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  button('Start', _startButtonClicked),
-                  button('Stop', _stopButtonClicked),
-                  button('Toggle', _toggleButtonClicked),
-                  button('Color', _colorButtonClicked)
+                  button(context.l10n.startButton, _startButtonClicked),
+                  button(context.l10n.stopButton, _stopButtonClicked),
+                  button(context.l10n.toggleButton, _toggleButtonClicked),
+                  button(context.l10n.colorButton, _colorButtonClicked)
                 ],
               ),
             ],

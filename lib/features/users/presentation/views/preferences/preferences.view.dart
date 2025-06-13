@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
@@ -17,69 +18,77 @@ class PreferencesView extends StatefulWidget {
 }
 
 class _PreferencesViewState extends State<PreferencesView> {
-  List<Map<String, dynamic>> notificationPreferences = [
-    {
-      'title': 'Email Notifications',
-      'key': 'email',
-      'value': true,
-    },
-    {
-      'title': 'Push Notifications',
-      'key': 'push',
-      'value': true,
-    },
-  ];
-  List<Map<String, dynamic>> preferences = [
-    {
-      'key': 'available_spaces',
-      'title': 'Available spaces',
-      'value': true,
-    },
-    {
-      'key': 'radar_alert',
-      'title': 'Radar alerts',
-      'value': false,
-    },
-    {
-      'key': 'camera_alert',
-      'title': 'Camera alerts',
-      'value': false,
-    },
-    {
-      'key': 'prohibited_zone_alert',
-      'title': 'Prohibited zone alert',
-      'value': false,
-    },
-    {
-      'key': 'speed_limit_alert',
-      'title': 'Speed limit alert',
-      'value': false,
-    },
-    {
-      'key': 'fatigue_alert',
-      'title': 'Fatigue alert',
-      'value': false,
-    },
-    {
-      'key': 'police_alert',
-      'title': 'Police alert',
-      'value': false,
-    },
-    {
-      'key': 'accident_alert',
-      'title': 'Accident alert',
-      'value': false,
-    },
-    {
-      'key': 'road_closed_alert',
-      'title': 'Road closed alert',
-      'value': false,
-    }
-  ];
+  late List<Map<String, dynamic>> notificationPreferences;
+  late List<Map<String, dynamic>> preferences;
+
+  void _initPreferences() {
+    notificationPreferences = [
+      {
+        'title': context.l10n.emailNotifications,
+        'key': 'email',
+        'value': true,
+      },
+      {
+        'title': context.l10n.pushNotifications,
+        'key': 'push',
+        'value': true,
+      },
+    ];
+    preferences = [
+      {
+        'key': 'available_spaces',
+        'title': context.l10n.availableSpaces,
+        'value': true,
+      },
+      {
+        'key': 'radar_alert',
+        'title': context.l10n.radarAlerts,
+        'value': false,
+      },
+      {
+        'key': 'camera_alert',
+        'title': context.l10n.cameraAlerts,
+        'value': false,
+      },
+      {
+        'key': 'prohibited_zone_alert',
+        'title': context.l10n.prohibitedZoneAlert,
+        'value': false,
+      },
+      {
+        'key': 'speed_limit_alert',
+        'title': context.l10n.speedLimitAlert,
+        'value': false,
+      },
+      {
+        'key': 'fatigue_alert',
+        'title': context.l10n.fatigueAlert,
+        'value': false,
+      },
+      {
+        'key': 'police_alert',
+        'title': context.l10n.policeAlert,
+        'value': false,
+      },
+      {
+        'key': 'accident_alert',
+        'title': context.l10n.accidentAlert,
+        'value': false,
+      },
+      {
+        'key': 'road_closed_alert',
+        'title': context.l10n.roadClosedAlert,
+        'value': false,
+      }
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _initPreferences();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final preferences = context.userProfile?.preferences;
       final notifications = context.userProfile?.notificationPreferences;
@@ -131,7 +140,7 @@ class _PreferencesViewState extends State<PreferencesView> {
       body: StyledBody(
         children: [
           StyledAppBar(
-            title: 'Preferences',
+            title: context.l10n.preferences,
             onTap: () {
               NavigatorHelper.pop();
             },
@@ -142,7 +151,7 @@ class _PreferencesViewState extends State<PreferencesView> {
             child: ListView(
               children: [
                 SettingsContainer(
-                  title: 'Notifications',
+                  title: context.l10n.notifications,
                   child: Column(
                     children: notificationPreferences.map((preference) {
                       return SettingsRow(
@@ -165,7 +174,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                 ),
                 Dimens.space(5),
                 SettingsContainer(
-                  title: 'Alerts',
+                  title: context.l10n.alerts,
                   child: Column(
                     children: preferences.map((preference) {
                       return SettingsRow(

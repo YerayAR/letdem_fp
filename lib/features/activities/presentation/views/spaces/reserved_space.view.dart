@@ -91,7 +91,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
           Center(
             child: Text(
               context.l10n.confirmationCodeTitle,
-              style: TextStyle(fontSize: 16, color: Colors.black54),
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
           const SizedBox(height: 12),
@@ -129,7 +129,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
       children: [
         Text(
           context.l10n.ownerPlateNumber,
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
         Text(
           details.carPlateNumber,
@@ -186,7 +186,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            '€${details.price.toStringAsFixed(2)}',
+            '${details.price.toStringAsFixed(2)} €',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],

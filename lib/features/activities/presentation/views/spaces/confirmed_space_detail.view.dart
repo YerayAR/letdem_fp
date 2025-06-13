@@ -142,7 +142,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           ),
           const SizedBox(height: 12),
           Text(
-            '€${widget.payload.price.toStringAsFixed(2)}',
+            '${widget.payload.price.toStringAsFixed(2)} €',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],

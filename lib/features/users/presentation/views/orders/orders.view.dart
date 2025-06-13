@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/models/orders/order.model.dart';
 
@@ -28,8 +29,8 @@ class _OrdersListViewState extends State<OrdersListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Orders',
+        title: Text(
+          context.l10n.orders,
         ),
         centerTitle: true,
       ),
@@ -64,8 +65,8 @@ class _OrdersListViewState extends State<OrdersListView> {
             );
           }
 
-          return const Center(
-            child: Text('Error loading orders'),
+          return Center(
+            child: Text(context.l10n.errorLoadingOrders),
           );
         },
       ),
@@ -134,7 +135,7 @@ class OrderCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      _formatDate(order.created),
+                      _formatDate(order.created, context),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -150,7 +151,7 @@ class OrderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '€${double.parse(order.price).toStringAsFixed(2)}',
+                '${double.parse(order.price).toStringAsFixed(2)} €',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -158,7 +159,7 @@ class OrderCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildStatusChip(order.status),
+              _buildStatusChip(order.status, context),
             ],
           ),
         ],
@@ -166,7 +167,11 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(ReservedStatus status) {
+  Color _getIconColor(Order order) {
+    return Colors.white;
+  }
+
+  Widget _buildStatusChip(ReservedStatus status, BuildContext context) {
     late Color backgroundColor;
     late Color textColor;
     late String text;
@@ -174,15 +179,15 @@ class OrderCard extends StatelessWidget {
     if (status case ReservedStatus.reserved || ReservedStatus.pending) {
       backgroundColor = AppColors.green50;
       textColor = AppColors.green500;
-      text = 'Active';
+      text = context.l10n.active;
     } else if (status case ReservedStatus.confirmed) {
       backgroundColor = AppColors.primary50;
       textColor = AppColors.primary500;
-      text = 'Confirmed';
+      text = context.l10n.confirmed;
     } else if (status case ReservedStatus.canceled) {
       backgroundColor = AppColors.red50;
       textColor = AppColors.red500;
-      text = 'Expired';
+      text = context.l10n.expired;
     }
 
     return Container(
@@ -202,24 +207,24 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, BuildContext context) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inMinutes < 5) {
-      return 'Just now';
+      return context.l10n.justNow;
     } else if (difference.inDays == 0) {
-      return 'Today';
+      return context.l10n.today;
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return context.l10n.yesterday;
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return context.l10n.daysAgo(difference.inDays);
     } else if (difference.inDays < 14) {
-      return '1 week ago';
+      return context.l10n.oneWeekAgo;
     } else if (difference.inDays < 21) {
-      return '2 weeks ago';
+      return context.l10n.twoWeeksAgo;
     } else if (difference.inDays < 30) {
-      return '3 weeks ago';
+      return context.l10n.threeWeeksAgo;
     } else {
       return '${date.day} ${_getMonthName(date.month)}. ${date.year}';
     }
@@ -366,16 +371,16 @@ class EmptyOrdersView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No orders yet',
-            style: TextStyle(
+          Text(
+            context.l10n.noOrdersYet,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'You have not made any orders yet.\nStart exploring and make your first order!',
+            context.l10n.noOrdersDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

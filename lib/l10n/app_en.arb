@@ -30,7 +30,7 @@
   "done": "Done",
   "selectDuration": "Select Duration",
   "minutes": "MIN",
-  "seconds": "SEC",
+  "sec": "SEC",
   "proceed": "Proceed",
   "pleaseEnter": "Please enter",
   "passwordMinLength": "Password must be at least 8 characters",
@@ -101,7 +101,7 @@
   "locationPermissionRequired": "Location Permission\nRequired",
   "locationPermissionDescription": "We need to get access to your location services to perform any action in the app",
   "openSystemSettings": "Open System Settings",
-    "spaceDetails": "Space Details",
+  "spaceDetails": "Space Details",
   "confirmOrder": "Confirm Order",
   "spaceReserved": "Space Reserved",
   "spaceReservedSuccessfully": "Your space has been reserved successfully.",
@@ -115,17 +115,16 @@
   "confirmationCodeTitle": "Confirmation Code",
   "shareCodeOwner": "Share this code with the parking space owner",
   "ownerPlateNumber": "The Owner's Plate Number: ",
-  "navigateToSpace": "Navigate to Space",
   "callSpaceOwner": "Call Space Owner",
   "couldNotLaunchDialer": "Could not launch dialer",
   "viewDetails": "View details",
   "free": "Free",
   "timeRemaining": "Time remaining",
   "currency": "€",
-    "showAll": "Show All",
+  "showAll": "Show All",
   "noContributions": "No Contributions Yet",
   "noContributionsDescription": "You haven't made any contributions yet. Start by publishing a space or event!",
-   "all": "All",
+  "all": "All",
   "parkingSpace": "Parking Space",
   "events": "Events",
   "failedToLoadActivities": "Failed to load activities: {error}",
@@ -137,9 +136,9 @@
     }
   },
   "selectFilterActivities": "Select a filter to view activities",
-    "searchLocation": "Search location",
+  "searchLocation": "Search location",
   "back": "Back",
-    "updatingLocation": "UPDATING {type} LOCATION",
+  "updatingLocation": "UPDATING {type} LOCATION",
   "@updatingLocation": {
     "placeholders": {
       "type": {
@@ -168,11 +167,11 @@
   "otherLocation": "Other Location",
   "homeLocation": "Home Location",
   "workLocation": "Work Location",
-    "whereAreYouGoing": "Where are you going to?",
+  "whereAreYouGoing": "Where are you going to?",
   "favourites": "Favourites",
   "recent": "Recent",
   "clearAll": "Clear all",
-    "spacePublished": "Space Published",
+  "spacePublished": "Space Published",
   "eventPublished": "Event Published",
   "pointsEarned": "+{points} Pts",
   "@pointsEarned": {
@@ -182,7 +181,7 @@
       }
     }
   },
-    "noCarRegistered": "No Car Registered",
+  "noCarRegistered": "No Car Registered",
   "registerCarDetails": "Register your car with the car details\nfor safety and accessibility",
   "tapToRegisterCar": "Tap to Register Car",
   "registerCar": "Register Car",
@@ -205,31 +204,28 @@
   "ecoLabelPluginHybrids": "Plug-in hybrids with an electric range of less than 40 km.",
   "ecoLabelNonPluginHybrids": "Non-plug-in hybrids (HEV).",
   "ecoLabelGasPowered": "Gas-powered vehicles (LPG, CNG, or LNG).",
-  
   "zeroLabelElectric": "100% electric vehicles (BEV).",
   "zeroLabelPluginHybrids": "Plug-in hybrids (PHEV) with an electric range of more than 40 km.",
   "zeroLabelHydrogen": "Hydrogen-powered vehicles.",
-  
   "bLabelPetrol": "Petrol cars and vans registered from January 2001 onwards.",
   "bLabelDiesel": "Diesel cars and vans registered from January 2006 onwards.",
   "bLabelIndustrial": "Industrial vehicles and buses registered from 2005 onwards.",
-  
   "cLabelPetrol": "Petrol cars and vans registered from January 2006 onwards.",
   "cLabelDiesel": "Diesel cars and vans registered from September 2015 onwards.",
   "cLabelIndustrial": "Industrial vehicles and buses registered from 2014 onwards.",
-    "yourCarDetails": "Your Car Details",
+  "yourCarDetails": "Your Car Details",
   "editDetails": "Edit Details",
   "lastPlaceParked": "Last place Parked",
   "unknown": "Unknown",
   "navigateToCar": "Navigate to car",
-    "errorConfirmSpaceReservation": "Unable to confirm space reservation",
+  "errorConfirmSpaceReservation": "Unable to confirm space reservation",
   "errorReserveSpace": "Unable to reserve space",
   "errorSendFeedback": "Unable to send feedback",
   "errorTakeSpace": "Unable to take space",
   "errorPublishRoadEvent": "Unable to publish road event",
   "errorLoadActivities": "Unable to load activities",
   "errorPublishSpace": "Unable to publish space",
-    "forgotPassword": "Forgot Password",
+  "forgotPassword": "Forgot Password",
   "getHelp": "Get Help",
   "enterEmailToReset": "Enter your email address below to proceed with",
   "emailAddress": "Email Address",
@@ -242,7 +238,7 @@
   "enterPassword": "Enter your password",
   "passwordsDoNotMatch": "Passwords do not match",
   "passwordRequirements": "Ensure to use at least 8 characters, with a number and a special character and uppercase letter",
-    "emailSentTitle": "We sent you an email",
+  "emailSentTitle": "We sent you an email",
   "emailSentDescription": "We've sent an OTP to your email. Enter it below to reset your password.",
   "mailSentTo": "Mail is sent to: ",
   "notYou": "Not you? ",
@@ -257,29 +253,24 @@
       }
     }
   },
-    "createNewAccount": "CREATE NEW ACCOUNT",
+  "createNewAccount": "CREATE NEW ACCOUNT",
   "personalInformation": "Personal Information",
   "enterFullName": "Enter your full name to proceed",
   "firstName": "First Name",
   "lastName": "Last Name",
   "enterFirstName": "Enter your first name",
   "enterLastName": "Enter your last name",
-   "getStarted": "Get Started",
+  "getStarted": "Get Started",
   "alreadyHaveAccount": "Already have an account? ",
   "loginHere": "Login here",
   "signUpWithGoogle": "Sign up with Google",
   "agreeToTerms": "By continuing, I agree to LetDem ",
   "termsAndConditions": "Terms & Conditions",
   "pleaseAcceptTerms": "Please accept the terms and conditions",
-    "emailAddress": "Email Address",
-  "enterEmailAddress": "Enter your email address",
   "password": "Password",
-  "enterPassword": "Enter your password",
-  "repeatPassword": "Repeat Password",
-  "passwordRequirements": "Ensure to use at least 8 characters, with a number and a special character and uppercase letter",
   "continuee": "Continue",
   "unableToResendVerification": "Unable to resend verification code",
-    "somethingWentWrong": "Something went wrong",
+  "somethingWentWrong": "Something went wrong",
   "unableToProcessRequest": "We were unable to process your request. Please try again later. The error is: {error}",
   "@unableToProcessRequest": {
     "placeholders": {
@@ -290,52 +281,53 @@
   },
   "retry": "Retry",
   "sessionExpired": "The session has expired. Please login again.",
-    "verifyAccount": "Verify Account",
+  "verifyAccount": "Verify Account",
   "weWillSendOTP": "We sent you an email",
   "verificationInstructions": "Kindly check the email you provided for an OTP to verify your email and enter it below",
   "resending": "Resending",
   "verificationSuccess": "Verification Success",
   "verificationSuccessMessage": "Your account email has been verified successfully. You can proceed to the app.",
-    "findShareParking": "Find & Share Parking Spaces near you",
+  "findShareParking": "Find & Share Parking Spaces near you",
   "parkingDescription": "Get access to wide range of parking spaces within your location and beyond",
-   "geolocationPermission": "Geolocation Permission",
+  "geolocationPermission": "Geolocation Permission",
   "enableGeolocationDescription": "Kindly enable geolocation to allow the app to track your location automatically. This process must be completed to use the app.",
   "enableGeolocation": "Enable Geolocation",
   "openSettings": "Open Settings",
   "notNow": "Not now",
-    "loginToAccount": "LOGIN TO YOUR ACCOUNT",
+  "loginToAccount": "LOGIN TO YOUR ACCOUNT",
   "welcomeBack": "Welcome Back!",
   "dontHaveAccount": "Don't have an account? ",
   "signUpHere": "Sign Up here",
   "login": "Login",
   "forgotPasswordQuestion": "Forgot Password? ",
   "resetHere": "Reset here",
-    "next": "Next",
+  "next": "Next",
   "goBack": "Go Back",
   "connectAccountProgress": "Connect Account Progress",
   "identityVerification": "Identity Verification",
   "bankInformation": "Bank Information",
-    "addressInformationTitle": "Your address information",
+  "addressInformationTitle": "Your address information",
   "addressInformationDescription": "Input your full address and location of residence",
   "enterAddress": "Enter your address",
-  "addressExample": "Eg. Calle de Olivos 3, 46",
+  "address": "Address",
   "enterPostalCode": "Enter postal code",
-  "postalCodeExample": "Eg. 28944",
+  "postalCode": "Postal Code",
   "enterCity": "Enter city",
-  "cityExample": "Eg. Fuenlabrada",
-    "bankInformationTitle": "Bank Information",
+  "city": "City",
+  "bankInformationTitle": "Bank Information",
   "bankInformationDescription": "Enter your IBAN to complete this step",
   "enterIBAN": "Enter your IBAN",
-  "ibanExample": "Eg. ES0700120345030000067890",
+  "ibanExample": "ES00 0000 0000 0000 0000 0000",
+  "iban": "IBAN",
   "bankAccountNote": "Kindly note that this bank account is required to receive payout from our payment provider.",
   "detailsSubmitted": "Details Submitted",
   "gotItThanks": "Got it, Thanks",
   "accountDetailsSuccess": "Your account connection details submitted successfully, you will soon be able to receive money for paid spaces.",
-    "selectCountry": "Select Country",
+  "selectCountry": "Select Country",
   "selectCountryDescription": "Select your country of residence to continue",
   "spain": "Spain",
   "selectCountryLabel": "Select Country",
-    "uploadIDCard": "Upload ID Card",
+  "uploadIDCard": "Upload ID Card",
   "uploadIDDescription": "Upload your ID card both sides",
   "uploadIDFront": "Tap to upload ID Card Front",
   "uploadIDBack": "Tap to upload ID Card Back",
@@ -347,17 +339,353 @@
   "openCamera": "Open Camera",
   "upload": "Upload",
   "pleaseUploadBothSides": "Please upload both sides of your ID",
-    "selectIdType": "Select ID Type",
+  "selectIdType": "Select ID Type",
   "selectIdDescription": "Select your ID type and upload the front & Back of your Identity Card",
   "nationalIdCard": "National ID Card",
   "nationalIdDescription": "Your government issued national identity card",
   "residentPermit": "Resident Permit",
   "residentPermitDescription": "Your government issued national resident permit",
-    "personalInfoTitle": "Your personal information",
+  "personalInfoTitle": "Your personal information",
   "personalInfoDescription": "Input your personal details as it is on your ID Card",
   "phoneNumber": "Phone number",
   "enterPhoneNumber": "Enter phone number",
   "dateOfBirth": "Date of Birth",
   "dateFormat": "YYYY/MM/DD",
-  "selectDateOfBirth": "Please select your date of birth"
+  "selectDateOfBirth": "Please select your date of birth",
+  "clickToOpenCamera": "Click to open camera",
+  "publishPaidSpace": "Publish Paid Space",
+  "waitingTime": "Waiting Time",
+  "waitingTimeMinutes": "MM",
+  "price": "Price",
+  "enterPrice": "Enter price",
+  "publish": "Publish",
+  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before they leave, and after this time elapses, the published space will expire.",
+  "whatIsThisWaitingTime": "What's this?",
+  "fetchingLocation": "Fetching location...",
+  "pleaseEnterAllFields": "Please fill all fields",
+  "spacePublishedSuccesfully": "Space Published Successfully",
+  "spacePublishedDescription": "Your space have been published successfully, people can now have access to use space.",
+  "speedLimitAlert": "Speed Limit Alert",
+  "speedLimitWarning": "You are driving at speed limit, slow down",
+  "kmPerHour": "Km/h",
+  "speedLimit": "Speed limit",
+  "recalculatingRoute": "Recalculating route...",
+  "youHaveArrived": "You have arrived at your destination!",
+  "navigatingToParking": "Navigating to parking space",
+  "preparingNavigation": "Preparing your navigation...",
+  "navigationError": "Could not calculate route. Please try again.",
+  "tryAgain": "Try Again",
+  "fatigueAlertTitle": "Fatigue Alert",
+  "fatigueAlertMessage": "You have been driving for 3 hours. Please consider taking a break.",
+  "fatigueAlertVoice": "You have been driving for three hours. Please take a rest.",
+  "addEvent": "Add event",
+  "ahead": "ahead",
+  "navigateToSpaceButton": "Navigate to Space",
+  "locationPermissionDenied": "Location permission denied",
+  "locationPermissionDeniedPermanently": "Location permissions permanently denied, please enable in settings",
+  "failedToLoadMap": "Failed to load map",
+  "failedToInitializeLocation": "Failed to initialize location services",
+  "failedToInitNavigation": "Failed to initialize navigation",
+  "failedToStartNavigation": "Failed to start navigation visualization",
+  "freeCameraMode": "Free camera",
+  "lockPositionMode": "Lock to position",
+  "cameraAlertTitle": "Camera Alert",
+  "radarAlertTitle": "Radar Alert",
+  "cameraAlertMessage": "You are in a CCTV Camera surveillance zone",
+  "radarAlertMessage": "You are approaching a nearby radar zone",
+  "unnamedRoad": "Unnamed Road",
+  "couldNotRecalculateRoute": "Could not recalculate route",
+  "tooCloseToLocation": "Too Close to Location",
+  "closeToLocationDescription": "You are close to the location, Please select a different location",
+  "close": "Close",
+  "trafficLevel": "Traffic Level",
+  "toArriveBy": "To Arrive by {time}",
+  "@toArriveBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyAvailableSpace": "Notify me of available space in this area",
+  "dateAndTime": "Date & Time",
+  "notificationRadius": "Receive notifications up to (meters)",
+  "startRoute": "Start Route",
+  "radiusLessThan": "Radius cannot be less than {meters} meters",
+  "@radiusLessThan": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationScheduled": "Notification Scheduled",
+  "notificationScheduledDescription": "You will be notified when a space is available in this area",
+  "minutesShort": "mins",
+  "hoursShort": "hrs",
+  "metersShort": "m",
+  "kilometersShort": "km",
+  "timesRequired": "Start and end times are required",
+  "startBeforeEnd": "Start time should be before end time",
+  "timeGreaterThanCurrent": "Start and end times should be greater than the current time",
+  "maxScheduleDays": "You can only schedule up to 5 days",
+  "distanceTraveled": "Distance traveled: {distance} m",
+  "@distanceTraveled": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "youHaveTraveled": "You have traveled {distance} meters",
+  "@youHaveTraveled": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "estimatedArrival": "Estimated arrival in {time} with {distance} meters remaining",
+  "@estimatedArrival": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "seconds": "{count} seconds",
+  "@seconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesAndSeconds": "{minutes} min {seconds} sec",
+  "@minutesAndSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesOnly": "{minutes} minutes",
+  "@minutesOnly": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAndMinutes": "{hours} hr {minutes} min",
+  "@hoursAndMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursOnly": "{hours} hours",
+  "@hoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "locationPermissionPermanentlyDenied": "Location permissions permanently denied, please enable in settings",
+  "failedToInitializeLocationServices": "Failed to initialize location services",
+  "failedToGetCurrentLocation": "Failed to get current location",
+  "failedToStartNavigationSimulation": "Failed to start navigation simulation",
+  "failedToInitializeRouting": "Failed to initialize routing",
+  "couldNotCalculateRoute": "Could not calculate route. Please try again.",
+  "failedToInitializeNavigation": "Failed to initialize navigation",
+  "metersAhead": "{distance}m ahead",
+  "@metersAhead": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "preparingYourNavigation": "Preparing your navigation...",
+  "metersAway": "{distance}m away",
+  "@metersAway": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "gotItThankYou": "Got it, Thank you",
+  "feedbackButton": "Feedback",
+  "feedbackSubmitted": "Your feedback has been submitted",
+  "thankYouForInput": "Thank you for your input!",
+  "eventFeedback": "Event Feedback",
+  "stillThere": "It's still there",
+  "notThere": "It's not there",
+  "illTakeIt": "I'll take it",
+  "itsInUse": "It's in use",
+  "notUseful": "Not useful",
+  "prohibited": "Prohibited",
+  "arrivedAtDestination": "You have arrived at your destination.",
+  "rateThisParkingSpace": "How would you like to rate this parking space?",
+  "customNavigation": "Custom Navigation",
+  "startButton": "Start",
+  "stopButton": "Stop",
+  "toggleButton": "Toggle",
+  "colorButton": "Color",
+  "unread": "Unread",
+  "notifications": "Notifications",
+  "yourSpaceLocatedAt": "Your space located at ",
+  "hasBeenOccupied": " has been occupied",
+  "aNewSpaceHasBeenPublished": "A new space has been published within ",
+  "around": " around ",
+  "hasBeenReserved": " has been reserved",
+  "receivedPositiveFeedback": " Received positive feedback",
+  "noNotificationsYet": "No Notifications Yet",
+  "notificationsWillAppear": "Your app notifications will appear here\nwhenever there is a new activity",
+  "noScheduledNotificationsYet": "No Scheduled Notifications Yet",
+  "scheduledNotificationsWillAppear": "Your app scheduled notifications will appear\nhere whenever you set this reminder",
+  "justNow": "Just now",
+  "viewSpace": "View space",
+  "noPaymentMethodsAdded": "No Payment Methods Added",
+  "noPaymentMethodsDescription": "You haven't added any payment methods yet.\nAdd one to make payments easily.",
+  "paymentMethodAdded": "Payment Method Added",
+  "paymentMethodAddedDescription": "Your payment method has been successfully added.",
+  "pleaseCompleteCardDetails": "Please complete the card details",
+  "failedToAddPaymentMethod": "Failed to add payment method. Please try again.",
+  "cardNumber": "Card number",
+  "addNewCard": "Add New Card",
+  "defaultt": "Default",
+  "expireDate": "Expire Date: {date}",
+  "@expireDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethod": "Payment method",
+  "makeDefault": "Make Default",
+  "confirmDeleteCard": "Confirm Delete Card",
+  "deleteCardConfirmation": "Are you sure you want to delete Card ending with {last4}? This action cannot be undone.",
+  "@deleteCardConfirmation": {
+    "placeholders": {
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "noKeepCard": "No, Keep Card",
+  "yesDeleteCard": "Yes, Delete Card",
+  "noPayoutMethodsYet": "No Payout Methods Yet",
+  "payoutMethodsDescription": "Your added payout methods will appear\nhere once you set them up in your profile",
+  "payoutMethodAdded": "Payout Method Added",
+  "payoutMethodAddedDescription": "Your payout method has been added successfully.",
+  "addPayoutMethod": "Add Payout Method",
+  "accountNumber": "Account Number",
+  "accountNumberExample": "ES00 0000 0000 0000 0000 0000",
+  "makeDefaultPaymentMethod": "Make as default payment method",
+  "pleaseEnterAccountNumber": "Please enter account number",
+  "payoutMethods": "Payout Methods",
+  "payoutMethodOptions": "Payout Method Options",
+  "rescheduleNotification": "Reschedule Notification",
+  "reschedule": "Reschedule",
+  "notificationRescheduledSuccessfully": "Notification rescheduled successfully",
+  "spaceReminder": "Space Reminder",
+  "rescheduleReminder": "Reschedule Reminder",
+  "deleteReminder": "Delete Reminder",
+  "youHaveReminderForSpace": "You have a reminder for a space at ",
+  "expired": "Expired",
+  "active": "Active",
+  "antiMoneyLaunderingMessage": "The Anti-money Laundering Directive forces us to verify your identity in order to receive payment for your online sales. You will only need to verify yourself once.",
+  "couldNotOpenTermsAndConditions": "Could not open Terms & Conditions link",
+  "byAgreementStripe": "By continuing, I agree to the ",
+  "stripeConnectedAccountAgreement": "Stripe Connected Account Agreement",
+  "and": " and ",
+  "stripeTermsOfService": "Stripe Terms of Service",
+  "accountInformationChanged": "Account information changed successfully",
+  "accountInformationChangedDescription": "Your account information has been changed successfully,",
+  "orders": "Orders",
+  "errorLoadingOrders": "Error loading orders",
+  "confirmed": "Confirmed",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "daysAgo": "{days} days ago",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "oneWeekAgo": "1 week ago",
+  "twoWeeksAgo": "2 weeks ago",
+  "threeWeeksAgo": "3 weeks ago",
+  "noOrdersYet": "No orders yet",
+  "noOrdersDescription": "You have not made any orders yet.\nStart exploring and make your first order!",
+  "alerts": "Alerts",
+  "emailNotifications": "Email Notifications",
+  "pushNotifications": "Push Notifications",
+  "availableSpaces": "Available spaces",
+  "radarAlerts": "Radar alerts",
+  "cameraAlerts": "Camera alerts",
+  "prohibitedZoneAlert": "Prohibited zone alert",
+  "fatigueAlert": "Fatigue alert",
+  "policeAlert": "Police alert",
+  "accidentAlert": "Accident alert",
+  "roadClosedAlert": "Road closed alert",
+  "nameNotProvided": "Name not provided",
+  "letdemPoints": "LetDem Points",
+  "walletBalance": "Wallet Balance",
+  "withdraw": "Withdraw",
+  "withdrawals": "Withdrawals",
+  "payouts": "Payouts",
+  "transactionHistory": "Transaction History",
+  "seeAll": "See all",
+  "noTransactionsYet": "No Transactions Yet",
+  "transactionsHistoryMessage": "Your transactions history will be listed here when you have any activity to show.",
+  "loadingTransactions": "Loading Transactions",
+  "noPayoutMethodsAvailable": "No payout methods available",
+  "success": "Success",
+  "withdrawalRequestSuccess": "Withdrawal request has been sent successfully.",
+  "withdrawalToBank": "Withdrawal to Bank {method}",
+  "@withdrawalToBank": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "successful": "Successful",
+  "failed": "Failed",
+  "noWithdrawalsYet": "No Withdrawals Yet",
+  "withdrawalHistoryMessage": "Your withdrawal history will appear here\nwhenever you make a withdrawal",
+  "amountCannotExceed": "Amount cannot exceed {balance} €",
+  "@amountCannotExceed": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "amountToReceive": "Amount to receive",
+  "pendingToBeCleared": "{amount} € Pending to be cleared",
+  "@pendingToBeCleared": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

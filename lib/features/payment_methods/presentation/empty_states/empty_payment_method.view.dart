@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 class EmptyPaymentMethodView extends StatelessWidget {
   const EmptyPaymentMethodView({super.key});
@@ -21,16 +22,16 @@ class EmptyPaymentMethodView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No Payment Methods Added',
-            style: TextStyle(
+          Text(
+            context.l10n.noPaymentMethodsAdded,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'You haven’t added any payment methods yet.\nAdd one to make payments easily.',
+            context.l10n.noPaymentMethodsDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

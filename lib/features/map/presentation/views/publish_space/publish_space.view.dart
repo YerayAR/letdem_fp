@@ -16,6 +16,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
@@ -82,7 +83,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
 
     if (widget.isPaid &&
         (waitingTime.isEmpty || price.isEmpty || phoneNumber.isEmpty)) {
-      Toast.showError("Please fill all fields");
+      Toast.showError(context.l10n.pleaseEnterAllFields);
       return;
     }
 
@@ -134,9 +135,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                 AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(
-                    title: "Space Published Successfully",
-                    subtext:
-                        "Your space have been published successfully, people can now have access to use space.",
+                    title: context.l10n.spacePublishedSuccesfully,
+                    subtext: context.l10n.spacePublishedDescription,
                     onProceed: () {
                       NavigatorHelper.pop();
                       NavigatorHelper.pop();
@@ -180,8 +180,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       ],
                     ),
                   ],
-                  title: const Text(
-                    'Publish Space',
+                  title: Text(
+                    context.l10n.publishSpace,
                   ),
                 ),
                 body: PageView(
@@ -285,7 +285,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                         ? StyledBody(
                             children: [
                               TextInputField(
-                                label: "Waiting Time (in minutes)",
+                                label: context.l10n.waitingTimeMinutes,
                                 placeHolder: "MM",
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
@@ -310,13 +310,13 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                         Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Text(
-                                              "Waiting Time",
+                                            Text(
+                                              context.l10n.waitingTime,
                                               style: Typo.heading4,
                                             ),
                                             Dimens.space(2),
-                                            const Text(
-                                              "This is the maximum amount of time the publisher can wait before they leave, and after this time elapses, the published space will expire.",
+                                            Text(
+                                              context.l10n.waitingTimeTooltip,
                                               style: Typo.mediumBody,
                                               textAlign: TextAlign.center,
                                             ),
@@ -325,7 +325,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                               onTap: () {
                                                 NavigatorHelper.pop();
                                               },
-                                              text: "Got it",
+                                              text: context.l10n.gotIt,
                                             ),
                                           ],
                                         ),
@@ -337,7 +337,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                       child: Align(
                                         alignment: Alignment.centerRight,
                                         child: Text(
-                                          "What’s this?",
+                                          context.l10n.whatIsThisWaitingTime,
                                           style: Typo.smallBody.copyWith(
                                             color: AppColors.secondary600,
                                             fontSize: 12,
@@ -353,14 +353,14 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                 ),
                               ),
                               TextInputField(
-                                label: "Price",
+                                label: context.l10n.price,
                                 inputType: TextFieldType.number,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                   FilteringTextInputFormatter.allow(
                                       RegExp(r'^\d+\.?\d{0,2}')),
                                 ],
-                                placeHolder: "Enter price",
+                                placeHolder: context.l10n.enterPrice,
                                 prefixIcon: Iconsax.money5,
                                 onChanged: (value) {
                                   setState(() {
@@ -370,7 +370,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                               ),
                               Dimens.space(2),
                               PhoneField(
-                                label: "Phone Number",
+                                label: context.l10n.phoneNumber,
                                 onChanged: (String text, String code) {
                                   setState(() {
                                     phoneNumber = text;
@@ -394,8 +394,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                           snapshot.data == null || selectedSpacePicture == null,
                       text: (_pageController.hasClients &&
                               _pageController.page == 1)
-                          ? "Publish"
-                          : (widget.isPaid ? "Next" : "Publish"),
+                          ? context.l10n.publish
+                          : (widget.isPaid ? context.l10n.next : context.l10n.publish),
                     ),
                   ),
                 ),
@@ -435,7 +435,7 @@ class PublishingLocationWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text("Location",
+                  Text(context.l10n.location as String, 
                       style: Typo.smallBody.copyWith(
                         color: AppColors.neutral600,
                         fontSize: 14,
@@ -443,7 +443,7 @@ class PublishingLocationWidget extends StatelessWidget {
                   SizedBox(
                     child: position == null
                         ? Text(
-                            "Fetching location...",
+                            context.l10n.fetchingLocation,
                             style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w500,
                             ),
@@ -511,8 +511,8 @@ class _TakePictureWidgetState extends State<TakePictureWidget> {
                   Icon(IconlyBold.camera,
                       size: 30, color: AppColors.neutral400),
                   Dimens.space(1),
-                  const Text(
-                    "Click to open camera",
+                  Text(
+                    context.l10n.clickToOpenCamera,
                     style: Typo.largeBody,
                   ),
                 ],
@@ -535,35 +535,35 @@ class PaidSpaceForm extends StatelessWidget {
             onTap: () {
               NavigatorHelper.pop();
             },
-            text: "Publish",
+            text: context.l10n.publish,
           ),
         ),
       ),
       appBar: AppBar(
-        title: const Text('Publish Paid Space'),
+        title: Text(context.l10n.publishPaidSpace),
       ),
       body: StyledBody(
         children: [
           TextInputField(
-            label: "Waiting Time",
-            placeHolder: "MM:SS",
+            label: context.l10n.waitingTime, // Cambiar "Waiting Time"
+            placeHolder: context.l10n.waitingTimeMinutes,
             prefixIcon: Iconsax.clock5,
             onChanged: (value) {},
           ),
           TextInputField(
-            label: "Price",
+            label: context.l10n.price,
             inputType: TextFieldType.number,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
               FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
             ],
-            placeHolder: "Enter price",
+            placeHolder: context.l10n.enterPrice,
             prefixIcon: Iconsax.money5,
             onChanged: (value) {},
           ),
           Dimens.space(2),
           PhoneField(
-            label: "Phone Number",
+            label: context.l10n.phoneNumber,
             onChanged: (String text, String countryCode) {},
             initialValue: '',
           )

@@ -5,6 +5,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/presentation/empty_states/empty_payout.view.dart';
@@ -45,7 +46,7 @@ class _WithdrawViewState extends State<WithdrawView> {
       isBottomPadding: true,
       children: [
         StyledAppBar(
-          title: 'Withdraw',
+          title: context.l10n.withdraw,
           onTap: () => Navigator.of(context).pop(),
           icon: Icons.close,
         ),
@@ -92,8 +93,8 @@ class _WithdrawViewState extends State<WithdrawView> {
               );
             }
             if (state is PayoutMethodInitial) {
-              return const Center(
-                child: Text('No payout methods available'),
+              return Center(
+                child: Text(context.l10n.noPayoutMethodsAvailable),
               );
             }
             if (state is PayoutMethodSuccess) {
@@ -133,15 +134,15 @@ class _WithdrawViewState extends State<WithdrawView> {
                 ),
               );
             }
-            return const Center(
-              child: Text('No payout methods available'),
+            return Center(
+              child: Text(context.l10n.noPayoutMethodsAvailable),
             );
           },
         ),
         Dimens.space(2),
         PrimaryButton(
           borderRadius: 15,
-          text: 'Add Payout Method',
+          text: context.l10n.addPayoutMethod,
           isLoading: false,
           color: AppColors.neutral100,
           textColor: AppColors.neutral600,
@@ -161,8 +162,8 @@ class _WithdrawViewState extends State<WithdrawView> {
               AppPopup.showDialogSheet(
                   NavigatorHelper.navigatorKey.currentContext!,
                   SuccessDialog(
-                    title: 'Success',
-                    subtext: 'Withdrawal request has been sent successfully.',
+                    title: context.l10n.success,
+                    subtext: context.l10n.withdrawalRequestSuccess,
                     onProceed: () {
                       NavigatorHelper.pop();
                       NavigatorHelper.pop();
@@ -174,7 +175,7 @@ class _WithdrawViewState extends State<WithdrawView> {
           },
           builder: (context, state) {
             return PrimaryButton(
-                text: 'Withdraw',
+                text: context.l10n.withdraw,
                 isDisabled: selectedMethod == null,
                 isLoading:
                     context.watch<WithdrawalBloc>().state is WithdrawalLoading,

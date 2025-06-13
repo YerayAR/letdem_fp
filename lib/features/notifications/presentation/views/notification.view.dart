@@ -8,6 +8,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/notifications/models/notification.model.dart';
@@ -22,12 +23,12 @@ enum NotificationType {
 }
 
 extension NotificationTypeExtension on NotificationType {
-  String get name {
+  String name(BuildContext context) {
     switch (this) {
       case NotificationType.all:
-        return 'All';
+        return context.l10n.all;
       case NotificationType.unread:
-        return 'Unread';
+        return context.l10n.unread;
     }
   }
 }
@@ -56,9 +57,9 @@ class _NotificationsViewState extends State<NotificationsView> {
         return RichText(
           text: TextSpan(
             children: [
-              const TextSpan(
-                text: 'Your space located at ',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.yourSpaceLocatedAt,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -71,9 +72,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   color: Colors.black,
                 ),
               ),
-              const TextSpan(
-                text: ' has been occupied',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.hasBeenOccupied,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -89,9 +90,9 @@ class _NotificationsViewState extends State<NotificationsView> {
         return RichText(
           text: TextSpan(
             children: [
-              const TextSpan(
-                text: 'A new space has been published within ',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.aNewSpaceHasBeenPublished,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -104,9 +105,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   fontSize: 14,
                 ),
               ),
-              const TextSpan(
-                text: ' around ',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.around,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -127,9 +128,9 @@ class _NotificationsViewState extends State<NotificationsView> {
         return RichText(
           text: TextSpan(
             children: [
-              const TextSpan(
-                text: 'Your space located at ',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.yourSpaceLocatedAt,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -142,9 +143,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   color: Colors.black,
                 ),
               ),
-              const TextSpan(
-                text: ' has been reserved',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.hasBeenReserved,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -158,9 +159,9 @@ class _NotificationsViewState extends State<NotificationsView> {
         return RichText(
           text: TextSpan(
             children: [
-              const TextSpan(
-                text: 'Your space located at ',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.yourSpaceLocatedAt,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -173,9 +174,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   fontSize: 14,
                 ),
               ),
-              const TextSpan(
-                text: ' Received positive feedback',
-                style: TextStyle(
+              TextSpan(
+                text: context.l10n.receivedPositiveFeedback,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
@@ -193,7 +194,7 @@ class _NotificationsViewState extends State<NotificationsView> {
       body: StyledBody(
         children: [
           StyledAppBar(
-            title: 'Notifications',
+            title: context.l10n.notifications,
             onTap: () {
               NavigatorHelper.pop();
             },
@@ -203,7 +204,7 @@ class _NotificationsViewState extends State<NotificationsView> {
           FilterTabs<NotificationType>(
             isExapnded: true,
             values: NotificationType.values,
-            getName: (type) => type.name,
+            getName: (type) => type.name(context),
             initialValue: viewAllType,
             onSelected: (type) {
               setState(() {
@@ -234,7 +235,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                         context.read<UserBloc>().add(FetchUserInfoEvent());
                       },
                       child: Text(
-                        'Clear all',
+                        context.l10n.clearAll,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -345,16 +346,16 @@ class EmptyNotificationView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No Notifications Yet',
-            style: TextStyle(
+          Text(
+            context.l10n.noNotificationsYet,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'Your app notifications will appear here\nwhenever there is a new activity',
+            context.l10n.notificationsWillAppear,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -386,16 +387,16 @@ class EmptyScheduleNotificationView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No Scheduled Notifications Yet',
-            style: TextStyle(
+          Text(
+            context.l10n.noScheduledNotificationsYet,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'Your app scheduled notifications will appear\nhere whenever you set this reminder',
+            context.l10n.scheduledNotificationsWillAppear,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -462,10 +463,10 @@ class NotificationItem extends StatelessWidget {
     this.onActionPressed,
   });
 
-  String _getFormattedTime() {
+  String _getFormattedTime(BuildContext context) {
     final now = DateTime.now();
     if (isRecent) {
-      return 'Just now';
+      return context.l10n.justNow;
     } else if (now.difference(timestamp).inDays == 0) {
       return DateFormat('hh:mm a').format(timestamp);
     } else {
@@ -600,7 +601,7 @@ class NotificationItem extends StatelessWidget {
                         children: [
                           // Timestamp
                           Text(
-                            _getFormattedTime(),
+                            _getFormattedTime(context),
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 12,
@@ -646,7 +647,7 @@ class NotificationItem extends StatelessWidget {
                                 horizontal: 10,
                                 vertical: 7,
                               ),
-                              text: 'View space ',
+                              text: context.l10n.viewSpace,
                               backgroundColor: AppColors.primary300,
                               color: Colors.white,
                             ),

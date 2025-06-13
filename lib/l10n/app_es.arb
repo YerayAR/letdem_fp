@@ -1,5 +1,6 @@
 {
   "@@locale": "es",
+  "language": "Idioma",
   "enterDestination": "Ingresar destino",
   "whatDoYouWantToDo": "¿Qué quieres hacer?",
   "publishSpace": "Publicar espacio",
@@ -28,7 +29,7 @@
   "done": "Listo",
   "selectDuration": "Seleccionar Duración",
   "minutes": "MIN",
-  "seconds": "SEG",
+  "sec": "SEG",
   "proceed": "Continuar",
   "pleaseEnter": "Por favor ingrese",
   "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
@@ -99,7 +100,7 @@
   "locationPermissionRequired": "Permiso de Ubicación\nRequerido",
   "locationPermissionDescription": "Necesitamos acceder a tus servicios de ubicación para realizar cualquier acción en la aplicación",
   "openSystemSettings": "Abrir Configuración del Sistema",
-    "spaceDetails": "Detalles del Espacio",
+  "spaceDetails": "Detalles del Espacio",
   "confirmOrder": "Confirmar Orden",
   "spaceReserved": "Espacio Reservado",
   "spaceReservedSuccessfully": "Tu espacio ha sido reservado exitosamente.",
@@ -113,17 +114,16 @@
   "confirmationCodeTitle": "Código de Confirmación",
   "shareCodeOwner": "Comparte este código con el propietario del espacio",
   "ownerPlateNumber": "Matrícula del Propietario: ",
-  "navigateToSpace": "Navegar al Espacio",
   "callSpaceOwner": "Llamar al Propietario",
   "couldNotLaunchDialer": "No se pudo abrir el marcador",
   "viewDetails": "Ver detalles",
   "free": "Gratis",
   "timeRemaining": "Tiempo restante",
   "currency": "€",
-    "showAll": "Ver Todos",
+  "showAll": "Ver Todos",
   "noContributions": "Sin Contribuciones Aún",
   "noContributionsDescription": "Aún no has hecho ninguna contribución. ¡Comienza publicando un espacio o evento!",
-    "all": "Todos",
+  "all": "Todos",
   "parkingSpace": "Espacio de Estacionamiento",
   "events": "Eventos",
   "failedToLoadActivities": "Error al cargar actividades: {error}",
@@ -135,9 +135,9 @@
     }
   },
   "selectFilterActivities": "Selecciona un filtro para ver actividades",
-    "searchLocation": "Buscar ubicación",
+  "searchLocation": "Buscar ubicación",
   "back": "Atrás",
-    "updatingLocation": "ACTUALIZANDO UBICACIÓN DE {type}",
+  "updatingLocation": "ACTUALIZANDO UBICACIÓN DE {type}",
   "@updatingLocation": {
     "placeholders": {
       "type": {
@@ -166,11 +166,11 @@
   "otherLocation": "Otra Ubicación",
   "homeLocation": "Ubicación de Casa",
   "workLocation": "Ubicación de Trabajo",
-    "whereAreYouGoing": "¿A dónde vas?",
+  "whereAreYouGoing": "¿A dónde vas?",
   "favourites": "Favoritos",
   "recent": "Recientes",
   "clearAll": "Borrar todo",
-    "spacePublished": "Espacio Publicado",
+  "spacePublished": "Espacio Publicado",
   "eventPublished": "Evento Publicado",
   "pointsEarned": "+{points} Pts",
   "@pointsEarned": {
@@ -180,7 +180,7 @@
       }
     }
   },
-    "noCarRegistered": "Sin Coche Registrado",
+  "noCarRegistered": "Sin Coche Registrado",
   "registerCarDetails": "Registra tu coche con los detalles\npara seguridad y accesibilidad",
   "tapToRegisterCar": "Toca para Registrar Coche",
   "registerCar": "Registrar Coche",
@@ -203,36 +203,33 @@
   "ecoLabelPluginHybrids": "Híbridos enchufables con autonomía eléctrica inferior a 40 km.",
   "ecoLabelNonPluginHybrids": "Híbridos no enchufables (HEV).",
   "ecoLabelGasPowered": "Vehículos propulsados por gas (GLP, GNC o GNL).",
-  
   "zeroLabelElectric": "Vehículos 100% eléctricos (BEV).",
   "zeroLabelPluginHybrids": "Híbridos enchufables (PHEV) con autonomía eléctrica superior a 40 km.",
   "zeroLabelHydrogen": "Vehículos propulsados por hidrógeno.",
-  
   "bLabelPetrol": "Coches y furgonetas de gasolina matriculados desde enero de 2001.",
   "bLabelDiesel": "Coches y furgonetas diésel matriculados desde enero de 2006.",
   "bLabelIndustrial": "Vehículos industriales y autobuses matriculados desde 2005.",
-  
   "cLabelPetrol": "Coches y furgonetas de gasolina matriculados desde enero de 2006.",
   "cLabelDiesel": "Coches y furgonetas diésel matriculados desde septiembre de 2015.",
   "cLabelIndustrial": "Vehículos industriales y autobuses matriculados desde 2014.",
-    "yourCarDetails": "Detalles de tu Coche",
+  "yourCarDetails": "Detalles de tu Coche",
   "editDetails": "Editar Detalles",
   "lastPlaceParked": "Último lugar Estacionado",
   "unknown": "Desconocido",
   "navigateToCar": "Navegar al coche",
-    "errorConfirmSpaceReservation": "No se pudo confirmar la reserva del espacio",
+  "errorConfirmSpaceReservation": "No se pudo confirmar la reserva del espacio",
   "errorReserveSpace": "No se pudo reservar el espacio",
   "errorSendFeedback": "No se pudo enviar la retroalimentación",
   "errorTakeSpace": "No se pudo tomar el espacio",
   "errorPublishRoadEvent": "No se pudo publicar el evento en la vía",
   "errorLoadActivities": "No se pudieron cargar las actividades",
   "errorPublishSpace": "No se pudo publicar el espacio",
-    "forgotPassword": "Olvidé mi Contraseña",
+  "forgotPassword": "Olvidé mi Contraseña",
   "getHelp": "Obtener Ayuda",
   "enterEmailToReset": "Ingresa tu dirección de correo electrónico para continuar",
   "emailAddress": "Correo Electrónico",
   "enterEmailAddress": "Ingresa tu correo electrónico",
-    "resetPassword": "Restablecer Contraseña",
+  "resetPassword": "Restablecer Contraseña",
   "setNewPassword": "Establecer Nueva Contraseña",
   "createStrongPassword": "Crea una contraseña segura para tu cuenta",
   "newPassword": "Nueva Contraseña",
@@ -240,7 +237,7 @@
   "enterPassword": "Ingresa tu contraseña",
   "passwordsDoNotMatch": "Las contraseñas no coinciden",
   "passwordRequirements": "Asegúrate de usar al menos 8 caracteres, con un número, un carácter especial y una letra mayúscula",
-   "emailSentTitle": "Te enviamos un correo",
+  "emailSentTitle": "Te enviamos un correo",
   "emailSentDescription": "Hemos enviado un código OTP a tu correo. Ingrésalo abajo para restablecer tu contraseña.",
   "mailSentTo": "Correo enviado a: ",
   "notYou": "¿No eres tú? ",
@@ -255,29 +252,24 @@
       }
     }
   },
-    "createNewAccount": "CREAR NUEVA CUENTA",
+  "createNewAccount": "CREAR NUEVA CUENTA",
   "personalInformation": "Información Personal",
   "enterFullName": "Ingresa tu nombre completo para continuar",
   "firstName": "Nombre",
   "lastName": "Apellido",
   "enterFirstName": "Ingresa tu nombre",
   "enterLastName": "Ingresa tu apellido",
-   "getStarted": "Empezar",
+  "getStarted": "Empezar",
   "alreadyHaveAccount": "¿Ya tienes una cuenta? ",
   "loginHere": "Inicia sesión aquí",
   "signUpWithGoogle": "Registrarse con Google",
   "agreeToTerms": "Al continuar, acepto los ",
   "termsAndConditions": "Términos y Condiciones",
   "pleaseAcceptTerms": "Por favor acepta los términos y condiciones",
-    "emailAddress": "Correo Electrónico",
-  "enterEmailAddress": "Ingresa tu correo electrónico",
   "password": "Contraseña",
-  "enterPassword": "Ingresa tu contraseña",
-  "repeatPassword": "Repetir Contraseña",
-  "passwordRequirements": "Asegúrate de usar al menos 8 caracteres, con un número, un carácter especial y una letra mayúscula",
   "continue": "Continuar",
   "unableToResendVerification": "No se pudo reenviar el código de verificación",
-    "somethingWentWrong": "Algo salió mal",
+  "somethingWentWrong": "Algo salió mal",
   "unableToProcessRequest": "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo más tarde. El error es: {error}",
   "@unableToProcessRequest": {
     "placeholders": {
@@ -288,52 +280,52 @@
   },
   "retry": "Reintentar",
   "sessionExpired": "La sesión ha expirado. Por favor, inicia sesión nuevamente.",
-    "verifyAccount": "Verificar Cuenta",
+  "verifyAccount": "Verificar Cuenta",
   "weWillSendOTP": "Te enviamos un correo",
   "verificationInstructions": "Por favor revisa el correo proporcionado para obtener un código OTP y verificar tu correo. Ingrésalo abajo",
   "resending": "Reenviando",
   "verificationSuccess": "Verificación Exitosa",
   "verificationSuccessMessage": "Tu correo ha sido verificado exitosamente. Puedes proceder a la aplicación.",
-    "findShareParking": "Encuentra y Comparte Espacios de Estacionamiento cerca de ti",
+  "findShareParking": "Encuentra y Comparte Espacios de Estacionamiento cerca de ti",
   "parkingDescription": "Accede a una amplia gama de espacios de estacionamiento dentro y fuera de tu ubicación",
-   "geolocationPermission": "Geolocation Permission",
+  "geolocationPermission": "Geolocation Permission",
   "enableGeolocationDescription": "Kindly enable geolocation to allow the app to track your location automatically. This process must be completed to use the app.",
   "enableGeolocation": "Enable Geolocation",
   "openSettings": "Open Settings",
   "notNow": "Not now",
-    "loginToAccount": "INICIAR SESIÓN EN TU CUENTA",
+  "loginToAccount": "INICIAR SESIÓN EN TU CUENTA",
   "welcomeBack": "¡Bienvenido de Nuevo!",
   "dontHaveAccount": "¿No tienes una cuenta? ",
   "signUpHere": "Regístrate aquí",
   "login": "Iniciar Sesión",
   "forgotPasswordQuestion": "¿Olvidaste tu Contraseña? ",
   "resetHere": "Restablecer aquí",
-    "next": "Siguiente",
+  "next": "Siguiente",
   "goBack": "Volver",
   "connectAccountProgress": "Progreso de Conexión de Cuenta",
   "identityVerification": "Verificación de Identidad",
   "bankInformation": "Información Bancaria",
-    "addressInformationTitle": "Tu información de dirección",
+  "addressInformationTitle": "Tu información de dirección",
   "addressInformationDescription": "Ingresa tu dirección completa y ubicación de residencia",
   "enterAddress": "Ingresa tu dirección",
-  "addressExample": "Ej. Calle de Olivos 3, 46",
+  "address": "Dirección",
   "enterPostalCode": "Ingresa código postal",
-  "postalCodeExample": "Ej. 28944",
+  "postalCode": "Código Postal",
   "enterCity": "Ingresa ciudad",
-  "cityExample": "Ej. Fuenlabrada",
-    "bankInformationTitle": "Información Bancaria",
+  "city": "Ciudad",
+  "bankInformationTitle": "Información Bancaria",
   "bankInformationDescription": "Ingresa tu IBAN para completar este paso",
   "enterIBAN": "Ingresa tu IBAN",
-  "ibanExample": "Ej. ES0700120345030000067890",
+  "ibanExample": "ES00 0000 0000 0000 0000 0000",
   "bankAccountNote": "Ten en cuenta que esta cuenta bancaria es necesaria para recibir pagos de nuestro proveedor de pagos.",
   "detailsSubmitted": "Detalles Enviados",
   "gotItThanks": "Entendido, Gracias",
   "accountDetailsSuccess": "Los detalles de conexión de tu cuenta se han enviado correctamente, pronto podrás recibir dinero por los espacios pagados.",
-    "selectCountry": "Seleccionar País",
+  "selectCountry": "Seleccionar País",
   "selectCountryDescription": "Selecciona tu país de residencia para continuar",
   "spain": "España",
   "selectCountryLabel": "Seleccionar País",
-   "uploadIDCard": "Subir DNI",
+  "uploadIDCard": "Subir DNI",
   "uploadIDDescription": "Sube ambos lados de tu DNI",
   "uploadIDFront": "Toca para subir el frente del DNI",
   "uploadIDBack": "Toca para subir el reverso del DNI",
@@ -345,17 +337,354 @@
   "openCamera": "Abrir Cámara",
   "upload": "Subir",
   "pleaseUploadBothSides": "Por favor sube ambos lados de tu DNI",
-    "selectIdType": "Seleccionar Tipo de Identificación",
+  "selectIdType": "Seleccionar Tipo de Identificación",
   "selectIdDescription": "Selecciona tu tipo de identificación y sube el frente y reverso de tu documento",
   "nationalIdCard": "DNI",
   "nationalIdDescription": "Tu documento nacional de identidad emitido por el gobierno",
   "residentPermit": "Permiso de Residencia",
   "residentPermitDescription": "Tu permiso de residencia emitido por el gobierno",
-    "personalInfoTitle": "Tu información personal",
+  "personalInfoTitle": "Tu información personal",
   "personalInfoDescription": "Ingresa tus datos personales como aparecen en tu DNI",
   "phoneNumber": "Número de teléfono",
   "enterPhoneNumber": "Ingresa número de teléfono",
   "dateOfBirth": "Fecha de Nacimiento",
   "dateFormat": "AAAA/MM/DD",
-  "selectDateOfBirth": "Por favor selecciona tu fecha de nacimiento"
+  "selectDateOfBirth": "Por favor selecciona tu fecha de nacimiento",
+  "clickToOpenCamera": "Haz clic para abrir la cámara",
+  "publishPaidSpace": "Publicar Espacio de Pago",
+  "waitingTime": "Tiempo de Espera",
+  "waitingTimeMinutes": "MM",
+  "price": "Precio",
+  "enterPrice": "Ingresa el precio",
+  "publish": "Publicar",
+  "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de irse, y después de que este tiempo expire, el espacio publicado caducará.",
+  "whatIsThisWaitingTime": "¿Qué es esto?",
+  "fetchingLocation": "Obteniendo ubicación...",
+  "pleaseEnterAllFields": "Por favor completa todos los campos",
+  "spacePublishedSuccesfully": "Espacio Publicado Exitosamente",
+  "spacePublishedDescription": "Tu espacio ha sido publicado exitosamente, las personas ahora pueden tener acceso para usar el espacio.",
+  "speedLimitAlert": "Alerta de Límite de Velocidad",
+  "speedLimitWarning": "Estás conduciendo al límite de velocidad, reduce la velocidad",
+  "kmPerHour": "Km/h",
+  "speedLimit": "Límite de velocidad",
+  "recalculatingRoute": "Recalculando ruta...",
+  "youHaveArrived": "¡Has llegado a tu destino!",
+  "navigatingToParking": "Navegando al espacio de estacionamiento",
+  "preparingNavigation": "Preparando tu navegación...",
+  "navigationError": "No se pudo calcular la ruta. Por favor, inténtalo de nuevo.",
+  "tryAgain": "Intentar de Nuevo",
+  "fatigueAlertTitle": "Alerta de Fatiga",
+  "fatigueAlertMessage": "Has estado conduciendo durante 3 horas. Por favor considera tomar un descanso.",
+  "fatigueAlertVoice": "Has estado conduciendo durante tres horas. Por favor toma un descanso.",
+  "addEvent": "Agregar evento",
+  "ahead": "por delante",
+  "navigateToSpaceButton": "Navegar al Espacio",
+  "locationPermissionDenied": "Permiso de ubicación denegado",
+  "locationPermissionDeniedPermanently": "Permisos de ubicación denegados permanentemente, por favor habilítalos en configuración",
+  "failedToLoadMap": "Error al cargar el mapa",
+  "failedToInitializeLocation": "Error al inicializar los servicios de ubicación",
+  "failedToInitNavigation": "Error al inicializar la navegación",
+  "failedToStartNavigation": "Error al iniciar la visualización de navegación",
+  "freeCameraMode": "Cámara libre",
+  "lockPositionMode": "Bloquear posición",
+  "cameraAlertTitle": "Alerta de Cámara",
+  "radarAlertTitle": "Alerta de Radar",
+  "cameraAlertMessage": "Estás en una zona de vigilancia con cámaras CCTV",
+  "radarAlertMessage": "Te estás acercando a una zona con radar",
+  "unnamedRoad": "Calle sin nombre",
+  "couldNotRecalculateRoute": "No se pudo recalcular la ruta",
+  "tooCloseToLocation": "Demasiado Cerca de la Ubicación",
+  "closeToLocationDescription": "Estás cerca de la ubicación, por favor selecciona una ubicación diferente",
+  "close": "Cerrar",
+  "trafficLevel": "Nivel de Tráfico",
+  "toArriveBy": "Para llegar a las {time}",
+  "@toArriveBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyAvailableSpace": "Notificarme de espacios disponibles en esta área",
+  "dateAndTime": "Fecha y Hora",
+  "notificationRadius": "Recibir notificaciones hasta (metros)",
+  "startRoute": "Iniciar Ruta",
+  "save": "Guardar",
+  "radiusLessThan": "El radio no puede ser menor a {meters} metros",
+  "@radiusLessThan": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationScheduled": "Notificación Programada",
+  "notificationScheduledDescription": "Se te notificará cuando haya un espacio disponible en esta área",
+  "minutesShort": "min",
+  "hoursShort": "hrs",
+  "metersShort": "m",
+  "kilometersShort": "km",
+  "timesRequired": "Las horas de inicio y fin son requeridas",
+  "startBeforeEnd": "La hora de inicio debe ser anterior a la hora de fin",
+  "timeGreaterThanCurrent": "Las horas de inicio y fin deben ser posteriores a la hora actual",
+  "maxScheduleDays": "Solo puedes programar hasta 5 días",
+  "distanceTraveled": "Distancia recorrida: {distance} m",
+  "@distanceTraveled": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "youHaveTraveled": "Has recorrido {distance} metros",
+  "@youHaveTraveled": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "estimatedArrival": "Llegada estimada en {time} con {distance} metros restantes",
+  "@estimatedArrival": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "seconds": "{count} segundos",
+  "@seconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesAndSeconds": "{minutes} min {seconds} seg",
+  "@minutesAndSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesOnly": "{minutes} minutos",
+  "@minutesOnly": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAndMinutes": "{hours} h {minutes} min",
+  "@hoursAndMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursOnly": "{hours} horas",
+  "@hoursOnly": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "preparingYourNavigation": "Preparando tu navegación...",
+  "locationPermissionPermanentlyDenied": "Permisos de ubicación denegados permanentemente, habilítelos en la configuración",
+  "failedToInitializeLocationServices": "Error al inicializar los servicios de ubicación",
+  "failedToGetCurrentLocation": "Error al obtener la ubicación actual",
+  "failedToStartNavigationSimulation": "Error al iniciar la simulación de navegación",
+  "failedToInitializeRouting": "Error al inicializar el enrutamiento",
+  "couldNotCalculateRoute": "No se pudo calcular la ruta. Por favor, inténtelo de nuevo.",
+  "failedToInitializeNavigation": "Error al inicializar la navegación",
+  "metersAhead": "{distance}m por delante",
+  "@metersAhead": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "metersAway": "{distance}m de distancia",
+  "@metersAway": {
+    "placeholders": {
+      "distance": {
+        "type": "int"
+      }
+    }
+  },
+  "gotItThankYou": "Entendido, gracias",
+  "feedbackButton": "Comentarios",
+  "feedbackSubmitted": "Tu comentario ha sido enviado",
+  "thankYouForInput": "¡Gracias por tu aporte!",
+  "eventFeedback": "Comentarios sobre el evento",
+  "stillThere": "Todavía está ahí",
+  "notThere": "Ya no está ahí",
+  "illTakeIt": "Lo tomaré",
+  "itsInUse": "Está en uso",
+  "notUseful": "No es útil",
+  "prohibited": "Prohibido",
+  "arrivedAtDestination": "Has llegado a tu destino.",
+  "rateThisParkingSpace": "¿Cómo calificarías este espacio de estacionamiento?",
+  "customNavigation": "Navegación Personalizada",
+  "startButton": "Iniciar",
+  "stopButton": "Detener",
+  "toggleButton": "Cambiar",
+  "colorButton": "Color",
+  "unread": "No leídas",
+  "notifications": "Notificaciones",
+  "yourSpaceLocatedAt": "Tu espacio ubicado en ",
+  "hasBeenOccupied": " ha sido ocupado",
+  "aNewSpaceHasBeenPublished": "Se ha publicado un nuevo espacio dentro de ",
+  "around": " alrededor de ",
+  "hasBeenReserved": " ha sido reservado",
+  "receivedPositiveFeedback": " Recibió comentarios positivos",
+  "noNotificationsYet": "Aún no hay notificaciones",
+  "notificationsWillAppear": "Las notificaciones de la aplicación aparecerán aquí\ncuando haya una nueva actividad",
+  "noScheduledNotificationsYet": "Aún no hay notificaciones programadas",
+  "scheduledNotificationsWillAppear": "Las notificaciones programadas aparecerán\naquí cuando configures este recordatorio",
+  "justNow": "Ahora mismo",
+  "viewSpace": "Ver espacio",
+  "noPaymentMethodsAdded": "No se han añadido métodos de pago",
+  "noPaymentMethodsDescription": "Aún no has añadido ningún método de pago.\nAñade uno para realizar pagos fácilmente.",
+  "paymentMethodAdded": "Método de Pago Añadido",
+  "paymentMethodAddedDescription": "Tu método de pago ha sido añadido correctamente.",
+  "pleaseCompleteCardDetails": "Por favor completa los detalles de la tarjeta",
+  "failedToAddPaymentMethod": "Error al añadir método de pago. Por favor, inténtalo de nuevo.",
+  "cardNumber": "Número de tarjeta",
+  "addNewCard": "Añadir Nueva Tarjeta",
+  "defaultt": "Predeterminado",
+  "expireDate": "Fecha de vencimiento: {date}",
+  "@expireDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethod": "Método de pago",
+  "makeDefault": "Establecer como predeterminado",
+  "confirmDeleteCard": "Confirmar Eliminación de Tarjeta",
+  "deleteCardConfirmation": "¿Estás seguro de que quieres eliminar la tarjeta que termina en {last4}? Esta acción no se puede deshacer.",
+  "@deleteCardConfirmation": {
+    "placeholders": {
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "noKeepCard": "No, Mantener Tarjeta",
+  "yesDeleteCard": "Sí, Eliminar Tarjeta",
+  "noPayoutMethodsYet": "Aún No Hay Métodos de Cobro",
+  "payoutMethodsDescription": "Tus métodos de cobro añadidos aparecerán\naquí una vez que los configures en tu perfil",
+  "payoutMethodAdded": "Método de Cobro Añadido",
+  "payoutMethodAddedDescription": "Tu método de cobro ha sido añadido correctamente.",
+  "addPayoutMethod": "Añadir Método de Cobro",
+  "accountNumber": "Número de Cuenta",
+  "accountNumberExample": "ES00 0000 0000 0000 0000 0000",
+  "makeDefaultPaymentMethod": "Establecer como método de pago predeterminado",
+  "pleaseEnterAccountNumber": "Por favor ingresa el número de cuenta",
+  "payoutMethods": "Métodos de cobro",
+  "payoutMethodOptions": "Opciones de método de cobro",
+  "rescheduleNotification": "Reprogramar Notificación",
+  "reschedule": "Reprogramar",
+  "notificationRescheduledSuccessfully": "Notificación reprogramada correctamente",
+  "spaceReminder": "Recordatorio de Espacio",
+  "rescheduleReminder": "Reprogramar Recordatorio",
+  "deleteReminder": "Eliminar Recordatorio",
+  "youHaveReminderForSpace": "Tienes un recordatorio para un espacio en ",
+  "expired": "Expirado",
+  "active": "Activo",
+  "antiMoneyLaunderingMessage": "La Directiva contra el Blanqueo de Dinero nos obliga a verificar tu identidad para recibir pagos por tus ventas online. Solo necesitarás verificarte una vez.",
+  "couldNotOpenTermsAndConditions": "No se pudo abrir el enlace de Términos y Condiciones",
+  "byAgreementStripe": "Al continuar, acepto el ",
+  "stripeConnectedAccountAgreement": "Acuerdo de Cuenta Conectada de Stripe",
+  "and": " y ",
+  "stripeTermsOfService": "Términos de Servicio de Stripe",
+  "accountInformationChanged": "Información de cuenta cambiada correctamente",
+  "accountInformationChangedDescription": "La información de tu cuenta ha sido cambiada correctamente,",
+  "orders": "Pedidos",
+  "errorLoadingOrders": "Error al cargar pedidos",
+  "confirmed": "Confirmado",
+  "today": "Hoy",
+  "yesterday": "Ayer",
+  "daysAgo": "hace {days} días",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "oneWeekAgo": "hace 1 semana",
+  "twoWeeksAgo": "hace 2 semanas",
+  "threeWeeksAgo": "hace 3 semanas",
+  "noOrdersYet": "Aún no hay pedidos",
+  "noOrdersDescription": "Aún no has realizado ningún pedido.\n¡Comienza a explorar y haz tu primer pedido!",
+  "alerts": "Alertas",
+  "emailNotifications": "Notificaciones por correo",
+  "pushNotifications": "Notificaciones push",
+  "availableSpaces": "Espacios disponibles",
+  "radarAlerts": "Alertas de radar",
+  "cameraAlerts": "Alertas de cámara",
+  "prohibitedZoneAlert": "Alerta de zona prohibida",
+  "fatigueAlert": "Alerta de fatiga",
+  "policeAlert": "Alerta de policía",
+  "accidentAlert": "Alerta de accidente",
+  "roadClosedAlert": "Alerta de carretera cerrada",
+  "nameNotProvided": "Nombre no proporcionado",
+  "letdemPoints": "Puntos LetDem",
+  "walletBalance": "Saldo de Cartera",
+  "withdraw": "Retirar",
+  "withdrawals": "Retiros",
+  "payouts": "Pagos",
+  "transactionHistory": "Historial de Transacciones",
+  "seeAll": "Ver todo",
+  "noTransactionsYet": "Aún No Hay Transacciones",
+  "transactionsHistoryMessage": "Tu historial de transacciones aparecerá aquí cuando tengas alguna actividad que mostrar.",
+  "loadingTransactions": "Cargando Transacciones",
+  "noPayoutMethodsAvailable": "No hay métodos de cobro disponibles",
+  "success": "Éxito",
+  "withdrawalRequestSuccess": "La solicitud de retiro ha sido enviada correctamente.",
+  "withdrawalToBank": "Retiro al Banco {method}",
+  "@withdrawalToBank": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "successful": "Exitoso",
+  "failed": "Fallido",
+  "noWithdrawalsYet": "Aún No Hay Retiros",
+  "withdrawalHistoryMessage": "Tu historial de retiros aparecerá aquí\ncuando realices un retiro",
+  "amountCannotExceed": "El monto no puede exceder {balance} €",
+  "@amountCannotExceed": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "amountToReceive": "Monto a recibir",
+  "pendingToBeCleared": "{amount} € Pendiente de ser liberado",
+  "@pendingToBeCleared": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

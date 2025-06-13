@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/models/withdrawals/withdrawal.model.dart';
 
@@ -26,8 +27,8 @@ class _WithdrawListViewState extends State<WithdrawListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Withdrawals',
+        title: Text(
+          context.l10n.withdrawals,
         ),
       ),
       body: BlocConsumer<WithdrawalBloc, WithdrawalState>(
@@ -136,7 +137,7 @@ class WithdrawalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Withdrawal to Bank ${withdrawal.maskedPayoutMethod}',
+                  context.l10n.withdrawalToBank(withdrawal.maskedPayoutMethod),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -145,7 +146,7 @@ class WithdrawalCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _formatDate(withdrawal.created),
+                  _formatDate(withdrawal.created, context),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -159,7 +160,7 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '€${withdrawal.amount.toStringAsFixed(1)}',
+                '${withdrawal.amount.toStringAsFixed(1)} €',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -167,7 +168,7 @@ class WithdrawalCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              _buildStatusChip(withdrawal.status),
+              _buildStatusChip(withdrawal.status, context),
             ],
           ),
         ],
@@ -175,7 +176,7 @@ class WithdrawalCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(WithdrawalStatus status) {
+  Widget _buildStatusChip(WithdrawalStatus status, BuildContext context) {
     Color backgroundColor;
     Color textColor;
     String text;
@@ -184,17 +185,17 @@ class WithdrawalCard extends StatelessWidget {
       case WithdrawalStatus.completed:
         backgroundColor = AppColors.green50;
         textColor = AppColors.green500;
-        text = 'Successful';
+        text = context.l10n.successful;
         break;
       case WithdrawalStatus.pending:
         backgroundColor = Colors.orange[50]!;
         textColor = Colors.orange[600]!;
-        text = 'Pending';
+        text = context.l10n.pending;
         break;
       case WithdrawalStatus.failed:
         backgroundColor = Colors.red[50]!;
         textColor = Colors.red[600]!;
-        text = 'Failed';
+        text = context.l10n.failed;
         break;
     }
 
@@ -215,16 +216,16 @@ class WithdrawalCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, BuildContext context) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final dateOnly = DateTime(date.year, date.month, date.day);
 
     if (dateOnly == today) {
-      return 'Just now';
+      return context.l10n.justNow;
     } else if (dateOnly == yesterday) {
-      return 'Yesterday ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+       return '${context.l10n.yesterday} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
     } else {
       return '${date.day} ${_getMonthName(date.month)}, ${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
     }
@@ -365,16 +366,16 @@ class EmptyWithdrawalView extends StatelessWidget {
                 width: 40, height: 40, color: AppColors.primary500),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No Withdrawals Yet',
-            style: TextStyle(
+          Text(
+            context.l10n.noWithdrawalsYet,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'Your withdrawal history will appear here\nwhenever you make a withdrawal',
+            context.l10n.withdrawalHistoryMessage,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -413,9 +414,9 @@ class WithdrawalErrorView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Something went wrong',
-            style: TextStyle(
+          Text(
+            context.l10n.somethingWentWrong,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -440,7 +441,7 @@ class WithdrawalErrorView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Try Again'),
+            child: Text(context.l10n.tryAgain),
           ),
         ],
       ),
