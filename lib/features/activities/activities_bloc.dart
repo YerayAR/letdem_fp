@@ -25,8 +25,24 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     on<PublishRoadEventEvent>(_onPublishRoadEvent);
     on<TakeSpaceEvent>(_onTakeSpace);
     on<EventFeedBackEvent>(_onEventFeedBack);
+    on<DeleteSpaceEvent>(_onDeleteSpaceEvent);
     on<ReserveSpaceEvent>(_onReserveSpace);
     on<ConfirmSpaceReserveEvent>(_onConfirmSpaceReserveEvent);
+  }
+
+  Future<void> _onDeleteSpaceEvent(
+      DeleteSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+      await activityRepository.deleteSpace(event.spaceID);
+      emit(const ActivitiesPublished(totalPointsEarned: 0));
+    } on ApiError catch (err) {
+      Toast.showError(err.message);
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      Toast.showError("Unable to delete space");
+      emit(const ActivitiesError(error: "Unable to delete space"));
+    }
   }
 
   Future<void> _onConfirmSpaceReserveEvent(

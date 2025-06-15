@@ -151,35 +151,38 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
             builder: (context, state) {
               return Scaffold(
                 appBar: AppBar(
-                  actions: [
-                    Dimens.space(2),
-                    // Row to contain page indicators with proper spacing
-                    Row(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: 70,
-                          height: 8,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: AppColors.secondary500),
-                        ),
-                        const SizedBox(width: 8), // consistent spacing
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: 70,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: _selectedPage == 1
-                                ? AppColors.secondary500
-                                : AppColors.secondary500.withOpacity(0.3),
+                  actions: !widget.isPaid
+                      ? []
+                      : [
+                          Dimens.space(2),
+                          // Row to contain page indicators with proper spacing
+                          Row(
+                            children: [
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                width: 70,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: AppColors.secondary500),
+                              ),
+                              const SizedBox(width: 8), // consistent spacing
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                width: 70,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: _selectedPage == 1
+                                      ? AppColors.secondary500
+                                      : AppColors.secondary500.withOpacity(0.3),
+                                ),
+                              ),
+                              const SizedBox(
+                                  width: 16), // add padding at the end
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 16), // add padding at the end
-                      ],
-                    ),
-                  ],
+                        ],
                   title: Text(
                     context.l10n.publishSpace,
                   ),

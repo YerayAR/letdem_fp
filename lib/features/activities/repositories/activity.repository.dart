@@ -98,4 +98,11 @@ class ActivityRepository extends IActivityRepository {
           EndPoints.confirmReservation(spaceID).copyWithDTO(confirmationCode),
     );
   }
+
+  @override
+  Future deleteSpace(String spaceID) {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.deleteSpace(spaceID),
+    );
+  }
 }

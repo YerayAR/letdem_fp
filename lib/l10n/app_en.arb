@@ -111,6 +111,22 @@
   "pleaseEnterConfirmationCode": "Please enter the confirmation code",
   "reserved": "Reserved",
   "waiting": "Waiting",
+  "deleteSpaceTitle": "Delete Space",
+  "deleteSpaceSubtext": "Are you sure you want to delete this space? This action cannot be undone.",
+  "@deleteSpaceTitle": {
+    "description": "Title shown in the dialog when the user is about to delete a space"
+  },
+  "@deleteSpaceSubtext": {
+    "description": "Subtext shown in the dialog explaining that the space deletion is permanent"
+  },
+  "spaceDeleted": "Space Deleted",
+  "spaceDeletedSubtext": "The space has been successfully deleted.",
+  "@spaceDeleted": {
+    "description": "Title shown when a space is successfully deleted"
+  },
+  "@spaceDeletedSubtext": {
+    "description": "Subtext shown to confirm the space deletion was successful"
+  },
   "reservedSpace": "Reserved Space",
   "confirmationCodeTitle": "Confirmation Code",
   "shareCodeOwner": "Share this code with the parking space owner",

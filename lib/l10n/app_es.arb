@@ -369,6 +369,14 @@
   "navigatingToParking": "Navegando al espacio de estacionamiento",
   "preparingNavigation": "Preparando tu navegación...",
   "navigationError": "No se pudo calcular la ruta. Por favor, inténtalo de nuevo.",
+  "spaceDeleted": "Espacio eliminado",
+  "spaceDeletedSubtext": "El espacio ha sido eliminado con éxito.",
+  "@spaceDeleted": {
+    "description": "Título que se muestra cuando un espacio se ha eliminado correctamente"
+  },
+  "@spaceDeletedSubtext": {
+    "description": "Texto que confirma que la eliminación del espacio fue exitosa"
+  },
   "tryAgain": "Intentar de Nuevo",
   "fatigueAlertTitle": "Alerta de Fatiga",
   "fatigueAlertMessage": "Has estado conduciendo durante 3 horas. Por favor considera tomar un descanso.",
@@ -390,6 +398,14 @@
   "radarAlertMessage": "Te estás acercando a una zona con radar",
   "unnamedRoad": "Calle sin nombre",
   "spaceOwnerCannotReserve": "El propietario del espacio no puede reservar su propio espacio",
+  "deleteSpaceTitle": "Eliminar espacio",
+  "deleteSpaceSubtext": "¿Estás seguro de que deseas eliminar este espacio? Esta acción no se puede deshacer.",
+  "@deleteSpaceTitle": {
+    "description": "Título que se muestra en el diálogo cuando el usuario está a punto de eliminar un espacio"
+  },
+  "@deleteSpaceSubtext": {
+    "description": "Texto que explica que la eliminación del espacio es permanente"
+  },
   "couldNotRecalculateRoute": "No se pudo recalcular la ruta",
   "tooCloseToLocation": "Demasiado Cerca de la Ubicación",
   "closeToLocationDescription": "Estás cerca de la ubicación, por favor selecciona una ubicación diferente",

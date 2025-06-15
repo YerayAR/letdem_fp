@@ -137,7 +137,11 @@ class WithdrawalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.l10n.withdrawalToBank(withdrawal.maskedPayoutMethod),
+                  // maskedPayoutMethod last 5 digits if available
+
+                  context.l10n.withdrawalToBank(
+                    "...${withdrawal.maskedPayoutMethod.substring(withdrawal.maskedPayoutMethod.length - 4)}",
+                  ),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -160,11 +164,11 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${withdrawal.amount.toStringAsFixed(1)} €',
-                style: const TextStyle(
+                '€${withdrawal.amount.abs().toStringAsFixed(1)}',
+                style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.neutral600,
                 ),
               ),
               const SizedBox(height: 4),
@@ -205,13 +209,19 @@ class WithdrawalCard extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: textColor,
-        ),
+      child: Row(
+        children: [
+          CircleAvatar(radius: 3, backgroundColor: textColor),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -225,7 +235,7 @@ class WithdrawalCard extends StatelessWidget {
     if (dateOnly == today) {
       return context.l10n.justNow;
     } else if (dateOnly == yesterday) {
-       return '${context.l10n.yesterday} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+      return '${context.l10n.yesterday} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
     } else {
       return '${date.day} ${_getMonthName(date.month)}, ${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
     }

@@ -63,7 +63,7 @@ class TextInputFieldState extends State<TextInputField> {
   bool isPasswordVisible = false;
 
   // We'll track password strength level instead of individual criteria
-  int passwordStrength = 0; // 0-4 scale for strength levels
+  int passwordStrength = 1; // 0-4 scale for strength levels
 
   @override
   void initState() {
@@ -92,19 +92,8 @@ class TextInputFieldState extends State<TextInputField> {
     }
 
     setState(() {
-      passwordStrength = strength;
+      passwordStrength = strength < 1 ? 1 : strength.clamp(1, 4);
     });
-  }
-
-  // Get color based on password strength level
-  Color _getStrengthColor() {
-    if (passwordStrength <= 1) {
-      return Colors.red; // Weak password
-    } else if (passwordStrength <= 3) {
-      return Colors.amber; // Medium password (yellow)
-    } else {
-      return Colors.green; // Strong password
-    }
   }
 
   @override

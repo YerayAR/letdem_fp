@@ -49,10 +49,6 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   void initState() {
     _selectedPaymentMethod = context.userProfile!.defaultPaymentMethod;
 
-    if (widget.space.isOwner) {
-      Toast.showError(context.l10n.spaceOwnerCannotReserve);
-      NavigatorHelper.pop();
-    }
     super.initState();
   }
 
@@ -80,7 +76,51 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
           _buildHeader(context),
           Dimens.space(3),
           _buildPaymentCard(context, _selectedPaymentMethod),
-          _buildReserveButton(context, widget.space),
+          SizedBox(
+              child: (widget.space.isOwner)
+                  ? BlocConsumer<ActivitiesBloc, ActivitiesState>(
+                      listener: (context, state) {
+                        if (state is ActivitiesPublished) {
+                          context.read<UserBloc>().add(FetchUserInfoEvent());
+                          AppPopup.showDialogSheet(
+                            context,
+                            SuccessDialog(
+                              title: context.l10n.spaceDeleted,
+                              subtext: context.l10n.spaceDeletedSubtext,
+                              onProceed: () {
+                                NavigatorHelper.popAll();
+                              },
+                            ),
+                          );
+                        } else if (state is ActivitiesError) {
+                          Toast.showError(state.error);
+                        }
+                        // TODO: implement listener
+                      },
+                      builder: (context, state) {
+                        return PrimaryButton(
+                          text: context.l10n.delete,
+                          color: AppColors.red500,
+                          onTap: () {
+                            AppPopup.showDialogSheet(
+                              context,
+                              ConfirmationDialog(
+                                title: context.l10n.deleteSpaceTitle,
+                                subtext: context.l10n.deleteSpaceSubtext,
+                                onProceed: () {
+                                  context.read<ActivitiesBloc>().add(
+                                        DeleteSpaceEvent(
+                                            spaceID: widget.space.id),
+                                      );
+                                  NavigatorHelper.pop();
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    )
+                  : _buildReserveButton(context, widget.space)),
         ],
       ),
     );
@@ -316,5 +356,46 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
       widget.space.location.point.lat,
       widget.space.location.point.lng,
     ));
+  }
+}
+
+class ConfirmationDialog extends StatelessWidget {
+  final String title;
+  final String subtext;
+  final VoidCallback onProceed;
+
+  const ConfirmationDialog({
+    super.key,
+    this.title = '',
+    this.subtext = '',
+    required this.onProceed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: Typo.heading4.copyWith(fontWeight: FontWeight.w800),
+          ),
+          Dimens.space(2),
+          Text(
+            subtext,
+            style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
+            textAlign: TextAlign.center,
+          ),
+          Dimens.space(4),
+          PrimaryButton(
+            text: context.l10n.proceed,
+            onTap: onProceed,
+            color: AppColors.primary500,
+            textColor: Colors.white,
+          ),
+        ],
+      ),
+    );
   }
 }
