@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:country_phone_validator/country_phone_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -84,6 +85,16 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       return;
     }
 
+    print("Phone Number: $phoneNumber");
+    print("Country Code: $countryCode");
+
+    bool isValid = CountryUtils.validatePhoneNumber(
+        phoneNumber, countryCode.replaceAll('-', ''));
+
+    if (!isValid) {
+      Toast.showError("The phone number is not valid");
+      return;
+    }
     if (widget.isPaid &&
         (waitingTime.isEmpty || price.isEmpty || phoneNumber.isEmpty)) {
       Toast.showError(context.l10n.pleaseEnterAllFields);

@@ -169,6 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  country_phone_validator:
+    dependency: "direct main"
+    description:
+      name: country_phone_validator
+      sha256: "002e0b46dc8d1bd1030d8c4735669e7e895a5477bb8541011d5e7cc553d25445"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   cross_file:
     dependency: transitive
     description:

@@ -70,7 +70,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
           ),
           Dimens.space(1),
           Text(
-            '€${(context.userProfile!.earningAccount?.availableBalance ?? 0).toStringAsFixed(2)}',
+            '${(context.userProfile!.earningAccount?.availableBalance ?? 0).toStringAsFixed(2)} €',
             style: Typo.heading3.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 36,

@@ -175,7 +175,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         Dimens.space(2),
         if (widget.space.isPremium)
           Text(
-            "€${widget.space.price}",
+            "${widget.space.price} €",
             style: Typo.largeBody.copyWith(fontWeight: FontWeight.w800),
           ),
       ],

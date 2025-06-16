@@ -48,6 +48,10 @@ class AppAssets {
   static String visa = 'assets/icon/visa.png';
   static String masterCard = 'assets/icon/mastercard.png';
 
+  // americanExpress
+  static String americanExpress = 'assets/icon/american_express.png';
+  static String discover = 'assets/icon/discover.png';
+
   static String carTagC = 'assets/icon/car_tags/c.svg';
   static String carTagB = 'assets/icon/car_tags/b.svg';
   static String carTagNone = 'assets/icon/car_tags/none.svg';

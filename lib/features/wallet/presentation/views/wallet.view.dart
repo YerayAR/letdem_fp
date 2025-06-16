@@ -196,7 +196,7 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
     }
 
     return Text(
-      '€${context.watch<UserBloc>().state is UserLoaded ? context.userProfile!.earningAccount!.balance.toStringAsFixed(2) : widget.balance.toStringAsFixed(2)}',
+      '${context.watch<UserBloc>().state is UserLoaded ? context.userProfile!.earningAccount!.balance.toStringAsFixed(2) : widget.balance.toStringAsFixed(2)} €',
       style: const TextStyle(
         color: Colors.white,
         fontSize: 36,

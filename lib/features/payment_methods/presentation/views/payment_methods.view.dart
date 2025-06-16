@@ -82,6 +82,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                                 child: _buildCardItem(
                                   cardId: paymentMethod.paymentMethodId,
                                   last4: paymentMethod.last4,
+                                  brand: getBrandName(paymentMethod.brand),
                                   expireDate:
                                       '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
                                   cardType: paymentMethod.brand,
@@ -124,6 +125,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     required String holderName,
     required String cardId,
     required bool isDefault,
+    required String brand,
     required String expireDate,
     required String last4,
     required VoidCallback onMenuTap,
@@ -142,7 +144,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                context.l10n.cardEndingWith('Visa', last4),
+                context.l10n.cardEndingWith(brand, last4),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -422,6 +424,25 @@ getCardIcon(String cardType) {
       return AppAssets.visa;
     case 'mastercard':
       return AppAssets.masterCard;
+    case 'americanexpress':
+      return AppAssets.americanExpress;
+    case 'discover':
+      return AppAssets.discover;
+    default:
+      return '';
+  }
+}
+
+getBrandName(String cardType) {
+  switch (cardType.toLowerCase()) {
+    case 'visa':
+      return 'Visa';
+    case 'mastercard':
+      return 'MasterCard';
+    case 'americanexpress':
+      return 'American Express';
+    case 'discover':
+      return 'Discover';
     default:
       return '';
   }
