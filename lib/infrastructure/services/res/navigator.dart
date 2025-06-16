@@ -20,7 +20,11 @@ class NavigatorHelper {
   static void popAll() {
     final context = navigatorKey.currentContext;
     if (context != null) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      // check if the current route is not the first route
+
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
     }
   }
 

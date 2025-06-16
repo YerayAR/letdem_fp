@@ -66,7 +66,9 @@ class NoContributionsWidget extends StatelessWidget {
                           if (image != null) {
                             NavigatorHelper.to(
                               PublishSpaceScreen(
-                                  isPaid: false, file: File(image.path)),
+                                  onAdded: () {},
+                                  isPaid: false,
+                                  file: File(image.path)),
                             );
                           }
                         },
@@ -327,7 +329,9 @@ class NoContributionsWidget extends StatelessWidget {
 
                             NavigatorHelper.to(
                               PublishSpaceScreen(
-                                  isPaid: true, file: File(image.path)),
+                                  onAdded: () {},
+                                  isPaid: true,
+                                  file: File(image.path)),
                             );
                           }
                         },

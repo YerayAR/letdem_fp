@@ -26,7 +26,8 @@ import '../../../../infrastructure/services/mapbox_search/models/service.dart';
 import '../../../map/presentation/views/publish_space/publish_space.view.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
-  const HomeMapBottomSection({super.key});
+  final VoidCallback onRefreshTriggered;
+  const HomeMapBottomSection({super.key, required this.onRefreshTriggered});
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +112,7 @@ class HomeMapBottomSection extends StatelessWidget {
                                   if (image != null) {
                                     NavigatorHelper.to(
                                       PublishSpaceScreen(
+                                          onAdded: onRefreshTriggered,
                                           isPaid: false,
                                           file: File(image.path)),
                                     );
@@ -388,7 +390,9 @@ class HomeMapBottomSection extends StatelessWidget {
 
                                     NavigatorHelper.to(
                                       PublishSpaceScreen(
-                                          isPaid: true, file: File(image.path)),
+                                          onAdded: onRefreshTriggered,
+                                          isPaid: true,
+                                          file: File(image.path)),
                                     );
                                   }
                                 },

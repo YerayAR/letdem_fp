@@ -32,8 +32,11 @@ class SpacePopupSheet extends StatefulWidget {
   final Space space;
   final GeoCoordinates currentPosition;
 
+  final VoidCallback onRefreshTrigger;
+
   const SpacePopupSheet({
     required this.space,
+    required this.onRefreshTrigger,
     required this.currentPosition,
     super.key,
   });
@@ -81,6 +84,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   ? BlocConsumer<ActivitiesBloc, ActivitiesState>(
                       listener: (context, state) {
                         if (state is ActivitiesPublished) {
+                          widget.onRefreshTrigger();
                           context.read<UserBloc>().add(FetchUserInfoEvent());
                           AppPopup.showDialogSheet(
                             context,
@@ -224,7 +228,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   }
 
   Widget _buildPaymentCard(BuildContext context, PaymentMethodModel? method) {
-    if (!widget.space.isPremium) return const SizedBox();
+    if (!widget.space.isPremium || widget.space.isOwner)
+      return const SizedBox();
 
     return GestureDetector(
       onTap: () {
@@ -293,6 +298,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     return BlocConsumer<ActivitiesBloc, ActivitiesState>(
       listener: (context, state) {
         if (state is SpaceReserved) {
+          widget.onRefreshTrigger();
           context.read<UserBloc>().add(FetchUserInfoEvent());
           AppPopup.showDialogSheet(
             context,

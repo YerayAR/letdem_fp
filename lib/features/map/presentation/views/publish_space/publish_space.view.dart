@@ -19,8 +19,6 @@ import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/features/auth/models/map_options.model.dart';
-import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -31,8 +29,13 @@ class PublishSpaceScreen extends StatefulWidget {
   final File file;
   final bool isPaid;
 
+  final VoidCallback onAdded;
+
   const PublishSpaceScreen(
-      {super.key, required this.file, required this.isPaid});
+      {super.key,
+      required this.file,
+      required this.isPaid,
+      required this.onAdded});
 
   @override
   State<PublishSpaceScreen> createState() => _PublishSpaceScreenState();
@@ -120,15 +123,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
           return BlocConsumer<ActivitiesBloc, ActivitiesState>(
             listener: (context, state) {
               if (state is ActivitiesPublished) {
-                context.read<MapBloc>().add(GetNearbyPlaces(
-                      queryParams: MapQueryParams(
-                        currentPoint:
-                            "${snapshot.data!.latitude},${snapshot.data!.longitude}",
-                        radius: 8000,
-                        drivingMode: false,
-                        options: ['spaces', 'events'],
-                      ),
-                    ));
+                // Call the onAdded callback if provided
+                widget.onAdded();
 
                 context.read<UserBloc>().add(FetchUserInfoEvent());
 

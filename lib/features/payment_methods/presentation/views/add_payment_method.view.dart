@@ -27,7 +27,7 @@ class AddPaymentMethod extends StatefulWidget {
 }
 
 class _AddPaymentMethodState extends State<AddPaymentMethod> {
-  final controller = CardFormEditController();
+  final controller = CardEditController();
   final _nameController = TextEditingController();
   bool _isLoading = false;
 
@@ -100,8 +100,46 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                       padding: const EdgeInsets.all(1),
                       child: Column(
                         children: [
-                          CardFormField(
-                            controller: controller,
+                          Theme(
+                            data: ThemeData.light().copyWith(
+                              colorScheme:
+                                  ThemeData.light().colorScheme.copyWith(
+                                        primary: Colors.blueGrey,
+                                      ),
+                            ),
+                            child: CardField(
+                              decoration: InputDecoration(
+                                labelText: 'Card Details',
+                                labelStyle: TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontSize: 14,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Colors.blueGrey.shade300
+                                        .withOpacity(0.5),
+                                    width: 1,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Colors.blueGrey.shade300
+                                        .withOpacity(0.5),
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+
+                              controller: controller,
+                              // style: CardFormStyle(
+                              //   backgroundColor: Colors.black12,
+                              //   borderColor: Colors.blueGrey,
+                              //   textColor: Colors.black,
+                              //   placeholderColor: Colors.blue,
+                              // ),
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -139,7 +177,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                         isLoading: context.read<PaymentMethodBloc>().state
                                 is PaymentMethodLoading ||
                             _isLoading,
-                        onTap: controller.details.complete && !_isLoading
+                        onTap: (controller.details.complete && !_isLoading)
                             ? _handlePayPress
                             : () {
                                 Toast.showError(
@@ -162,6 +200,10 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
 
   Future<void> _handlePayPress() async {
     if (!controller.details.complete) return;
+    if (_nameController.text.trim().isEmpty) {
+      Toast.showError('Please enter your name');
+      return;
+    }
 
     setState(() => _isLoading = true);
 
