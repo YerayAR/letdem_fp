@@ -35,6 +35,11 @@ class TextInputField extends StatefulWidget {
   final Widget? child;
 
   final Color? placeholderColor;
+
+  final TextInputAction? textInputAction;
+
+  final VoidCallback? onEditingComplete;
+
   const TextInputField({
     super.key,
     this.controller,
@@ -53,6 +58,8 @@ class TextInputField extends StatefulWidget {
     this.isLoading = false,
     this.showDeleteIcon = false,
     this.child,
+    this.textInputAction,
+    this.onEditingComplete,
   });
 
   @override
@@ -129,6 +136,7 @@ class TextInputFieldState extends State<TextInputField> {
           ),
           TextFormField(
               enabled: widget.isEnabled,
+              onEditingComplete: widget.onEditingComplete,
               onChanged: widget.showPasswordStrengthIndicator
                   ? (value) {
                       _calculatePasswordStrength(value);
@@ -177,7 +185,7 @@ class TextInputFieldState extends State<TextInputField> {
                   (widget.inputType == TextFieldType.number
                       ? [FilteringTextInputFormatter.digitsOnly]
                       : []),
-              textInputAction: TextInputAction.newline,
+              textInputAction: widget.textInputAction ?? TextInputAction.newline,
               obscureText: widget.inputType == TextFieldType.password
                   ? !isPasswordVisible
                   : false,
