@@ -621,6 +621,7 @@
   "youHaveReminderForSpace": "You have a reminder for a space at ",
   "expired": "Expired",
   "active": "Active",
+  "activeMayus": "ACTIVE",
   "antiMoneyLaunderingMessage": "The Anti-money Laundering Directive forces us to verify your identity in order to receive payment for your online sales. You will only need to verify yourself once.",
   "couldNotOpenTermsAndConditions": "Could not open Terms & Conditions link",
   "byAgreementStripe": "By continuing, I agree to the ",
