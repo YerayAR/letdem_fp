@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
 class PublishSpaceDTO extends DTO {
@@ -30,6 +31,7 @@ class PublishSpaceDTO extends DTO {
 
   @override
   Map<String, dynamic> toMap() {
+    Clipboard.setData(ClipboardData(text: image));
     var map = {
       "type": type,
       "image": image,

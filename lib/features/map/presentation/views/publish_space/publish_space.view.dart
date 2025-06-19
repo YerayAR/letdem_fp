@@ -84,21 +84,22 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       _moveToNextPage();
       return;
     }
+    if (widget.isPaid) {
+      print("Phone Number: $phoneNumber");
+      print("Country Code: $countryCode");
 
-    print("Phone Number: $phoneNumber");
-    print("Country Code: $countryCode");
+      bool isValid = CountryUtils.validatePhoneNumber(
+          phoneNumber, countryCode.replaceAll('-', ''));
 
-    bool isValid = CountryUtils.validatePhoneNumber(
-        phoneNumber, countryCode.replaceAll('-', ''));
-
-    if (!isValid) {
-      Toast.showError("The phone number is not valid");
-      return;
-    }
-    if (widget.isPaid &&
-        (waitingTime.isEmpty || price.isEmpty || phoneNumber.isEmpty)) {
-      Toast.showError(context.l10n.pleaseEnterAllFields);
-      return;
+      if (!isValid) {
+        Toast.showError("The phone number is not valid");
+        return;
+      }
+      if (widget.isPaid &&
+          (waitingTime.isEmpty || price.isEmpty || phoneNumber.isEmpty)) {
+        Toast.showError(context.l10n.pleaseEnterAllFields);
+        return;
+      }
     }
 
     // Otherwise proceed with publishing
