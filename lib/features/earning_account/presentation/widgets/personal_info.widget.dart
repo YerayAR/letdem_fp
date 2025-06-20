@@ -27,16 +27,20 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _submitForm() {
+    FocusScope.of(context).unfocus();
+    
     if (_formKey.currentState!.validate()) {
       if (_dateOfBirth == null) {
         Toast.showError(context.l10n.selectDateOfBirth);
@@ -65,121 +69,123 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           Toast.showError(state.message);
         }
       },
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: Dimens.defaultMargin),
-          child: ListView(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(context.l10n.personalInfoTitle,
-                  style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold)),
-              Text(context.l10n.personalInfoDescription,
-                  style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
-              const SizedBox(height: 30),
-              TextInputField(
-                label: context.l10n.firstName,
-                placeHolder: context.l10n.enterFirstName,
-                controller: _firstNameController,
-              ),
-              const SizedBox(height: 16),
-              TextInputField(
-                label: context.l10n.lastName,
-                placeHolder: context.l10n.enterLastName,
-                controller: _lastNameController,
-              ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        height: 400,
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            // Done button
-                            Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(context.l10n.done),
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: Dimens.defaultMargin),
+            child: ListView(
+              controller: _scrollController,
+              children: [
+                Text(context.l10n.personalInfoTitle,
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(context.l10n.personalInfoDescription,
+                    style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
+                const SizedBox(height: 30),
+                TextInputField(
+                  label: context.l10n.firstName,
+                  placeHolder: context.l10n.enterFirstName,
+                  controller: _firstNameController,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 16),
+                TextInputField(
+                  label: context.l10n.lastName,
+                  placeHolder: context.l10n.enterLastName,
+                  controller: _lastNameController,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: 400,
+                          color: Colors.white,
+                          child: Column(
+                            children: [
+                              // Done button
+                              Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(context.l10n.done),
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: CupertinoDatePicker(
-                                mode: CupertinoDatePickerMode.date,
-                                initialDateTime:
-                                    _dateOfBirth ?? DateTime(1990, 1, 1),
-                                minimumDate: DateTime(1900),
-                                // maximumDate for age 18
-                                maximumDate: DateTime.now()
-                                    .subtract(const Duration(days: 365 * 18)),
-                                onDateTimeChanged: (DateTime date) {
-                                  setState(() {
-                                    _dateOfBirth = date;
-                                  });
-                                },
+                              Expanded(
+                                child: CupertinoDatePicker(
+                                  mode: CupertinoDatePickerMode.date,
+                                  initialDateTime:
+                                      _dateOfBirth ?? DateTime(1990, 1, 1),
+                                  minimumDate: DateTime(1900),
+                                  // maximumDate for age 18
+                                  maximumDate: DateTime.now()
+                                      .subtract(const Duration(days: 365 * 18)),
+                                  onDateTimeChanged: (DateTime date) {
+                                    setState(() {
+                                      _dateOfBirth = date;
+                                    });
+                                  },
+                                ),
                               ),
-                            ),
-                            // SafeArea(
-                            //   child: Material(
-                            //     child: Padding(
-                            //       padding: const EdgeInsets.symmetric(
-                            //           horizontal: 16, vertical: 0),
-                            //       child: PrimaryButton(
-                            //         text: 'Done',
-                            //         onTap: () {
-                            //           Navigator.of(context).pop();
-                            //         },
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: AbsorbPointer(
-                  child: TextInputField(
-                    placeholderColor: _dateOfBirth != null
-                        ? AppColors.neutral600
-                        : AppColors.neutral300,
-                    mustValidate: false,
-                    label: context.l10n.dateOfBirth,
-                    placeHolder: _dateOfBirth != null
-                        ? DateFormat('dd/MM/yyyy').format(_dateOfBirth!)
-                        : context.l10n.dateFormat,
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: AbsorbPointer(
+                    child: TextInputField(
+                      placeholderColor: _dateOfBirth != null
+                          ? AppColors.neutral600
+                          : AppColors.neutral300,
+                      mustValidate: false,
+                      label: context.l10n.dateOfBirth,
+                      placeHolder: _dateOfBirth != null
+                          ? DateFormat('dd/MM/yyyy').format(_dateOfBirth!)
+                          : context.l10n.dateFormat,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              PhoneField(
-                label: context.l10n.phoneNumber,
-                onChanged: (String text, String countryCode) {
-                  _phoneController.text = "$countryCode$text";
-                },
-                initialValue: '',
-              ),
-              Dimens.space(3),
-              BlocBuilder<EarningsBloc, EarningsState>(
-                builder: (context, state) {
-                  return PrimaryButton(
-                    onTap: state is EarningsLoading ? null : _submitForm,
-                    isLoading: state is EarningsLoading,
-                    text: context.l10n.next,
-                  );
-                },
-              ),
-            ],
+                const SizedBox(height: 16),
+                PhoneField(
+                  label: context.l10n.phoneNumber,
+                  onChanged: (String text, String countryCode) {
+                    _phoneController.text = "$countryCode$text";
+                  },
+                  initialValue: '',
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: () {
+                    FocusScope.of(context).unfocus();
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  },
+                ),
+                SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0 ? 100 : 30),
+                BlocBuilder<EarningsBloc, EarningsState>(
+                  builder: (context, state) {
+                    return PrimaryButton(
+                      onTap: state is EarningsLoading ? null : _submitForm,
+                      isLoading: state is EarningsLoading,
+                      text: context.l10n.next,
+                    );
+                  },
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
