@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
+import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/extensions/locale.dart';
 
 class PlatformTimePickerButton extends StatefulWidget {
@@ -94,7 +95,8 @@ class _PlatformTimePickerButtonState extends State<PlatformTimePickerButton> {
                     CupertinoButton(
                       child: Text(
                         context.l10n.done,
-                        style: const TextStyle(color: CupertinoColors.activeBlue),
+                        style:
+                            const TextStyle(color: CupertinoColors.activeBlue),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -210,12 +212,18 @@ class PlatformDatePickerButton extends StatefulWidget {
   final DateTime initialDate;
   final Function(DateTime) onDateSelected;
   final bool isSelected;
+  final DateTime? maximumDate;
+  final DateTime? minimumDate;
+  final String? label;
 
   const PlatformDatePickerButton({
     super.key,
     required this.initialDate,
     required this.onDateSelected,
+    this.maximumDate,
+    this.minimumDate,
     this.isSelected = false,
+    this.label,
   });
 
   @override
@@ -237,8 +245,10 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
+      firstDate: widget.minimumDate ??
+          DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day),
+      lastDate: widget.maximumDate ?? DateTime(2100),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -293,7 +303,8 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
                     CupertinoButton(
                       child: Text(
                         context.l10n.done,
-                        style: const TextStyle(color: CupertinoColors.activeBlue),
+                        style:
+                            const TextStyle(color: CupertinoColors.activeBlue),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -305,12 +316,16 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
                 Expanded(
                   child: CupertinoDatePicker(
                     mode: CupertinoDatePickerMode.date,
-                    initialDateTime: selectedDate.isBefore(DateTime.now())
-                        ? DateTime.now()
-                        : selectedDate,
-                    minimumDate: DateTime(DateTime.now().year,
-                        DateTime.now().month, DateTime.now().day),
-                    maximumDate: DateTime(2100),
+                    initialDateTime:
+                        widget.minimumDate != null && widget.maximumDate != null
+                            ? widget.initialDate
+                            : selectedDate.isBefore(DateTime.now())
+                                ? DateTime.now()
+                                : selectedDate,
+                    minimumDate: widget.minimumDate ??
+                        DateTime(DateTime.now().year, DateTime.now().month,
+                            DateTime.now().day),
+                    maximumDate: widget.maximumDate ?? DateTime(2100),
                     onDateTimeChanged: (DateTime newDateTime) {
                       setState(() {
                         selectedDate = newDateTime;
@@ -329,53 +344,74 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: widget.isSelected
-                ? Colors.purple
-                : Colors.grey.withOpacity(0.4),
-            width: widget.isSelected ? 2.0 : 1.0,
-          ),
-          borderRadius: BorderRadius.circular(24),
-          color: widget.isSelected
-              ? Colors.purple.withOpacity(0.05)
-              : Colors.transparent,
-        ),
-        child: TextButton(
-          onPressed: () {
-            if (Platform.isIOS) {
-              _showCupertinoDatePicker(context);
-            } else {
-              _showMaterialDatePicker(context);
-            }
-          },
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.label != null)
+            Column(
+              children: [
+                Text(
+                  widget.label!,
+                  style: TextStyle(
+                    color: AppColors.neutral500,
+                    fontWeight:
+                        widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                const SizedBox(height: 4),
+              ],
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                // 11/2/2025
-                DateFormat('MM/dd/yyyy').format(selectedDate),
-                style: TextStyle(
-                  color: widget.isSelected ? Colors.purple : Colors.black,
-                  fontWeight:
-                      widget.isSelected ? FontWeight.bold : FontWeight.normal,
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: widget.isSelected
+                    ? AppColors.primary500
+                    : Colors.grey.withOpacity(0.4),
+                width: widget.isSelected ? 2.0 : 1.0,
+              ),
+              borderRadius: BorderRadius.circular(24),
+              color: widget.isSelected
+                  ? Colors.purple.withOpacity(0.05)
+                  : Colors.transparent,
+            ),
+            child: TextButton(
+              onPressed: () {
+                if (Platform.isIOS) {
+                  _showCupertinoDatePicker(context);
+                } else {
+                  _showMaterialDatePicker(context);
+                }
+              },
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              const Icon(
-                IconlyLight.calendar,
-                color: Colors.black54,
-                size: 23,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    // 11/2/2025
+                    DateFormat('MM/dd/yyyy').format(selectedDate),
+                    style: TextStyle(
+                      color: widget.isSelected ? Colors.purple : Colors.black,
+                      fontWeight: widget.isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  const Icon(
+                    IconlyLight.calendar,
+                    color: Colors.black54,
+                    size: 23,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

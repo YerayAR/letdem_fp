@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:here_sdk/core.dart' as HERE;
-import 'package:here_sdk/core.engine.dart';
 import 'package:here_sdk/core.errors.dart';
 import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart' as HERE;
@@ -36,6 +35,7 @@ import 'package:letdem/infrastructure/services/map/map_asset_provider.service.da
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class NavigationView extends StatefulWidget {
@@ -490,13 +490,6 @@ class _NavigationViewState extends State<NavigationView> {
     return true;
   }
 
-  void _disposeHERESDK() {
-    debugPrint('🧼 Disposing HERE SDK resources...');
-    SDKNativeEngine.sharedInstance?.dispose();
-    HERE.SdkContext.release();
-    debugPrint('✅ HERE SDK resources disposed.');
-  }
-
   void _initLocationEngine() {
     debugPrint('🛰️ Initializing Location Engine...');
     try {
@@ -596,9 +589,6 @@ class _NavigationViewState extends State<NavigationView> {
         );
   }
 
-  bool _isNavigatingToParking = false;
-  String _parkingSpaceName = "";
-
   showSpacePopup({
     required Space space,
   }) {
@@ -692,8 +682,6 @@ class _NavigationViewState extends State<NavigationView> {
                       _hasShownParkingRating = false;
                       _isPopupDisplayed = false;
                       _isLoading = true;
-                      _isNavigatingToParking = true;
-                      _parkingSpaceName = space.location.streetName;
                     });
 
                     if (_currentLocation != null) {
@@ -837,6 +825,11 @@ class _NavigationViewState extends State<NavigationView> {
           });
 
           _startGuidance(calculatedRoute);
+
+          // FIX: Set initial position after guidance starts
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _setInitialNavigationPosition();
+          });
         } else {
           final error = routingError?.toString() ?? "Unknown error";
           debugPrint('❌ Error while calculating route: $error');
@@ -847,6 +840,21 @@ class _NavigationViewState extends State<NavigationView> {
         }
       },
     );
+  }
+
+  void _setInitialNavigationPosition() {
+    if (_currentLocation != null && _visualNavigator != null) {
+      // Create a simulated location update to kickstart navigation
+      final initialLocation = HERE.Location.withCoordinates(
+        _currentLocation!,
+      );
+
+      // Send initial location to visual navigator
+      _visualNavigator!.onLocationUpdated(initialLocation);
+
+      debugPrint(
+          '📍 Set initial navigation position: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+    }
   }
 
   void _startGuidance(HERE.Route route) {
@@ -1143,10 +1151,6 @@ class _NavigationViewState extends State<NavigationView> {
       _visualNavigator!.route = route;
       _locationEngine = HERE.LocationEngine();
 
-      _locationEngine?.startWithLocationAccuracy(
-        HERE.LocationAccuracy.navigation,
-      );
-
       _locationEngine!.addLocationListener(
         HERE.LocationListener((HERE.Location location) {
           _currentLocation = location.coordinates;
@@ -1167,6 +1171,9 @@ class _NavigationViewState extends State<NavigationView> {
           );
           locationListener.onLocationUpdated(location);
         }),
+      );
+      _locationEngine?.startWithLocationAccuracy(
+        HERE.LocationAccuracy.navigation,
       );
 
       _visualNavigator!.startRendering(_hereMapController!);
@@ -1204,15 +1211,19 @@ class _NavigationViewState extends State<NavigationView> {
     IconData directionIcon = Icons.navigation;
 
     for (final entry in _directionIcons.entries) {
-      print(normalManuevers);
       if (normalManuevers.toLowerCase().contains(entry.key)) {
         directionIcon = entry.value;
         break;
       }
     }
 
-    return Container(
-      height: 90,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: _isNavigating &&
+              _navigationInstruction.isNotEmpty &&
+              _distanceNotifier.value > 0
+          ? 90
+          : 70,
       padding: const EdgeInsets.symmetric(
           horizontal: _containerPadding, vertical: _containerPadding + 5),
       decoration: BoxDecoration(
@@ -1226,68 +1237,84 @@ class _NavigationViewState extends State<NavigationView> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.amber,
-            ),
-            child: Icon(directionIcon, color: Colors.black, size: 24),
-          ),
-          const SizedBox(width: 15),
-          ValueListenableBuilder<int>(
-            valueListenable: _distanceNotifier,
-            builder: (context, state, _) {
-              return Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${_nextManuoverDistance.toFormattedDistance()} ${context.l10n.ahead}',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                    Text(
-                      _navigationInstruction,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+      child: _isNavigating &&
+              _navigationInstruction.isNotEmpty &&
+              _distanceNotifier.value > 0
+          ? Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.amber,
+                  ),
+                  child: Icon(directionIcon, color: Colors.black, size: 24),
                 ),
-              );
-            },
-          ),
-          Dimens.space(1),
-          CircleAvatar(
-            backgroundColor: AppColors.neutral500.withOpacity(0.5),
-            child: IconButton(
-              icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: Colors.white),
-              onPressed: () {
-                setState(() {
-                  _isMuted = !_isMuted;
+                const SizedBox(width: 15),
+                ValueListenableBuilder<int>(
+                  valueListenable: _distanceNotifier,
+                  builder: (context, state, _) {
+                    return Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${_nextManuoverDistance.toFormattedDistance()} ${context.l10n.ahead}',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
+                          Text(
+                            _navigationInstruction,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 15),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                Dimens.space(1),
+                CircleAvatar(
+                  backgroundColor: AppColors.neutral500.withOpacity(0.5),
+                  child: IconButton(
+                    icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up,
+                        color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        _isMuted = !_isMuted;
 
-                  if (_visualNavigator != null) {
-                    debugPrint('🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}');
-                  }
-                });
-                if (_isMuted) {
-                  speech.mute();
-                } else {
-                  speech.unmute();
-                }
-              },
+                        if (_visualNavigator != null) {
+                          debugPrint(
+                              '🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}');
+                        }
+                      });
+                      if (_isMuted) {
+                        speech.mute();
+                      } else {
+                        speech.unmute();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            )
+          : Center(
+              child: Shimmer.fromColors(
+                baseColor: Colors.white.withOpacity(0.5),
+                highlightColor: Colors.grey[100]!,
+                child: Text(
+                  "Waiting for navigation to start...",
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.7), fontSize: 16),
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -1451,15 +1478,12 @@ class _NavigationViewState extends State<NavigationView> {
                   ),
                 ),
                 if (_errorMessage.isNotEmpty) _buildErrorMessage(),
-                if (_isNavigating &&
-                    _navigationInstruction.isNotEmpty &&
-                    _distanceNotifier.value > 0)
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 10,
-                    left: _mapPadding,
-                    right: _mapPadding,
-                    child: _buildNavigationInstructionCard(),
-                  ),
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  left: _mapPadding,
+                  right: _mapPadding,
+                  child: _buildNavigationInstructionCard(),
+                ),
                 if (_isNavigating)
                   Positioned(
                     bottom: 30,
