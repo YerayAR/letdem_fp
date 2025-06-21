@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/enums/EarningStep.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_state.dart';
 import 'package:letdem/features/earning_account/presentation/widgets/address_info.widget.dart';
@@ -78,7 +79,7 @@ class _ConnectAccountViewState extends State<ConnectAccountView> {
             pages.add(BankInfoView(onNext: _goToNextPage));
             break;
           case EarningStep.submitted:
-            pages.add(const Center(child: Text("Submitted")));
+            pages.add(Center(child: Text(context.l10n.submitted)));
             break;
         }
       }
@@ -180,7 +181,7 @@ Widget buildNextButton(BuildContext context, VoidCallback onNext) {
     child: PrimaryButton(
       isLoading: context.read<EarningsBloc>().state is EarningsLoading,
       onTap: onNext,
-      text: ('Next'),
+      text: context.l10n.next,
     ),
   );
 }

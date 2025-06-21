@@ -9,6 +9,7 @@ import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -46,12 +47,13 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
           if (state is PayoutMethodFailure) {
             Toast.showError(state.message);
           }
-          if (state is PayoutMethodSuccess) {
+          if (state is PayoutMethodAdded) {
+            context.read<PayoutMethodBloc>().add(FetchPayoutMethods());
             AppPopup.showDialogSheet(
                 context,
                 SuccessDialog(
-                  title: "Payout Method Added",
-                  subtext: "Your payout method has been added successfully.",
+                  title: context.l10n.payoutMethodAdded,
+                  subtext: context.l10n.payoutMethodAddedDescription,
                   onProceed: () {
                     NavigatorHelper.pop();
                     NavigatorHelper.pop();
@@ -65,19 +67,19 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
             isBottomPadding: false,
             children: [
               StyledAppBar(
-                title: 'Add Payout Method',
+                title: context.l10n.addPayoutMethod,
                 onTap: () => Navigator.of(context).pop(),
                 icon: Icons.close,
               ),
               Dimens.space(2),
               TextInputField(
                 controller: _accountNumberController,
-                label: 'Account Number',
-                placeHolder: 'Eg. ES91 2100 0418 4502 0005 1332',
+                label: context.l10n.accountNumber,
+                placeHolder: context.l10n.accountNumberExample,
               ),
               Row(
                 children: [
-                  Text("Make as default payment method",
+                  Text(context.l10n.makeDefaultPaymentMethod,
                       style: Typo.mediumBody.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.neutral600,
@@ -100,13 +102,13 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
               ),
               Dimens.space(5),
               PrimaryButton(
-                text: 'Add Payout Method',
+                text: context.l10n.addPayoutMethod,
                 background: AppColors.primary500,
                 textColor: Colors.white,
                 isLoading: state is PayoutMethodLoading,
                 onTap: () {
                   if (_accountNumberController.text.trim().isEmpty) {
-                    Toast.showError("Please enter account number");
+                    Toast.showError(context.l10n.pleaseEnterAccountNumber);
                     return;
                   }
                   print(

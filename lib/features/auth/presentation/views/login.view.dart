@@ -11,6 +11,7 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/presentation/views/forgot_password/request_forgot_password.view.dart';
 import 'package:letdem/features/auth/presentation/views/onboard/register.view.dart';
@@ -87,7 +88,7 @@ class _LoginViewState extends State<LoginView> {
                       children: [
                         DecoratedChip(
                           backgroundColor: AppColors.secondary50,
-                          text: 'LOGIN TO YOUR ACCOUNT',
+                          text: context.l10n.loginToAccount,
                           color: AppColors.secondary600,
                         ),
                         SizedBox(
@@ -107,19 +108,18 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     Dimens.space(3),
                     Text(
-                      'Welcome Back!',
+                      context.l10n.welcomeBack,
                       style:
                           Typo.heading4.copyWith(color: AppColors.neutral600),
                     ),
                     Dimens.space(1),
                     Text.rich(
                       TextSpan(
-                        text:
-                            'Don\'t have an account? ', // Default style for this text
+                        text: context.l10n.dontHaveAccount,
                         style: Typo.largeBody.copyWith(),
                         children: [
                           TextSpan(
-                            text: 'Sign Up here',
+                            text: context.l10n.signUpHere,
                             style: Typo.largeBody.copyWith(
                               color: AppColors.primary400,
                               decoration: TextDecoration.underline,
@@ -139,16 +139,16 @@ class _LoginViewState extends State<LoginView> {
                       prefixIcon: Iconsax.sms,
                       controller: _emailCTRL,
                       inputType: TextFieldType.email,
-                      label: 'Email Address',
-                      placeHolder: 'Enter your email address',
+                      label: context.l10n.emailAddress,
+                      placeHolder: context.l10n.enterEmailAddress,
                     ),
                     Dimens.space(1),
                     TextInputField(
                       prefixIcon: Iconsax.lock,
                       controller: _passwordCTRL,
-                      label: 'Password',
+                      label: context.l10n.password,
                       inputType: TextFieldType.password,
-                      placeHolder: 'Enter your password',
+                      placeHolder: context.l10n.enterPassword,
                     ),
                     Dimens.space(2),
                     PrimaryButton(
@@ -160,18 +160,18 @@ class _LoginViewState extends State<LoginView> {
                               password: _passwordCTRL.text));
                         }
                       },
-                      text: 'Login',
+                      text: context.l10n.login,
                     ),
                     Dimens.space(2),
                     Center(
                       child: Text.rich(
                         TextSpan(
-                          text: 'Forgot Password? ',
+                          text: context.l10n.forgotPasswordQuestion,
                           // Default style for this text
                           style: Typo.largeBody.copyWith(),
                           children: [
                             TextSpan(
-                              text: ' Reset here', // Styled differently
+                              text: context.l10n.resetHere,
                               style: Typo.largeBody.copyWith(
                                 color: AppColors.primary400,
                                 decoration: TextDecoration.underline,

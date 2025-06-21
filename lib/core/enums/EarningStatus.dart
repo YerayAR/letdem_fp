@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:letdem/core/extensions/locale.dart';
+
 enum EarningStatus {
   missingInfo,
   pending,
@@ -6,18 +9,18 @@ enum EarningStatus {
   accepted,
 }
 
-getStatusString(EarningStatus status) {
+getStatusString(EarningStatus status, BuildContext context) {
   switch (status) {
     case EarningStatus.missingInfo:
-      return 'Missing Info';
+      return context.l10n.missingInfo;
     case EarningStatus.pending:
-      return 'Pending';
+      return context.l10n.pending;
     case EarningStatus.rejected:
-      return 'Rejected';
+      return context.l10n.rejected;
     case EarningStatus.blocked:
-      return 'Blocked';
+      return context.l10n.blocked;
     case EarningStatus.accepted:
-      return 'Accepted';
+      return context.l10n.accepted;
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/LetDemLocationType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/add_location.widget.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -43,6 +44,17 @@ class SavedAddressComponent extends StatelessWidget {
       this.place,
       required this.onPlaceSelected,
       this.onApiPlaceSelected});
+
+  String _getLocationTypeString(BuildContext context, LetDemLocationType type) {
+    switch (type) {
+      case LetDemLocationType.other:
+        return context.l10n.otherLocation;
+      case LetDemLocationType.home:
+        return context.l10n.homeLocation;
+      case LetDemLocationType.work:
+        return context.l10n.workLocation;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,16 +134,25 @@ class SavedAddressComponent extends StatelessWidget {
                                             children: [
                                               Text(
                                                 isLocationCreating
-                                                    ? ""
-                                                        "UPDATING ${locationType.name.toUpperCase()} LOCATION"
+                                                    ? context.l10n
+                                                        .updatingLocation(
+                                                            locationType.name)
+                                                        .toUpperCase()
                                                     : place != null ||
                                                             apiPlace != null
                                                         ? apiPlace != null
-                                                            ? "${locationType.name.toUpperCase()} LOCATION"
+                                                            ? context.l10n
+                                                                .locationType(
+                                                                    locationType
+                                                                        .name)
                                                             : place!
                                                                 .placeFormatted
                                                                 .toUpperCase()
-                                                        : "${locationType.name.toUpperCase()} LOCATION",
+                                                        : context.l10n
+                                                            .locationType(
+                                                                locationType
+                                                                    .name)
+                                                            .toUpperCase(),
                                                 style: Typo.smallBody.copyWith(
                                                   fontWeight: FontWeight.w400,
                                                   color: AppColors.neutral400,
@@ -159,8 +180,11 @@ class SavedAddressComponent extends StatelessWidget {
                                                           AppPopup.showBottomSheet(
                                                               context,
                                                               AddLocationBottomSheet(
-                                                                title:
-                                                                    "${toBeginningOfSentenceCase(locationType.name)} Location",
+                                                                title: context
+                                                                    .l10n
+                                                                    .setLocation(
+                                                                        toBeginningOfSentenceCase(
+                                                                            locationType.name)!),
                                                                 onLocationSelected:
                                                                     (MapBoxPlace
                                                                         place) {
@@ -170,7 +194,10 @@ class SavedAddressComponent extends StatelessWidget {
                                                               ));
                                                         },
                                                         child: Text(
-                                                          "Set ${toBeginningOfSentenceCase(locationType.name)} Location",
+                                                          context.l10n.setLocation(
+                                                              toBeginningOfSentenceCase(
+                                                                  locationType
+                                                                      .name)!),
                                                           style: Typo.mediumBody
                                                               .copyWith(
                                                             color: AppColors
@@ -297,7 +324,7 @@ class LocationBottomSheet extends StatelessWidget {
           Row(
             children: [
               Text(
-                "$type Location",
+                context.l10n.locationType(type).toUpperCase(),
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 17,
@@ -330,7 +357,7 @@ class LocationBottomSheet extends StatelessWidget {
                     ),
                     Dimens.space(1),
                     Text(
-                      "Edit",
+                      context.l10n.edit,
                       style: Typo.mediumBody.copyWith(),
                     ),
                   ],
@@ -366,7 +393,7 @@ class LocationBottomSheet extends StatelessWidget {
                     ),
                     Dimens.space(1),
                     Text(
-                      "Delete",
+                      context.l10n.delete,
                       style: Typo.mediumBody.copyWith(),
                     ),
                   ],

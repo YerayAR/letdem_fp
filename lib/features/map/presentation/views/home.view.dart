@@ -338,7 +338,21 @@ class _HomeViewState extends State<HomeView>
                       _currentPosition != null
                           ? HereMap(onMapCreated: _onMapCreated)
                           : const Center(child: CircularProgressIndicator()),
-                      const HomeMapBottomSection(),
+                      HomeMapBottomSection(
+                        onRefreshTriggered: () {
+                          if (_currentPosition != null) {
+                            context.read<MapBloc>().add(GetNearbyPlaces(
+                                  queryParams: MapQueryParams(
+                                    currentPoint:
+                                        "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                                    radius: 8000,
+                                    drivingMode: false,
+                                    options: ['spaces', 'events'],
+                                  ),
+                                ));
+                          }
+                        },
+                      ),
                     ],
                   );
                 },
@@ -378,7 +392,23 @@ class _HomeViewState extends State<HomeView>
   }) {
     AppPopup.showBottomSheet(
       context,
-      SpacePopupSheet(space: space, currentPosition: _currentPosition!),
+      SpacePopupSheet(
+        space: space,
+        currentPosition: _currentPosition!,
+        onRefreshTrigger: () {
+          if (_currentPosition != null) {
+            context.read<MapBloc>().add(GetNearbyPlaces(
+                  queryParams: MapQueryParams(
+                    currentPoint:
+                        "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                    radius: 8000,
+                    drivingMode: false,
+                    options: ['spaces', 'events'],
+                  ),
+                ));
+          }
+        },
+      ),
     );
   }
 }

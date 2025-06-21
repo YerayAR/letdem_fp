@@ -1,18 +1,11 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:letdem/common/popups/multi_selector.popup.dart';
-import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
-import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/features/activities/presentation/utils/publish_space_handler.dart';
 
 class NoContributionsWidget extends StatelessWidget {
   const NoContributionsWidget({super.key});
@@ -24,14 +17,14 @@ class NoContributionsWidget extends StatelessWidget {
       children: [
         const Spacer(),
         Text(
-          "No Contributions Yet",
+          context.l10n.noContributions,
           style: Typo.largeBody.copyWith(
             fontWeight: FontWeight.w700,
           ),
         ),
         Dimens.space(2),
         Text(
-          "Your Contributions history will appear\nhere, Publish to see them",
+          context.l10n.noContributionsDescription,
           style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
           textAlign: TextAlign.center,
         ),
@@ -40,57 +33,10 @@ class NoContributionsWidget extends StatelessWidget {
           width: MediaQuery.of(context).size.width / 1.9,
           child: PrimaryButton(
             onTap: () async {
-              ImagePicker imagePicker = ImagePicker();
-
-              AppPopup.showBottomSheet(
-                  context,
-                  MultiSelectPopup(
-                    title: context.l10n.publishSpace,
-                    items: [
-                      MultiSelectItem(
-                        backgroundColor: AppColors.green50,
-                        icon: Icons.done,
-                        iconColor: AppColors.green500,
-                        text: "Regular Space",
-                        onTap: () async {
-                          XFile? image = kDebugMode
-                              ? await imagePicker.pickImage(
-                                  source: ImageSource.gallery)
-                              : await imagePicker.pickImage(
-                                  source: ImageSource.camera);
-                          if (image != null) {
-                            NavigatorHelper.to(
-                              PublishSpaceScreen(
-                                  isPaid: false, file: File(image.path)),
-                            );
-                          }
-                        },
-                      ),
-                      Divider(color: AppColors.neutral50, height: 1),
-                      MultiSelectItem(
-                        backgroundColor: AppColors.secondary50,
-                        icon: Iconsax.money,
-                        iconColor: AppColors.secondary600,
-                        text: "Paid Space",
-                        onTap: () async {
-                          XFile? image = kDebugMode
-                              ? await imagePicker.pickImage(
-                                  source: ImageSource.gallery)
-                              : await imagePicker.pickImage(
-                                  source: ImageSource.camera);
-                          if (image != null) {
-                            NavigatorHelper.to(
-                              PublishSpaceScreen(
-                                  isPaid: true, file: File(image.path)),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ));
+              PublishSpaceHandler.showSpaceOptions(context, () {});
             },
             icon: Iconsax.location5,
-            text: 'Publish Space',
+            text: context.l10n.publishSpace,
           ),
         ),
         Dimens.space(1),

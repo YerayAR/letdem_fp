@@ -7,6 +7,7 @@ import 'package:letdem/core/base.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 class RequestPermissionView extends StatefulWidget {
@@ -64,22 +65,28 @@ class _RequestPermissionViewState extends State<RequestPermissionView> {
           ),
           Dimens.space(8),
           Text(
-            "Geolocation Permission",
+            context.l10n.geolocationPermission,
             textAlign: TextAlign.center,
-            style: Typo.heading4.copyWith(color: AppColors.neutral600),
+            style: Typo.heading4.copyWith(
+              color: AppColors.neutral600
+            ),
           ),
           Dimens.space(1),
           Text(
-            "Kindly enable geolocation to allow the app to track your location automatically. This process must be completed to use the app.",
+            context.l10n.enableGeolocationDescription,
             textAlign: TextAlign.center,
-            style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
+            style: Typo.mediumBody.copyWith(
+              color: AppColors.neutral400
+            ),
           ),
           Dimens.space(15),
           PrimaryButton(
             onTap: _isDeniedForever
                 ? () => Geolocator.openLocationSettings()
                 : _requestPermission,
-            text: _isDeniedForever ? 'Open Settings' : 'Enable Geolocation',
+            text: _isDeniedForever 
+                ? context.l10n.openSettings 
+                : context.l10n.enableGeolocation,
           ),
           Dimens.space(1),
           PrimaryButton(
@@ -90,7 +97,7 @@ class _RequestPermissionViewState extends State<RequestPermissionView> {
             borderColor: Colors.transparent,
             textColor: Colors.black,
             outline: true,
-            text: 'Not now',
+            text: context.l10n.notNow,
           ),
         ],
       ),

@@ -232,6 +232,9 @@ class PhoneField extends StatefulWidget {
 
   final Function(String text, String countryCode)? onChanged;
 
+  final TextInputAction? textInputAction;
+  final VoidCallback? onEditingComplete;
+
   const PhoneField({
     super.key,
     this.isRequired = true,
@@ -244,6 +247,8 @@ class PhoneField extends StatefulWidget {
     required this.onChanged,
     this.enabledBorder = true,
     required this.initialValue,
+    this.textInputAction,
+    this.onEditingComplete,
   });
 
   @override
@@ -313,6 +318,8 @@ class _TSLFieldState extends State<PhoneField> {
             ),
             TextFormField(
               initialValue: updatedInitialValue,
+              textInputAction: widget.textInputAction ?? TextInputAction.next,
+              onEditingComplete: widget.onEditingComplete,
               onChanged: (e) {
                 if (widget.onChanged != null) {
                   if (e.isEmpty) {

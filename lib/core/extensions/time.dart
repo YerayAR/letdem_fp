@@ -1,22 +1,23 @@
 extension TimeFormatter on int {
-  // String toFormattedTime() {
-  //   int minutes = this ~/ 60;
-  //   int seconds = this % 60;
-  //
-  //   String minutesStr = minutes.toString().padLeft(2, '0');
-  //   String secondsStr = seconds.toString().padLeft(2, '0');
-  //
-  //   return "$minutesStr min".startsWith("00")
-  //       ? "$secondsStr sec"
-  //       : "$minutesStr min";
-  // }
+  String toFormattedTime() {
+    if (this < 60) {
+      return "$this seconds";
+    } else if (this < 3600) {
+      final minutes = (this / 60).floor();
+      return "$minutes min";
+    } else {
+      final hours = (this / 3600).floor();
+      final minutes = ((this % 3600) / 60).floor();
+      return minutes > 0 ? "$hours h $minutes m" : "$hours h";
+    }
+  }
 
-//   format meters to km
   String toFormattedDistance() {
     if (this >= 1000) {
-      return "${(this / 1000).toStringAsFixed(1)} km";
+      final km = (this / 1000).round();
+      return "$km km";
     } else {
-      return "$this m";
+      return "$this meters";
     }
   }
 }

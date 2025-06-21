@@ -10,13 +10,17 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/models/payment/payment.model.dart';
 
 import '../../../../common/widgets/button.dart';
 
 class AddPaymentMethod extends StatefulWidget {
-  const AddPaymentMethod({super.key});
+  final Function(PaymentMethodModel m)? onPaymentMethodAdded;
+
+  const AddPaymentMethod({super.key, this.onPaymentMethodAdded});
 
   @override
   _AddPaymentMethodState createState() => _AddPaymentMethodState();
@@ -49,7 +53,14 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
       body: SafeArea(
         child: BlocConsumer<PaymentMethodBloc, PaymentMethodState>(
           listener: (context, state) {
-            if (state is PaymentMethodLoaded) {
+            print('PaymentMethodBloc state: $state');
+            if (state is PaymentMethodAdded) {
+              // Call the callback if provided
+              widget.onPaymentMethodAdded?.call(state.paymentMethod);
+              context.read<PaymentMethodBloc>().add(
+                    const FetchPaymentMethods(),
+                  );
+              context.read<UserBloc>().add(FetchUserInfoEvent());
               AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(
@@ -86,36 +97,69 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                     Divider(height: 1, color: Colors.grey.shade300),
                     Dimens.space(2),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(1),
                       child: Column(
                         children: [
-                          CardField(
-                            controller: controller,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Card number',
-                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                          Theme(
+                            data: ThemeData.light().copyWith(
+                              colorScheme:
+                                  ThemeData.light().colorScheme.copyWith(
+                                        primary: Colors.blueGrey,
+                                      ),
+                            ),
+                            child: CardField(
+                              decoration: InputDecoration(
+                                labelText: 'Card Details',
+                                labelStyle: TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontSize: 14,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Colors.blueGrey.shade300
+                                        .withOpacity(0.5),
+                                    width: 1,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Colors.blueGrey.shade300
+                                        .withOpacity(0.5),
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+
+                              controller: controller,
+                              // style: CardFormStyle(
+                              //   backgroundColor: Colors.black12,
+                              //   borderColor: Colors.blueGrey,
+                              //   textColor: Colors.black,
+                              //   placeholderColor: Colors.blue,
+                              // ),
                             ),
                           ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
                               Icon(
-                                controller.complete
+                                controller.details.complete
                                     ? Icons.check_circle
                                     : Icons.info_outline,
-                                color: controller.complete
+                                color: controller.details.complete
                                     ? Colors.green
                                     : Colors.grey,
                                 size: 16,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                controller.complete
+                                controller.details.complete
                                     ? 'Valid card'
                                     : 'Enter card details',
                                 style: TextStyle(
-                                  color: controller.complete
+                                  color: controller.details.complete
                                       ? Colors.green
                                       : Colors.grey,
                                   fontSize: 12,
@@ -133,14 +177,14 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                         isLoading: context.read<PaymentMethodBloc>().state
                                 is PaymentMethodLoading ||
                             _isLoading,
-                        onTap: controller.complete && !_isLoading
+                        onTap: (controller.details.complete && !_isLoading)
                             ? _handlePayPress
                             : () {
                                 Toast.showError(
                                   'Please complete the card details',
                                 );
                               },
-                        text: 'Next',
+                        text: 'Create',
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -155,7 +199,11 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
   }
 
   Future<void> _handlePayPress() async {
-    if (!controller.complete) return;
+    if (!controller.details.complete) return;
+    if (_nameController.text.trim().isEmpty) {
+      Toast.showError('Please enter your name');
+      return;
+    }
 
     setState(() => _isLoading = true);
 

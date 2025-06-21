@@ -6,6 +6,11 @@ abstract class PayoutMethodState extends Equatable {
   List<Object?> get props => [];
 }
 
+class PayoutMethodAdded extends PayoutMethodState {
+  @override
+  List<Object?> get props => [];
+}
+
 class PayoutMethodInitial extends PayoutMethodState {}
 
 class PayoutMethodLoading extends PayoutMethodState {}

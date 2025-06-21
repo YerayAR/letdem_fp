@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:here_sdk/core.dart' as HERE;
-import 'package:here_sdk/core.engine.dart';
 import 'package:here_sdk/core.errors.dart';
 import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart' as HERE;
@@ -15,7 +14,6 @@ import 'package:here_sdk/navigation.dart' as HERE;
 import 'package:here_sdk/routing.dart' as HERE;
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
@@ -23,6 +21,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/time.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
@@ -30,13 +29,14 @@ import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
-import 'package:letdem/features/map/presentation/views/test.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class NavigationView extends StatefulWidget {
   final double destinationLat;
@@ -59,27 +59,23 @@ class NavigationView extends StatefulWidget {
 }
 
 class _NavigationViewState extends State<NavigationView> {
-  // Constants
   static const double _initialZoomDistanceInMeters = 8000;
   static const double _mapPadding = 20;
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
-  static const int _distanceTriggerThreshold =
-      200; // 50m threshold for triggering
+  static const int _distanceTriggerThreshold = 200;
+
   DateTime? _navigationStartTime;
   bool _hasShownFatigueAlert = false;
 
-  // Controllers and engines
   HereMapController? _hereMapController;
   late final AppLifecycleListener _lifecycleListener;
   HERE.RoutingEngine? _routingEngine;
   HERE.VisualNavigator? _visualNavigator;
   HERE.LocationEngine? _locationEngine;
 
-  // Navigation state
   HERE.GeoCoordinates? _currentLocation;
-
   double _speed = 0;
   bool _isNavigating = false;
   bool _isLoading = false;
@@ -94,12 +90,60 @@ class _NavigationViewState extends State<NavigationView> {
 
   Space? _currentSpace;
 
-  // Added for the fixes
   bool _hasShownArrivalNotification = false;
+  bool _hasShownParkingRating = false;
   HERE.SpeedLimit? _currentSpeedLimit;
   bool _isOverSpeedLimit = false;
+  bool _isPopupDisplayed = false;
+  bool _isUserPanning = false;
+  bool _isCameraLocked = true;
+  bool _isRecalculatingRoute = false;
 
-// Add this method to initialize the speed limit listener
+  late double _actualDestinationLat;
+  late double _actualDestinationLng;
+
+  String _lastSpokenInstruction = "";
+  final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
+  int _nextManuoverDistance = 0;
+  Timer? _rerouteDebounceTimer;
+  int _lastRerouteTime = 0;
+  String normalManuevers = "";
+
+  final Map<String, IconData> _directionIcons = {
+    'turn right': Icons.turn_right,
+    'turn left': Icons.turn_left,
+    'go straight': Icons.arrow_upward,
+    'make a u-turn': Icons.u_turn_left,
+  };
+
+  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
+  final Map<MapMarker, Space> _spaceMarkers = {};
+  final Map<MapMarker, Event> _eventMarkers = {};
+  final speech = SpeechService();
+
+  @override
+  void initState() {
+    print("IS navigating to parking: ${widget.isNavigatingToParking}");
+    print("Parking space ID: ${widget.parkingSpaceID}");
+    WakelockPlus.enable();
+
+    super.initState();
+
+    _actualDestinationLat = widget.destinationLat;
+    _actualDestinationLng = widget.destinationLng;
+
+    _lifecycleListener = AppLifecycleListener(
+      onDetach: _cleanupNavigation,
+      onHide: _cleanupNavigation,
+      onPause: _cleanupNavigation,
+      onRestart: _startNavigation,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _requestLocationPermission();
+    });
+  }
+
   void _setupSpeedLimitListener() {
     if (_visualNavigator == null) return;
 
@@ -121,15 +165,12 @@ class _NavigationViewState extends State<NavigationView> {
       setState(() {
         _currentSpeedLimit = speedLimit;
 
-        // Check if current speed exceeds speed limit (with a small buffer)
         if (_speed > 0 && _currentSpeedLimit != null) {
-          // Adding a 5% buffer to avoid overly sensitive alerts
           final buffer =
               _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
           _isOverSpeedLimit = _speed >
               (_currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
 
-          // Show speed limit alert if over the limit and not already shown
           if (_isOverSpeedLimit && !_isMuted) {
             _showSpeedLimitAlert();
           }
@@ -161,7 +202,6 @@ class _NavigationViewState extends State<NavigationView> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Current maximum speed indicator
             Container(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
               decoration: BoxDecoration(
@@ -180,7 +220,7 @@ class _NavigationViewState extends State<NavigationView> {
                     ),
                   ),
                   Text(
-                    "Km/h",
+                    context.l10n.kmPerHour,
                     style: TextStyle(
                       color: Colors.grey.shade700,
                       fontSize: 10,
@@ -191,7 +231,6 @@ class _NavigationViewState extends State<NavigationView> {
               ),
             ),
             const SizedBox(width: 8),
-            // Speed limit indicator
             Container(
               width: 50,
               height: 50,
@@ -224,57 +263,32 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-// Add this method to show speed limit alerts
+  bool isSpeedLimitCooldownActive = false;
+
   void _showSpeedLimitAlert() {
+    if (isSpeedLimitCooldownActive) return;
+
+    isSpeedLimitCooldownActive = true;
+
     if (_currentSpeedLimit == null || context.isSpeedAlertEnabled) return;
 
-    // Convert m/s to km/h for display
     final speedLimitKmh =
         (_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
-    final currentSpeedKmh = (_speed * 3.6).round();
 
     AlertHelper.showWarning(
       context: context,
-      title: 'Speed Limit Alert',
-      subtext: 'You are driving at speed limit, slow down',
+      title: context.l10n.speedLimitAlert,
+      subtext: context.l10n.speedLimitWarning,
     );
 
-    // Optionally use text-to-speech for alert
+    Timer.periodic(const Duration(seconds: 3), (timer) {
+      isSpeedLimitCooldownActive = false;
+      timer.cancel();
+    });
+
     if (!_isMuted) {
       speech.speak("Speed limit is $speedLimitKmh kilometers per hour");
     }
-  }
-
-  // Map of direction icons
-  final Map<String, IconData> _directionIcons = {
-    'turn right': Icons.turn_right,
-    'turn left': Icons.turn_left,
-    'go straight': Icons.arrow_upward,
-    'make a u-turn': Icons.u_turn_left,
-  };
-
-  @override
-  void initState() {
-    print("IS navigating to parking: ${widget.isNavigatingToParking}");
-    print("Parking space ID: ${widget.parkingSpaceID}");
-    // assert(
-    //   widget.isNavigatingToParking && widget.parkingSpaceID != null,
-    //   "isNavigatingToParking cannot be null",
-    // );
-    super.initState();
-
-    // Set up app lifecycle listener
-    _lifecycleListener = AppLifecycleListener(
-      onDetach: _cleanupNavigation,
-      onHide: _cleanupNavigation,
-      onPause: _cleanupNavigation,
-      onRestart: _startNavigation,
-    );
-
-    // Delay navigation start until map is created
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _requestLocationPermission();
-    });
   }
 
   putParkingSpacesOnMap() {
@@ -304,7 +318,6 @@ class _NavigationViewState extends State<NavigationView> {
     super.dispose();
   }
 
-  // Permission handling
   Future<void> _requestLocationPermission() async {
     setState(() => _isLoading = true);
     await _assetsProvider.loadAssets();
@@ -314,7 +327,7 @@ class _NavigationViewState extends State<NavigationView> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         setState(() {
-          _errorMessage = "Location permission denied";
+          _errorMessage = context.l10n.locationPermissionDenied;
           _isLoading = false;
         });
         return;
@@ -323,8 +336,7 @@ class _NavigationViewState extends State<NavigationView> {
 
     if (permission == LocationPermission.deniedForever) {
       setState(() {
-        _errorMessage =
-            "Location permissions permanently denied, please enable in settings";
+        _errorMessage = context.l10n.locationPermissionDeniedPermanently;
         _isLoading = false;
       });
       return;
@@ -333,16 +345,10 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() => _isLoading = false);
   }
 
-  final speech = SpeechService();
-
-  bool _isPopupDisplayed = false;
-
-  // Map initialization and cleanup
   void _onMapCreated(HereMapController hereMapController) {
     debugPrint('🗺️ Map created!');
     _hereMapController = hereMapController;
 
-    // Enable all map gestures for user interaction
     _hereMapController?.gestures.enableDefaultAction(GestureType.pan);
     _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
     _hereMapController?.gestures.enableDefaultAction(GestureType.twoFingerPan);
@@ -371,7 +377,7 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController?.mapScene
         .enableFeatures({MapFeatures.terrain: MapFeatureModes.defaultMode});
     _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow});
+        {MapFeatures.trafficFlow: MapFeatureModes.trafficIncidentsAll});
     _hereMapController?.mapScene.enableFeatures(
         {MapFeatures.lowSpeedZones: MapFeatureModes.lowSpeedZonesAll});
     _hereMapController?.mapScene.enableFeatures(
@@ -387,7 +393,6 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController?.gestures.panListener = PanListener((GestureState state,
         HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
       if (state == GestureState.begin) {
-        // User started panning - disable automatic camera tracking
         if (_isCameraLocked && _visualNavigator != null) {
           setState(() {
             _isUserPanning = true;
@@ -411,17 +416,13 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     if (_isCameraLocked) {
-      // Re-enable camera tracking
       _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
       debugPrint('🔒 Camera tracking re-enabled');
     } else {
-      // Disable camera tracking
       _visualNavigator!.cameraBehavior = null;
       debugPrint('🔓 Camera tracking disabled');
     }
   }
-
-  bool _isUserPanning = false;
 
   void _loadMapScene() {
     if (_hereMapController == null) return;
@@ -434,7 +435,7 @@ class _NavigationViewState extends State<NavigationView> {
         if (error != null) {
           debugPrint('❌ Map scene not loaded. MapError: ${error.toString()}');
           setState(() {
-            _errorMessage = "Failed to load map";
+            _errorMessage = context.l10n.failedToLoadMap;
             _isLoading = false;
           });
           return;
@@ -455,40 +456,32 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _cleanupNavigation() {
-    debugPrint('🧹 Cleaning up navigation resources...');
+    _visualNavigator?.stopRendering();
+    _locationEngine?.stop();
 
-    // Stop visual rendering
-    if (_visualNavigator != null) {
-      _visualNavigator!.stopRendering();
-      _visualNavigator = null; // Explicitly clear reference
-    }
+    _visualNavigator?.routeProgressListener = null;
+    _visualNavigator?.speedLimitListener = null;
+    _visualNavigator?.routeDeviationListener = null;
 
-    // Stop location engine
-    if (_locationEngine != null) {
-      _locationEngine!.stop();
-      _locationEngine = null; // Explicitly clear reference
-    }
-
-    // Clear route
+    _visualNavigator = null;
+    _locationEngine = null;
     _routingEngine = null;
 
-    // Reset navigation state
-    setState(() {
-      _isNavigating = false;
-      _navigationInstruction = "";
-      _totalRouteTime = 0;
-      _errorMessage = "";
-      _navigationInstruction = "";
-      _isNavigating = false;
-      _isLoading = false;
-      _isMuted = false;
-      _hasShownFatigueAlert = false;
-      _currentSpeedLimit = null;
-      _isOverSpeedLimit = false;
-      _hasShownArrivalNotification = false;
-    });
-
-    debugPrint('✅ Navigation resources fully cleaned up.');
+    if (mounted) {
+      setState(() {
+        _isNavigating = false;
+        _isLoading = false;
+        _navigationInstruction = "";
+        _currentSpeedLimit = null;
+        _isOverSpeedLimit = false;
+        _hasShownArrivalNotification = false;
+        _hasShownParkingRating = false;
+        _isPopupDisplayed = false;
+        _hasShownArrivalNotification = false;
+        _hasShownParkingRating = false;
+        _isPopupDisplayed = false;
+      });
+    }
   }
 
   Future<bool> _handleBackPress() async {
@@ -497,14 +490,6 @@ class _NavigationViewState extends State<NavigationView> {
     return true;
   }
 
-  void _disposeHERESDK() {
-    debugPrint('🧼 Disposing HERE SDK resources...');
-    SDKNativeEngine.sharedInstance?.dispose();
-    HERE.SdkContext.release();
-    debugPrint('✅ HERE SDK resources disposed.');
-  }
-
-  // Location and routing
   void _initLocationEngine() {
     debugPrint('🛰️ Initializing Location Engine...');
     try {
@@ -513,7 +498,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of LocationEngine failed.');
       setState(() {
-        _errorMessage = "Failed to initialize location services";
+        _errorMessage = context.l10n.failedToInitializeLocation;
         _isLoading = false;
       });
     }
@@ -546,7 +531,6 @@ class _NavigationViewState extends State<NavigationView> {
         currentLocationGeo.longitude,
       );
 
-      // Initialize last known position
       _lastLatitude = currentLocationGeo.latitude;
       _lastLongitude = currentLocationGeo.longitude;
       _distanceTraveled = 0;
@@ -566,7 +550,6 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _checkDistanceTrigger(double latitude, double longitude) {
-    // Calculate distance between last position and current position
     final distanceBetweenPoints = Geolocator.distanceBetween(
       _lastLatitude,
       _lastLongitude,
@@ -577,18 +560,15 @@ class _NavigationViewState extends State<NavigationView> {
     if (distanceBetweenPoints > 0) {
       _distanceTraveled += distanceBetweenPoints;
 
-      // Update last known position
       _lastLatitude = latitude;
       _lastLongitude = longitude;
 
-      // Check if we've traveled another 50m since last trigger
       if (_distanceTraveled - _lastTriggerDistance >=
           _distanceTriggerThreshold) {
         _lastTriggerDistance =
             (_distanceTraveled ~/ _distanceTriggerThreshold) *
                 _distanceTriggerThreshold;
 
-        // Trigger action for every 50m traveled
         _showDistanceTriggerToast();
       }
     }
@@ -609,15 +589,6 @@ class _NavigationViewState extends State<NavigationView> {
         );
   }
 
-  final MapAssetsProvider _assetsProvider = MapAssetsProvider();
-  final Map<MapMarker, Space> _spaceMarkers = {};
-  final Map<MapMarker, Event> _eventMarkers = {};
-
-  bool _isNavigatingToParking = false;
-  String _parkingSpaceName =
-      ""; // Store parking space name for the thank you message
-
-// Modified showSpacePopup to set the flag when navigating to a parking space
   showSpacePopup({
     required Space space,
   }) {
@@ -656,7 +627,8 @@ class _NavigationViewState extends State<NavigationView> {
                               ),
                               Dimens.space(1),
                               Text(
-                                getSpaceAvailabilityMessage(space.type),
+                                getSpaceAvailabilityMessage(
+                                    space.type, context),
                                 style: Typo.largeBody
                                     .copyWith(fontWeight: FontWeight.w800),
                               ),
@@ -694,37 +666,31 @@ class _NavigationViewState extends State<NavigationView> {
                 Dimens.space(2),
                 PrimaryButton(
                   icon: IconlyBold.location,
-                  text: 'Navigate to Space',
+                  text: context.l10n.navigateToSpaceButton,
                   onTap: () {
-                    // Close the popup first
                     Navigator.pop(context);
 
                     setState(() {
                       _currentSpace = space;
                     });
 
-                    // Clean up existing navigation
                     _stopNavigation();
                     _cleanupNavigation();
 
-                    // Navigate to the space directly instead of creating a new screen
                     setState(() {
                       _hasShownArrivalNotification = false;
+                      _hasShownParkingRating = false;
+                      _isPopupDisplayed = false;
                       _isLoading = true;
-                      // Set flag for parking navigation and store space name
-                      _isNavigatingToParking = true;
-                      _parkingSpaceName = space.location.streetName;
                     });
 
-                    // Recalculate route to the space
                     if (_currentLocation != null) {
                       _calculateRoute(
                           _currentLocation!,
                           HERE.GeoCoordinates(space.location.point.lat,
                               space.location.point.lng));
 
-                      // Show toast notification
-                      _showToast("Navigating to parking space",
+                      _showToast(context.l10n.navigatingToParking,
                           backgroundColor: AppColors.primary500);
                     }
                   },
@@ -737,12 +703,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  String _lastSpokenInstruction = "";
-
-  final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
-  int _nextManuoverDistance = 0;
-  Timer? _rerouteDebounceTimer;
-  int _lastRerouteTime = 0;
   void _pickMapMarker(HERE.Point2D touchPoint) {
     final rectangle = HERE.Rectangle2D(touchPoint, HERE.Size2D(1, 1));
     final filter =
@@ -784,7 +744,6 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
-    // Clear existing markers
     _hereMapController?.mapScene.removeMapMarkers(_spaceMarkers.keys.toList());
     _spaceMarkers.clear();
     for (var space in events) {
@@ -828,6 +787,8 @@ class _NavigationViewState extends State<NavigationView> {
   void _calculateRoute(
       HERE.GeoCoordinates start, HERE.GeoCoordinates destination) {
     debugPrint('🧭 Calculating route...');
+    print('📍 Start: ${start.latitude}, ${start.longitude}');
+    print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
 
     try {
       _routingEngine = HERE.RoutingEngine();
@@ -844,7 +805,6 @@ class _NavigationViewState extends State<NavigationView> {
     HERE.Waypoint startWaypoint = HERE.Waypoint(start);
     HERE.Waypoint destinationWaypoint = HERE.Waypoint(destination);
 
-    // Create car options with realistic route
     final carOptions = HERE.CarOptions();
     carOptions.routeOptions.enableTolls = true;
     carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
@@ -857,8 +817,7 @@ class _NavigationViewState extends State<NavigationView> {
           HERE.Route calculatedRoute = routeList.first;
 
           _totalRouteTime = calculatedRoute.duration.inSeconds;
-          _distanceNotifier.value =
-              calculatedRoute.lengthInMeters; // Update distance notifier
+          _distanceNotifier.value = calculatedRoute.lengthInMeters;
 
           setState(() {
             _isNavigating = true;
@@ -866,11 +825,16 @@ class _NavigationViewState extends State<NavigationView> {
           });
 
           _startGuidance(calculatedRoute);
+
+          // FIX: Set initial position after guidance starts
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _setInitialNavigationPosition();
+          });
         } else {
           final error = routingError?.toString() ?? "Unknown error";
           debugPrint('❌ Error while calculating route: $error');
           setState(() {
-            _errorMessage = "Could not calculate route. Please try again.";
+            _errorMessage = context.l10n.navigationError;
             _isLoading = false;
           });
         }
@@ -878,7 +842,20 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  String normalManuevers = "";
+  void _setInitialNavigationPosition() {
+    if (_currentLocation != null && _visualNavigator != null) {
+      // Create a simulated location update to kickstart navigation
+      final initialLocation = HERE.Location.withCoordinates(
+        _currentLocation!,
+      );
+
+      // Send initial location to visual navigator
+      _visualNavigator!.onLocationUpdated(initialLocation);
+
+      debugPrint(
+          '📍 Set initial navigation position: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+    }
+  }
 
   void _startGuidance(HERE.Route route) {
     if (_hereMapController == null) return;
@@ -891,7 +868,7 @@ class _NavigationViewState extends State<NavigationView> {
     } on InstantiationException {
       debugPrint('❌ Initialization of VisualNavigator failed.');
       setState(() {
-        _errorMessage = "Failed to initialize navigation";
+        _errorMessage = context.l10n.failedToInitNavigation;
         _isNavigating = false;
       });
       return;
@@ -900,7 +877,6 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.startRendering(_hereMapController!);
     debugPrint('📡 Started rendering navigator.');
 
-    // Set up route progress listener with throttling
     DateTime lastUpdateTime = DateTime.now();
 
     _visualNavigator!.routeProgressListener =
@@ -908,14 +884,11 @@ class _NavigationViewState extends State<NavigationView> {
       final now = DateTime.now();
       HERE.SectionProgress lastSectionProgress =
           routeProgress.sectionProgress.last;
-      int distance = lastSectionProgress.remainingDistanceInMeters;
+      int remainingDistance = lastSectionProgress.remainingDistanceInMeters;
 
       print('🟡 Route progress update at ${now.toIso8601String()}');
-      print('➡️ Remaining distance in section: $distance meters');
-      print(
-          '➡️ Section remaining duration: ${lastSectionProgress.remainingDuration.inSeconds} seconds');
+      print('➡️ Remaining distance in section: $remainingDistance meters');
 
-      // Throttle updates to avoid too many setState calls
       if (now.difference(lastUpdateTime).inMilliseconds < 500) {
         print('⏱ Throttling update. Skipping this tick.');
         return;
@@ -929,58 +902,53 @@ class _NavigationViewState extends State<NavigationView> {
       _nextManuoverDistance = routeProgress
           .maneuverProgress.first.remainingDistanceInMeters
           .floor();
-
-      final remainingDistanceInMeters =
-          lastSectionProgress.remainingDistanceInMeters;
       final remainingDurationInSeconds =
           lastSectionProgress.remainingDuration.inSeconds;
+      _distanceNotifier.value = remainingDistance;
 
-      _distanceNotifier.value = remainingDistanceInMeters;
+      bool isAtDestination = remainingDistance <= 15;
+      bool isParkingNavigation =
+          _currentSpace != null || widget.isNavigatingToParking;
 
-      // Show arrival notification when very close to destination (within 10 meters)
-      if (remainingDistanceInMeters < 10) {
-        print('✅ Within 10 meters of destination.');
-        if (!_hasShownArrivalNotification) {
-          print('📣 Showing arrival notification...');
+      print('🎯 Distance to destination: $remainingDistance meters');
+      print('🅿️ Is parking navigation: $isParkingNavigation');
+      print('🔔 Has shown arrival: $_hasShownArrivalNotification');
+      print('⭐ Has shown rating: $_hasShownParkingRating');
+
+      if (isAtDestination && !_hasShownArrivalNotification) {
+        print('✅ Arrived at destination!');
+        setState(() {
+          _hasShownArrivalNotification = true;
+        });
+        if (isParkingNavigation &&
+            !_hasShownParkingRating &&
+            !_isPopupDisplayed) {
           setState(() {
-            _hasShownArrivalNotification = true;
-          });
-
-          if (_isNavigatingToParking) {
-            print(
-                '🅿️ Navigated to a selected parking space. Showing rating UI.');
-            AppPopup.showBottomSheet(
-                context,
-                ParkingRatingWidget(
-                  spaceID: _currentSpace?.id ?? widget.parkingSpaceID!,
-                  onSubmit: () {
-                    _stopNavigation();
-                    _cleanupNavigation();
-                    NavigatorHelper.pop();
-                  },
-                ));
-          } else {
-            print('🎯 Standard destination reached. Showing toast.');
-            _showToast("You have arrived at your destination!",
-                backgroundColor: AppColors.green600);
-          }
-
-          putParkingSpacesOnMap();
-        }
-      }
-
-      // Load spaces if very close to destination
-      if (remainingDistanceInMeters < 1) {
-        print('📌 Less than 1 meter away. Checking if popup needs to show.');
-        if (!_isPopupDisplayed) {
-          print('🧩 Showing nearby parking spaces.');
-          setState(() {
+            _hasShownParkingRating = true;
             _isPopupDisplayed = true;
           });
 
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              AppPopup.showBottomSheet(
+                  context,
+                  ParkingRatingWidget(
+                    spaceID: _currentSpace!.id,
+                    onSubmit: () {
+                      NavigatorHelper.pop();
+                      _isPopupDisplayed = false;
+                      _hasShownParkingRating = false;
+                    },
+                  ));
+            }
+          });
+        } else if (!isParkingNavigation) {
+          print('🎯 Standard destination reached. Showing toast.');
+          _showToast("You have arrived at your destination!",
+              backgroundColor: AppColors.green600);
+
           putParkingSpacesOnMap();
         }
-        return;
       }
 
       lastUpdateTime = now;
@@ -992,11 +960,10 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       if (mounted) {
-        _distanceNotifier.value = distance;
-
         setState(() {
           _totalRouteTime = remainingDurationInSeconds;
         });
+
         if (context.isFatigueAlertEnabled) {
           if (_navigationStartTime != null &&
               !_hasShownFatigueAlert &&
@@ -1005,45 +972,18 @@ class _NavigationViewState extends State<NavigationView> {
             _hasShownFatigueAlert = true;
             AlertHelper.showWarning(
               context: context,
-              title: 'Fatigue Alert',
-              subtext:
-                  'You have been driving for 3 hours. Please consider taking a break.',
+              title: context.l10n.fatigueAlertTitle,
+              subtext: context.l10n.fatigueAlertMessage,
             );
 
             if (!_isMuted) {
-              speech.speak(
-                  "You have been driving for three hours. Please take a rest.");
+              speech.speak(context.l10n.fatigueAlertVoice);
             }
           }
         }
-        if (distance < 10 &&
-            (_isNavigatingToParking || widget.isNavigatingToParking)) {
-          AppPopup.showBottomSheet(
-            context,
-            ParkingRatingWidget(
-              spaceID: _currentSpace?.id ?? widget.parkingSpaceID!,
-              onSubmit: () {
-                _stopNavigation();
-                _cleanupNavigation();
-                NavigatorHelper.pop();
-              },
-            ),
-          );
-        }
-
-        print('🚗 Maneuver updated:');
-        print(
-            '➡️ Distance to next maneuver: ${_distanceNotifier.value} meters');
-        print(
-            '📏 Total remaining route distance: ${_distanceNotifier.value} meters');
-        print('⏳ Total remaining time: $_totalRouteTime seconds');
       }
     });
 
-    //
-    // // Add route deviation listener for re-routing
-
-    // Set up voice instruction listener
     _visualNavigator!.eventTextListener =
         HERE.EventTextListener((HERE.EventText eventText) {
       String? streetName = getStreetNameFromManeuver(
@@ -1059,27 +999,20 @@ class _NavigationViewState extends State<NavigationView> {
       }
     });
 
-    // Set route and start location simulation
     _visualNavigator!.route = route;
-
     _setupLocationSource(_visualNavigator!, route);
   }
 
-  bool _isRecalculatingRoute = false;
-
-// Replace the entire routeDeviationListener implementation with this optimized version
   void _setupRouteDeviationListener() {
     _visualNavigator!.routeDeviationListener =
         HERE.RouteDeviationListener((HERE.RouteDeviation routeDeviation) {
       debugPrint('🛰️ Route deviation listener triggered');
 
-      // Skip processing if already calculating a new route
       if (_isRecalculatingRoute) {
         debugPrint('⏳ Already recalculating route. Skipping...');
         return;
       }
 
-      // Get current route or skip if none
       HERE.Route? route = _visualNavigator?.route;
       if (route == null) {
         debugPrint(
@@ -1087,13 +1020,11 @@ class _NavigationViewState extends State<NavigationView> {
         return;
       }
 
-      // Get current location coordinates
       HERE.GeoCoordinates currentGeoCoordinates =
           routeDeviation.currentLocation.originalLocation.coordinates;
       debugPrint(
           '📍 Current location: (${currentGeoCoordinates.latitude}, ${currentGeoCoordinates.longitude})');
 
-      // Calculate deviation distance
       double distanceInMeters = Geolocator.distanceBetween(
         _currentLocation!.latitude,
         _currentLocation!.longitude,
@@ -1106,7 +1037,6 @@ class _NavigationViewState extends State<NavigationView> {
 
       debugPrint('⏰ Time since last reroute: ${now - _lastRerouteTime} ms');
 
-      // Conditions to trigger reroute
       bool isSignificantlyOffRoute = true;
       bool isFarEnoughFromDestination = _distanceNotifier.value > 50;
       bool isTimeElapsedSinceLastReroute = (now - _lastRerouteTime > 5000);
@@ -1118,22 +1048,16 @@ class _NavigationViewState extends State<NavigationView> {
             '⚠️ Significant deviation detected! Off by ${distanceInMeters}m');
         debugPrint('📡 Initiating reroute sequence...');
 
-        // Cancel any existing timer
         _rerouteDebounceTimer?.cancel();
 
-        // Set flag to prevent multiple calculations
         _isRecalculatingRoute = true;
         _lastRerouteTime = now;
 
-        // Show toast to inform user
         _showToast(
-          "Recalculating route...",
+          context.l10n.recalculatingRoute,
           backgroundColor: AppColors.red500,
         );
 
-        // Force the UI to update before heavy calculation
-
-        // Delay slightly to allow UI to update
         Future.delayed(const Duration(milliseconds: 100), () {
           debugPrint('🚀 Launching route recalculation from new position...');
           _recalculateRouteFromCurrentLocation(currentGeoCoordinates);
@@ -1150,9 +1074,6 @@ class _NavigationViewState extends State<NavigationView> {
     });
   }
 
-  bool _isCameraLocked = true; // Add this flag to track camera lock state
-
-// New method to separate route recalculation logic
   void _recalculateRouteFromCurrentLocation(
       HERE.GeoCoordinates currentPosition) {
     if (_currentLocation == null) return;
@@ -1161,15 +1082,14 @@ class _NavigationViewState extends State<NavigationView> {
       debugPrint('🧭 Recalculating route from current position...');
 
       HERE.Waypoint startWaypoint = HERE.Waypoint(currentPosition);
-      HERE.Waypoint destinationWaypoint = HERE.Waypoint(
-          HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng));
 
-      // Create car options with realistic route
+      HERE.Waypoint destinationWaypoint = HERE.Waypoint(
+          HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng));
+
       final carOptions = HERE.CarOptions();
       carOptions.routeOptions.enableTolls = true;
       carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
 
-      // Check if routing engine is still valid
       _routingEngine ??= HERE.RoutingEngine();
 
       _routingEngine!.calculateCarRoute(
@@ -1182,20 +1102,15 @@ class _NavigationViewState extends State<NavigationView> {
             HERE.Route calculatedRoute = routeList.first;
 
             _totalRouteTime = calculatedRoute.duration.inSeconds;
-            _distanceNotifier.value =
-                calculatedRoute.lengthInMeters; // Update distance notifier
+            _distanceNotifier.value = calculatedRoute.lengthInMeters;
 
             if (_visualNavigator != null && mounted) {
-              // Set new route for visualization
               _visualNavigator!.route = calculatedRoute;
 
-              // Update UI state
               setState(() {
                 _isNavigating = true;
                 _isRecalculatingRoute = false;
               });
-
-              // Show success toast
             }
           } else {
             final error = routingError?.toString() ?? "Unknown error";
@@ -1205,9 +1120,8 @@ class _NavigationViewState extends State<NavigationView> {
               _isRecalculatingRoute = false;
             });
 
-            // Show error toast
             _showToast(
-              "Could not recalculate route",
+              context.l10n.couldNotRecalculateRoute,
               backgroundColor: AppColors.red500,
             );
           }
@@ -1223,30 +1137,22 @@ class _NavigationViewState extends State<NavigationView> {
 
   String getStreetNameFromManeuver(HERE.Maneuver maneuver,
       {List<Locale> preferredLocales = const []}) {
-    // Try next road name first (where the vehicle is heading)
     String? name = maneuver.nextRoadTexts.names.getDefaultValue();
 
-    // Fallback to current road name if next is unavailable
     name ??= maneuver.roadTexts.names.getDefaultValue();
 
-    return name ?? 'Unnamed Road';
+    return name ?? context.l10n.unnamedRoad;
   }
 
   void _setupLocationSource(
       HERE.LocationListener locationListener, HERE.Route route) {
     debugPrint('📍 Setting up navigation with visual map...');
     try {
-      // Set the route for visualization first
       _visualNavigator!.route = route;
       _locationEngine = HERE.LocationEngine();
 
-      _locationEngine?.startWithLocationAccuracy(
-        HERE.LocationAccuracy.navigation,
-      );
-
       _locationEngine!.addLocationListener(
         HERE.LocationListener((HERE.Location location) {
-          // Update current location
           _currentLocation = location.coordinates;
           double? speed = location.speedInMetersPerSecond;
 
@@ -1254,13 +1160,11 @@ class _NavigationViewState extends State<NavigationView> {
             _speed = speed ?? 0;
           });
 
-          // reset the last location if it is in 50m
           if (_lastLatitude == 0 && _lastLongitude == 0) {
             _lastLatitude = location.coordinates.latitude;
             _lastLongitude = location.coordinates.longitude;
           }
 
-          // Check distance trigger for 50m intervals
           _checkDistanceTrigger(
             location.coordinates.latitude,
             location.coordinates.longitude,
@@ -1268,29 +1172,21 @@ class _NavigationViewState extends State<NavigationView> {
           locationListener.onLocationUpdated(location);
         }),
       );
+      _locationEngine?.startWithLocationAccuracy(
+        HERE.LocationAccuracy.navigation,
+      );
 
-      // Set visual navigator to follow the route
       _visualNavigator!.startRendering(_hereMapController!);
       _setupSpeedLimitListener();
 
-      // Configure map view for 3D navigation
-      // _hereMapController!.camera.lookAtPoint(
-      //   HERE.GeoCoordinates(
-      //     widget.destinationLat,
-      //     widget.destinationLng,
-      //   ),
-      // );
-
-      // Tilt camera for 3D effect
-      _hereMapController!.camera.setOrientationAtTarget(
-          HERE.GeoOrientationUpdate(0, 65) // 60-degree tilt for 3D view
-          );
+      _hereMapController!.camera
+          .setOrientationAtTarget(HERE.GeoOrientationUpdate(0, 65));
 
       debugPrint('✅ Navigation with 3D view started successfully');
     } catch (e) {
       debugPrint('❌ Failed to set up location simulation: $e');
       setState(() {
-        _errorMessage = "Failed to start navigation visualization";
+        _errorMessage = context.l10n.failedToStartNavigation;
         _isNavigating = false;
         _isLoading = false;
       });
@@ -1309,25 +1205,25 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('✅ Navigation stopped.');
   }
 
-  // Add a method to show toast notifications
   void _showToast(String message, {Color backgroundColor = Colors.black}) {}
 
-  // UI Components
   Widget _buildNavigationInstructionCard() {
-    // Determine which icon to show based on the instruction text
     IconData directionIcon = Icons.navigation;
 
-    // Check if any of the direction phrases are contained in the instruction
     for (final entry in _directionIcons.entries) {
-      print(normalManuevers);
       if (normalManuevers.toLowerCase().contains(entry.key)) {
         directionIcon = entry.value;
         break;
       }
     }
 
-    return Container(
-      height: 90,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: _isNavigating &&
+              _navigationInstruction.isNotEmpty &&
+              _distanceNotifier.value > 0
+          ? 90
+          : 70,
       padding: const EdgeInsets.symmetric(
           horizontal: _containerPadding, vertical: _containerPadding + 5),
       decoration: BoxDecoration(
@@ -1341,98 +1237,90 @@ class _NavigationViewState extends State<NavigationView> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.amber,
-            ),
-            child: Icon(directionIcon, color: Colors.black, size: 24),
-          ),
-          const SizedBox(width: 15),
-          ValueListenableBuilder<int>(
-            valueListenable: _distanceNotifier,
-            builder: (context, state, _) {
-              print("Distance: $state");
-              if (state < 4) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    _isPopupDisplayed = true;
-                    AppPopup.showBottomSheet(
-                      context,
-                      ParkingRatingWidget(
-                        spaceID:
-                            _currentSpace?.id ?? widget.parkingSpaceID ?? "-1",
-                        onSubmit: () {
-                          _stopNavigation();
-                          _cleanupNavigation();
-                          NavigatorHelper.pop();
-                        },
+      child: _isNavigating &&
+              _navigationInstruction.isNotEmpty &&
+              _distanceNotifier.value > 0
+          ? Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.amber,
+                  ),
+                  child: Icon(directionIcon, color: Colors.black, size: 24),
+                ),
+                const SizedBox(width: 15),
+                ValueListenableBuilder<int>(
+                  valueListenable: _distanceNotifier,
+                  builder: (context, state, _) {
+                    return Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${_nextManuoverDistance.toFormattedDistance()} ${context.l10n.ahead}',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
+                          Text(
+                            _navigationInstruction,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 15),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     );
-                  }
-                });
-              }
-              return Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${_nextManuoverDistance.toFormattedDistance()} ahead',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                    Text(
-                      _navigationInstruction,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  },
                 ),
-              );
-            },
-          ),
-          Dimens.space(1),
-          CircleAvatar(
-            backgroundColor: AppColors.neutral500.withOpacity(0.5),
-            child: IconButton(
-              icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: Colors.white),
-              onPressed: () {
-                setState(() {
-                  _isMuted = !_isMuted;
+                Dimens.space(1),
+                CircleAvatar(
+                  backgroundColor: AppColors.neutral500.withOpacity(0.5),
+                  child: IconButton(
+                    icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up,
+                        color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        _isMuted = !_isMuted;
 
-                  // TODO: Implement actual muting of navigation instructions
-                  if (_visualNavigator != null) {
-                    // _visualNavigator!.isVoiceEnabled = !_isMuted;
-                    // This would be the ideal implementation but depends on the HERE SDK version
-                    debugPrint('🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}');
-                  }
-                });
-                if (_isMuted) {
-                  speech.mute();
-                } else {
-                  speech.unmute();
-                }
-              },
+                        if (_visualNavigator != null) {
+                          debugPrint(
+                              '🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}');
+                        }
+                      });
+                      if (_isMuted) {
+                        speech.mute();
+                      } else {
+                        speech.unmute();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            )
+          : Center(
+              child: Shimmer.fromColors(
+                baseColor: Colors.white.withOpacity(0.5),
+                highlightColor: Colors.grey[100]!,
+                child: Text(
+                  "Waiting for navigation to start...",
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.7), fontSize: 16),
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _buildNavigationControls() {
     return Row(
       children: [
-        // Close button
         CircleAvatar(
           radius: _buttonRadius,
           backgroundColor: Colors.white,
@@ -1445,8 +1333,6 @@ class _NavigationViewState extends State<NavigationView> {
           ),
         ),
         const Spacer(),
-
-        // Time and distance indicator
         GestureDetector(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -1475,16 +1361,13 @@ class _NavigationViewState extends State<NavigationView> {
             ),
           ),
         ),
-
         const Spacer(),
-
-        // Add event button
         CircleAvatar(
           radius: _buttonRadius,
           backgroundColor: AppColors.red500,
           child: IconButton(
             icon: const Icon(Icons.add, color: Colors.white),
-            tooltip: "Add event",
+            tooltip: context.l10n.addEvent,
             onPressed: () {
               AppPopup.showBottomSheet(context, const AddEventBottomSheet());
             },
@@ -1498,14 +1381,14 @@ class _NavigationViewState extends State<NavigationView> {
     return Center(
       child: Container(
         color: Colors.white,
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text("Preparing your navigation..."),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(context.l10n.preparingNavigation),
             ],
           ),
         ),
@@ -1534,7 +1417,7 @@ class _NavigationViewState extends State<NavigationView> {
                   });
                   _startNavigation();
                 },
-                child: const Text("Try Again"),
+                child: Text(context.l10n.tryAgain),
               ),
             ],
           ),
@@ -1548,22 +1431,22 @@ class _NavigationViewState extends State<NavigationView> {
     return BlocConsumer<MapBloc, MapState>(
       listener: (context, state) {
         if (state is MapLoaded) {
-          // Add markers to the map
           _addMapMarkers(state.payload.events, state.payload.spaces);
 
           if (state.payload.alerts.isNotEmpty) {
             for (var alert in state.payload.alerts) {
               AlertHelper.showWarning(
                 context: context,
-                title: "${toBeginningOfSentenceCase(alert.type)} Alert",
+                title: alert.type.toLowerCase() == "camera"
+                    ? context.l10n.cameraAlertTitle
+                    : context.l10n.radarAlertTitle,
                 subtext: alert.type.toLowerCase() == "camera"
-                    ? "You are in a CCTV Camera surveillance zone "
-                    : "You are approaching a nearby radar zone",
+                    ? context.l10n.cameraAlertMessage
+                    : context.l10n.radarAlertMessage,
               );
             }
           }
         }
-        // TODO: implement listener
       },
       builder: (context, state) {
         return WillPopScope(
@@ -1571,10 +1454,8 @@ class _NavigationViewState extends State<NavigationView> {
           child: Scaffold(
             body: Stack(
               children: [
-                // Map layer
                 HereMap(onMapCreated: _onMapCreated),
                 _buildSpeedLimitIndicator(),
-                // Loading indicator
                 if (_isLoading) _buildLoadingIndicator(),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 200,
@@ -1590,26 +1471,19 @@ class _NavigationViewState extends State<NavigationView> {
                             : Colors.grey,
                       ),
                       onPressed: _toggleCameraTracking,
-                      tooltip:
-                          _isCameraLocked ? "Free camera" : "Lock to position",
+                      tooltip: _isCameraLocked
+                          ? context.l10n.freeCameraMode
+                          : context.l10n.lockPositionMode,
                     ),
                   ),
                 ),
-                // Error message
                 if (_errorMessage.isNotEmpty) _buildErrorMessage(),
-
-                // Navigation instruction
-                if (_isNavigating &&
-                    _navigationInstruction.isNotEmpty &&
-                    _distanceNotifier.value > 0)
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 10,
-                    left: _mapPadding,
-                    right: _mapPadding,
-                    child: _buildNavigationInstructionCard(),
-                  ),
-
-                // Bottom controls
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  left: _mapPadding,
+                  right: _mapPadding,
+                  child: _buildNavigationInstructionCard(),
+                ),
                 if (_isNavigating)
                   Positioned(
                     bottom: 30,
@@ -1623,5 +1497,17 @@ class _NavigationViewState extends State<NavigationView> {
         );
       },
     );
+  }
+}
+
+class Debouncer {
+  final Duration delay;
+  Timer? _timer;
+
+  Debouncer({required this.delay});
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
   }
 }

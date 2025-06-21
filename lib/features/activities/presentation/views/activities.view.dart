@@ -6,6 +6,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
@@ -40,41 +41,37 @@ class _ActivitiesViewState extends State<ActivitiesView> {
     // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
   }
 
-  Widget _buildFooter(ActivitiesState state) {
-    Widget item = const ContributionsSection();
+  Widget _buildFooter(ActivitiesState state, bool isAllRouted) {
+    Widget item = ContributionsSection(
+      isAllRouted: isAllRouted,
+    );
 
     return item;
   }
 
   Widget _buidShowAllButton(ActivitiesState state) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Contributions',
-            style: Typo.mediumBody.copyWith(
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(
+        context.l10n.contributions,
+        style: Typo.mediumBody.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      if (state is ActivitiesLoaded && state.activities.isNotEmpty)
+        TextButton(
+          onPressed: () {
+            NavigatorHelper.to(const ViewAllView());
+          },
+          child: Text(
+            context.l10n.showAll,
+            style: Typo.smallBody.copyWith(
+              color: AppColors.primary500,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
             ),
           ),
-          if (state is ActivitiesLoaded && state.activities.isNotEmpty)
-            TextButton(
-              onPressed: () {
-                NavigatorHelper.to(const ViewAllView());
-              },
-              child: Text(
-                'Show All',
-                style: Typo.smallBody.copyWith(
-                  color: AppColors.primary500,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
+        ),
+    ]);
   }
 
   @override
@@ -94,7 +91,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                           const CarSection(),
                           const ActiveReservationSection(),
                           _buidShowAllButton(state),
-                          _buildFooter(state),
+                          _buildFooter(state, true),
                         ],
                       ),
                     ),
@@ -104,7 +101,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                     const CarSection(),
                     const ActiveReservationSection(),
                     _buidShowAllButton(state),
-                    Expanded(child: _buildFooter(state)),
+                    Expanded(child: _buildFooter(state, false)),
                   ],
           );
 
@@ -138,7 +135,7 @@ class NotificationAppBar extends StatelessWidget {
                 ),
               ),
             ),
-      title: 'Activities',
+      title: context.l10n.activities,
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       icon: Iconsax.notification5,
     );
@@ -185,7 +182,8 @@ class ActiveReservationSection extends StatelessWidget {
 }
 
 class ContributionsSection extends StatelessWidget {
-  const ContributionsSection({super.key});
+  final bool isAllRouted;
+  const ContributionsSection({super.key, required this.isAllRouted});
 
   @override
   Widget build(BuildContext context) {
@@ -210,6 +208,12 @@ class ContributionsSection extends StatelessWidget {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimens.defaultRadius),
               topRight: Radius.circular(Dimens.defaultRadius),
+              bottomLeft: isAllRouted
+                  ? Radius.circular(Dimens.defaultRadius)
+                  : Radius.zero,
+              bottomRight: isAllRouted
+                  ? Radius.circular(Dimens.defaultRadius)
+                  : Radius.zero,
             ),
           ),
           child: isEmpty

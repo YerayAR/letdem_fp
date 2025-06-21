@@ -4,6 +4,7 @@ import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
 
 class OptionItem extends StatelessWidget {
@@ -99,7 +100,7 @@ class OptionItem extends StatelessWidget {
                         const Spacer(),
                         if (method.isDefault)
                           DecoratedChip(
-                            text: 'Default',
+                            text: context.l10n.defaultt,
                             textSize: 10,
                             color: AppColors.secondary600,
                           )
@@ -108,8 +109,8 @@ class OptionItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       method.accountHolderName,
-                      style:
-                          Typo.smallBody.copyWith(color: AppColors.neutral300),
+                      style: Typo.smallBody
+                          .copyWith(color: AppColors.neutral400, fontSize: 15),
                     ),
                   ],
                 ),

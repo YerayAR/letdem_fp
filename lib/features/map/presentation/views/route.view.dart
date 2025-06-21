@@ -15,6 +15,7 @@ import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
@@ -355,9 +356,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           AppPopup.showDialogSheet(
             context,
             SuccessDialog(
-              title: "Notification Scheduled",
-              subtext:
-                  "You will be notified when a space is available in this area",
+              title: context.l10n.notificationScheduled,
+              subtext: context.l10n.notificationScheduledDescription,
               onProceed: () => Navigator.pop(context),
             ),
           );
@@ -432,17 +432,21 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                 Icon(IconlyBold.location, color: AppColors.green600, size: 36),
           ),
           Dimens.space(2),
-          const Text("Close to Location", style: Typo.heading4),
+          Text(
+            context.l10n.tooCloseToLocation,
+            style: Typo.heading4,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 8),
-          const Text(
-            "You are close to the location, Please select a different location",
+          Text(
+            context.l10n.closeToLocationDescription,
             style: Typo.mediumBody,
             textAlign: TextAlign.center,
           ),
           Dimens.space(4),
           PrimaryButton(
             onTap: () => Navigator.pop(context),
-            text: "Close",
+            text: context.l10n.close,
           ),
           Dimens.space(4),
         ],
@@ -454,13 +458,16 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     return Row(
       children: [
         Text(
-          "${parseHours(routeInfo.duration)} (${parseMeters(routeInfo.distance)})",
+          "${parseHours(context, routeInfo.duration)} (${parseMeters(routeInfo.distance)})",
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const Spacer(),
         Row(
           children: [
-            const Text("Traffic Level", style: TextStyle(fontSize: 14)),
+            Text(
+              "${parseHours(context, routeInfo.duration)} (${parseMeters(routeInfo.distance)})",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(width: 8),
             DecoratedChip(
               text: toBeginningOfSentenceCase(routeInfo.tafficLevel) ?? "--",
@@ -498,7 +505,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
         const Icon(IconlyLight.time_circle, color: Colors.grey),
         const SizedBox(width: 8),
         Text(
-          "To Arrive by ${DateFormat('HH:mm').format(routeInfo.arrivingAt.toLocal())}",
+          context.l10n.toArriveBy(
+              DateFormat('HH:mm').format(routeInfo.arrivingAt.toLocal())),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ],
@@ -516,10 +524,11 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           children: [
             const Icon(IconlyLight.notification, color: Colors.grey),
             const SizedBox(width: 8),
-            const Expanded(
+            Expanded(
               child: Text(
-                "Notify me of available space in this area",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                context.l10n.notifyAvailableSpace,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
             ToggleSwitch(
@@ -540,7 +549,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       children: [
         Divider(color: Colors.grey.withOpacity(0.2)),
         Dimens.space(1),
-        const Text("Date & Time"),
+        Text(context.l10n.dateAndTime),
         Dimens.space(3),
         Row(
           children: [
@@ -579,8 +588,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       children: [
         Row(
           children: [
-            const Text("Receive notifications up to (meters)",
-                style: TextStyle(fontSize: 14)),
+            Text(context.l10n.notificationRadius,
+                style: const TextStyle(fontSize: 14)),
             const Spacer(),
             Text(radius.toStringAsFixed(0),
                 style:
@@ -621,7 +630,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           ? _handleScheduleNotification()
           : _navigateToDestination(),
       icon: !shouldSchedule ? IconlyBold.location : null,
-      text: shouldSchedule ? "Save" : "Start Route",
+      text: shouldSchedule ? context.l10n.save : context.l10n.startRoute,
     );
   }
 
@@ -631,9 +640,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     final end = DateTime(
         _toDate.year, _toDate.month, _toDate.day, _toTime.hour, _toTime.minute);
 
-    if (!validateDateTime(start, end)) return;
+    if (!validateDateTime(context, start, end)) return;
     if (radius < 100) {
-      Toast.showError('Radius cannot be less than 100 meters');
+      Toast.showError(context.l10n.radiusLessThan(100));
       return;
     }
 
@@ -664,45 +673,42 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 
 String parseMeters(double distance) {
   if (distance < 1000) {
-    return "${distance.toStringAsFixed(0)}m";
+    return "${distance.toStringAsFixed(0)} meters";
   } else {
-    return "${(distance / 1000).toStringAsFixed(1)}km";
+    return "${(distance / 1000).toStringAsFixed(1)} m";
   }
-
-//   if
 }
 
-parseHours(int min) {
+String parseHours(BuildContext context, int min) {
   if (min < 60) {
-    return "$min mins";
+    return "$min ${context.l10n.minutesShort}";
   } else {
-    return "${(min / 60).toStringAsFixed(0)} hrs";
+    return "${(min / 60).toStringAsFixed(0)} ${context.l10n.hoursShort}";
   }
 }
 
-bool validateDateTime(DateTime? start, DateTime? end) {
+bool validateDateTime(BuildContext context, DateTime? start, DateTime? end) {
   DateTime now = DateTime.now();
 
   if (start == null || end == null) {
-    Toast.showError('Start and end times are required');
+    Toast.showError(context.l10n.timesRequired);
     return false;
   }
 
   if (start.isAfter(end) || start.isAtSameMomentAs(end)) {
-    Toast.showError('Start time should be before end time');
+    Toast.showError(context.l10n.startBeforeEnd);
     return false;
   }
 
   if (start.isBefore(now) || end.isBefore(now)) {
-    Toast.showError(
-        'Start and end times should be greater than the current time');
+    Toast.showError(context.l10n.timeGreaterThanCurrent);
     return false;
   }
 
   // Ensure difference is not greater than 5 days (including milliseconds rounding)
   if (end.difference(start).inMilliseconds >
       const Duration(days: 5).inMilliseconds) {
-    Toast.showError('You can only schedule up to 5 days');
+    Toast.showError(context.l10n.maxScheduleDays);
     return false;
   }
 

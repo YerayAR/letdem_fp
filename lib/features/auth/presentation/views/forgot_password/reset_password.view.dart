@@ -7,6 +7,7 @@ import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -47,7 +48,15 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is ResetPasswordError) {
+            Toast.showError(state.error);
+            return;
+          }
+          if (state is ResetPasswordSuccess) {
+            NavigatorHelper.to(const LoginView());
+          }
+        },
         builder: (context, snapshot) {
           return Scaffold(
             bottomNavigationBar: SafeArea(
@@ -58,15 +67,16 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
                       if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
-                        Toast.showError('Passwords do not match');
+                        Toast.showError(context.l10n.passwordsDoNotMatch);
                         return;
                       }
 
                       context.read<AuthBloc>().add(ResetPasswordEvent(
-                          email: widget.email, password: _passwordCTRL.text));
+                          email: widget.email, 
+                          password: _passwordCTRL.text));
                     }
                   },
-                  text: 'Reset Password',
+                  text: context.l10n.resetPassword,
                 ),
               ),
             ),
@@ -81,7 +91,6 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                   if (state is ResetPasswordSuccess) {
                     NavigatorHelper.to(const LoginView());
                   }
-                  // TODO: implement listener
                 },
                 builder: (context, state) {
                   return ListView(
@@ -90,35 +99,39 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                         children: [
                           Dimens.space(3),
                           Text(
-                            'Set a New Password',
-                            style: Typo.heading4
-                                .copyWith(color: AppColors.neutral600),
+                            context.l10n.setNewPassword,
+                            style: Typo.heading4.copyWith(
+                              color: AppColors.neutral600
+                            ),
                           ),
                           Dimens.space(1),
-                          Text('Create a strong password for your account',
-                              style: Typo.mediumBody
-                                  .copyWith(color: AppColors.neutral500)),
+                          Text(
+                            context.l10n.createStrongPassword,
+                            style: Typo.mediumBody.copyWith(
+                              color: AppColors.neutral500
+                            ),
+                          ),
                           Dimens.space(5),
                           TextInputField(
                             prefixIcon: Iconsax.lock,
-                            label: 'New Password',
+                            label: context.l10n.newPassword,
                             controller: _passwordCTRL,
                             inputType: TextFieldType.password,
                             showPasswordStrengthIndicator: true,
-                            placeHolder: 'Enter your password',
+                            placeHolder: context.l10n.enterPassword,
                           ),
                           Dimens.space(1),
                           TextInputField(
                             prefixIcon: Iconsax.lock,
                             controller: _repeatPasswordCTRL,
-                            label: 'Repeat Password',
+                            label: context.l10n.repeatPassword,
                             showPasswordStrengthIndicator: true,
                             inputType: TextFieldType.password,
-                            placeHolder: 'Enter your password',
+                            placeHolder: context.l10n.enterPassword,
                           ),
                           Dimens.space(2),
                           Text(
-                            "Ensure to use at least 8 characters, with a number and a special character and uppercase letter",
+                            context.l10n.passwordRequirements,
                             style: Typo.smallBody.copyWith(
                               color: AppColors.neutral400,
                               fontSize: 14,

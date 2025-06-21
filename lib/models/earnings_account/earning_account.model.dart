@@ -23,6 +23,8 @@ class DocumentInfo {
 class EarningAccount {
   final double balance;
   final double pendingBalance;
+
+  final double availableBalance;
   final String currency;
   final String legalFirstName;
   final String legalLastName;
@@ -39,6 +41,7 @@ class EarningAccount {
     required this.pendingBalance,
     required this.currency,
     required this.legalFirstName,
+    required this.availableBalance,
     required this.legalLastName,
     required this.phone,
     required this.birthday,
@@ -55,6 +58,8 @@ class EarningAccount {
       pendingBalance:
           double.tryParse((json['pending_balance']).toString()) ?? 0.0,
       currency: json['currency'] ?? '',
+      availableBalance:
+          double.tryParse((json['available_balance']).toString()) ?? 0.0,
       legalFirstName: json['legal_first_name'] ?? '',
       legalLastName: json['legal_last_name'] ?? '',
       phone: json['phone'] ?? '',

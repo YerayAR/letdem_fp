@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
@@ -24,16 +26,20 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
   final _addressController = TextEditingController();
   final _postalController = TextEditingController();
   final _cityController = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void dispose() {
     _addressController.dispose();
     _postalController.dispose();
     _cityController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _submit() {
+    FocusScope.of(context).unfocus();
+    
     if (_formKey.currentState!.validate()) {
       final dto = EarningsAddressDTO(
         fullStreet: _addressController.text.trim(),
@@ -58,46 +64,62 @@ class _AddressInfoPageState extends State<AddressInfoPage> {
           Toast.showError(state.message);
         }
       },
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Your address information',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text('Input your full address and location of residence',
-                  style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
-              const SizedBox(height: 30),
-              TextInputField(
-                label: 'Enter your address',
-                placeHolder: 'Eg. Calle de Olivos 3, 46',
-                controller: _addressController,
-              ),
-              const SizedBox(height: 16),
-              TextInputField(
-                label: 'Enter postal code',
-                placeHolder: 'Eg. 28944',
-                controller: _postalController,
-              ),
-              const SizedBox(height: 16),
-              TextInputField(
-                label: 'Enter city',
-                placeHolder: 'Eg. Fuenlabrada',
-                controller: _cityController,
-              ),
-              const Spacer(),
-              BlocBuilder<EarningsBloc, EarningsState>(
-                builder: (context, state) {
-                  return PrimaryButton(
-                    isLoading: state is EarningsLoading,
-                    onTap: state is EarningsLoading ? null : _submit,
-                    text: "Next",
-                  );
-                },
-              ),
-            ],
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: Dimens.defaultMargin),
+            child: ListView(
+              controller: _scrollController,
+              children: [
+                Text(context.l10n.addressInformationTitle,
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(context.l10n.addressInformationDescription,
+                    style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
+                const SizedBox(height: 30),
+                TextInputField(
+                  label: context.l10n.address,
+                  placeHolder: context.l10n.enterAddress,
+                  controller: _addressController,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 16),
+                TextInputField(
+                  label: context.l10n.postalCode,
+                  placeHolder: context.l10n.enterPostalCode,
+                  controller: _postalController,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 16),
+                TextInputField(
+                  label: context.l10n.city,
+                  placeHolder: context.l10n.enterCity,
+                  controller: _cityController,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: () {
+                    FocusScope.of(context).unfocus();
+                    // Scroll to show the button
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  },
+                ),
+                SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0 ? 100 : 30),
+                BlocBuilder<EarningsBloc, EarningsState>(
+                  builder: (context, state) {
+                    return PrimaryButton(
+                      isLoading: state is EarningsLoading,
+                      onTap: state is EarningsLoading ? null : _submit,
+                      text: context.l10n.next,
+                    );
+                  },
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),

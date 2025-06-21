@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/popup.dart';
@@ -11,14 +12,18 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
 import 'package:letdem/features/payment_methods/presentation/empty_states/empty_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/models/payment/payment.model.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {
-  const PaymentMethodsScreen({super.key});
+  final Function(PaymentMethodModel)? onPaymentMethodSelected;
+  const PaymentMethodsScreen({super.key, this.onPaymentMethodSelected});
 
   @override
   State<PaymentMethodsScreen> createState() => _PaymentMethodsScreenState();
@@ -42,13 +47,15 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           if (state is PaymentMethodError) {
             Toast.showError(state.message);
           }
-          // TODO: implement listener
+          if (state is PaymentMethodLoaded) {
+            context.read<UserBloc>().add(FetchUserInfoEvent());
+          }
         },
         builder: (context, state) {
           return StyledBody(
             children: [
               StyledAppBar(
-                title: 'Payment Methods',
+                title: context.l10n.paymentMethods,
                 onTap: () {
                   NavigatorHelper.pop();
                 },
@@ -63,17 +70,30 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                             itemCount: state.paymentMethods.length,
                             itemBuilder: (context, index) {
                               final paymentMethod = state.paymentMethods[index];
-                              return _buildCardItem(
-                                cardId: paymentMethod.paymentMethodId,
-                                last4: paymentMethod.last4,
-                                cardType: paymentMethod.brand,
-                                holderName: paymentMethod.holderName,
-                                isDefault: paymentMethod.isDefault,
-                                onMenuTap: () {
-                                  setState(() {
-                                    showOptions = true;
-                                  });
+                              return GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  if (widget.onPaymentMethodSelected != null) {
+                                    widget.onPaymentMethodSelected!(
+                                      paymentMethod,
+                                    );
+                                  }
                                 },
+                                child: _buildCardItem(
+                                  cardId: paymentMethod.paymentMethodId,
+                                  last4: paymentMethod.last4,
+                                  brand: getBrandName(paymentMethod.brand),
+                                  expireDate:
+                                      '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
+                                  cardType: paymentMethod.brand,
+                                  holderName: paymentMethod.holderName,
+                                  isDefault: paymentMethod.isDefault,
+                                  onMenuTap: () {
+                                    setState(() {
+                                      showOptions = true;
+                                    });
+                                  },
+                                ),
                               );
                             },
                           )
@@ -87,7 +107,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
               // Add New Card Button
               PrimaryButton(
-                text: 'Add New Card',
+                text: context.l10n.addNewCard,
                 onTap: () {
                   NavigatorHelper.to(const AddPaymentMethod());
                   // Add new card action
@@ -105,6 +125,8 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     required String holderName,
     required String cardId,
     required bool isDefault,
+    required String brand,
+    required String expireDate,
     required String last4,
     required VoidCallback onMenuTap,
   }) {
@@ -122,7 +144,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Visa ending with $last4',
+                context.l10n.cardEndingWith(brand, last4),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -135,7 +157,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                     child: !isDefault
                         ? null
                         : DecoratedChip(
-                            text: 'Default',
+                            text: context.l10n.defaultt,
                             backgroundColor: AppColors.secondary50,
                             color: AppColors.secondary600,
                           ),
@@ -162,7 +184,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             ],
           ),
           Text(
-            'Expire Date: March, 2026',
+            context.l10n.expireDate(expireDate),
             style: Typo.smallBody.copyWith(
                 fontWeight: FontWeight.w500, color: AppColors.neutral400),
           ),
@@ -200,7 +222,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           Row(
             children: [
               Text(
-                "Payment method",
+                context.l10n.paymentMethod,
                 style: Typo.largeBody
                     .copyWith(fontWeight: FontWeight.w700, fontSize: 18),
               ),
@@ -235,7 +257,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                   ),
                 ),
                 Dimens.space(2),
-                Text("Make Default",
+                Text(context.l10n.makeDefault,
                     style: Typo.largeBody.copyWith(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
@@ -249,32 +271,58 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             color: AppColors.neutral50,
           ),
           Dimens.space(1),
-          GestureDetector(
-            onTap: () {
-              context.read<PaymentMethodBloc>().add(
-                    RemovePaymentMethod(cardId),
-                  );
+          BlocConsumer<PaymentMethodBloc, PaymentMethodState>(
+            listener: (context, state) {
+              if (state is PaymentMethodError) {
+                Toast.showError(state.message);
+              }
+              if (state is PaymentMethodLoaded && !(state.isDeleting)) {
+                Navigator.of(context).pop();
+              }
+              // TODO: implement listener
             },
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 17,
-                  backgroundColor: AppColors.red50,
-                  child: Icon(
-                    Iconsax.trash,
-                    color: AppColors.red500,
-                    size: 17,
-                  ),
+            builder: (context, state) {
+              return GestureDetector(
+                onTap: () {
+                  context.read<PaymentMethodBloc>().add(
+                        RemovePaymentMethod(cardId),
+                      );
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 17,
+                      backgroundColor: AppColors.red50,
+                      child: Icon(
+                        Iconsax.trash,
+                        color: AppColors.red500,
+                        size: 17,
+                      ),
+                    ),
+                    Dimens.space(2),
+                    Text(context.l10n.delete,
+                        style: Typo.largeBody.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.neutral600,
+                        )),
+                    if (context.read<PaymentMethodBloc>().state
+                            is PaymentMethodLoaded &&
+                        (context.read<PaymentMethodBloc>().state
+                                as PaymentMethodLoaded)
+                            .isDeleting)
+                      Row(
+                        children: [
+                          Dimens.space(1),
+                          const CupertinoActivityIndicator(
+                            radius: 8,
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-                Dimens.space(2),
-                Text("Delete",
-                    style: Typo.largeBody.copyWith(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.neutral600,
-                    )),
-              ],
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -306,18 +354,18 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Confirm Delete Card',
-            style: TextStyle(
+          Text(
+            context.l10n.confirmDeleteCard,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Are you sure you want to delete Card ending with 0967? This action cannot be undone.',
+          Text(
+            context.l10n.deleteCardConfirmation('0967'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: Colors.black87,
             ),
@@ -337,9 +385,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              'No, Keep Card',
-              style: TextStyle(
+            child: Text(
+              context.l10n.noKeepCard,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -356,9 +404,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               foregroundColor: Colors.red,
               minimumSize: const Size(double.infinity, 50),
             ),
-            child: const Text(
-              'Yes, Delete Card',
-              style: TextStyle(
+            child: Text(
+              context.l10n.yesDeleteCard,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -376,6 +424,25 @@ getCardIcon(String cardType) {
       return AppAssets.visa;
     case 'mastercard':
       return AppAssets.masterCard;
+    case 'americanexpress':
+      return AppAssets.americanExpress;
+    case 'discover':
+      return AppAssets.discover;
+    default:
+      return '';
+  }
+}
+
+getBrandName(String cardType) {
+  switch (cardType.toLowerCase()) {
+    case 'visa':
+      return 'Visa';
+    case 'mastercard':
+      return 'MasterCard';
+    case 'americanexpress':
+      return 'American Express';
+    case 'discover':
+      return 'Discover';
     default:
       return '';
   }

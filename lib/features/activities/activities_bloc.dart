@@ -25,8 +25,24 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     on<PublishRoadEventEvent>(_onPublishRoadEvent);
     on<TakeSpaceEvent>(_onTakeSpace);
     on<EventFeedBackEvent>(_onEventFeedBack);
+    on<DeleteSpaceEvent>(_onDeleteSpaceEvent);
     on<ReserveSpaceEvent>(_onReserveSpace);
     on<ConfirmSpaceReserveEvent>(_onConfirmSpaceReserveEvent);
+  }
+
+  Future<void> _onDeleteSpaceEvent(
+      DeleteSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    try {
+      emit(ActivitiesLoading());
+      await activityRepository.deleteSpace(event.spaceID);
+      emit(const ActivitiesPublished(totalPointsEarned: 0));
+    } on ApiError catch (err) {
+      Toast.showError(err.message);
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      Toast.showError("Unable to delete space");
+      emit(const ActivitiesError(error: "Unable to delete space"));
+    }
   }
 
   Future<void> _onConfirmSpaceReserveEvent(
@@ -50,6 +66,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   Future<void> _onReserveSpace(
       ReserveSpaceEvent event, Emitter<ActivitiesState> emit) async {
     try {
+      print("Reserving space with ID: ${event.spaceID}");
       emit(ActivitiesLoading());
       var payload = await activityRepository.reserveSpace(
         spaceID: event.spaceID,
@@ -57,12 +74,16 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       );
       emit(SpaceReserved(spaceID: payload));
     } on ApiError catch (err) {
-      emit(ActivitiesError(error: err.message));
+      print("Error reserving space: ${err.message}");
+      emit(ReserveSpaceError(
+          error: err.message,
+          clientSecret: err.data!['client_secret'],
+          status: err.data!['error_code'] == 'PAYMENT_REQUIRES_ACTION'
+              ? ReserveSpaceErrorStatus.requiredAction
+              : ReserveSpaceErrorStatus.generic));
     } catch (err, st) {
-      print(err);
-      print(st);
-
-      emit(const ActivitiesError(error: "Unable to reserve space"));
+      emit(const ReserveSpaceError(
+          error: "Unable to reserve paid space", clientSecret: null));
     }
   }
 

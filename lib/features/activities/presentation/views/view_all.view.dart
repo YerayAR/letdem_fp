@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
@@ -17,14 +18,14 @@ enum ViewAllType {
 }
 
 extension ViewAllTypeExtension on ViewAllType {
-  String get name {
+  String getName(BuildContext context) {
     switch (this) {
       case ViewAllType.all:
-        return 'All';
+        return context.l10n.all;
       case ViewAllType.space:
-        return 'Parking Space';
+        return context.l10n.parkingSpace;
       case ViewAllType.event:
-        return 'Events';
+        return context.l10n.events;
     }
   }
 
@@ -82,7 +83,7 @@ class _ViewAllViewState extends State<ViewAllView> {
               children: [
                 StyledAppBar(
                   onTap: () => NavigatorHelper.pop(),
-                  title: 'Contributions',
+                  title: context.l10n.contributions,
                   icon: Icons.close,
                 ),
                 FilterTabs<ViewAllType>(
@@ -162,7 +163,7 @@ class _ViewAllViewState extends State<ViewAllView> {
       return Expanded(
         child: Center(
           child: Text(
-            'Failed to load activities: ${state.error}',
+            context.l10n.failedToLoadActivities(state.error),
             style: const TextStyle(color: Colors.red),
           ),
         ),
@@ -188,16 +189,16 @@ class _ViewAllViewState extends State<ViewAllView> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'No Contributions Yet',
-                style: TextStyle(
+              Text(
+                context.l10n.noContributions,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 10),
               Text(
-                'You have not made any contributions yet. Please check back later.',
+                context.l10n.noContributionsDescription,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -231,9 +232,9 @@ class _ViewAllViewState extends State<ViewAllView> {
       );
     }
 
-    return const Expanded(
+    return Expanded(
       child: Center(
-        child: Text('Select a filter to view activities'),
+        child: Text(context.l10n.selectFilterActivities),
       ),
     );
   }

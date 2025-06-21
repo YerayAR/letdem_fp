@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 enum TextFieldType { email, password, number, text }
 
@@ -32,9 +33,17 @@ class TextInputField extends StatefulWidget {
   final bool showDeleteIcon;
 
   final Widget? child;
+
+  final Color? placeholderColor;
+
+  final TextInputAction? textInputAction;
+
+  final VoidCallback? onEditingComplete;
+
   const TextInputField({
     super.key,
     this.controller,
+    this.placeholderColor,
     this.inputFormatters,
     required this.label,
     this.isEnabled = true,
@@ -49,6 +58,8 @@ class TextInputField extends StatefulWidget {
     this.isLoading = false,
     this.showDeleteIcon = false,
     this.child,
+    this.textInputAction,
+    this.onEditingComplete,
   });
 
   @override
@@ -59,7 +70,7 @@ class TextInputFieldState extends State<TextInputField> {
   bool isPasswordVisible = false;
 
   // We'll track password strength level instead of individual criteria
-  int passwordStrength = 0; // 0-4 scale for strength levels
+  int passwordStrength = 1; // 0-4 scale for strength levels
 
   @override
   void initState() {
@@ -88,19 +99,8 @@ class TextInputFieldState extends State<TextInputField> {
     }
 
     setState(() {
-      passwordStrength = strength;
+      passwordStrength = strength < 1 ? 1 : strength.clamp(1, 4);
     });
-  }
-
-  // Get color based on password strength level
-  Color _getStrengthColor() {
-    if (passwordStrength <= 1) {
-      return Colors.red; // Weak password
-    } else if (passwordStrength <= 3) {
-      return Colors.amber; // Medium password (yellow)
-    } else {
-      return Colors.green; // Strong password
-    }
   }
 
   @override
@@ -136,6 +136,7 @@ class TextInputFieldState extends State<TextInputField> {
           ),
           TextFormField(
               enabled: widget.isEnabled,
+              onEditingComplete: widget.onEditingComplete,
               onChanged: widget.showPasswordStrengthIndicator
                   ? (value) {
                       _calculatePasswordStrength(value);
@@ -149,29 +150,29 @@ class TextInputFieldState extends State<TextInputField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return 'Please enter${widget.label?.toLowerCase().replaceAll("enter", "")}';
+                  return '${context.l10n.pleaseEnter}${widget.label?.toLowerCase().replaceAll("enter", "")}';
                 }
                 if (widget.inputType == TextFieldType.password &&
                     value.length < 8) {
-                  return 'Password must be at least 8 characters';
+                  return context.l10n.passwordMinLength;
                 }
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[0-9]').hasMatch(value)) {
-                  return 'Password must contain at least one number';
+                  return context.l10n.passwordRequireNumber;
                 }
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]')
                         .hasMatch(value)) {
-                  return 'Password must contain at least one special character';
+                  return context.l10n.passwordRequireSpecial;
                 }
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[A-Z]').hasMatch(value)) {
-                  return 'Password must contain at least one uppercase letter';
+                  return context.l10n.passwordRequireUppercase;
                 }
 
                 if (widget.inputType == TextFieldType.email &&
                     !value.isValidEmail()) {
-                  return 'Please enter valid email';
+                  return context.l10n.pleaseEnterValidEmail;
                 }
                 return null;
               },
@@ -184,7 +185,7 @@ class TextInputFieldState extends State<TextInputField> {
                   (widget.inputType == TextFieldType.number
                       ? [FilteringTextInputFormatter.digitsOnly]
                       : []),
-              textInputAction: TextInputAction.newline,
+              textInputAction: widget.textInputAction ?? TextInputAction.newline,
               obscureText: widget.inputType == TextFieldType.password
                   ? !isPasswordVisible
                   : false,
@@ -213,7 +214,7 @@ class TextInputFieldState extends State<TextInputField> {
                             ),
                   hintText: widget.placeHolder,
                   hintStyle: Typo.largeBody.copyWith(
-                    color: AppColors.neutral300,
+                    color: widget.placeholderColor ?? AppColors.neutral300,
                     fontWeight: FontWeight.w500,
                   ),
                   errorStyle: Typo.smallBody.copyWith(

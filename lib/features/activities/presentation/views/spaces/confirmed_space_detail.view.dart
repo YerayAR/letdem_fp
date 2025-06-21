@@ -12,6 +12,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
@@ -53,6 +54,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
               ),
             );
           }
+
           // TODO: implement listener
         },
         builder: (context, state) {
@@ -83,8 +85,8 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   }
 
   Widget _buildAppBar() {
-    return const StyledAppBar(
-      title: "Space Details",
+    return StyledAppBar(
+      title: context.l10n.spaceDetails,
       onTap: NavigatorHelper.pop,
       icon: Iconsax.close_circle5,
     );
@@ -122,7 +124,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           ),
           const SizedBox(height: 12),
           Text(
-            getSpaceAvailabilityMessage(widget.payload.space.type),
+            getSpaceAvailabilityMessage(widget.payload.space.type, context),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -141,7 +143,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           ),
           const SizedBox(height: 12),
           Text(
-            '€${widget.payload.price.toStringAsFixed(2)}',
+            '${widget.payload.price.toStringAsFixed(2)} €',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -205,7 +207,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
         ),
         Dimens.space(1),
         Text(
-          isReserved ? "Reserved" : "Waiting",
+          isReserved ? context.l10n.reserved : context.l10n.waiting,
           style: Typo.mediumBody.copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 12,
@@ -217,7 +219,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
 
   Widget _buildConfirmOrderButton(BuildContext context) {
     return PrimaryButton(
-      text: "Confirm Order",
+      text: context.l10n.confirmOrder,
       onTap: () => _showConfirmationSheet(context),
       textColor: Colors.white,
     );
@@ -232,9 +234,9 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
             NavigatorHelper.pop();
             AppPopup.showBottomSheet(
               context,
-              const SuccessDialog(
-                title: "Space Reserved",
-                subtext: "Your space has been reserved successfully.",
+              SuccessDialog(
+                title: context.l10n.spaceReserved,
+                subtext: context.l10n.spaceReservedSuccessfully,
                 onProceed: NavigatorHelper.popAll,
               ),
             );
@@ -262,10 +264,10 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   Widget _buildSheetTitle() {
     return Column(
       children: [
-        Text("Confirmation Code",
+        Text(context.l10n.confirmationCode,
             style: Typo.heading4.copyWith(color: AppColors.neutral600)),
         Text(
-          "The requester of the space will give you a 6-digit confirmation number, enter it here.",
+          context.l10n.enterConfirmationCode,
           textAlign: TextAlign.center,
           style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
         ),
@@ -305,7 +307,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        'Kindly ensure that the confirmation code works before you give out the space',
+        context.l10n.confirmationCodeWarning,
         textAlign: TextAlign.center,
         style: Typo.mediumBody.copyWith(
           color: AppColors.secondary600,
@@ -319,37 +321,45 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
     final isLoading =
         context.watch<ActivitiesBloc>().state is ActivitiesLoading;
 
-    return Column(
-      children: [
-        PrimaryButton(
-          isLoading: isLoading,
-          text: "Confirm Order",
-          onTap: () {
-            if (otp.length < 6) {
-              Toast.showError("Please enter the confirmation code");
-              return;
-            }
+    return BlocConsumer<ActivitiesBloc, ActivitiesState>(
+      listener: (context, state) {
+        // TODO: implement listener
+        Toast.show(state.toString());
+      },
+      builder: (context, state) {
+        return Column(
+          children: [
+            PrimaryButton(
+              isLoading: isLoading,
+              text: context.l10n.confirmOrder,
+              onTap: () {
+                if (otp.length < 6) {
+                  Toast.showError(context.l10n.pleaseEnterConfirmationCode);
+                  return;
+                }
 
-            context.read<ActivitiesBloc>().add(
-                  ConfirmSpaceReserveEvent(
-                    confirmationCode: ConfirmationCodeDTO(
-                      code: otp,
-                      spaceID: widget.payload.id,
-                    ),
-                  ),
-                );
-          },
-        ),
-        Dimens.space(2),
-        PrimaryButton(
-          text: "Cancel",
-          color: AppColors.neutral100,
-          textColor: Colors.black,
-          background: Colors.white,
-          borderWidth: 1,
-          onTap: NavigatorHelper.pop,
-        ),
-      ],
+                context.read<ActivitiesBloc>().add(
+                      ConfirmSpaceReserveEvent(
+                        confirmationCode: ConfirmationCodeDTO(
+                          code: otp,
+                          spaceID: widget.payload.id,
+                        ),
+                      ),
+                    );
+              },
+            ),
+            Dimens.space(2),
+            PrimaryButton(
+              text: context.l10n.cancel,
+              color: AppColors.neutral100,
+              textColor: Colors.black,
+              background: Colors.white,
+              borderWidth: 1,
+              onTap: NavigatorHelper.pop,
+            ),
+          ],
+        );
+      },
     );
   }
 }

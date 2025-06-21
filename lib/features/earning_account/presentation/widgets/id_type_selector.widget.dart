@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 
 class IDTypePage extends StatefulWidget {
@@ -22,46 +24,6 @@ class _IDTypePageState extends State<IDTypePage> {
     setState(() {
       _isNationalIDSelected = isNationalID;
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Select ID Type',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            'Select your ID type and upload the front & Back of your Identity Card',
-            style: TextStyle(fontSize: 14, color: AppColors.neutral600),
-          ),
-          const SizedBox(height: 30),
-          // Usage inside build()
-          _buildIDTypeOption(
-            title: 'National ID Card',
-            subtitle: 'Your government issued national identity card',
-            value: true,
-          ),
-
-          const SizedBox(height: 16),
-          _buildIDTypeOption(
-            title: 'Resident Permit',
-            subtitle: 'Your government issued national resident permit',
-            value: false,
-          ),
-          const Spacer(),
-          buildNextButton(
-              context,
-              () => widget.onNext(
-                    _isNationalIDSelected ? 'NATIONAL_ID' : 'RESIDENT_PERMIT',
-                  )),
-        ],
-      ),
-    );
   }
 
   Widget _buildIDTypeOption({
@@ -96,12 +58,17 @@ class _IDTypePageState extends State<IDTypePage> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                    style: Typo.mediumBody.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 12, color: AppColors.neutral600),
+                    style: Typo.smallBody.copyWith(
+                      fontSize: 12,
+                      color: AppColors.neutral600,
+                    ),
                   ),
                 ],
               ),
@@ -118,6 +85,51 @@ class _IDTypePageState extends State<IDTypePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.selectIdType,
+            style: Typo.heading4.copyWith(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            context.l10n.selectIdDescription,
+            style: Typo.mediumBody.copyWith(
+              fontSize: 14,
+              color: AppColors.neutral600,
+            ),
+          ),
+          const SizedBox(height: 30),
+          _buildIDTypeOption(
+            title: context.l10n.nationalIdCard,
+            subtitle: context.l10n.nationalIdDescription,
+            value: true,
+          ),
+          const SizedBox(height: 16),
+          _buildIDTypeOption(
+            title: context.l10n.residentPermit,
+            subtitle: context.l10n.residentPermitDescription,
+            value: false,
+          ),
+          const Spacer(),
+          buildNextButton(
+            context,
+            () => widget.onNext(
+              _isNationalIDSelected ? 'NATIONAL_ID' : 'RESIDENT_PERMIT',
+            ),
+          ),
+        ],
       ),
     );
   }

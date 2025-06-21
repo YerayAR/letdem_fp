@@ -12,6 +12,8 @@ abstract class IActivityRepository {
     required ConfirmationCodeDTO confirmationCode,
   });
 
+  Future deleteSpace(String spaceID);
+
   Future publishSpace(PublishSpaceDTO dto, bool isFree);
 
   Future<ReservedSpacePayload> reserveSpace({

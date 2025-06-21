@@ -9,14 +9,18 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/features/wallet/presentation/views/all_transactions.view.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/presentation/views/withdraw.view.dart';
 import 'package:letdem/features/withdrawals/presentation/views/withdrawals.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/transactions/transactions.model.dart';
+import 'package:shimmer/shimmer.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -32,7 +36,7 @@ class _WalletScreenState extends State<WalletScreen> {
     context.read<WalletBloc>().add(FetchTransactionsEvent(TransactionParams(
           startDate: DateTime.now().subtract(const Duration(days: 30)),
           endDate: DateTime.now().add(const Duration(days: 1)),
-          pageSize: 100,
+          pageSize: 50,
           page: 1,
         )));
   }
@@ -44,7 +48,7 @@ class _WalletScreenState extends State<WalletScreen> {
         isBottomPadding: false,
         children: [
           StyledAppBar(
-            title: 'Earnings',
+            title: context.l10n.earnings,
             onTap: () => Navigator.of(context).pop(),
             icon: Icons.close,
           ),
@@ -60,7 +64,7 @@ class _WalletScreenState extends State<WalletScreen> {
               listener: (context, state) {},
               builder: (context, state) {
                 if (state is WalletLoading) {
-                  return const LoadingTransactionsView();
+                  return const WalletLoadingComponent();
                 }
                 if (state is WalletFailure) {
                   return const EmptyTransactionsView();
@@ -154,9 +158,9 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Wallet Balance',
-          style: TextStyle(
+        Text(
+          context.l10n.walletBalance,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -193,19 +197,13 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
       );
     }
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: widget.balance),
-      duration: const Duration(seconds: 1),
-      builder: (context, value, _) {
-        return Text(
-          '€${value.toStringAsFixed(2)}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-          ),
-        );
-      },
+    return Text(
+      '${context.watch<UserBloc>().state is UserLoaded ? context.userProfile!.earningAccount!.balance.toStringAsFixed(2) : widget.balance.toStringAsFixed(2)} €',
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 36,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
@@ -214,7 +212,7 @@ class _WalletBalanceCardState extends State<WalletBalanceCard> {
       onTap: () {
         NavigatorHelper.to(const WithdrawView());
       },
-      text: 'Withdraw',
+      text: context.l10n.withdraw,
       background: AppColors.primary50,
       textColor: AppColors.primary500,
     );
@@ -230,7 +228,7 @@ class WalletActionsRow extends StatelessWidget {
       children: [
         _ActionButton(
           icon: AppAssets.location,
-          label: 'Orders',
+          label: context.l10n.orders,
           onTap: () {
             NavigatorHelper.to(const OrdersListView());
           },
@@ -238,7 +236,7 @@ class WalletActionsRow extends StatelessWidget {
         const SizedBox(width: 16),
         _ActionButton(
           icon: AppAssets.card,
-          label: 'Withdrawals',
+          label: context.l10n.withdrawals,
           onTap: () {
             NavigatorHelper.to(const WithdrawListView());
           },
@@ -246,7 +244,7 @@ class WalletActionsRow extends StatelessWidget {
         const SizedBox(width: 16),
         _ActionButton(
           icon: AppAssets.bank,
-          label: 'Payouts',
+          label: context.l10n.payouts,
           onTap: () {
             NavigatorHelper.to(const PayoutMethodsScreen());
           },
@@ -302,8 +300,8 @@ class TransactionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('Transaction History',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(context.l10n.transactionHistory,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         BlocBuilder<WalletBloc, WalletState>(
           builder: (context, state) {
             bool hasTransactions = false;
@@ -313,15 +311,17 @@ class TransactionHeader extends StatelessWidget {
 
             if (hasTransactions) {
               return TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  NavigatorHelper.to(AllTransactionsView());
+                },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: const Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text(
-                  'See all',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.seeAll,
+                  style: const TextStyle(
                       color: Color(0xFF8A3FFC),
                       fontWeight: FontWeight.w500,
                       fontSize: 14),
@@ -355,80 +355,124 @@ class TransactionList extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(19)),
             ),
-            child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.zero,
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                final tx = transactions[index];
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: tx.amount > 0
-                                ? const Color(0xFFE6F7EE)
-                                : const Color(0xFFFFEEEE),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            tx.amount > 0
-                                ? Icons.arrow_downward_rounded
-                                : Icons.arrow_upward_rounded,
-                            color: tx.amount > 0
-                                ? const Color(0xFF00A86B)
-                                : const Color(0xFFFF4D4F),
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            child: transactions.isEmpty
+                ? const EmptyTransactionsView()
+                : ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final tx = transactions[index];
+                      return Column(
+                        children: [
+                          Row(
                             children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: tx.amount > 0
+                                      ? const Color(0xFFE6F7EE)
+                                      : const Color(0xFFFFEEEE),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  tx.amount > 0
+                                      ? Icons.arrow_downward_rounded
+                                      : Icons.arrow_upward_rounded,
+                                  color: tx.amount > 0
+                                      ? const Color(0xFF00A86B)
+                                      : const Color(0xFFFF4D4F),
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        toBeginningOfSentenceCase(tx.source.name
+                                            .replaceAll('_', ' ')
+                                            .toLowerCase()),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 15)),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
+                                      style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               Text(
-                                  toBeginningOfSentenceCase(tx.source.name
-                                      .replaceAll('_', ' ')
-                                      .toLowerCase()),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15)),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
+                                tx.amount > 0
+                                    ? '+ ${tx.amount.toStringAsFixed(2)}€'
+                                    : '- ${(-tx.amount).toStringAsFixed(2)}€',
                                 style: TextStyle(
-                                    color: Colors.grey.shade600, fontSize: 12),
+                                  color: tx.amount > 0
+                                      ? const Color(0xFF00A86B)
+                                      : const Color(0xFFFF4D4F),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        Text(
-                          tx.amount > 0
-                              ? '+€${tx.amount.toStringAsFixed(2)}'
-                              : '-€${(-tx.amount).toStringAsFixed(2)}',
-                          style: TextStyle(
-                            color: tx.amount > 0
-                                ? const Color(0xFF00A86B)
-                                : const Color(0xFFFF4D4F),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Dimens.space(1),
-                    Divider(color: AppColors.neutral50, thickness: 1),
-                  ],
-                );
-              },
-            ),
+                          Dimens.space(1),
+                          Divider(color: AppColors.neutral50, thickness: 1),
+                        ],
+                      );
+                    },
+                  ),
           );
         }
         return const EmptyTransactionsView();
       },
+    );
+  }
+}
+
+class WalletLoadingComponent extends StatelessWidget {
+  const WalletLoadingComponent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(19)),
+      ),
+      child: ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: 20,
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  height: 40,
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.white.withOpacity(0.5),
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Dimens.space(1),
+              Divider(color: AppColors.neutral50, thickness: 1),
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -445,13 +489,13 @@ class EmptyTransactionsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'No Transactions Yet',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              context.l10n.noTransactionsYet,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Text(
-              'Your transactions history will be listed here when you have any activity to show.',
+              context.l10n.transactionsHistoryMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey.shade600,
@@ -498,7 +542,7 @@ class LoadingTransactionsView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Loading Transactions',
+            context.l10n.loadingTransactions,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

@@ -30,6 +30,12 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
+  // delete space
+  static Endpoint deleteSpace(String id) => Endpoint(
+        url: "/spaces/$id",
+        method: HTTPMethod.DELETE,
+      );
+
   static Endpoint getOrdersEndpoint = Endpoint(
     url: "/credits/orders?page_size=100&page=1",
     method: HTTPMethod.GET,
@@ -315,7 +321,7 @@ class EndPoints {
 
   static Endpoint setDefaultPaymentMethod(String id) {
     return Endpoint(
-      url: '/users/me/payment-methods/$id/default/',
+      url: '/credits/payment-methods/$id/mark-as-default',
       method: HTTPMethod.PUT,
     );
   }

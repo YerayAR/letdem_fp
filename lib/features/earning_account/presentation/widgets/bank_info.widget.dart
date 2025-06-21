@@ -7,6 +7,7 @@ import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/earning_account/dto/earning_account.dto.dart';
 import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/earning_account_event.dart';
@@ -58,10 +59,9 @@ class _BankInfoViewState extends State<BankInfoView> {
                   NavigatorHelper.pop();
                   NavigatorHelper.pop();
                 },
-                title: 'Details Submitted',
-                buttonText: 'Goi it, Thanks',
-                subtext:
-                    'Your account connection details submitted successfully, you will soon be able to receive money  for paid spaces. ',
+                title: context.l10n.detailsSubmitted,
+                buttonText: context.l10n.gotItThanks,
+                subtext: context.l10n.accountDetailsSuccess,
               ));
         } else if (state is EarningsFailure) {
           Toast.showError(state.message);
@@ -74,14 +74,15 @@ class _BankInfoViewState extends State<BankInfoView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Bank Information',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text('Enter your IBAN to complete this step',
+              Text(context.l10n.bankInformationTitle,
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(context.l10n.bankInformationDescription,
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 30),
               TextInputField(
-                label: 'Enter your IBAN',
-                placeHolder: 'Eg. ES0700120345030000067890',
+                label: context.l10n.enterIBAN,
+                placeHolder: context.l10n.ibanExample,
                 controller: _ibanController,
               ),
               const SizedBox(height: 16),
@@ -97,7 +98,7 @@ class _BankInfoViewState extends State<BankInfoView> {
                     Dimens.space(1),
                     Flexible(
                       child: Text(
-                        "Kindly note that this bank account is required to receive payout from our payment provider.",
+                        context.l10n.bankAccountNote,
                         style: TextStyle(
                             fontSize: 14, color: AppColors.secondary600),
                       ),

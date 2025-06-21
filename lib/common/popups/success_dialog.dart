@@ -3,6 +3,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 class SuccessDialog extends StatelessWidget {
   final String title;
@@ -56,7 +57,7 @@ class SuccessDialog extends StatelessWidget {
         PrimaryButton(
           isLoading: isLoading,
           onTap: onProceed,
-          text: buttonText ?? 'Proceed',
+          text: buttonText ?? context.l10n.proceed,
         ),
       ],
     );

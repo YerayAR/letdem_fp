@@ -8,6 +8,7 @@ import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/address_component.widget.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
@@ -106,7 +107,7 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
               controller: _controller,
               showDeleteIcon: true,
               prefixIcon: IconlyLight.search,
-              placeHolder: 'Enter destination',
+              placeHolder: context.l10n.enterDestination,
             ),
             Dimens.space(2),
 

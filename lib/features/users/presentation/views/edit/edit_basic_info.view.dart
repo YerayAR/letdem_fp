@@ -8,6 +8,7 @@ import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -64,13 +65,12 @@ class _EditBasicInfoViewState extends State<EditBasicInfoView> {
             AppPopup.showDialogSheet(
               context,
               SuccessDialog(
-                title: 'Account information changed successfully',
+                title: context.l10n.accountInformationChanged,
                 onProceed: () {
                   NavigatorHelper.pop();
                 },
-                subtext:
-                    'Your account information has been changed successfully,',
-                buttonText: "Go Back",
+                subtext: context.l10n.accountInformationChangedDescription,
+                buttonText: context.l10n.goBack,
               ),
             );
           }
@@ -84,7 +84,7 @@ class _EditBasicInfoViewState extends State<EditBasicInfoView> {
                 child: StyledBody(
                   children: [
                     StyledAppBar(
-                      title: 'Personal Information',
+                      title: context.l10n.personalInformation,
                       onTap: () {
                         NavigatorHelper.pop();
                       },
@@ -95,16 +95,16 @@ class _EditBasicInfoViewState extends State<EditBasicInfoView> {
                     Dimens.space(3),
                     TextInputField(
                       prefixIcon: Iconsax.user,
-                      label: 'First Name',
+                      label: context.l10n.firstName,
                       controller: _firstNameCTRL,
-                      placeHolder: 'Enter your first name',
+                      placeHolder: context.l10n.enterFirstName,
                     ),
                     Dimens.space(1),
                     TextInputField(
                       prefixIcon: Iconsax.user,
                       controller: _lastNameCTRL,
-                      label: 'Last Name',
-                      placeHolder: 'Enter your last name',
+                      label: context.l10n.lastName,
+                      placeHolder: context.l10n.enterLastName,
                     ),
 
                     Dimens.space(2),
@@ -122,7 +122,7 @@ class _EditBasicInfoViewState extends State<EditBasicInfoView> {
                               ),
                             );
                       },
-                      text: 'Save',
+                      text: context.l10n.save,
                     ),
                   ],
                 ),

@@ -9,6 +9,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/auth_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
@@ -69,7 +70,6 @@ class _VerifyForgotPasswordEmailViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
@@ -102,29 +102,27 @@ class _VerifyForgotPasswordEmailViewState
                     ),
                     Dimens.space(3),
                     Text(
-                      "We sent you an email",
+                      context.l10n.emailSentTitle,
                       textAlign: TextAlign.center,
-                      style:
-                          Typo.heading4.copyWith(color: AppColors.neutral600),
+                      style: Typo.heading4.copyWith(color: AppColors.neutral600),
                     ),
                     Text(
-                      "We've sent an OTP to your email. Enter it below to reset your password.",
+                      context.l10n.emailSentDescription,
                       textAlign: TextAlign.center,
-                      style:
-                          Typo.mediumBody.copyWith(color: AppColors.neutral400),
+                      style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
                     ),
                     Dimens.space(3),
                     OTPTextField(
                       length: 6,
                       width: MediaQuery.of(context).size.width,
                       otpFieldStyle: OtpFieldStyle(
-                        enabledBorderColor: Colors.black,
-                        borderColor: Colors.black,
+                        enabledBorderColor: AppColors.neutral200,
+                        borderColor: Colors.black.withOpacity(0.2),
                       ),
                       fieldWidth: 50,
                       controller: otpbox,
                       style: const TextStyle(fontSize: 17),
-                      spaceBetween: 15,
+                      spaceBetween: 5,
                       textFieldAlignment: MainAxisAlignment.center,
                       fieldStyle: FieldStyle.box,
                       onChanged: (value) {
@@ -153,7 +151,7 @@ class _VerifyForgotPasswordEmailViewState
                           Center(
                             child: Text.rich(
                               TextSpan(
-                                text: 'Mail is sent to: ',
+                                text: context.l10n.mailSentTo,
                                 style: Typo.smallBody.copyWith(),
                                 children: [
                                   TextSpan(
@@ -162,8 +160,6 @@ class _VerifyForgotPasswordEmailViewState
                                       decorationColor: AppColors.primary400,
                                       fontWeight: FontWeight.w600,
                                     ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {},
                                   ),
                                 ],
                               ),
@@ -173,12 +169,11 @@ class _VerifyForgotPasswordEmailViewState
                           Center(
                             child: Text.rich(
                               TextSpan(
-                                text:
-                                    'Not you? ', // Default style for this text
+                                text: context.l10n.notYou,
                                 style: Typo.smallBody.copyWith(),
                                 children: [
                                   TextSpan(
-                                    text: 'Change email', // Styled differently
+                                    text: context.l10n.changeEmail,
                                     style: Typo.smallBody.copyWith(
                                       color: AppColors.primary400,
                                       fontWeight: FontWeight.w600,
@@ -186,10 +181,7 @@ class _VerifyForgotPasswordEmailViewState
                                       decorationColor: AppColors.primary400,
                                     ),
                                     recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        NavigatorHelper.pop();
-                                        // NavigatorHelper.to(LoginView());
-                                      },
+                                      ..onTap = () => NavigatorHelper.pop(),
                                   ),
                                 ],
                               ),
@@ -203,38 +195,34 @@ class _VerifyForgotPasswordEmailViewState
                 const Spacer(),
                 PrimaryButton(
                   onTap: () {
-                    if (otp == null || otp!.length < 6) {
-                      return;
-                    }
+                    if (otp == null || otp!.length < 6) return;
                     context.read<AuthBloc>().add(ValidateResetPasswordEvent(
                           email: widget.email,
                           code: otp!,
                         ));
                   },
                   isLoading: state is ValidateResetPasswordLoading,
-                  text: 'Proceed',
+                  text: context.l10n.proceed,
                 ),
                 Dimens.space(2),
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                          child: state is ResendVerificationCodeLoading
-                              ? CircularProgressIndicator(
-                                  color: AppColors.primary500,
-                                )
-                              : null),
+                      if (state is ResendVerificationCodeLoading)
+                        CircularProgressIndicator(
+                          color: AppColors.primary500,
+                        ),
                       Text.rich(
                         TextSpan(
-                          text:
-                              'Did’nt get OTP? ', // Default style for this text
+                          text: context.l10n.didntGetOtp,
                           style: Typo.mediumBody.copyWith(),
                           children: [
                             TextSpan(
                               text: _isResendEnabled
-                                  ? "Tap to resend."
-                                  : ' Resend in 00:$_secondsRemaining',
+                                  ? context.l10n.tapToResend
+                                  : context.l10n.resendIn(
+                                      _secondsRemaining.toString()),
                               style: Typo.mediumBody.copyWith(
                                 color: AppColors.primary400,
                                 fontWeight: FontWeight.w600,
@@ -249,7 +237,6 @@ class _VerifyForgotPasswordEmailViewState
                                             email: widget.email));
                                     _startTimer();
                                   }
-                                  // NavigatorHelper.to(LoginView());
                                 },
                             ),
                           ],

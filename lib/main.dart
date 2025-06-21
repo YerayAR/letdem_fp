@@ -59,6 +59,8 @@ Future _initializeHERESDK() async {
 
     Stripe.publishableKey = AppCredentials.stripePublishableKey;
 
+    await Stripe.instance.applySettings();
+
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
 
@@ -242,6 +244,8 @@ class LetDemApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: MaterialApp(
+          darkTheme: ThemeData.light(), // Optional, will be ignored
+          themeMode: ThemeMode.light, // Forces light theme always
           locale: context.watch<LocaleProvider>().defaultLocale,
           localizationsDelegates: const [
             AppLocalizations.delegate, // Add this line

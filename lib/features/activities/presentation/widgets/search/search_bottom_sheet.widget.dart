@@ -12,6 +12,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/LetDemLocationType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/add_location.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/address_component.widget.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
@@ -115,7 +116,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("Where are you going to?",
+        Text(context.l10n.whereAreYouGoing,
             style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700)),
         IconButton(
           icon: Icon(CupertinoIcons.clear_circled_solid,
@@ -134,7 +135,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       onChanged: _onSearchChanged,
       showDeleteIcon: true,
       prefixIcon: IconlyLight.search,
-      placeHolder: 'Enter destination',
+      placeHolder: context.l10n.enterDestination,
     );
   }
 
@@ -179,8 +180,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
             final place = await AppPopup.showBottomSheet(
               NavigatorHelper.navigatorKey.currentState!.context,
               AddLocationBottomSheet(
-                title:
-                    "${toBeginningOfSentenceCase(locationType.name)} Location",
+                title: context.l10n
+                    .setLocation(toBeginningOfSentenceCase(locationType.name)!),
                 onLocationSelected: (MapBoxPlace selectedPlace) {
                   Navigator.pop(context, selectedPlace);
                 },
@@ -213,7 +214,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       children: [
         Row(
           children: [
-            Text('Recent',
+            Text(context.l10n.recent,
                 style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w500)),
             const Spacer(),
             GestureDetector(
@@ -221,7 +222,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                   .read<SearchLocationBloc>()
                   .add(const ClearRecentLocationEvent()),
               child: Text(
-                'Clear all',
+                context.l10n.clearAll,
                 style: Typo.mediumBody.copyWith(
                   color: AppColors.primary400,
                   fontWeight: FontWeight.w500,
@@ -259,7 +260,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Favourites',
+        Text(context.l10n.favourites,
             style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w500)),
         Dimens.space(2),
         _buildLocationTypeComponent(

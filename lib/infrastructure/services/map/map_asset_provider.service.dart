@@ -60,7 +60,7 @@ class MapAssetsProvider {
       case PublishSpaceType.disabled:
         return disasterMarker;
       case PublishSpaceType.paidFree:
-        return freeMarker;
+        return paidFreeMarker;
       case PublishSpaceType.paidGreenZone:
         return paidGreenMarker;
       case PublishSpaceType.paidBlue:
