@@ -80,7 +80,10 @@ class HomeMapBottomSection extends StatelessWidget {
                 Flexible(
                   child: PrimaryButton(
                     onTap: () async {
-                      PublishSpaceHandler.showSpaceOptions(context);
+                      PublishSpaceHandler.showSpaceOptions(context, () {
+                        ;
+                        onRefreshTriggered();
+                      });
                     },
                     icon: Iconsax.location5,
                     text: context.l10n.publishSpace,

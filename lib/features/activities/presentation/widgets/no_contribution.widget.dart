@@ -33,7 +33,7 @@ class NoContributionsWidget extends StatelessWidget {
           width: MediaQuery.of(context).size.width / 1.9,
           child: PrimaryButton(
             onTap: () async {
-              PublishSpaceHandler.showSpaceOptions(context);
+              PublishSpaceHandler.showSpaceOptions(context, () {});
             },
             icon: Iconsax.location5,
             text: context.l10n.publishSpace,

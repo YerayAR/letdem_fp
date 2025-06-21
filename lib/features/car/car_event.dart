@@ -12,6 +12,14 @@ final class GetCarEvent extends CarEvent {
   List<Object?> get props => [];
 }
 
+final class ClearCarEvent extends CarEvent {
+  const ClearCarEvent();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
 final class CreateCarEvent extends CarEvent {
   final String brand;
   final String registrationNumber;

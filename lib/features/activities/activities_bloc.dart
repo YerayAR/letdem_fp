@@ -66,6 +66,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   Future<void> _onReserveSpace(
       ReserveSpaceEvent event, Emitter<ActivitiesState> emit) async {
     try {
+      print("Reserving space with ID: ${event.spaceID}");
       emit(ActivitiesLoading());
       var payload = await activityRepository.reserveSpace(
         spaceID: event.spaceID,
@@ -73,12 +74,16 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       );
       emit(SpaceReserved(spaceID: payload));
     } on ApiError catch (err) {
-      emit(ActivitiesError(error: err.message));
+      print("Error reserving space: ${err.message}");
+      emit(ReserveSpaceError(
+          error: err.message,
+          clientSecret: err.data!['client_secret'],
+          status: err.data!['error_code'] == 'PAYMENT_REQUIRES_ACTION'
+              ? ReserveSpaceErrorStatus.requiredAction
+              : ReserveSpaceErrorStatus.generic));
     } catch (err, st) {
-      print(err);
-      print(st);
-
-      emit(const ActivitiesError(error: "Unable to reserve space"));
+      emit(const ReserveSpaceError(
+          error: "Unable to reserve paid space", clientSecret: null));
     }
   }
 

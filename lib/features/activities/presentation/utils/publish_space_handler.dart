@@ -11,6 +11,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/car/car_bloc.dart';
@@ -21,7 +22,56 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 class PublishSpaceHandler {
   static final ImagePicker _imagePicker = ImagePicker();
 
-  static void showSpaceOptions(BuildContext context) {
+  static bool preCheck(BuildContext context) {
+    final carState = context.read<CarBloc>().state;
+    final isCarExist = carState is CarLoaded && carState.car != null;
+
+    if (!isCarExist) {
+      _showInfoPopup(
+        context,
+        context.l10n.importantNotice,
+        context.l10n.createCarProfileFirst,
+        () => NavigatorHelper.pop(),
+      );
+      return false;
+    }
+
+    final isPaidAccountExist = context.userProfile?.earningAccount != null;
+
+    if (!isPaidAccountExist) {
+      _showInfoPopup(
+        context,
+        context.l10n.importantNotice,
+        context.l10n.createEarningAccountFirst,
+        () {
+          NavigatorHelper.pop();
+          NavigatorHelper.to(
+            const ConnectAccountView(status: null, remainingStep: null),
+          );
+        },
+      );
+      return false;
+    }
+
+    if (context.userProfile!.earningAccount?.status != EarningStatus.accepted) {
+      _showInfoPopup(
+        context,
+        context.l10n.importantNotice,
+        context.l10n.verifyYourAccountFirst,
+        () {
+          NavigatorHelper.pop();
+          NavigatorHelper.to(
+            const ConnectAccountView(status: null, remainingStep: null),
+          );
+        },
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  static void showSpaceOptions(BuildContext context, void Function() onAdded) {
     AppPopup.showBottomSheet(
       context,
       MultiSelectPopup(
@@ -33,11 +83,13 @@ class PublishSpaceHandler {
             iconColor: AppColors.primary500,
             text: context.l10n.regularSpace,
             onTap: () async {
+              if (!preCheck(context)) return;
+
               final XFile? image = await _pickImage();
               if (image != null) {
                 NavigatorHelper.to(
                   PublishSpaceScreen(
-                    onAdded: () {},
+                    onAdded: onAdded,
                     isPaid: false,
                     file: File(image.path),
                   ),
@@ -52,44 +104,14 @@ class PublishSpaceHandler {
             iconColor: AppColors.secondary600,
             text: context.l10n.paidSpace,
             onTap: () async {
-              final carState = context.read<CarBloc>().state;
-              final isCarExist = carState is CarLoaded && carState.car != null;
-
-              if (!isCarExist) {
-                _showInfoPopup(
-                  context,
-                  context.l10n.importantNotice,
-                  context.l10n.createCarProfileFirst,
-                  () => NavigatorHelper.pop(),
-                );
-                return;
-              }
-
-              final isPaidAccountExist =
-                  context.userProfile?.earningAccount != null;
-
-              if (!isPaidAccountExist) {
-                _showInfoPopup(
-                  context,
-                  context.l10n.importantNotice,
-                  context.l10n.createEarningAccountFirst,
-                  () {
-                    NavigatorHelper.pop();
-                    NavigatorHelper.to(
-                      const ConnectAccountView(
-                          status: null, remainingStep: null),
-                    );
-                  },
-                );
-                return;
-              }
+              if (!preCheck(context)) return;
 
               final XFile? image = await _pickImage();
               if (image != null) {
                 NavigatorHelper.pop();
                 NavigatorHelper.to(
                   PublishSpaceScreen(
-                    onAdded: () {},
+                    onAdded: onAdded,
                     isPaid: true,
                     file: File(image.path),
                   ),
