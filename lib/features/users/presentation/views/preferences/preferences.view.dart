@@ -18,8 +18,8 @@ class PreferencesView extends StatefulWidget {
 }
 
 class _PreferencesViewState extends State<PreferencesView> {
-  late List<Map<String, dynamic>> notificationPreferences;
-  late List<Map<String, dynamic>> preferences;
+  List<Map<String, dynamic>>? notificationPreferences;
+  List<Map<String, dynamic>>? preferences;
 
   void _initPreferences() {
     notificationPreferences = [
@@ -87,14 +87,14 @@ class _PreferencesViewState extends State<PreferencesView> {
   void initState() {
     super.initState();
 
-    _initPreferences();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initPreferences();
+
       final preferences = context.userProfile?.preferences;
       final notifications = context.userProfile?.notificationPreferences;
       if (preferences != null && notifications != null) {
         setState(() {
-          this.preferences = this.preferences.map((preference) {
+          this.preferences = this.preferences?.map((preference) {
             final value = preferences.getPreference(preference['key']);
             return {
               ...preference,
@@ -102,12 +102,12 @@ class _PreferencesViewState extends State<PreferencesView> {
             };
           }).toList();
 
-          notificationPreferences[0] = {
-            ...notificationPreferences[0],
+          notificationPreferences![0] = {
+            ...notificationPreferences![0],
             'value': notifications.emailNotifications,
           };
-          notificationPreferences[1] = {
-            ...notificationPreferences[1],
+          notificationPreferences![1] = {
+            ...notificationPreferences![1],
             'value': notifications.pushNotifications,
           };
         });
@@ -119,13 +119,13 @@ class _PreferencesViewState extends State<PreferencesView> {
     if (isNotification) {
       context.read<UserBloc>().add(
             UpdateNotificationPreferencesEvent(
-                pushNotifications: notificationPreferences[1]['value'] as bool,
+                pushNotifications: notificationPreferences![1]['value'] as bool,
                 emailNotifications:
-                    notificationPreferences[0]['value'] as bool),
+                    notificationPreferences![0]['value'] as bool),
           );
     } else {
       context.read<UserBloc>().add(UpdatePreferencesEvent(
-              preferences: preferences.map((preference) {
+              preferences: preferences!.map((preference) {
             return {
               preference['key'].toString(): preference['value'] as bool,
             };
@@ -148,54 +148,56 @@ class _PreferencesViewState extends State<PreferencesView> {
           ),
           Dimens.space(3),
           Expanded(
-            child: ListView(
-              children: [
-                SettingsContainer(
-                  title: context.l10n.notifications,
-                  child: Column(
-                    children: notificationPreferences.map((preference) {
-                      return SettingsRow(
-                        showDivider:
-                            notificationPreferences.indexOf(preference) !=
-                                notificationPreferences.length - 1,
-                        widget: ToggleSwitch(
-                          value: preference['value'],
-                          onChanged: (value) {
-                            setState(() {
-                              preference['value'] = value;
-                            });
-                            submit(true);
-                          },
+            child: notificationPreferences == null || preferences == null
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                    children: [
+                      SettingsContainer(
+                        title: context.l10n.notifications,
+                        child: Column(
+                          children: notificationPreferences!.map((preference) {
+                            return SettingsRow(
+                              showDivider: notificationPreferences!
+                                      .indexOf(preference) !=
+                                  notificationPreferences!.length - 1,
+                              widget: ToggleSwitch(
+                                value: preference['value'],
+                                onChanged: (value) {
+                                  setState(() {
+                                    preference['value'] = value;
+                                  });
+                                  submit(true);
+                                },
+                              ),
+                              text: preference['title'],
+                            );
+                          }).toList(),
                         ),
-                        text: preference['title'],
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Dimens.space(5),
-                SettingsContainer(
-                  title: context.l10n.alerts,
-                  child: Column(
-                    children: preferences.map((preference) {
-                      return SettingsRow(
-                        showDivider: preferences.indexOf(preference) !=
-                            preferences.length - 1,
-                        widget: ToggleSwitch(
-                          value: preference['value'],
-                          onChanged: (value) {
-                            setState(() {
-                              preference['value'] = value;
-                            });
-                            submit(false);
-                          },
+                      ),
+                      Dimens.space(5),
+                      SettingsContainer(
+                        title: context.l10n.alerts,
+                        child: Column(
+                          children: preferences!.map((preference) {
+                            return SettingsRow(
+                              showDivider: preferences!.indexOf(preference) !=
+                                  preferences!.length - 1,
+                              widget: ToggleSwitch(
+                                value: preference['value'],
+                                onChanged: (value) {
+                                  setState(() {
+                                    preference['value'] = value;
+                                  });
+                                  submit(false);
+                                },
+                              ),
+                              text: preference['title'],
+                            );
+                          }).toList(),
                         ),
-                        text: preference['title'],
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

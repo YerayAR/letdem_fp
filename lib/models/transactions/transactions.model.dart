@@ -48,7 +48,7 @@ class Transaction {
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       amount: getTransactionType(json['source']) == TransactionType.WITHDRAW
-          ? double.parse(json['amount'].toString()) * -1
+          ? double.parse(json['amount'].toString())
           : double.parse(json['amount'].toString()),
       source: getTransactionType(json['source']),
       created: DateTime.parse(json['created']),

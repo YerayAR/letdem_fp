@@ -14,11 +14,13 @@ import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/features/wallet/presentation/views/all_transactions.view.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/presentation/views/withdraw.view.dart';
 import 'package:letdem/features/withdrawals/presentation/views/withdrawals.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/transactions/transactions.model.dart';
+import 'package:shimmer/shimmer.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -34,7 +36,7 @@ class _WalletScreenState extends State<WalletScreen> {
     context.read<WalletBloc>().add(FetchTransactionsEvent(TransactionParams(
           startDate: DateTime.now().subtract(const Duration(days: 30)),
           endDate: DateTime.now().add(const Duration(days: 1)),
-          pageSize: 100,
+          pageSize: 50,
           page: 1,
         )));
   }
@@ -62,7 +64,7 @@ class _WalletScreenState extends State<WalletScreen> {
               listener: (context, state) {},
               builder: (context, state) {
                 if (state is WalletLoading) {
-                  return const LoadingTransactionsView();
+                  return const WalletLoadingComponent();
                 }
                 if (state is WalletFailure) {
                   return const EmptyTransactionsView();
@@ -309,7 +311,9 @@ class TransactionHeader extends StatelessWidget {
 
             if (hasTransactions) {
               return TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  NavigatorHelper.to(AllTransactionsView());
+                },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: const Size(0, 0),
@@ -351,80 +355,124 @@ class TransactionList extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(19)),
             ),
-            child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.zero,
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                final tx = transactions[index];
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: tx.amount > 0
-                                ? const Color(0xFFE6F7EE)
-                                : const Color(0xFFFFEEEE),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            tx.amount > 0
-                                ? Icons.arrow_downward_rounded
-                                : Icons.arrow_upward_rounded,
-                            color: tx.amount > 0
-                                ? const Color(0xFF00A86B)
-                                : const Color(0xFFFF4D4F),
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            child: transactions.isEmpty
+                ? const EmptyTransactionsView()
+                : ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final tx = transactions[index];
+                      return Column(
+                        children: [
+                          Row(
                             children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: tx.amount > 0
+                                      ? const Color(0xFFE6F7EE)
+                                      : const Color(0xFFFFEEEE),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  tx.amount > 0
+                                      ? Icons.arrow_downward_rounded
+                                      : Icons.arrow_upward_rounded,
+                                  color: tx.amount > 0
+                                      ? const Color(0xFF00A86B)
+                                      : const Color(0xFFFF4D4F),
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        toBeginningOfSentenceCase(tx.source.name
+                                            .replaceAll('_', ' ')
+                                            .toLowerCase()),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 15)),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
+                                      style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               Text(
-                                  toBeginningOfSentenceCase(tx.source.name
-                                      .replaceAll('_', ' ')
-                                      .toLowerCase()),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15)),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
+                                tx.amount > 0
+                                    ? '+ ${tx.amount.toStringAsFixed(2)}€'
+                                    : '- ${(-tx.amount).toStringAsFixed(2)}€',
                                 style: TextStyle(
-                                    color: Colors.grey.shade600, fontSize: 12),
+                                  color: tx.amount > 0
+                                      ? const Color(0xFF00A86B)
+                                      : const Color(0xFFFF4D4F),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        Text(
-                          tx.amount > 0
-                              ? '+ ${tx.amount.toStringAsFixed(2)}€'
-                              : '- ${(-tx.amount).toStringAsFixed(2)}€',
-                          style: TextStyle(
-                            color: tx.amount > 0
-                                ? const Color(0xFF00A86B)
-                                : const Color(0xFFFF4D4F),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Dimens.space(1),
-                    Divider(color: AppColors.neutral50, thickness: 1),
-                  ],
-                );
-              },
-            ),
+                          Dimens.space(1),
+                          Divider(color: AppColors.neutral50, thickness: 1),
+                        ],
+                      );
+                    },
+                  ),
           );
         }
         return const EmptyTransactionsView();
       },
+    );
+  }
+}
+
+class WalletLoadingComponent extends StatelessWidget {
+  const WalletLoadingComponent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(19)),
+      ),
+      child: ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: 20,
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  height: 40,
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.white.withOpacity(0.5),
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Dimens.space(1),
+              Divider(color: AppColors.neutral50, thickness: 1),
+            ],
+          );
+        },
+      ),
     );
   }
 }

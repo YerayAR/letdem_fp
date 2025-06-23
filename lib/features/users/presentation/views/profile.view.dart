@@ -14,6 +14,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
+import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
@@ -132,7 +133,8 @@ class _ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildUserInfo(LetDemUser user, String fullName, BuildContext context) {
+  Widget _buildUserInfo(
+      LetDemUser user, String fullName, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -403,6 +405,7 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        BlocProvider.of<CarBloc>(context).add(const ClearCarEvent());
         BlocProvider.of<UserBloc>(context).add(UserLoggedOutEvent());
       },
       child: Padding(

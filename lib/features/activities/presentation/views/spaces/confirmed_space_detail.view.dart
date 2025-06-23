@@ -54,6 +54,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
               ),
             );
           }
+
           // TODO: implement listener
         },
         builder: (context, state) {
@@ -320,37 +321,45 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
     final isLoading =
         context.watch<ActivitiesBloc>().state is ActivitiesLoading;
 
-    return Column(
-      children: [
-        PrimaryButton(
-          isLoading: isLoading,
-          text: context.l10n.confirmOrder,
-          onTap: () {
-            if (otp.length < 6) {
-              Toast.showError(context.l10n.pleaseEnterConfirmationCode);
-              return;
-            }
+    return BlocConsumer<ActivitiesBloc, ActivitiesState>(
+      listener: (context, state) {
+        // TODO: implement listener
+        Toast.show(state.toString());
+      },
+      builder: (context, state) {
+        return Column(
+          children: [
+            PrimaryButton(
+              isLoading: isLoading,
+              text: context.l10n.confirmOrder,
+              onTap: () {
+                if (otp.length < 6) {
+                  Toast.showError(context.l10n.pleaseEnterConfirmationCode);
+                  return;
+                }
 
-            context.read<ActivitiesBloc>().add(
-                  ConfirmSpaceReserveEvent(
-                    confirmationCode: ConfirmationCodeDTO(
-                      code: otp,
-                      spaceID: widget.payload.id,
-                    ),
-                  ),
-                );
-          },
-        ),
-        Dimens.space(2),
-        PrimaryButton(
-          text: context.l10n.cancel,
-          color: AppColors.neutral100,
-          textColor: Colors.black,
-          background: Colors.white,
-          borderWidth: 1,
-          onTap: NavigatorHelper.pop,
-        ),
-      ],
+                context.read<ActivitiesBloc>().add(
+                      ConfirmSpaceReserveEvent(
+                        confirmationCode: ConfirmationCodeDTO(
+                          code: otp,
+                          spaceID: widget.payload.id,
+                        ),
+                      ),
+                    );
+              },
+            ),
+            Dimens.space(2),
+            PrimaryButton(
+              text: context.l10n.cancel,
+              color: AppColors.neutral100,
+              textColor: Colors.black,
+              background: Colors.white,
+              borderWidth: 1,
+              onTap: NavigatorHelper.pop,
+            ),
+          ],
+        );
+      },
     );
   }
 }

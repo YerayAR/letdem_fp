@@ -16,6 +16,11 @@ class CarBloc extends Bloc<CarEvent, CarState> {
   }) : super(CarInitial()) {
     on<GetCarEvent>(_onGetCarEvent);
     on<CreateCarEvent>(_onCreateCarEvent);
+    on<ClearCarEvent>(_onClearCarEvent);
+  }
+
+  void _onClearCarEvent(ClearCarEvent event, Emitter<CarState> emit) {
+    emit(CarInitial());
   }
 
   void _onCreateCarEvent(CreateCarEvent event, Emitter<CarState> emit) async {

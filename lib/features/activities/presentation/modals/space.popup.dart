@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:here_sdk/core.dart';
@@ -294,26 +295,71 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     );
   }
 
+  Future<void> handle3DSPayment(
+      String clientSecret, VoidCallback onSuccess, VoidCallback onError) async {
+    try {
+      // Triggers the 3DS flow if required
+      final paymentIntent = await Stripe.instance.confirmPayment(
+        paymentIntentClientSecret: clientSecret,
+      );
+
+      if (paymentIntent.status == PaymentIntentsStatus.Succeeded) {
+        // Payment succeeded
+        onSuccess();
+      } else {
+        // Payment failed or requires further action
+        onError();
+      }
+    } on StripeException catch (e) {
+      onError();
+      print('Stripe error: ${e.error.localizedMessage}');
+    } catch (e) {
+      onError();
+      print('Unhandled error: $e');
+    }
+  }
+
   Widget _buildReserveButton(BuildContext context, Space space) {
     return BlocConsumer<ActivitiesBloc, ActivitiesState>(
       listener: (context, state) {
+        if (state is ReserveSpaceError) {
+          if (state.status == ReserveSpaceErrorStatus.requiredAction) {
+            handle3DSPayment(
+              state.clientSecret!,
+              () {
+                widget.onRefreshTrigger();
+                context.read<UserBloc>().add(FetchUserInfoEvent());
+                NavigatorHelper.pop();
+                AppPopup.showDialogSheet(
+                  context,
+                  SuccessDialog(
+                    title: context.l10n.spaceReserved,
+                    subtext:
+                        "Your Payment was successful. You will get a notification once the space is reserved. You can safely close this popup.",
+                    onProceed: () {
+                      NavigatorHelper.pop();
+                    },
+                  ),
+                );
+              },
+              () {
+                // Handle error
+                Toast.showError("Payment failed or requires further action");
+              },
+            );
+          } else {
+            // Handle generic error
+            Toast.showError(state.error);
+          }
+        }
         if (state is SpaceReserved) {
           widget.onRefreshTrigger();
           context.read<UserBloc>().add(FetchUserInfoEvent());
-          AppPopup.showDialogSheet(
-            context,
-            SuccessDialog(
-              onProceed: () {
-                NavigatorHelper.to(ReservedSpaceDetailView(
-                  space: widget.space,
-                  details: state.spaceID,
-                ));
-              },
-              title: context.l10n.paymentSuccessful,
-              subtext: context.l10n.spaceReservedSuccess,
-              buttonText: context.l10n.getSpaceDetails,
-            ),
-          );
+          NavigatorHelper.pop();
+          NavigatorHelper.to(ReservedSpaceDetailView(
+            space: widget.space,
+            details: state.spaceID,
+          ));
         } else if (state is ActivitiesError) {
           Toast.showError(state.error);
         }

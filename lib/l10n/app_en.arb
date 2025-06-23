@@ -143,6 +143,7 @@
   "all": "All",
   "parkingSpace": "Parking Space",
   "events": "Events",
+  "verifyYourAccountFirst" : "Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.",
   "failedToLoadActivities": "Failed to load activities: {error}",
   "@failedToLoadActivities": {
     "placeholders": {

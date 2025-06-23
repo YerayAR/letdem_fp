@@ -119,13 +119,15 @@ class ApiService extends BaseApiService {
       if (response.data is Map<String, dynamic> &&
           response.data.containsKey('error_code')) {
         String status = response.data['error_code'];
-        throw ApiError(message: ErrorMessageHelper.getMessage(status));
+        throw ApiError(
+            message: ErrorMessageHelper.getMessage(status),
+            data: response.data);
       }
       String err =
           response.data['message'] ?? response.data['error'] ?? 'Unknown error';
-      throw ApiError(message: err);
+      throw ApiError(message: err, data: response.data);
     } on DioException catch (e) {
-      _handleDioError(e);
+      _handleDioError(e, e.response?.data);
     } on TimeoutException {
       throw ApiError(message: 'The request has timed out');
     } catch (e, srt) {
@@ -240,7 +242,7 @@ ${response.data}
         status: ErrorStatus.noInternet,
       );
     } on DioException catch (e) {
-      _handleDioError(e);
+      _handleDioError(e, e.response?.data);
     } on TimeoutException {
       throw ApiError(
           message: 'The request is timed out', status: ErrorStatus.timeout);
@@ -255,7 +257,7 @@ ${response.data}
     throw ApiError(message: "Unexpected error occurred, no response received");
   }
 
-  static void _handleDioError(DioException e) {
+  static void _handleDioError(DioException e, Map<String, dynamic>? data) {
     print("-----------------");
     print(e.type);
     print("-----------------");
@@ -266,7 +268,9 @@ ${response.data}
         e.type == DioExceptionType.sendTimeout) {
       Toast.showError("No internet connection");
       throw ApiError(
-          message: "No internet connection", status: ErrorStatus.noInternet);
+          message: "No internet connection",
+          status: ErrorStatus.noInternet,
+          data: data);
     }
     if (EndPoints.showApiLogs) {
       log("""
@@ -286,7 +290,8 @@ ${response.data}
     if (e.response!.data is Map<String, dynamic> &&
         e.response!.data.containsKey('error_code')) {
       String status = e.response!.data['error_code'];
-      throw ApiError(message: ErrorMessageHelper.getMessage(status));
+      throw ApiError(
+          message: ErrorMessageHelper.getMessage(status), data: data);
     }
 
     var message = e.response == null
@@ -294,7 +299,9 @@ ${response.data}
         : e.response!.data?['message'] ?? "Unknown error";
 
     throw ApiError(
-        message: message, status: fromCode(e.response?.statusCode ?? 0));
+        message: message,
+        status: fromCode(e.response?.statusCode ?? 0),
+        data: data);
   }
 }
 
