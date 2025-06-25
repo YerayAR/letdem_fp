@@ -104,7 +104,9 @@ class ContributionItem extends StatelessWidget {
                 ),
                 DecoratedChip(
                   backgroundColor: AppColors.secondary50,
-                  text: context.l10n.pointsEarned(activity.points as String),
+                  text: context.l10n
+                      .pointsEarned(activity.points.toString())
+                      .toString(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
                   textStyle: Typo.smallBody.copyWith(

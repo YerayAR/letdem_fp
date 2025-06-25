@@ -218,11 +218,10 @@ class ContributionsSection extends StatelessWidget {
           ),
           child: isEmpty
               ? const NoContributionsWidget()
-              : Column(
+              : ListView(
                   // Fix: Prevent overflow in column
-                  mainAxisSize: MainAxisSize.min,
+                  // mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Fix: Use Flexible or shrinkWrap for ListView if many items
                     ...contributions.map((activity) {
                       return ContributionItem(
                         showDivider: contributions.last != activity,

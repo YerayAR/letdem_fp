@@ -7,6 +7,7 @@ import 'package:here_sdk/core.dart';
 import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
+import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_bottom_section.widget.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
@@ -48,6 +49,14 @@ class _HomeViewState extends State<HomeView>
   static const double TRIGGER_DISTANCE_METERS = 250.0;
 
   // ---------------------------------------------------------------------------
+  // Refresh Button State
+  // ---------------------------------------------------------------------------
+  bool _showRefreshButton = false;
+  Timer? _refreshButtonTimer;
+  GeoCoordinates? _lastCameraPosition;
+  static const Duration _refreshButtonHideDuration = Duration(seconds: 3);
+
+  // ---------------------------------------------------------------------------
   // Marker & Asset State
   // ---------------------------------------------------------------------------
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
@@ -75,6 +84,7 @@ class _HomeViewState extends State<HomeView>
     _locationIndicator = null;
     _mapController = null;
     _isListeningToLocation = false;
+    _refreshButtonTimer?.cancel();
     super.dispose();
   }
 
@@ -88,6 +98,48 @@ class _HomeViewState extends State<HomeView>
     setState(() => isLoadingAssets = true);
     await _assetsProvider.loadAssets();
     setState(() => isLoadingAssets = false);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Refresh Button Logic
+  // ---------------------------------------------------------------------------
+  void _showRefreshButtonTemporarily() {
+    _refreshButtonTimer?.cancel();
+
+    if (!_showRefreshButton) {
+      setState(() => _showRefreshButton = true);
+    }
+
+    _refreshButtonTimer = Timer(_refreshButtonHideDuration, () {
+      if (mounted) {
+        setState(() => _showRefreshButton = false);
+      }
+    });
+  }
+
+  void _hideRefreshButton() {
+    _refreshButtonTimer?.cancel();
+    if (_showRefreshButton) {
+      setState(() => _showRefreshButton = false);
+    }
+  }
+
+  void _onCameraPositionChanged(GeoCoordinates newPosition) {
+    // Only show refresh button if map was manually moved (not by location updates)
+    if (_lastCameraPosition != null) {
+      final distance = geolocator.Geolocator.distanceBetween(
+        _lastCameraPosition!.latitude,
+        _lastCameraPosition!.longitude,
+        newPosition.latitude,
+        newPosition.longitude,
+      );
+
+      // Show refresh button if camera moved more than 10 meters
+      if (distance > 10) {
+        _showRefreshButtonTemporarily();
+      }
+    }
+    _lastCameraPosition = newPosition;
   }
 
   // ---------------------------------------------------------------------------
@@ -195,6 +247,7 @@ class _HomeViewState extends State<HomeView>
         myLocation.coordinates,
         MapMeasure(MapMeasureKind.distanceInMeters, 3000),
       );
+      _lastCameraPosition = myLocation.coordinates;
     }
   }
 
@@ -211,6 +264,14 @@ class _HomeViewState extends State<HomeView>
             options: ['spaces', 'events'],
           ),
         ));
+  }
+
+  void _onRefreshPressed() {
+    if (_mapController != null) {
+      final cameraPosition = _mapController!.camera.state.targetCoordinates;
+      _fetchNearbyPlaces(cameraPosition);
+      _hideRefreshButton();
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -264,6 +325,19 @@ class _HomeViewState extends State<HomeView>
     _mapController!.gestures.tapListener = TapListener((touchPoint) {
       _pickMapMarker(touchPoint);
     });
+
+    // Add pan gesture listener to detect map movement
+    _mapController!.gestures.panListener = PanListener(
+      (GestureState state, Point2D origin, Point2D translation,
+          double velocity) {
+        if (state == GestureState.end) {
+          // Get current camera position when pan ends
+          final currentCameraPosition =
+              _mapController!.camera.state.targetCoordinates;
+          _onCameraPositionChanged(currentCameraPosition);
+        }
+      },
+    );
   }
 
   void _pickMapMarker(Point2D touchPoint) {
@@ -305,6 +379,7 @@ class _HomeViewState extends State<HomeView>
         target,
         MapMeasure(MapMeasureKind.distanceInMeters, 14000),
       );
+      _lastCameraPosition = target;
 
       if (_currentPosition != null) {
         _addMyLocationToMap(Location.withCoordinates(_currentPosition!));
@@ -353,6 +428,56 @@ class _HomeViewState extends State<HomeView>
                           }
                         },
                       ),
+                      // Refresh chip on top - only shown when map is moved
+                      if (_showRefreshButton)
+                        Positioned(
+                          top: 10,
+                          child: SafeArea(
+                            child: Center(
+                              child: AnimatedOpacity(
+                                opacity: _showRefreshButton ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: GestureDetector(
+                                  onTap: _onRefreshPressed,
+                                  child: FittedBox(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 1,
+                                              blurRadius: 7,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 10),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.refresh,
+                                                color: AppColors.primary500,
+                                                size: 17),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              "Refresh",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   );
                 },
