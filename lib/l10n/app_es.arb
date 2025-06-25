@@ -621,6 +621,7 @@
   "youHaveReminderForSpace": "Tienes un recordatorio para un espacio en ",
   "expired": "Expirado",
   "active": "Activo",
+  "activeMayus": "ACTIVO",
   "antiMoneyLaunderingMessage": "La Directiva contra el Blanqueo de Dinero nos obliga a verificar tu identidad para recibir pagos por tus ventas online. Solo necesitarás verificarte una vez.",
   "couldNotOpenTermsAndConditions": "No se pudo abrir el enlace de Términos y Condiciones",
   "byAgreementStripe": "Al continuar, acepto el ",

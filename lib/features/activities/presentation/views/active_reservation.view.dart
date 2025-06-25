@@ -111,11 +111,11 @@ class ActiveReservationView extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 5,
-          backgroundColor: isReserved ? AppColors.green500 : AppColors.red500,
+          backgroundColor: isReserved ? AppColors.red500 : AppColors.green500,
         ),
         Dimens.space(1),
         Text(
-          isReserved ? context.l10n.reserved : context.l10n.waiting,
+          isReserved ? context.l10n.reserved : context.l10n.activeMayus,
           style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
@@ -123,14 +123,19 @@ class ActiveReservationView extends StatelessWidget {
   }
 
   Widget _buildDetailsRow(BuildContext context) {
+    final isReserved = payload.status == "RESERVED";
+
     return Row(
       children: [
         Expanded(
           child: Row(
             children: [
-              _buildIconText(
-                  Iconsax.clock5, getTimeRemaining(payload.expireAt)),
-              Dimens.space(3),
+              if (!isReserved)
+                _buildIconText(
+                    Iconsax.clock5, getTimeRemaining(payload.expireAt)),
+
+              isReserved ? const SizedBox() : Dimens.space(3),
+
               _buildIconText(
                 Iconsax.money5,
                 payload.price == null
