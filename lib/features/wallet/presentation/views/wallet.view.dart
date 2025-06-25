@@ -371,16 +371,16 @@ class TransactionList extends StatelessWidget {
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color: tx.amount > 0
+                                  color: isPositiveTransaction(tx.source)
                                       ? const Color(0xFFE6F7EE)
                                       : const Color(0xFFFFEEEE),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
-                                  tx.amount > 0
+                                  isPositiveTransaction(tx.source)
                                       ? Icons.arrow_downward_rounded
                                       : Icons.arrow_upward_rounded,
-                                  color: tx.amount > 0
+                                  color: tx.source != TransactionType.WITHDRAW
                                       ? const Color(0xFF00A86B)
                                       : const Color(0xFFFF4D4F),
                                   size: 22,
@@ -391,13 +391,10 @@ class TransactionList extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                        toBeginningOfSentenceCase(tx.source.name
-                                            .replaceAll('_', ' ')
-                                            .toLowerCase()),
+                                    Text(getTransactionTypeString(tx.source),
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 15)),
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14)),
                                     const SizedBox(height: 4),
                                     Text(
                                       '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
@@ -408,12 +405,13 @@ class TransactionList extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              const SizedBox(width: 16),
                               Text(
-                                tx.amount > 0
+                                isPositiveTransaction(tx.source)
                                     ? '+ ${tx.amount.toStringAsFixed(2)}€'
-                                    : '- ${(-tx.amount).toStringAsFixed(2)}€',
+                                    : '${(-tx.amount).toStringAsFixed(2)}€',
                                 style: TextStyle(
-                                  color: tx.amount > 0
+                                  color: isPositiveTransaction(tx.source)
                                       ? const Color(0xFF00A86B)
                                       : const Color(0xFFFF4D4F),
                                   fontWeight: FontWeight.w600,

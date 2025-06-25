@@ -324,7 +324,6 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
     return BlocConsumer<ActivitiesBloc, ActivitiesState>(
       listener: (context, state) {
         // TODO: implement listener
-        Toast.show(state.toString());
       },
       builder: (context, state) {
         return Column(

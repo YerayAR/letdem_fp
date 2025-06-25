@@ -132,12 +132,12 @@ class _NavigationViewState extends State<NavigationView> {
     _actualDestinationLat = widget.destinationLat;
     _actualDestinationLng = widget.destinationLng;
 
-    _lifecycleListener = AppLifecycleListener(
-      onDetach: _cleanupNavigation,
-      onHide: _cleanupNavigation,
-      onPause: _cleanupNavigation,
-      onRestart: _startNavigation,
-    );
+    // _lifecycleListener = AppLifecycleListener(
+    //   onDetach: _cleanupNavigation,
+    //   onHide: _cleanupNavigation,
+    //   onPause: _cleanupNavigation,
+    //   onRestart: _startNavigation,
+    // );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _requestLocationPermission();
@@ -311,10 +311,24 @@ class _NavigationViewState extends State<NavigationView> {
 
   @override
   void dispose() {
+    debugPrint('🗑️ Disposing NavigationView...');
+
+    // Cleanup navigation first
     _cleanupNavigation();
+
+    // Cancel timers
     _rerouteDebounceTimer?.cancel();
+
+    // Dispose notifiers
     _distanceNotifier.dispose();
-    _lifecycleListener.dispose();
+
+    // Dispose lifecycle listener
+    // _lifecycleListener.dispose();
+
+    // Disable wakelock
+    WakelockPlus.disable();
+
+    debugPrint('✅ NavigationView disposed');
     super.dispose();
   }
 
@@ -456,17 +470,58 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _cleanupNavigation() {
-    _visualNavigator?.stopRendering();
-    _locationEngine?.stop();
+    debugPrint('🧹 Starting comprehensive navigation cleanup...');
 
-    _visualNavigator?.routeProgressListener = null;
-    _visualNavigator?.speedLimitListener = null;
-    _visualNavigator?.routeDeviationListener = null;
+    // Stop and cleanup VisualNavigator
+    if (_visualNavigator != null) {
+      try {
+        _visualNavigator!.stopRendering();
+        _visualNavigator!.routeProgressListener = null;
+        _visualNavigator!.speedLimitListener = null;
+        _visualNavigator!.routeDeviationListener = null;
+        _visualNavigator!.eventTextListener = null;
+        _visualNavigator!.cameraBehavior = null;
+        _visualNavigator!.route = null;
+        debugPrint('✅ VisualNavigator cleaned up');
+      } catch (e) {
+        debugPrint('⚠️ Error cleaning up VisualNavigator: $e');
+      }
+      _visualNavigator = null;
+    }
 
-    _visualNavigator = null;
-    _locationEngine = null;
-    _routingEngine = null;
+    // Stop and cleanup LocationEngine
+    if (_locationEngine != null) {
+      try {
+        _locationEngine!.stop();
+        // Clear all location listeners
+        _locationEngine = null;
+        debugPrint('✅ LocationEngine stopped and cleaned up');
+      } catch (e) {
+        debugPrint('⚠️ Error stopping LocationEngine: $e');
+      }
+    }
 
+    // NEW: Clean up map scene and remove all markers/indicators
+    if (_hereMapController != null) {
+      try {
+        // NEW: Reset camera behavior to default
+        _hereMapController!.camera
+            .setOrientationAtTarget(HERE.GeoOrientationUpdate(0, 0));
+
+        debugPrint(
+            '✅ Map scene cleaned up - removed markers, polylines, and reset camera');
+      } catch (e) {
+        debugPrint('⚠️ Error cleaning up map scene: $e');
+      }
+    }
+
+    // Cleanup RoutingEngine
+    if (_routingEngine != null) {
+      _routingEngine = null;
+      debugPrint('✅ RoutingEngine cleaned up');
+    }
+
+    // Reset state variables
     if (mounted) {
       setState(() {
         _isNavigating = false;
@@ -477,11 +532,19 @@ class _NavigationViewState extends State<NavigationView> {
         _hasShownArrivalNotification = false;
         _hasShownParkingRating = false;
         _isPopupDisplayed = false;
-        _hasShownArrivalNotification = false;
-        _hasShownParkingRating = false;
-        _isPopupDisplayed = false;
+        _isRecalculatingRoute = false;
+        _isCameraLocked = true;
+        _isUserPanning = false;
+        _speed = 0;
+        _totalRouteTime = 0;
+        _nextManuoverDistance = 0;
+        normalManuevers = "";
+        _lastSpokenInstruction = "";
+        _currentLocation = null; // NEW: Reset current location
       });
     }
+
+    debugPrint('🧹 Navigation cleanup completed');
   }
 
   Future<bool> _handleBackPress() async {
@@ -506,6 +569,9 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _startNavigation() async {
     _cleanupNavigation();
+
+    await Future.delayed(const Duration(milliseconds: 200));
+
     _navigationStartTime = DateTime.now();
     _hasShownFatigueAlert = false;
 

@@ -19,6 +19,33 @@ enum TransactionType {
   SPACE_DEPOSIT,
 }
 
+String getTransactionTypeString(TransactionType type) {
+  switch (type) {
+    case TransactionType.SPACE_PAYMENT:
+      return 'Payment Received for Space';
+    case TransactionType.WITHDRAW:
+      return 'Withdrawal';
+    case TransactionType.SPACE_TRANSFER:
+      return 'Space Transfer';
+    case TransactionType.SPACE_WITHDRAWAL:
+      return 'Space Withdrawal';
+    case TransactionType.SPACE_DEPOSIT:
+      return 'Space Deposit';
+  }
+}
+
+bool isPositiveTransaction(TransactionType type) {
+  switch (type) {
+    case TransactionType.SPACE_PAYMENT:
+    case TransactionType.SPACE_DEPOSIT:
+      return true;
+    case TransactionType.WITHDRAW:
+    case TransactionType.SPACE_TRANSFER:
+    case TransactionType.SPACE_WITHDRAWAL:
+      return false;
+  }
+}
+
 TransactionType getTransactionType(String type) {
   switch (type) {
     case 'SPACE_PAYMENT':

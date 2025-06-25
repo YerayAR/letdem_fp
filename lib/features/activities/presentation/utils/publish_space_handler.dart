@@ -14,6 +14,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
@@ -31,7 +32,7 @@ class PublishSpaceHandler {
         context,
         context.l10n.importantNotice,
         context.l10n.createCarProfileFirst,
-        () => NavigatorHelper.pop(),
+        () => NavigatorHelper.to(const RegisterCarView()),
       );
       return false;
     }
@@ -83,7 +84,7 @@ class PublishSpaceHandler {
             iconColor: AppColors.primary500,
             text: context.l10n.regularSpace,
             onTap: () async {
-              if (!preCheck(context)) return;
+              // if (!preCheck(context)) return;
 
               final XFile? image = await _pickImage();
               if (image != null) {
