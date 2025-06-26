@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/repository/payments.repository.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/models/payment/payment.model.dart';
 
 part 'payment_method_event.dart';
@@ -35,6 +36,9 @@ class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
       emit(PaymentMethodLoading());
       var res = await repository.addPaymentMethod(event.dto);
       emit(PaymentMethodAdded(res));
+    } on ApiError catch (e) {
+      emit(PaymentMethodError(e.message));
+      add(const FetchPaymentMethods());
     } catch (_) {
       emit(const PaymentMethodError("Failed to register payment method."));
       add(const FetchPaymentMethods());

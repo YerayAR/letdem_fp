@@ -13,6 +13,10 @@ class SuccessDialog extends StatelessWidget {
 
   final String? buttonText;
 
+  final String? secondaryCTAText;
+
+  final VoidCallback? onSecondaryCTA;
+
   final IconData? icon;
 
   const SuccessDialog({
@@ -21,6 +25,8 @@ class SuccessDialog extends StatelessWidget {
     this.buttonText,
     required this.subtext,
     this.onProceed,
+    this.onSecondaryCTA,
+    this.secondaryCTAText,
     this.isLoading = false,
     this.icon,
   });
@@ -59,6 +65,22 @@ class SuccessDialog extends StatelessWidget {
           onTap: onProceed,
           text: buttonText ?? context.l10n.proceed,
         ),
+        if (secondaryCTAText != null) ...[
+          Dimens.space(2),
+          GestureDetector(
+            onTap: () {
+              if (onSecondaryCTA != null) {
+                onSecondaryCTA!();
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text(
+              secondaryCTAText!,
+              style: Typo.mediumBody.copyWith(color: AppColors.primary500),
+            ),
+          ),
+        ],
       ],
     );
   }

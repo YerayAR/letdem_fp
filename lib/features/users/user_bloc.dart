@@ -287,6 +287,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       emit(UserLoading());
 
+      print("OneSignal User ID: ${OneSignal.User.pushSubscription.id}");
+      print(OneSignal.User.pushSubscription.id);
+
       LetDemUser user = await userRepository.getUser();
 
       await OneSignal.Notifications.requestPermission(true);
