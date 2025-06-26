@@ -154,8 +154,6 @@
       }
     }
   },
-
-
   "locationType": "Ubicación de {type}",
   "spaceDetailsTitle": "Detalles del Espacio",
   "edit": "Editar",
@@ -701,5 +699,12 @@
         "type": "String"
       }
     }
-  }
+  },
+  "paymentMethodAddedTitle": "Método de Pago Añadido",
+  "paymentMethodAddedSubtext": "Tu método de pago ha sido añadido correctamente.",
+  "addPaymentMethodTitle": "Añadir Método de Pago",
+  "cardDetails": "Detalles de la Tarjeta",
+  "enterTheNumber": "Ingresa el número",
+  "create": "Crear",
+  "pleaseEnterYourName": "Por favor ingresa tu nombre"
 }
