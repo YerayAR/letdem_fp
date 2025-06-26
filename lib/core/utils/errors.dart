@@ -21,6 +21,8 @@ class ErrorMessageHelper {
     'INACTIVE_ACCOUNT': 'Your account is inactive.',
     'EMAIL_ALREADY_EXISTS': 'This email is already registered.',
     'INVALID_SOCIAL_TOKEN': 'Invalid social login token.',
+    'card_declined':
+        'Your card was declined. Please check your payment details.',
     'INVALID_OTP': 'Invalid OTP code.',
     'ACCOUNT_ALREADY_ACTIVATED': 'Account is already activated.',
     'BALANCE_LOWER_THAN_MINIMUM':
@@ -83,6 +85,8 @@ class ErrorMessageHelper {
   static const Map<String, String> _spanishMessages = {
     // Accounts
     'INVALID_CREDENTIALS': 'Credenciales inválidas. Intenta nuevamente.',
+    'card_declined':
+        'Tu tarjeta fue rechazada. Verifica los detalles de tu pago.',
     'INVALID_CURRENT_PASSWORD': 'La contraseña actual es incorrecta.',
     'REPEATED_PASSWORD':
         'La nueva contraseña no puede ser igual a la anterior.',

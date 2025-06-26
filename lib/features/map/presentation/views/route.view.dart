@@ -465,8 +465,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
         Row(
           children: [
             Text(
-              "${parseHours(context, routeInfo.duration)} (${parseMeters(routeInfo.distance)})",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "Traffic Level",
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
             DecoratedChip(

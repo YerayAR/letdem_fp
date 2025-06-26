@@ -109,6 +109,8 @@ class _NavigationViewState extends State<NavigationView> {
   int _lastRerouteTime = 0;
   String normalManuevers = "";
 
+  int DISTANCE_THREESHOLD = 10;
+
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
     'turn left': Icons.turn_left,
@@ -119,6 +121,8 @@ class _NavigationViewState extends State<NavigationView> {
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
   final Map<MapMarker, Space> _spaceMarkers = {};
   final Map<MapMarker, Event> _eventMarkers = {};
+
+  bool _isShownRegularDestinationAlert = false;
   final speech = SpeechService();
 
   @override
@@ -371,6 +375,20 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController?.mapScene.enableFeatures({
       MapFeatures.buildingFootprints: MapFeatureModes.buildingFootprintsAll
     });
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow});
+
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.trafficIncidents: MapFeatureModes.trafficIncidentsAll});
+
+    // Additional traffic-related features
+    _hereMapController?.mapScene.enableFeatures(
+        {MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll});
+
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.vehicleRestrictions:
+          MapFeatureModes.vehicleRestrictionsActiveAndInactive
+    });
     _hereMapController?.mapScene
         .enableFeatures({MapFeatures.contours: MapFeatureModes.contoursAll});
     _hereMapController?.mapScene.enableFeatures(
@@ -400,6 +418,8 @@ class _NavigationViewState extends State<NavigationView> {
       MapFeatures.vehicleRestrictions:
           MapFeatureModes.vehicleRestrictionsActiveAndInactive
     });
+    _hereMapController?.mapScene
+        .enableFeatures({MapFeatures.contours: MapFeatureModes.contoursAll});
     _hereMapController?.gestures.tapListener =
         TapListener((HERE.Point2D touchPoint) {
       _pickMapMarker(touchPoint);
@@ -738,27 +758,17 @@ class _NavigationViewState extends State<NavigationView> {
 
                     setState(() {
                       _currentSpace = space;
-                    });
-
-                    _stopNavigation();
-                    _cleanupNavigation();
-
-                    setState(() {
+                      _actualDestinationLat = space.location.point.lat;
+                      _actualDestinationLng = space.location.point.lng;
                       _hasShownArrivalNotification = false;
                       _hasShownParkingRating = false;
                       _isPopupDisplayed = false;
                       _isLoading = true;
                     });
 
-                    if (_currentLocation != null) {
-                      _calculateRoute(
-                          _currentLocation!,
-                          HERE.GeoCoordinates(space.location.point.lat,
-                              space.location.point.lng));
-
-                      _showToast(context.l10n.navigatingToParking,
-                          backgroundColor: AppColors.primary500);
-                    }
+                    // FIX: Don't call _stopNavigation() and _cleanupNavigation() together
+                    // Just update the route instead of full cleanup
+                    _switchToNewDestination(space);
                   },
                 ),
               ],
@@ -767,6 +777,34 @@ class _NavigationViewState extends State<NavigationView> {
         ),
       ),
     );
+  }
+
+// Fix 2: Add new method to switch destinations without full cleanup
+  void _switchToNewDestination(Space space) {
+    debugPrint('🔄 Switching to new destination: ${space.location.streetName}');
+
+    if (_currentLocation != null) {
+      // Update destination coordinates
+      _actualDestinationLat = space.location.point.lat;
+      _actualDestinationLng = space.location.point.lng;
+
+      // Recalculate route to new destination
+      _calculateRoute(
+          _currentLocation!,
+          HERE.GeoCoordinates(
+              space.location.point.lat, space.location.point.lng));
+
+      _showToast(
+        context.l10n.navigatingToParking,
+        backgroundColor: AppColors.primary500,
+      );
+    } else {
+      debugPrint('❌ Current location is null, cannot switch destination');
+      setState(() {
+        _isLoading = false;
+        _errorMessage = "Unable to get current location";
+      });
+    }
   }
 
   void _pickMapMarker(HERE.Point2D touchPoint) {
@@ -856,16 +894,19 @@ class _NavigationViewState extends State<NavigationView> {
     print('📍 Start: ${start.latitude}, ${start.longitude}');
     print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
 
-    try {
-      _routingEngine = HERE.RoutingEngine();
-      debugPrint('✅ Routing Engine initialized.');
-    } on InstantiationException {
-      debugPrint('❌ Initialization of RoutingEngine failed.');
-      setState(() {
-        _errorMessage = "Failed to initialize routing";
-        _isLoading = false;
-      });
-      return;
+    // Don't reinitialize routing engine if it already exists
+    if (_routingEngine == null) {
+      try {
+        _routingEngine = HERE.RoutingEngine();
+        debugPrint('✅ Routing Engine initialized.');
+      } on InstantiationException {
+        debugPrint('❌ Initialization of RoutingEngine failed.');
+        setState(() {
+          _errorMessage = "Failed to initialize routing";
+          _isLoading = false;
+        });
+        return;
+      }
     }
 
     HERE.Waypoint startWaypoint = HERE.Waypoint(start);
@@ -890,9 +931,15 @@ class _NavigationViewState extends State<NavigationView> {
             _isLoading = false;
           });
 
-          _startGuidance(calculatedRoute);
+          // If we already have a visual navigator, just update the route
+          if (_visualNavigator != null) {
+            _visualNavigator!.route = calculatedRoute;
+            debugPrint('✅ Updated existing navigation route');
+          } else {
+            _startGuidance(calculatedRoute);
+          }
 
-          // FIX: Set initial position after guidance starts
+          // Set initial position after route update
           Future.delayed(const Duration(milliseconds: 500), () {
             _setInitialNavigationPosition();
           });
@@ -972,7 +1019,7 @@ class _NavigationViewState extends State<NavigationView> {
           lastSectionProgress.remainingDuration.inSeconds;
       _distanceNotifier.value = remainingDistance;
 
-      bool isAtDestination = remainingDistance <= 15;
+      bool isAtDestination = remainingDistance <= DISTANCE_THREESHOLD;
       bool isParkingNavigation =
           _currentSpace != null || widget.isNavigatingToParking;
 
@@ -983,9 +1030,22 @@ class _NavigationViewState extends State<NavigationView> {
 
       if (isAtDestination && !_hasShownArrivalNotification) {
         print('✅ Arrived at destination!');
+
+        if (!isParkingNavigation) {
+          AppPopup.showDialogSheet(
+            context,
+            ArrivalNotificationWidget(
+              onClose: () {
+                NavigatorHelper.pop();
+              },
+            ),
+          );
+        }
+
         setState(() {
           _hasShownArrivalNotification = true;
         });
+
         if (isParkingNavigation &&
             !_hasShownParkingRating &&
             !_isPopupDisplayed) {
@@ -1575,5 +1635,54 @@ class Debouncer {
   void run(VoidCallback action) {
     _timer?.cancel();
     _timer = Timer(delay, action);
+  }
+}
+
+class ArrivalNotificationWidget extends StatelessWidget {
+  final VoidCallback? onClose;
+
+  const ArrivalNotificationWidget({super.key, this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        CircleAvatar(
+          radius: 45,
+          backgroundColor: AppColors.green50,
+          child: Icon(
+            Iconsax.location5,
+            size: 45,
+            color: AppColors.green600,
+          ),
+        ),
+        Dimens.space(3),
+        Text(
+          context.l10n.arrivalTitle,
+          textAlign: TextAlign.center,
+          style: Typo.heading4.copyWith(color: AppColors.neutral600),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            context.l10n.arrivalSubtitle,
+            textAlign: TextAlign.center,
+            style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
+          ),
+        ),
+        Dimens.space(5),
+        PrimaryButton(
+          onTap: () {
+            if (onClose != null) {
+              onClose!();
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          text: context.l10n.proceed,
+        ),
+      ],
+    );
   }
 }

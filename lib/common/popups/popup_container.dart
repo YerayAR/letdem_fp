@@ -31,12 +31,12 @@ class PopupContainer extends StatelessWidget {
                       vertical: Dimens.defaultMargin,
                       horizontal: Dimens.defaultMargin / 2,
                     )
-                  : EdgeInsets.all(Dimens.defaultMargin * 2),
+                  : EdgeInsets.all(Dimens.defaultMargin * 2.3),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(
-                  Dimens.defaultRadius * 1.5,
+                  Dimens.defaultRadius * 2,
                 ),
               ),
               child: child,

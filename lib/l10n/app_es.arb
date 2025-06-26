@@ -545,6 +545,9 @@
   "thankYouForInput": "¡Gracias por tu aporte!",
   "eventFeedback": "Comentarios sobre el evento",
   "stillThere": "Todavía está ahí",
+
+  "arrivalTitle": "¡Has llegado!",
+  "arrivalSubtitle": "Las plazas de aparcamiento cercanas ahora están visibles en el mapa. Pulsa una para iniciar la navegación.",
   "notThere": "Ya no está ahí",
   "illTakeIt": "Lo tomaré",
   "itsInUse": "Está en uso",

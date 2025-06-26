@@ -6,7 +6,10 @@ class AppPopup {
     return showDialog(
       // barrierDismissible: false,
       context: context,
-      builder: (context) => Center(child: PopupContainer(child: child)),
+      builder: (context) => Align(
+        alignment: Alignment.bottomCenter,
+        child: PopupContainer(child: child),
+      ),
     );
   }
 

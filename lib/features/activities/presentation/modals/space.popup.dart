@@ -343,13 +343,57 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 );
               },
               () {
-                // Handle error
-                Toast.showError("Payment failed or requires further action");
+                AppPopup.showDialogSheet(
+                  context,
+                  ConfirmationDialog(
+                    isError: true,
+                    onSecondaryCTA: () {
+                      NavigatorHelper.pop();
+                      NavigatorHelper.to(PaymentMethodsScreen(
+                        onPaymentMethodSelected: (e) => setState(() {
+                          NavigatorHelper.pop();
+
+                          setState(() {
+                            _selectedPaymentMethod = e;
+                          });
+                        }),
+                      ));
+                    },
+                    title: "Payment Failed",
+                    secondaryCTAText: "Change payment method",
+                    subtext:
+                        "The reservation failed because your payment didn’t go through successfully",
+                    onProceed: () {
+                      NavigatorHelper.pop();
+                    },
+                  ),
+                );
               },
             );
           } else {
             // Handle generic error
-            Toast.showError(state.error);
+            AppPopup.showDialogSheet(
+              context,
+              ConfirmationDialog(
+                isError: true,
+                onSecondaryCTA: () {
+                  NavigatorHelper.pop();
+                  context.read<ActivitiesBloc>().add(
+                        ReserveSpaceEvent(
+                          spaceID: widget.space.id,
+                          paymentMethodID: context.userProfile!
+                              .defaultPaymentMethod!.paymentMethodId,
+                        ),
+                      );
+                },
+                title: context.l10n.errorReserveSpace,
+                subtext:
+                    "${state.error}. Please try again later. If the issue persists, contact support.",
+                onProceed: () {
+                  NavigatorHelper.pop();
+                },
+              ),
+            );
           }
         }
         if (state is SpaceReserved) {
@@ -414,12 +458,18 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String subtext;
+  final bool isError;
   final VoidCallback onProceed;
+  final String? secondaryCTAText;
+  final VoidCallback? onSecondaryCTA;
 
   const ConfirmationDialog({
     super.key,
     this.title = '',
+    this.secondaryCTAText,
+    this.onSecondaryCTA,
     this.subtext = '',
+    this.isError = false,
     required this.onProceed,
   });
 
@@ -429,8 +479,22 @@ class ConfirmationDialog extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (isError)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: CircleAvatar(
+                radius: 45,
+                backgroundColor: AppColors.red50,
+                child: Icon(
+                  Icons.error,
+                  size: 45,
+                  color: AppColors.red500,
+                ),
+              ),
+            ),
           Text(
             title,
+            textAlign: TextAlign.center,
             style: Typo.heading4.copyWith(fontWeight: FontWeight.w800),
           ),
           Dimens.space(2),
@@ -446,6 +510,19 @@ class ConfirmationDialog extends StatelessWidget {
             color: AppColors.primary500,
             textColor: Colors.white,
           ),
+          if (secondaryCTAText != null && onSecondaryCTA != null) ...[
+            Dimens.space(2),
+            GestureDetector(
+              onTap: onSecondaryCTA,
+              child: Text(
+                secondaryCTAText!,
+                style: Typo.mediumBody.copyWith(
+                    color: AppColors.neutral500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -89,6 +89,8 @@
   },
   "paymentSuccessful": "Payment Successful",
   "spaceReservedSuccess": "You have successfully reserved a paid space. You can get the details by clicking below.",
+  "arrivalTitle": "You’ve Arrived!",
+  "arrivalSubtitle": "Nearby parking spots are now visible on the map. Tap a spot to start navigation.",
   "getSpaceDetails": "Get Details of space",
   "reserveSpace": "Reserve space",
   "navigateToSpace": "Navigate to space",
