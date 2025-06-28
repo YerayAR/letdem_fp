@@ -145,7 +145,7 @@
   "all": "All",
   "parkingSpace": "Parking Space",
   "events": "Events",
-  "verifyYourAccountFirst" : "Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.",
+  "verifyYourAccountFirst": "Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.",
   "failedToLoadActivities": "Failed to load activities: {error}",
   "@failedToLoadActivities": {
     "placeholders": {
@@ -169,7 +169,6 @@
   "location": "Location",
   "spaceDetailsTitle": "Space Details",
   "locationType": "{type} LOCATION",
-
   "setLocation": "Set {type} Location",
   "@setLocation": {
     "placeholders": {
@@ -704,5 +703,12 @@
         "type": "String"
       }
     }
-  }
+  },
+  "paymentMethodAddedTitle": "Payment Method Added",
+  "paymentMethodAddedSubtext": "Your payment method has been successfully added.",
+  "addPaymentMethodTitle": "Add Payment Method",
+  "cardDetails": "Card Details",
+  "enterTheNumber": "Enter the number",
+  "create": "Create",
+  "pleaseEnterYourName": "Please enter your name"
 }
