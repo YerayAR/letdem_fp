@@ -434,13 +434,14 @@ getCardIcon(String cardType) {
 }
 
 getBrandName(String cardType) {
+  print('Card Type: $cardType');
   switch (cardType.toLowerCase()) {
     case 'visa':
       return 'Visa';
     case 'mastercard':
       return 'MasterCard';
-    case 'americanexpress':
-      return 'American Express';
+    case 'americanexpress' || 'amex' || 'american express':
+      return 'Amex';
     case 'discover':
       return 'Discover';
     default:

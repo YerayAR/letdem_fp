@@ -107,7 +107,7 @@ class NotificationObject {
         image: json['image'],
         location: Location.fromJson(json['location']),
         created: DateTime.parse(json['created']),
-        resourceType: json['resourcetype'],
+        resourceType: json['resourcetype'] ?? "",
       );
 }
 
