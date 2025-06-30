@@ -5,8 +5,8 @@ import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
-import 'package:letdem/common/widgets/textfield.dart';
 import 'package:letdem/core/constants/dimens.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payment_methods/dto/add_payment.dto.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
@@ -64,8 +64,8 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
               AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(
-                    title: 'Payment Method Added',
-                    subtext: 'Your payment method has been successfully added.',
+                    title: context.l10n.paymentMethodAddedTitle,
+                    subtext: context.l10n.paymentMethodAddedSubtext,
                     onProceed: () {
                       NavigatorHelper.pop();
                       NavigatorHelper.pop();
@@ -84,22 +84,84 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                   children: [
                     StyledAppBar(
                       onTap: () => NavigatorHelper.pop(),
-                      title: 'Add Payment Method',
+                      title: context.l10n.addPaymentMethodTitle,
                       icon: Icons.close,
                     ),
                     Dimens.space(2),
-                    TextInputField(
-                      label: 'Cardholder Name',
-                      controller: _nameController,
-                      placeHolder: 'Enter your name',
-                    ),
-                    Dimens.space(3),
-                    Divider(height: 1, color: Colors.grey.shade300),
-                    Dimens.space(2),
+                    // Custom styled name input to match Stripe CardField
                     Container(
-                      padding: const EdgeInsets.all(1),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            context.l10n.cardholderName,
+                            style: const TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              hintText: context.l10n.enterYourName,
+                              hintStyle: TextStyle(
+                                color: Colors.blueGrey.shade400,
+                                fontSize: 16,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color:
+                                      Colors.blueGrey.shade300.withOpacity(0.5),
+                                  width: 1,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 2,
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color:
+                                      Colors.blueGrey.shade300.withOpacity(0.5),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.l10n.cardDetails,
+                            style: const TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Theme(
                             data: ThemeData.light().copyWith(
                               colorScheme:
@@ -109,10 +171,16 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                             ),
                             child: CardField(
                               decoration: InputDecoration(
-                                labelText: 'Card Details',
-                                labelStyle: TextStyle(
-                                  color: Colors.blueGrey,
-                                  fontSize: 14,
+                                hintText: context.l10n.enterTheNumber,
+                                hintStyle: TextStyle(
+                                  color: Colors.blueGrey.shade400,
+                                  fontSize: 16,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 16,
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -120,6 +188,13 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                                     color: Colors.blueGrey.shade300
                                         .withOpacity(0.5),
                                     width: 1,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(
+                                    color: Colors.blueGrey,
+                                    width: 2,
                                   ),
                                 ),
                                 border: OutlineInputBorder(
@@ -131,14 +206,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                                   ),
                                 ),
                               ),
-
                               controller: controller,
-                              // style: CardFormStyle(
-                              //   backgroundColor: Colors.black12,
-                              //   borderColor: Colors.blueGrey,
-                              //   textColor: Colors.black,
-                              //   placeholderColor: Colors.blue,
-                              // ),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -156,8 +224,8 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                               const SizedBox(width: 8),
                               Text(
                                 controller.details.complete
-                                    ? 'Valid card'
-                                    : 'Enter card details',
+                                    ? context.l10n.validCard
+                                    : context.l10n.enterCardDetails,
                                 style: TextStyle(
                                   color: controller.details.complete
                                       ? Colors.green
@@ -181,10 +249,10 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
                             ? _handlePayPress
                             : () {
                                 Toast.showError(
-                                  'Please complete the card details',
+                                  context.l10n.pleaseCompleteCardDetails,
                                 );
                               },
-                        text: 'Create',
+                        text: context.l10n.create,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -201,7 +269,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
   Future<void> _handlePayPress() async {
     if (!controller.details.complete) return;
     if (_nameController.text.trim().isEmpty) {
-      Toast.showError('Please enter your name');
+      Toast.showError(context.l10n.pleaseEnterYourName);
       return;
     }
 
@@ -240,7 +308,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
     } catch (e) {
       // Handle errors
       print('Error creating payment method: $e');
-      Toast.showError('Failed to add payment method. Please try again.');
+      Toast.showError(context.l10n.failedToAddPaymentMethod);
     } finally {
       setState(() => _isLoading = false);
     }
