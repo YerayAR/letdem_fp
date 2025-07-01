@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 class CountryCode {
   String countryName;
@@ -338,7 +339,7 @@ class _TSLFieldState extends State<PhoneField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return context.l10n.pleaseEnterYourNumber;
                 }
                 return null;
               },

@@ -334,8 +334,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   context,
                   SuccessDialog(
                     title: context.l10n.spaceReserved,
-                    subtext:
-                        "Your Payment was successful. You will get a notification once the space is reserved. You can safely close this popup.",
+                    subtext: context.l10n.paymentSuccessfulReservation,
                     onProceed: () {
                       NavigatorHelper.pop();
                     },
@@ -344,7 +343,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
               },
               () {
                 // Handle error
-                Toast.showError("Payment failed or requires further action");
+                Toast.showError(context.l10n.paymentFailedRequiresAction);
               },
             );
           } else {

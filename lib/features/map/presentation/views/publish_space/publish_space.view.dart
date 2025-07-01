@@ -296,8 +296,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                         ? StyledBody(
                             children: [
                               TextInputField(
-                                label: context.l10n.waitingTimeMinutes,
-                                placeHolder: "MM",
+                                label: context.l10n.waitingTime,
+                                placeHolder: "MM:SS",
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                   FilteringTextInputFormatter.allow(
@@ -558,8 +558,8 @@ class PaidSpaceForm extends StatelessWidget {
       body: StyledBody(
         children: [
           TextInputField(
-            label: context.l10n.waitingTime, // Cambiar "Waiting Time"
-            placeHolder: context.l10n.waitingTimeMinutes,
+            label: context.l10n.waitingTime,
+            placeHolder: 'MM:SS',
             prefixIcon: Iconsax.clock5,
             onChanged: (value) {},
           ),

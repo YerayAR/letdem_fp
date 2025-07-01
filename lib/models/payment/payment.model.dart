@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:letdem/core/extensions/locale.dart';
+
 class PaymentMethodModel {
   final String paymentMethodId;
   final String holderName;
@@ -18,32 +21,32 @@ class PaymentMethodModel {
     required this.isDefault,
   });
 
-  getMonthName() {
+  String getMonthName(BuildContext context) {
     switch (expMonth) {
       case '01' || '1':
-        return 'Jan';
+        return context.l10n.monthJan;
       case '02' || '2':
-        return 'Feb';
+        return context.l10n.monthFeb;
       case '03' || '3':
-        return 'Mar';
+        return context.l10n.monthMar;
       case '04' || '4':
-        return 'Apr';
+        return context.l10n.monthApr;
       case '05' || '5':
-        return 'May';
+        return context.l10n.monthMay;
       case '06' || '6':
-        return 'Jun';
+        return context.l10n.monthJun;
       case '07' || '7':
-        return 'Jul';
+        return context.l10n.monthJul;
       case '08' || '8':
-        return 'Aug';
+        return context.l10n.monthAug;
       case '09' || '9':
-        return 'Sep';
+        return context.l10n.monthSep;
       case '10' || '10':
-        return 'Oct';
+        return context.l10n.monthOct;
       case '11' || '11':
-        return 'Nov';
+        return context.l10n.monthNov;
       case '12' || '12':
-        return 'Dec';
+        return context.l10n.monthDec;
       default:
         return '';
     }

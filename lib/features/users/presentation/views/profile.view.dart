@@ -248,19 +248,19 @@ class _MainActionsSection extends StatelessWidget {
                   ),
                   Dimens.space(3),
                   Text(
-                    'Connection Pending',
+                    context.l10n.connectionPending,
                     style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Dimens.space(1),
                   Text(
-                    "Your account connection is still pending, you will be notified when the connection is complete",
+                    context.l10n.connectionPendingMessage,
                     textAlign: TextAlign.center,
                     style:
                         Typo.mediumBody.copyWith(color: AppColors.neutral600),
                   ),
                   Dimens.space(2),
                   PrimaryButton(
-                    text: "Go Back",
+                    text: context.l10n.goBack,
                     onTap: () {
                       NavigatorHelper.pop();
                     },
@@ -288,19 +288,19 @@ class _MainActionsSection extends StatelessWidget {
                   ),
                   Dimens.space(3),
                   Text(
-                    'Something went wrong',
+                    context.l10n.somethingWentWrong,
                     style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Dimens.space(1),
                   Text(
-                    "There seems to be an issue with your account. Please contact support for assistance.",
+                    context.l10n.contactSupportMessage,
                     textAlign: TextAlign.center,
                     style:
                         Typo.mediumBody.copyWith(color: AppColors.neutral600),
                   ),
                   Dimens.space(2),
                   PrimaryButton(
-                    text: "Go Back",
+                    text: context.l10n.goBack,
                     onTap: () {
                       NavigatorHelper.pop();
                     },

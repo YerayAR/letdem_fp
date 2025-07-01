@@ -7,6 +7,7 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/users/presentation/views/security/change_password.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
@@ -27,7 +28,7 @@ class SecurityView extends StatelessWidget {
             onTap: () {
               NavigatorHelper.pop();
             },
-            title: 'Security Settings',
+            title: context.l10n.securitySettings,
             icon: Icons.close,
           ),
           ProfileSection(
@@ -39,7 +40,7 @@ class SecurityView extends StatelessWidget {
                         child: Column(
                           children: [
                             SettingsRow(
-                              text: 'Change Password',
+                              text: context.l10n.changePassword,
                               onTap: () {
                                 NavigatorHelper.to(const ChangePasswordView());
                               },
@@ -57,20 +58,20 @@ class SecurityView extends StatelessWidget {
                 builder: (context, state) {
                   return PrimaryButton(
                     color: AppColors.red50,
-                    text: 'Delete Account',
+                    text: context.l10n.deleteAccount,
                     textColor: AppColors.red500,
                     onTap: () {
                       AppPopup.showDialogSheet(
                           context,
                           Column(children: <Widget>[
                             Text(
-                              'Delete Account',
+                              context.l10n.deleteAccount,
                               style: Typo.heading1.copyWith(
                                 fontSize: 24,
                               ),
                             ),
                             Text(
-                              'Are you sure you want to delete your account? This action cannot be undone.',
+                              context.l10n.deleteAccountConfirmation,
                               style: Typo.mediumBody
                                   .copyWith(color: AppColors.neutral400),
                               textAlign: TextAlign.center,
@@ -81,7 +82,7 @@ class SecurityView extends StatelessWidget {
                               children: [
                                 Flexible(
                                   child: PrimaryButton(
-                                    text: 'Cancel',
+                                    text: context.l10n.cancel,
                                     color: AppColors.red500,
                                     borderColor: AppColors.red500,
                                     outline: true,
@@ -93,7 +94,7 @@ class SecurityView extends StatelessWidget {
                                 Dimens.space(1),
                                 Flexible(
                                   child: PrimaryButton(
-                                    text: 'Delete',
+                                    text: context.l10n.delete,
                                     isLoading: state is UserLoading,
                                     color: AppColors.red500,
                                     onTap: () {
