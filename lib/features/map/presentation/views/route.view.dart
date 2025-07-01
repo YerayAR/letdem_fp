@@ -79,10 +79,12 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   void initState() {
     super.initState();
     // if latitude and longitude and space details are not provided, call a special method to get the location info from space id;
-    if (widget.latitude == null ||
-        widget.longitude == null ||
+    if (widget.latitude == null &&
+        widget.longitude == null &&
         widget.spaceDetails == null) {
-      getInfoFromSpaceID(widget.spaceID!);
+      if (widget.spaceID != null) {
+        getInfoFromSpaceID(widget.spaceID!);
+      }
     } else {
       _initializeRouting();
     }
