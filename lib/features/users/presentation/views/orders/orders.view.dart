@@ -102,6 +102,8 @@ class OrderCard extends StatelessWidget {
           // Icon
           SvgPicture.asset(
             getSpaceTypeIcon(order.type),
+            width: 40,
+            height: 40,
           ),
           const SizedBox(width: 16),
           // Details

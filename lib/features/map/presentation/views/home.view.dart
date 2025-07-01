@@ -17,6 +17,7 @@ import 'package:letdem/features/auth/models/nearby_payload.model.dart'
     hide Location;
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
+import 'package:letdem/infrastructure/services/notification/notification.service.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../../../../common/popups/popup.dart';
@@ -77,21 +78,12 @@ class _HomeViewState extends State<HomeView>
     super.initState();
     _loadAssets();
     _getCurrentLocation();
-    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      print("Foreground notification received: ${event.jsonRepresentation()}");
-
-      // You can choose to show the notification or not:
-    });
 
     OneSignal.Notifications.addClickListener((event) {
-      print("Notification clicked: ${event.jsonRepresentation()}");
-
-      // You can navigate or perform other actions based on the notification data
       final data = event.notification.additionalData;
-      final route = data?['route']; // Example custom key
-      if (route != null) {
-        // Navigate or perform some logic
-      }
+      final handler = NotificationHandler(context);
+
+      handler.handleNotification(data);
     });
   }
 

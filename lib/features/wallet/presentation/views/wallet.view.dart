@@ -408,7 +408,7 @@ class TransactionList extends StatelessWidget {
                               const SizedBox(width: 16),
                               Text(
                                 isPositiveTransaction(tx.source)
-                                    ? '+ ${tx.amount.toStringAsFixed(2)}€'
+                                    ? '+${tx.amount.toStringAsFixed(2)}€'
                                     : '${(-tx.amount).toStringAsFixed(2)}€',
                                 style: TextStyle(
                                   color: isPositiveTransaction(tx.source)
