@@ -403,12 +403,9 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       onTap: _publishSpace,
                       isDisabled:
                           snapshot.data == null || selectedSpacePicture == null,
-                      text: (_pageController.hasClients &&
-                              _pageController.page == 1)
-                          ? context.l10n.publish
-                          : (widget.isPaid
-                              ? context.l10n.next
-                              : context.l10n.publish),
+                      text: widget.isPaid && _selectedPage == 0
+                          ? context.l10n.next
+                          : context.l10n.publish,
                     ),
                   ),
                 ),
