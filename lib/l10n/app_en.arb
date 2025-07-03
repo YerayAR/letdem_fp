@@ -813,5 +813,12 @@
   "monthSep": "Sep",
   "monthOct": "Oct",
   "monthNov": "Nov",
-  "monthDec": "Dec"
+  "monthDec": "Dec",
+  "faqTitle": "FAQ",
+  "faqPublishPaidSpaceQuestion": "How do I publish a paid space?",
+  "faqPublishPaidSpaceAnswer": "To publish a paid space, you must meet the following requirements:\n\n• Enter your vehicle information in the app so it can be used at the time of reservation.\n• Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.",
+  "faqEarnMoneyQuestion": "How do I earn money from my paid space?",
+  "faqEarnMoneyAnswer": "To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.\n\nOnce the reservation is confirmed, the amount of your reservation — minus LetDem's service fees — will be transferred to you.\n\nYou can see the total amount earned in the Earnings section of your profile.",
+  "faqWithdrawFundsQuestion": "How do I withdraw my funds to a personal account?",
+  "faqWithdrawFundsAnswer": "To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you'll be able to withdraw them using one of your linked bank accounts."
 }

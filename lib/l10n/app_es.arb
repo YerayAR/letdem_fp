@@ -813,5 +813,12 @@
   "monthSep": "Sep",
   "monthOct": "Oct",
   "monthNov": "Nov",
-  "monthDec": "Dic"
+  "monthDec": "Dic",
+  "faqTitle": "FAQ",
+  "faqPublishPaidSpaceQuestion": "¿Cómo puedo publicar un espacio de pago?",
+  "faqPublishPaidSpaceAnswer": "Para publicar un espacio de pago, debes cumplir con los siguientes requisitos:\n\n• Registrar los datos de tu vehículo en la aplicación, ya que serán necesarios al momento de la reserva.\n• Crear una cuenta de beneficios desde tu perfil. Para ello, deberás ingresar tu información fiscal, la cual es obligatoria para recibir pagos en la aplicación conforme a la normativa europea de prevención de lavado de dinero.",
+  "faqEarnMoneyQuestion": "¿Cómo obtengo ganancias por mi espacio de pago?",
+  "faqEarnMoneyAnswer": "Para generar ganancias con tu espacio, este debe ser reservado por otro usuario. Una vez realizada la reserva, deberás confirmar la operación ingresando el código de confirmación que se le proporciona al usuario que reservó. Tras recibir el código, podrás confirmar la reserva.\n\nCuando la reserva es confirmada, recibirás el importe correspondiente menos las comisiones aplicadas por LetDem por la operación.\n\nEl monto total de tus ganancias se reflejará en la sección \"Ganancias\" de tu perfil.",
+  "faqWithdrawFundsQuestion": "¿Cómo retiro mis fondos a una cuenta personal?",
+  "faqWithdrawFundsAnswer": "Para retirar tus fondos, estos deben ser liberados previamente por el proveedor de pagos. Este proceso suele tardar aproximadamente 10 días. Una vez liberados, los fondos estarán disponibles en la app y podrás retirarlos utilizando una de las cuentas bancarias que hayas asociado previamente."
 }

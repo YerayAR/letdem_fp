@@ -21,6 +21,7 @@ import 'package:letdem/features/payment_methods/presentation/views/payment_metho
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
+import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
@@ -61,6 +62,7 @@ class ProfileView extends StatelessWidget {
                         _ProfileHeader(user: state.user),
                         _MainActionsSection(user: state.user),
                         const _AccountSettingsSection(),
+                        const _HelpSection(),
                         const _LogoutButton(),
                       ],
                     ),
@@ -388,6 +390,31 @@ class _AccountSettingsSection extends StatelessWidget {
                 showDivider: false,
                 onTap: () {
                   NavigatorHelper.to(const SecurityView());
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HelpSection extends StatelessWidget {
+  const _HelpSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileSection(
+      child: [
+        SettingsContainer(
+          child: Column(
+            children: [
+              SettingsRow(
+                icon: IconlyLight.info_circle,
+                text: context.l10n.help,
+                onTap: () {
+                  NavigatorHelper.to(const HelpView());
                 },
               ),
             ],
