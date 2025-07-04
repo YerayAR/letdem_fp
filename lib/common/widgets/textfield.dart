@@ -89,7 +89,7 @@ class TextInputFieldState extends State<TextInputField> {
       strength++;
     }
 
-    if (RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]').hasMatch(password)) {
+    if (RegExp(r'[\$\.&@]').hasMatch(password)) {
       strength++;
     }
 
@@ -185,7 +185,8 @@ class TextInputFieldState extends State<TextInputField> {
                   (widget.inputType == TextFieldType.number
                       ? [FilteringTextInputFormatter.digitsOnly]
                       : []),
-              textInputAction: widget.textInputAction ?? TextInputAction.newline,
+              textInputAction:
+                  widget.textInputAction ?? TextInputAction.newline,
               obscureText: widget.inputType == TextFieldType.password
                   ? !isPasswordVisible
                   : false,

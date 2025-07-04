@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+
+import '../../../../common/popups/popup.dart';
 
 class AmountInputCard extends StatefulWidget {
   final Function(String)? onChange;
@@ -105,16 +109,49 @@ class _AmountInputCardState extends State<AmountInputCard> {
           //   onChanged: _validateAmount,
           // ),
           Dimens.space(1),
-          Text(
-            _errorText ??
-                context.l10n.pendingToBeCleared(context
-                    .userProfile!.earningAccount!.pendingBalance
-                    .toStringAsFixed(2)),
-            style: Typo.mediumBody.copyWith(
-              fontSize: 13,
-              color:
-                  _errorText != null ? AppColors.red500 : AppColors.neutral300,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Icon(Icons.info_outline,
+                    color: AppColors.neutral300, size: 18),
+                onPressed: () {
+                  AppPopup.showDialogSheet(
+                    context,
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          context.l10n.pendingFundsInfo,
+                          style: Typo.mediumBody,
+                          textAlign: TextAlign.center,
+                        ),
+                        Dimens.space(3),
+                        PrimaryButton(
+                          onTap: () {
+                            NavigatorHelper.pop();
+                          },
+                          text: context.l10n.gotIt,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              Text(
+                _errorText ??
+                    context.l10n.pendingToBeCleared(context
+                        .userProfile!.earningAccount!.pendingBalance
+                        .toStringAsFixed(2)),
+                style: Typo.mediumBody.copyWith(
+                  fontSize: 13,
+                  color: _errorText != null
+                      ? AppColors.red500
+                      : AppColors.neutral300,
+                ),
+              ),
+              //   info button
+            ],
           ),
         ],
       ),

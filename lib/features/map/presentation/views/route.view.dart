@@ -90,27 +90,40 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     }
   }
 
+  bool isError = false;
+
   void getInfoFromSpaceID(
     String spaceID,
   ) async {
-    setState(() {
-      _isLoading = true;
-    });
-    var response = await ApiService.sendRequest(
-        endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      var response = await ApiService.sendRequest(
+          endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
 
-    var spaceDetails = Space.fromJson(response.data);
-    setState(() {
-      _spaceDetails = spaceDetails;
-      _latitude = spaceDetails.location.point.lat;
-      _longitude = spaceDetails.location.point.lng;
-      _destinationStreetName = spaceDetails.location.streetName;
-    });
+      var spaceDetails = Space.fromJson(response.data);
+      setState(() {
+        _spaceDetails = spaceDetails;
+        _latitude = spaceDetails.location.point.lat;
+        _longitude = spaceDetails.location.point.lng;
+        _destinationStreetName = spaceDetails.location.streetName;
+      });
 
-    if (_latitude != null && _longitude != null) {
-      _initializeRouting();
-    } else {
-      Toast.showError("Could not retrieve location data for the space.");
+      if (_latitude != null && _longitude != null) {
+        _initializeRouting();
+      } else {
+        Toast.showError("Could not retrieve location data for the space.");
+        throw Exception("Latitude or Longitude is null");
+      }
+    } catch (e) {
+      setState(() {
+        isError = true;
+        _isLoading = false;
+      });
+
+      Toast.showError("Could not retrieve space details.");
+      return;
     }
   }
 
@@ -313,54 +326,63 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
           Dimens.space(2),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: _isLoading
-                ? const Center(child: CupertinoActivityIndicator())
-                : HereMap(
-                    key: UniqueKey(),
-                    onMapCreated: _onMapCreated,
-                  ),
-          ),
-          Positioned(
-            left: 0,
-            bottom: 0,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: _isLoading
-                  ? Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(16)),
-                      ),
-                      child: const HomePageShimmer(),
-                    )
-                  : NavigateNotificationCard(
-                      spaceInfo: widget.spaceDetails ?? _spaceDetails,
-                      hideToggle: widget.hideToggle,
-                      routeInfo: _routeInfo,
-                      notification: ScheduledNotification(
-                        id: "1",
-                        startsAt: DateTime.now(),
-                        endsAt: DateTime.now(),
-                        isExpired: false,
-                        location: LocationData(
-                          streetName: widget.destinationStreetName ??
-                              _destinationStreetName ??
-                              '',
-                          point: CoordinatesData(
-                            latitude: widget.latitude ?? _latitude!,
-                            longitude: widget.longitude ?? _longitude!,
-                          ),
+      body: isError
+          ? SizedBox(
+              child: Center(
+                child: Text(
+                  "Could not retrieve location data for the space.",
+                  style: Typo.largeBody.copyWith(color: Colors.red),
+                ),
+              ),
+            )
+          : Stack(
+              children: [
+                Positioned.fill(
+                  child: _isLoading
+                      ? const Center(child: CupertinoActivityIndicator())
+                      : HereMap(
+                          key: UniqueKey(),
+                          onMapCreated: _onMapCreated,
                         ),
-                      ),
-                    ),
+                ),
+                Positioned(
+                  left: 0,
+                  bottom: 0,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: _isLoading
+                        ? Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16)),
+                            ),
+                            child: const HomePageShimmer(),
+                          )
+                        : NavigateNotificationCard(
+                            spaceInfo: widget.spaceDetails ?? _spaceDetails,
+                            hideToggle: widget.hideToggle,
+                            routeInfo: _routeInfo,
+                            notification: ScheduledNotification(
+                              id: "1",
+                              startsAt: DateTime.now(),
+                              endsAt: DateTime.now(),
+                              isExpired: false,
+                              location: LocationData(
+                                streetName: widget.destinationStreetName ??
+                                    _destinationStreetName ??
+                                    '',
+                                point: CoordinatesData(
+                                  latitude: widget.latitude ?? _latitude!,
+                                  longitude: widget.longitude ?? _longitude!,
+                                ),
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

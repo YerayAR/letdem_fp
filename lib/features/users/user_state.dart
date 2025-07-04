@@ -33,6 +33,8 @@ class UserLoaded extends UserState {
   final LetDemUser user;
   final int points;
 
+  final int unreadNotificationsCount;
+
   final bool isUpdateLoading;
 
   final bool isLocationPermissionGranted;
@@ -46,6 +48,7 @@ class UserLoaded extends UserState {
     required this.isLocationPermissionGranted,
     required this.points,
     this.isOrdersLoading = false,
+    required this.unreadNotificationsCount,
     this.orders = const [],
   });
 
@@ -54,13 +57,15 @@ class UserLoaded extends UserState {
     bool? isLocationPermissionGranted,
     bool? isOrdersLoading,
     bool? isUpdateLoading,
+    int? unreadNotificationsCount,
     List<Order>? orders,
     int? points,
   }) {
     return UserLoaded(
       user: user ?? this.user,
-      isOrdersLoading:
-          isOrdersLoading ?? this.isOrdersLoading,
+      unreadNotificationsCount:
+          unreadNotificationsCount ?? this.unreadNotificationsCount,
+      isOrdersLoading: isOrdersLoading ?? this.isOrdersLoading,
       orders: orders ?? this.orders,
       isUpdateLoading: isUpdateLoading ?? this.isUpdateLoading,
       isLocationPermissionGranted:
@@ -76,6 +81,7 @@ class UserLoaded extends UserState {
         isLocationPermissionGranted,
         isUpdateLoading,
         isOrdersLoading,
+        unreadNotificationsCount,
         orders,
         points,
       ];

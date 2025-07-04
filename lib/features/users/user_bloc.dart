@@ -29,10 +29,29 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<ChangePasswordEvent>(_onChangePassword);
     on<ChangeLanguageEvent>(_onChangeLanguage);
     on<UpdateEarningAccountEvent>(_onUpdateEarningAccount);
+    on<UpdateUserNotificationsEvent>(_onUpdateNotificationCount);
     on<DeleteAccountEvent>(_onDeleteAccount);
     on<LoadOrdersEvent>(_onLoadOrdererInfo);
     on<UpdatePreferencesEvent>(_onUpdatePreferences);
     on<UpdateNotificationPreferencesEvent>(_onUpdateNotificationPreferences);
+  }
+
+  Future<void> _onUpdateNotificationCount(
+      UpdateUserNotificationsEvent event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      UserLoaded userLoaded = state as UserLoaded;
+
+      try {
+        emit(userLoaded.copyWith(
+          unreadNotificationsCount: event.unreadNotificationsCount,
+        ));
+      } catch (err) {
+        emit(userLoaded.copyWith(
+          isUpdateLoading: false,
+        ));
+        Toast.showError("Unable to update notifications");
+      }
+    }
   }
 
   Future<void> _onLoadOrdererInfo(
@@ -71,6 +90,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           earningAccount: event.account,
         );
         emit(UserLoaded(
+          unreadNotificationsCount: userLoaded.unreadNotificationsCount,
           user: updatedUser,
           points: userLoaded.points,
           isLocationPermissionGranted: userLoaded.isLocationPermissionGranted,
@@ -263,6 +283,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       var user = await userRepository.getUser();
 
       emit(UserLoaded(
+        unreadNotificationsCount: user.notificationsCount,
         user: user,
         points: user.totalPoints,
         isLocationPermissionGranted: isLocationPermissionGranted,
@@ -300,6 +321,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       emit(UserLoaded(
         points: user.totalPoints,
+        unreadNotificationsCount: user.notificationsCount,
         user: user,
         isLocationPermissionGranted: isLocationPermissionGranted,
       ));

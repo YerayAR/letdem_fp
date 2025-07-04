@@ -219,8 +219,17 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
 
   Widget _buildConfirmOrderButton(BuildContext context) {
     return PrimaryButton(
+      isDisabled: widget.payload.status == "PENDING",
       text: context.l10n.confirmOrder,
-      onTap: () => _showConfirmationSheet(context),
+      onTap: () {
+        // if penidng ignore the button
+
+        if (widget.payload.status == "PENDING") {
+          return;
+        }
+
+        _showConfirmationSheet(context);
+      },
       textColor: Colors.white,
     );
   }

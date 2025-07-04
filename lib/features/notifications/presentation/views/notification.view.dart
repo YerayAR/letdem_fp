@@ -9,7 +9,6 @@ import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/notifications/models/notification.model.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
@@ -41,7 +40,7 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
-  var viewAllType = NotificationType.all;
+  // var viewAllType = NotificationType.all;
 
   @override
   initState() {
@@ -201,28 +200,28 @@ class _NotificationsViewState extends State<NotificationsView> {
             icon: Icons.close,
           ),
           Dimens.space(3),
-          FilterTabs<NotificationType>(
-            isExapnded: true,
-            values: NotificationType.values,
-            getName: (type) => type.name(context),
-            initialValue: viewAllType,
-            onSelected: (type) {
-              setState(() {
-                viewAllType = type;
-              });
-              // Perform filtering logic here
-            },
-            selectedColor: AppColors.primary400,
-            unselectedTextColor: AppColors.neutral500,
-          ),
-          Dimens.space(2),
+          // FilterTabs<NotificationType>(
+          //   isExapnded: true,
+          //   values: NotificationType.values,
+          //   getName: (type) => type.name(context),
+          //   initialValue: viewAllType,
+          //   onSelected: (type) {
+          //     setState(() {
+          //       viewAllType = type;
+          //     });
+          //     // Perform filtering logic here
+          //   },
+          //   selectedColor: AppColors.primary400,
+          //   unselectedTextColor: AppColors.neutral500,
+          // ),
+          // Dimens.space(2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: context.watch<NotificationsBloc>().state
                         is NotificationsLoaded &&
                     (context.read<NotificationsBloc>().state
                             as NotificationsLoaded)
-                        .notifications
+                        .unreadNotifications
                         .results
                         .isNotEmpty
                 ? [
@@ -250,6 +249,11 @@ class _NotificationsViewState extends State<NotificationsView> {
           Dimens.space(2),
           BlocConsumer<NotificationsBloc, NotificationsState>(
             listener: (context, state) {
+              if (state is NotificationsLoaded) {
+                context.read<UserBloc>().add(UpdateUserNotificationsEvent(
+                      unreadNotificationsCount: state.unreadNotifications.count,
+                    ));
+              }
               // TODO: implement listener
             },
             builder: (context, state) {
@@ -265,7 +269,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               }
 
               if (state is NotificationsLoaded &&
-                  state.notifications.count == 0) {
+                  state.unreadNotifications.count == 0) {
                 return const Expanded(
                   child: EmptyNotificationView(),
                 );
@@ -274,13 +278,10 @@ class _NotificationsViewState extends State<NotificationsView> {
               if (state is NotificationsLoaded) {
                 return Expanded(
                   child: ListView.builder(
-                    itemCount: viewAllType == NotificationType.all
-                        ? state.notifications.count
-                        : state.unreadNotifications.count,
+                    itemCount: state.unreadNotifications.count,
                     itemBuilder: (context, index) {
-                      var notification = viewAllType == NotificationType.all
-                          ? state.notifications.results[index]
-                          : state.unreadNotifications.results[index];
+                      var notification =
+                          state.unreadNotifications.results[index];
                       return NotificationItem(
                         type: notification.type,
                         notificationObject: notification.notificationObject,
