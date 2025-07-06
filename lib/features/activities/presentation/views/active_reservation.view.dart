@@ -59,13 +59,13 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
     super.dispose();
   }
 
-  String _formatDuration(Duration duration) {
-    if (duration.inSeconds <= 0) return "00:00:00";
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$hours:$minutes:$seconds";
+  String _formatDuration(Duration duration, BuildContext context) {
+    if (duration.inSeconds <= 0) return context.l10n.secondsLeft(0);
+    if (duration.inSeconds < 60) {
+      return context.l10n.secondsLeft(duration.inSeconds);
+    } else {
+      return context.l10n.minutesLeft(duration.inMinutes);
+    }
   }
 
   void _navigateToDetails(BuildContext context) {
@@ -183,7 +183,8 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
           child: Row(
             children: [
               if (!isReserved)
-                _buildIconText(Iconsax.clock5, _formatDuration(_remaining)),
+                _buildIconText(
+                    Iconsax.clock5, _formatDuration(_remaining, context)),
               isReserved ? const SizedBox() : Dimens.space(3),
               _buildIconText(
                 Iconsax.money5,

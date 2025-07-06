@@ -22,7 +22,6 @@ import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart
 import 'package:letdem/models/location/local_location.model.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
-import '../../../../../infrastructure/services/mapbox_search/models/model.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
 
 class MapSearchBottomSheet extends StatefulWidget {
@@ -37,7 +36,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
   // Properties & Controllers
   // ---------------------------------------------------------------------------
   late TextEditingController _controller;
-  List<MapBoxPlace> _searchResults = [];
+  List<HerePlace> _searchResults = [];
   Timer? _debounce;
   bool _isSearching = false;
 
@@ -69,7 +68,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
         setState(() => _isSearching = true);
         try {
           var results =
-              await MapboxSearchApiService().getLocationResults(query, context);
+              await HereSearchApiService().getLocationResults(query, context);
           setState(() {
             _searchResults = results;
             _isSearching = false;
@@ -100,8 +99,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
         location.coordinates.longitude, location.name);
   }
 
-  void _onMapBoxPlaceSelected(MapBoxPlace place) async {
-    var fullName = '${place.name} ${place.placeFormatted}';
+  void _onHerePlaceSelected(HerePlace place) async {
+    var fullName = '${place.title} ';
     DatabaseHelper().savePlace(place);
     var coordinates = await MapboxService.getLatLng(fullName);
     if (coordinates != null) {
@@ -147,9 +146,9 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       children: _searchResults
           .map((place) => SavedAddressComponent(
                 place: place,
-                onPlaceSelected: _onMapBoxPlaceSelected,
+                onPlaceSelected: _onHerePlaceSelected,
                 onApiPlaceSelected: _onLetDemLocationSelected,
-                onMapBoxPlaceDeleted: (_) {},
+                onHerePlaceDeleted: (_) {},
                 onLetDemLocationDeleted: (_) {},
               ))
           .toList(),
@@ -175,14 +174,14 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                 .read<SearchLocationBloc>()
                 .add(DeleteLocationEvent(locationType: locationType));
           },
-          onMapBoxPlaceDeleted: (_) {},
+          onHerePlaceDeleted: (_) {},
           onEditLocationTriggered: () async {
             final place = await AppPopup.showBottomSheet(
               NavigatorHelper.navigatorKey.currentState!.context,
               AddLocationBottomSheet(
                 title: context.l10n
                     .setLocation(toBeginningOfSentenceCase(locationType.name)!),
-                onLocationSelected: (MapBoxPlace selectedPlace) {
+                onLocationSelected: (HerePlace selectedPlace) {
                   Navigator.pop(context, selectedPlace);
                 },
               ),
@@ -208,7 +207,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     );
   }
 
-  Widget _buildRecentLocationsSection(List<MapBoxPlace> recentPlaces) {
+  Widget _buildRecentLocationsSection(List<HerePlace> recentPlaces) {
     if (recentPlaces.isEmpty) return const SizedBox();
     return Column(
       children: [
@@ -238,8 +237,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
               .map((place) => SavedAddressComponent(
                     place: place,
                     locationType: LetDemLocationType.other,
-                    onPlaceSelected: _onMapBoxPlaceSelected,
-                    onMapBoxPlaceDeleted: (place) {
+                    onPlaceSelected: _onHerePlaceSelected,
+                    onHerePlaceDeleted: (place) {
                       context
                           .read<SearchLocationBloc>()
                           .add(DeleteRecentLocationEvent(place: place));

@@ -272,6 +272,18 @@
     "description": "Second requirement for publishing a paid space"
   },
 
+  "reservationPendingNote": "If you do not confirm the space by {expiresAt}, this reservation will be cancelled and the money will be refunded to the requester.",
+  "@reservationPendingNote": {
+    "description": "Notification message shown when a reservation is pending confirmation. Includes the expiration time {expiresAt}.",
+    "placeholders": {
+      "expiresAt": {
+        "type": "String",
+        "example": "6:30 PM"
+      }
+    }
+  },
+
+
   "howToEarnMoneyTitle": "How do I earn money from my paid space?",
   "@howToEarnMoneyTitle": {
     "description": "Title for the section about earning money from paid space"
@@ -286,7 +298,8 @@
   "@earningsTransferDescription": {
     "description": "Description of how earnings are transferred"
   },
-
+  "minutesLeft": "{minutes} minutes left",
+  "secondsLeft": "{seconds} seconds left",
   "earningsLocationDescription": "You can see the total amount earned in the Earnings section of your profile.",
   "@earningsLocationDescription": {
     "description": "Description of where to find earnings information"
@@ -463,7 +476,7 @@
   "price": "Price",
   "enterPrice": "Enter price",
   "publish": "Publish",
-  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before they leave, and after this time elapses, the published space will expire.",
+  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before they leave. The published space will expire after this time elapses. The minimum is 1 minute, and the maximum is 60 minutes.",
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
 

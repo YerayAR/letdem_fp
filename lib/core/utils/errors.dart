@@ -43,6 +43,7 @@ class ErrorMessageHelper {
     'EARNING_ACCOUNT_ALREADY_EXISTS': 'Earning account already exists.',
     'EARNING_ACCOUNT_REQUIRED': 'Earning account is required.',
     'EARNING_ACCOUNT_IS_NOT_ACCEPTED': 'Earning account is not accepted.',
+    'ACTIVE_RESERVATION_ALREADY_EXIST': 'An active reservation already exists.',
     'COUNTRY_NOT_SUPPORTED': 'This country is not supported.',
     'BAD_REQUEST_FOR_CURRENT_STEP': 'Invalid request for the current step.',
     'INVALID_ADDRESS_COUNTRY': 'The address country is invalid.',
@@ -137,6 +138,7 @@ class ErrorMessageHelper {
         'Los propietarios del evento no pueden enviar reseñas.',
 
     // Reservations
+    'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',
     'SPACE_ALREADY_RESERVED': 'Este espacio ya está reservado.',
     'SPACE_OWNER_CANNOT_RESERVE': 'No puedes reservar tu propio espacio.',
     'RESERVATION_NOT_FOUND': 'Reserva no encontrada.',

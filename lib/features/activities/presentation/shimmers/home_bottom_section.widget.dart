@@ -53,11 +53,11 @@ class HomeMapBottomSection extends StatelessWidget {
                 child: TextInputField(
                   label: null,
                   onChanged: (value) async {
-                    MapboxSearchApiService()
+                    HereSearchApiService()
                         .getLocationResults(value, context)
                         .then((value) {
                       for (var element in value) {
-                        debugPrint(element.fullAddress);
+                        print(element.toJson());
                       }
                     });
                   },

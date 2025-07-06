@@ -4,7 +4,7 @@ import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/cache.dart';
-import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
 
 part 'search_location_event.dart';
@@ -51,7 +51,7 @@ class SearchLocationBloc
       emit(currentState.copyWith(isLocationCreating: true));
 
       try {
-        await DatabaseHelper().deletePlace(event.place.mapboxId);
+        await DatabaseHelper().deletePlace(event.place.id);
         emit(currentState.copyWith(
           recentPlaces: currentState.recentPlaces
               .where((element) => element != event.place)

@@ -7,7 +7,7 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_state.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/features/map/presentation/views/navigate.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../common/widgets/appbar.dart';
@@ -37,7 +37,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                _buildImage(),
+                _buildImage(context),
                 const SizedBox(height: 24),
                 _buildConfirmationCard(context),
                 const SizedBox(height: 24),
@@ -68,14 +68,20 @@ class ReservedSpaceDetailView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // Top Image
   // ---------------------------------------------------------------------------
-  Widget _buildImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        space.image,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
+  Widget _buildImage(
+    BuildContext context,
+  ) {
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.network(
+            space.image,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ],
     );
   }
 
@@ -200,12 +206,9 @@ class ReservedSpaceDetailView extends StatelessWidget {
   Widget _buildNavigateButton(BuildContext context) {
     return PrimaryButton(
       onTap: () {
-        NavigatorHelper.to(NavigationMapScreen(
-          hideToggle: true,
-          spaceDetails: space,
-          destinationStreetName: space.location.streetName,
-          latitude: space.location.point.lat,
-          longitude: space.location.point.lng,
+        NavigatorHelper.to(NavigationView(
+          destinationLat: details.space.location.point.lat,
+          destinationLng: details.space.location.point.lng,
         ));
       },
       text: context.l10n.navigateToSpace,

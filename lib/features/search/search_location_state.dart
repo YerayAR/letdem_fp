@@ -17,7 +17,7 @@ final class SearchLocationLoading extends SearchLocationState {
 final class SearchLocationLoaded extends SearchLocationState {
   final List<LetDemLocation> locations;
 
-  final List<MapBoxPlace> recentPlaces;
+  final List<HerePlace> recentPlaces;
   final bool isLocationCreating;
 
   const SearchLocationLoaded({
@@ -28,7 +28,7 @@ final class SearchLocationLoaded extends SearchLocationState {
 
   SearchLocationLoaded copyWith({
     List<LetDemLocation>? locations,
-    List<MapBoxPlace>? recentPlaces,
+    List<HerePlace>? recentPlaces,
     bool? isLocationCreating,
   }) {
     return SearchLocationLoaded(

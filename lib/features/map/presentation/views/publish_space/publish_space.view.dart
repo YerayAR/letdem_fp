@@ -58,6 +58,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
   // Current location data
   CurrentLocationPayload? locationData;
 
+  int _activeIndex = 0;
+
   @override
   void initState() {
     selectedSpacePicture = widget.file;
@@ -296,7 +298,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                         ? StyledBody(
                             children: [
                               TextInputField(
-                                label: context.l10n.waitingTimeMinutes,
+                                label:
+                                    "${context.l10n.waitingTime} (${context.l10n.minutes})",
                                 placeHolder: "MM",
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
@@ -399,17 +402,13 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(Dimens.defaultMargin),
                     child: PrimaryButton(
-                      isLoading: state is ActivitiesLoading,
-                      onTap: _publishSpace,
-                      isDisabled:
-                          snapshot.data == null || selectedSpacePicture == null,
-                      text: (_pageController.hasClients &&
-                              _pageController.page == 1)
-                          ? context.l10n.publish
-                          : (widget.isPaid
-                              ? context.l10n.next
-                              : context.l10n.publish),
-                    ),
+                        isLoading: state is ActivitiesLoading,
+                        onTap: _publishSpace,
+                        isDisabled: snapshot.data == null ||
+                            selectedSpacePicture == null,
+                        text: _selectedPage == 0
+                            ? context.l10n.next
+                            : context.l10n.publish),
                   ),
                 ),
               );

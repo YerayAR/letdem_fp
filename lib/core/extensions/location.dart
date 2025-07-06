@@ -9,7 +9,7 @@ extension LocationPermissionExtension on BuildContext {
         permission == LocationPermission.whileInUse;
   }
 
-  Future<String?> getUserCountry() async {
+  Future<Map<String, String>?> getUserCountry() async {
     try {
       // Request permission if not granted
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -30,10 +30,15 @@ extension LocationPermissionExtension on BuildContext {
 
       print("Placemarks: $placemarks");
 
-      if (placemarks.isNotEmpty) {
-        return placemarks.first.isoCountryCode;
+      if (placemarks.isEmpty || placemarks.first.country == null) {
+        return null;
       }
-      return null;
+
+      return {
+        'countryCode': placemarks.first.isoCountryCode ?? '',
+        'latitude': position.latitude.toString(),
+        'longitude': position.longitude.toString(),
+      };
     } catch (e) {
       debugPrint("Error getting country: $e");
       return null;

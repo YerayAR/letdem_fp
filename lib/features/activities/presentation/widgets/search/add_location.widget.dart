@@ -14,12 +14,11 @@ import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
 
-import '../../../../../infrastructure/services/mapbox_search/models/model.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
 
 class AddLocationBottomSheet extends StatefulWidget {
   final String title;
-  final Function(MapBoxPlace) onLocationSelected;
+  final Function(HerePlace) onLocationSelected;
   const AddLocationBottomSheet(
       {super.key, required this.onLocationSelected, required this.title});
 
@@ -28,7 +27,7 @@ class AddLocationBottomSheet extends StatefulWidget {
 }
 
 class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
-  List<MapBoxPlace> _searchResults = [];
+  List<HerePlace> _searchResults = [];
   Timer? _debounce;
   bool isSearching = false;
 
@@ -51,7 +50,7 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
           isSearching = true;
         });
         var results =
-            await MapboxSearchApiService().getLocationResults(query, context);
+            await HereSearchApiService().getLocationResults(query, context);
         print(results.first.toJson());
         setState(() {
           _searchResults = results;
@@ -116,21 +115,21 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
               builder: (context, state) {
                 return Expanded(
                   child: ListView(
-                    children: _searchResults.isNotEmpty &&
-                            _controller.text.isNotEmpty
-                        ? _searchResults
-                            .map((e) => SavedAddressComponent(
-                                  place: e,
-                                  onPlaceSelected: (MapBoxPlace p) {
-                                    widget.onLocationSelected(p);
-                                    NavigatorHelper.pop();
-                                  },
-                                  onMapBoxPlaceDeleted: (MapBoxPlace place) {},
-                                  onLetDemLocationDeleted:
-                                      (LetDemLocation location) {},
-                                ))
-                            .toList()
-                        : [],
+                    children:
+                        _searchResults.isNotEmpty && _controller.text.isNotEmpty
+                            ? _searchResults
+                                .map((e) => SavedAddressComponent(
+                                      place: e,
+                                      onPlaceSelected: (HerePlace p) {
+                                        widget.onLocationSelected(p);
+                                        NavigatorHelper.pop();
+                                      },
+                                      onHerePlaceDeleted: (HerePlace place) {},
+                                      onLetDemLocationDeleted:
+                                          (LetDemLocation location) {},
+                                    ))
+                                .toList()
+                            : [],
                   ),
                 );
               },

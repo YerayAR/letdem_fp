@@ -134,7 +134,23 @@
       }
     }
   },
-  "selectFilterActivities": "Selecciona un filtro para ver actividades",
+
+
+  "reservationPendingNote": "Si no confirmas el espacio antes de {expiresAt}, esta reserva será cancelada y el dinero será reembolsado al solicitante.",
+  "@reservationPendingNote": {
+    "description": "Mensaje de notificación que se muestra cuando una reserva está pendiente de confirmación. Usa la hora de expiración {expiresAt} para indicar el límite.",
+    "placeholders": {
+      "expiresAt": {
+        "type": "String",
+        "example": "18:30"
+      }
+    }
+  },
+
+
+
+
+"selectFilterActivities": "Selecciona un filtro para ver actividades",
   "searchLocation": "Buscar ubicación",
   "back": "Atrás",
   "updatingLocation": "ACTUALIZANDO UBICACIÓN DE {type}",
@@ -154,6 +170,8 @@
       }
     }
   },
+  "minutesLeft": "Quedan {minutes} minutos",
+  "secondsLeft": "Quedan {seconds} segundos",
   "locationType": "Ubicación de {type}",
   "spaceDetailsTitle": "Detalles del Espacio",
   "edit": "Editar",
@@ -444,7 +462,7 @@
   "price": "Precio",
   "enterPrice": "Ingresa el precio",
   "publish": "Publicar",
-  "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de irse, y después de que este tiempo expire, el espacio publicado caducará.",
+  "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de irse. El espacio publicado caducará después de que este tiempo expire. El mínimo es 1 minuto y el máximo es 60 minutos.",
   "whatIsThisWaitingTime": "¿Qué es esto?",
   "fetchingLocation": "Obteniendo ubicación...",
   "pleaseEnterAllFields": "Por favor completa todos los campos",

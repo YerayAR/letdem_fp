@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'service.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -54,7 +55,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> savePlace(MapBoxPlace place) async {
+  Future<void> savePlace(HerePlace place) async {
     final db = await database;
 
     // Start a transaction for atomic operations
@@ -64,7 +65,7 @@ class DatabaseHelper {
       await txn.insert(
         'places',
         {
-          'id': place.mapboxId,
+          'id': place.id,
           'data': jsonString,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
         },
@@ -87,7 +88,7 @@ class DatabaseHelper {
     });
   }
 
-  Future<List<MapBoxPlace>> getPlaces() async {
+  Future<List<HerePlace>> getPlaces() async {
     final db = await database;
 
     try {
@@ -99,7 +100,7 @@ class DatabaseHelper {
       );
 
       return maps
-          .map((map) => MapBoxPlace.fromJson(jsonDecode(map['data'])))
+          .map((map) => HerePlace.fromJson(jsonDecode(map['data'])))
           .toList();
     } catch (e) {
       print('Error getting places: $e');

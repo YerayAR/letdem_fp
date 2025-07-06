@@ -10,7 +10,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/add_location.widget.dart';
-import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/location/local_location.model.dart';
 
@@ -20,15 +20,15 @@ class SavedAddressComponent extends StatelessWidget {
   final bool isLocationCreating;
   final LetDemLocationType locationType;
 
-  final Function(MapBoxPlace) onPlaceSelected;
+  final Function(HerePlace) onPlaceSelected;
 
   final Function? onEditLocationTriggered;
 
   final Function(LetDemLocation place)? onApiPlaceSelected;
 
-  final MapBoxPlace? place;
+  final HerePlace? place;
 
-  final Function(MapBoxPlace place) onMapBoxPlaceDeleted;
+  final Function(HerePlace place) onHerePlaceDeleted;
   final Function(LetDemLocation location) onLetDemLocationDeleted;
 
   final LetDemLocation? apiPlace;
@@ -38,7 +38,7 @@ class SavedAddressComponent extends StatelessWidget {
       this.apiPlace,
       this.isLocationCreating = false,
       this.onEditLocationTriggered,
-      required this.onMapBoxPlaceDeleted,
+      required this.onHerePlaceDeleted,
       required this.onLetDemLocationDeleted,
       this.locationType = LetDemLocationType.other,
       this.place,
@@ -58,7 +58,7 @@ class SavedAddressComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (place != null && place!.placeFormatted == "")
+    return (place != null && place!.title == "")
         ? const SizedBox()
         : GestureDetector(
             onTap: () {
@@ -97,7 +97,7 @@ class SavedAddressComponent extends StatelessWidget {
                         if (apiPlace != null) {
                           onLetDemLocationDeleted(apiPlace!);
                         } else {
-                          onMapBoxPlaceDeleted(place!);
+                          onHerePlaceDeleted(place!);
                         }
                       },
                       child: Row(
@@ -146,8 +146,17 @@ class SavedAddressComponent extends StatelessWidget {
                                                                     locationType
                                                                         .name)
                                                             : place!
-                                                                .placeFormatted
-                                                                .toUpperCase()
+                                                                    .toString()
+                                                                    .split(",")
+                                                                    .isNotEmpty
+                                                                ? place!.address
+                                                                    .toString()
+                                                                    .split(
+                                                                        ",")[0]
+                                                                    .toUpperCase()
+                                                                : place!.address
+                                                                    .toString()
+                                                                    .toUpperCase()
                                                         : context.l10n
                                                             .locationType(
                                                                 locationType
@@ -165,7 +174,7 @@ class SavedAddressComponent extends StatelessWidget {
                                                     ? Text(
                                                         apiPlace != null
                                                             ? apiPlace!.name
-                                                            : place!.name,
+                                                            : place!.title,
                                                         style: Typo.mediumBody
                                                             .copyWith(
                                                           fontSize: 16,
@@ -186,7 +195,7 @@ class SavedAddressComponent extends StatelessWidget {
                                                                         toBeginningOfSentenceCase(
                                                                             locationType.name)!),
                                                                 onLocationSelected:
-                                                                    (MapBoxPlace
+                                                                    (HerePlace
                                                                         place) {
                                                                   onPlaceSelected(
                                                                       place);
