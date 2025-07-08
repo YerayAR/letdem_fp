@@ -61,7 +61,7 @@ class _LoginViewState extends State<LoginView> {
             widgetImage: SvgPicture.asset(AppAssets.google),
             textColor: const Color(0xFF344054),
             borderColor: AppColors.neutral50,
-            text: 'Sign in with Google',
+            text: context.l10n.singInWithGoogle,
           ),
         ),
       ),

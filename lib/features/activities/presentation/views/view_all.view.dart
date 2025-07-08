@@ -89,7 +89,7 @@ class _ViewAllViewState extends State<ViewAllView> {
                 ),
                 FilterTabs<ViewAllType>(
                   values: ViewAllType.values,
-                  getName: (type) => toBeginningOfSentenceCase(type.name),
+                  getName: (type) => type.getName(context),
                   initialValue: viewAllType,
                   onSelected: (type) {
                     setState(() {
@@ -140,7 +140,7 @@ class _ViewAllViewState extends State<ViewAllView> {
           horizontal: 25,
         ),
         child: Text(
-          type.name,
+          type.getName(context),
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.neutral500,
             fontSize: 14,

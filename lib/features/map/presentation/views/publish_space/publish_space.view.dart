@@ -298,9 +298,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                         ? StyledBody(
                             children: [
                               TextInputField(
-                                label:
-                                    "${context.l10n.waitingTime} (${context.l10n.minutes})",
-                                placeHolder: "MM",
+                                label: context.l10n.waitingTime,
+                                placeHolder: "MM:SS",
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                   FilteringTextInputFormatter.allow(
@@ -402,13 +401,14 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(Dimens.defaultMargin),
                     child: PrimaryButton(
-                        isLoading: state is ActivitiesLoading,
-                        onTap: _publishSpace,
-                        isDisabled: snapshot.data == null ||
-                            selectedSpacePicture == null,
-                        text: _selectedPage == 0
-                            ? context.l10n.next
-                            : context.l10n.publish),
+                      isLoading: state is ActivitiesLoading,
+                      onTap: _publishSpace,
+                      isDisabled:
+                          snapshot.data == null || selectedSpacePicture == null,
+                      text: widget.isPaid && _selectedPage == 0
+                          ? context.l10n.next
+                          : context.l10n.publish,
+                    ),
                   ),
                 ),
               );
@@ -557,8 +557,8 @@ class PaidSpaceForm extends StatelessWidget {
       body: StyledBody(
         children: [
           TextInputField(
-            label: context.l10n.waitingTime, // Cambiar "Waiting Time"
-            placeHolder: context.l10n.waitingTimeMinutes,
+            label: context.l10n.waitingTime,
+            placeHolder: 'MM:SS',
             prefixIcon: Iconsax.clock5,
             onChanged: (value) {},
           ),
