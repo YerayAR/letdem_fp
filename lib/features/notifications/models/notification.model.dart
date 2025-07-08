@@ -30,12 +30,26 @@ class NotificationResult {
   }
 
   factory NotificationResult.fromJson(Map<String, dynamic> json) =>
+
+      // if notification object is not present, make dummy object
+
       NotificationResult(
         id: json['id'],
         type: notificationTypeFromString(json['type']),
         read: json['read'],
-        notificationObject:
-            NotificationObject.fromJson(json['notification_object']),
+        notificationObject: json['notification_object'] == null
+            ? NotificationObject(
+                id: '',
+                type: '',
+                image: '',
+                location: Location(
+                  streetName: '',
+                  point: Point(lng: 0.0, lat: 0.0),
+                ),
+                created: DateTime.now(),
+                resourceType: '',
+              )
+            : NotificationObject.fromJson(json['notification_object']),
         created: DateTime.parse(json['created']),
       );
 }
