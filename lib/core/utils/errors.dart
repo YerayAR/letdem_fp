@@ -17,6 +17,7 @@ class ErrorMessageHelper {
     // Accounts
     'INVALID_CREDENTIALS': 'Invalid credentials. Please try again.',
     'INVALID_CURRENT_PASSWORD': 'The current password is incorrect.',
+    'ACTIVE_RESERVATION_ALREADY_EXIST': 'An active reservation already exists.',
     'REPEATED_PASSWORD': 'New password cannot be the same as the old password.',
     'INACTIVE_ACCOUNT': 'Your account is inactive.',
     'EMAIL_ALREADY_EXISTS': 'This email is already registered.',
@@ -43,7 +44,6 @@ class ErrorMessageHelper {
     'EARNING_ACCOUNT_ALREADY_EXISTS': 'Earning account already exists.',
     'EARNING_ACCOUNT_REQUIRED': 'Earning account is required.',
     'EARNING_ACCOUNT_IS_NOT_ACCEPTED': 'Earning account is not accepted.',
-    'ACTIVE_RESERVATION_ALREADY_EXIST': 'An active reservation already exists.',
     'COUNTRY_NOT_SUPPORTED': 'This country is not supported.',
     'BAD_REQUEST_FOR_CURRENT_STEP': 'Invalid request for the current step.',
     'INVALID_ADDRESS_COUNTRY': 'The address country is invalid.',
@@ -88,6 +88,7 @@ class ErrorMessageHelper {
     'INVALID_CREDENTIALS': 'Credenciales inválidas. Intenta nuevamente.',
     'card_declined':
         'Tu tarjeta fue rechazada. Verifica los detalles de tu pago.',
+    'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',
     'INVALID_CURRENT_PASSWORD': 'La contraseña actual es incorrecta.',
     'REPEATED_PASSWORD':
         'La nueva contraseña no puede ser igual a la anterior.',
@@ -138,7 +139,6 @@ class ErrorMessageHelper {
         'Los propietarios del evento no pueden enviar reseñas.',
 
     // Reservations
-    'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',
     'SPACE_ALREADY_RESERVED': 'Este espacio ya está reservado.',
     'SPACE_OWNER_CANNOT_RESERVE': 'No puedes reservar tu propio espacio.',
     'RESERVATION_NOT_FOUND': 'Reserva no encontrada.',

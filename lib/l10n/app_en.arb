@@ -506,7 +506,7 @@
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
 
-    "pendingFundsInfo": "There is a portion of your funds that has not yet been released by the payment provider. Therefore, the amount shown as available for withdrawal in this view corresponds only to the funds that have already been released. The remaining balance is still pending.",
+    "pendingFundsInfo": "There is a portion of your funds that has not yet been released by the payment provider. Therefore, the amount shown as available for withdrawal in this view corresponds only to the funds that have already been released. The remaining balance is still pending. The minimum amount you can withdraw is €10.",
   "pleaseEnterAllFields": "Please fill all fields",
   "spacePublishedSuccesfully": "Space Published Successfully",
   "spacePublishedDescription": "Your space have been published successfully, people can now have access to use space.",

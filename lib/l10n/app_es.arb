@@ -475,7 +475,7 @@
   "youHaveArrived": "¡Has llegado a tu destino!",
   "navigatingToParking": "Navegando al aparcamiento de estacionamiento",
   "preparingNavigation": "Preparando tu navegación...",
-  "pendingFundsInfo"  : "Hay una parte de tu dinero que no ha sido liberado por el proveedor de pagos, por lo que en esta vista el monto que te permite retirar es el monto ya liberado por el proveedor de pagos, el resto sigue pendiente." ,
+  "pendingFundsInfo"  : "Hay una parte de tu dinero que no ha sido liberado por el proveedor de pagos, por lo que en esta vista el monto que te permite retirar es el monto ya liberado por el proveedor de pagos, el resto sigue pendiente. El monto mínimo que puedes retirar es de 10€.",
   "navigationError": "No se pudo calcular la ruta. Por favor, inténtalo de nuevo.",
   "spaceDeleted": "Aparcamiento eliminado",
   "spaceDeletedSubtext": "El aparcamiento ha sido eliminado con éxito.",
