@@ -84,7 +84,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                                   last4: paymentMethod.last4,
                                   brand: getBrandName(paymentMethod.brand),
                                   expireDate:
-                                      '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
+                                      '${paymentMethod.getMonthName(context)} - ${paymentMethod.expYear}',
                                   cardType: paymentMethod.brand,
                                   holderName: paymentMethod.holderName,
                                   isDefault: paymentMethod.isDefault,

@@ -183,8 +183,7 @@ class _WithdrawViewState extends State<WithdrawView> {
                 onTap: () {
                   if (context.userProfile!.earningAccount!.availableBalance <=
                       0) {
-                    Toast.showError(
-                        'You do not have enough balance to withdraw');
+                    Toast.showError(context.l10n.insufficientBalance);
                     return;
                   }
 
