@@ -25,6 +25,12 @@ class EndPoints {
 
   static bool showApiLogs = true;
 
+  // v1/spaces/1d75c325fab445edb60a9eebef996b0f
+  static Endpoint getSpaceDetails(String id) => Endpoint(
+        url: "/spaces/$id",
+        method: HTTPMethod.GET,
+      );
+
   static Endpoint<EditBasicInfoDTO> updateUserProfileEndpoint = Endpoint(
     url: "/users/me",
     method: HTTPMethod.PUT,

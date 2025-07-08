@@ -17,6 +17,7 @@ import 'package:letdem/features/auth/models/nearby_payload.model.dart'
     hide Location;
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
+import 'package:letdem/infrastructure/services/notification/notification.service.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../../../../common/popups/popup.dart';
@@ -42,6 +43,9 @@ class _HomeViewState extends State<HomeView>
   bool isLoadingAssets = true;
   bool hasNoPermission = false;
   bool _isListeningToLocation = false;
+  bool _isFollowingLocation = true; // Track if we should follow user location
+  bool _isUserInteracting =
+      false; // Track if user is manually interacting with map
 
   late LocationEngine _locationEngine;
   LocationIndicator? _locationIndicator;
@@ -74,21 +78,12 @@ class _HomeViewState extends State<HomeView>
     super.initState();
     _loadAssets();
     _getCurrentLocation();
-    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      print("Foreground notification received: ${event.jsonRepresentation()}");
-
-      // You can choose to show the notification or not:
-    });
 
     OneSignal.Notifications.addClickListener((event) {
-      print("Notification clicked: ${event.jsonRepresentation()}");
-
-      // You can navigate or perform other actions based on the notification data
       final data = event.notification.additionalData;
-      final route = data?['route']; // Example custom key
-      if (route != null) {
-        // Navigate or perform some logic
-      }
+      final handler = NotificationHandler(context);
+
+      handler.handleNotification(data);
     });
   }
 
@@ -220,6 +215,15 @@ class _HomeViewState extends State<HomeView>
         _currentPosition = location.coordinates;
         setState(() {});
         _locationIndicator?.updateLocation(location);
+
+        // Auto-align map to current location if following mode is enabled
+        if (_isFollowingLocation &&
+            !_isUserInteracting &&
+            _mapController != null) {
+          _mapController!.camera.lookAtPoint(location.coordinates);
+          _lastCameraPosition = location.coordinates;
+        }
+
         _checkDistanceAndFetchIfNeeded(location.coordinates);
       });
 
@@ -265,6 +269,20 @@ class _HomeViewState extends State<HomeView>
         MapMeasure(MapMeasureKind.distanceInMeters, 3000),
       );
       _lastCameraPosition = myLocation.coordinates;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Location Following Control
+  // ---------------------------------------------------------------------------
+  void _enableLocationFollowing() {
+    setState(() {
+      _isFollowingLocation = true;
+    });
+    if (_currentPosition != null && _mapController != null) {
+      _mapController!.camera.lookAtPoint(_currentPosition!);
+      _lastCameraPosition = _currentPosition;
+      _hideRefreshButton();
     }
   }
 
@@ -347,7 +365,16 @@ class _HomeViewState extends State<HomeView>
     _mapController!.gestures.panListener = PanListener(
       (GestureState state, Point2D origin, Point2D translation,
           double velocity) {
-        if (state == GestureState.end) {
+        if (state == GestureState.begin) {
+          // User started interacting with map - disable auto-follow
+          setState(() {
+            _isUserInteracting = true;
+            _isFollowingLocation = false;
+          });
+        } else if (state == GestureState.end) {
+          setState(() {
+            _isUserInteracting = false;
+          });
           // Get current camera position when pan ends
           final currentCameraPosition =
               _mapController!.camera.state.targetCoordinates;
@@ -493,6 +520,21 @@ class _HomeViewState extends State<HomeView>
                                 ),
                               ),
                             ),
+                          ),
+                        ),
+                      // My Location button - shown when not following location
+                      if (!_isFollowingLocation && _currentPosition != null)
+                        Positioned(
+                          bottom:
+                              265, // Adjust based on your bottom section height
+                          right: 16,
+                          child: FloatingActionButton(
+                            mini: true,
+                            onPressed: _enableLocationFollowing,
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primary500,
+                            elevation: 4,
+                            child: Icon(Icons.my_location, size: 20),
                           ),
                         ),
                     ],

@@ -30,12 +30,6 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
             previous: null,
             results: [],
           ),
-          notifications: NotificationModel(
-            count: 0,
-            next: null,
-            previous: null,
-            results: [],
-          ),
         ));
       }
     } catch (err) {
@@ -47,6 +41,22 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       Emitter<NotificationsState> emit) async {
     try {
       await notificationRepository.markNotificationAsRead(event.id);
+
+      if (state is NotificationsLoaded) {
+        var currentState = state as NotificationsLoaded;
+        var updatedResults = currentState.unreadNotifications.results
+            .where((notification) => notification.id != event.id)
+            .toList();
+
+        emit(NotificationsLoaded(
+          unreadNotifications: NotificationModel(
+            count: updatedResults.length,
+            next: null,
+            previous: null,
+            results: updatedResults,
+          ),
+        ));
+      }
       //   remove notification from the list
     } catch (err) {
       emit(const NotificationsError(
@@ -67,20 +77,15 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       LoadNotificationsEvent event, Emitter<NotificationsState> emit) async {
     try {
       emit(NotificationsLoading());
-      var notifications = await notificationRepository.getNotifications(false);
       var unread = await notificationRepository.getNotifications(true);
 
       var currentPos = await Geolocator.getCurrentPosition();
 
-      for (var notification in notifications.results) {
-        notification.setDistance(currentPos);
-      }
       for (var notification in unread.results) {
         notification.setDistance(currentPos);
       }
 
       emit(NotificationsLoaded(
-        notifications: notifications,
         unreadNotifications: unread,
       ));
     } catch (err, st) {

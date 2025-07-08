@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:letdem/infrastructure/services/mapbox_search/models/model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'service.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -13,27 +14,39 @@ class DatabaseHelper {
   DatabaseHelper._internal();
 
   Future<Database> get database async {
-    if (_database != null) return _database!;
+    if (_database != null) {
+      print('[DB] Returning existing database instance.');
+      return _database!;
+    }
+    print('[DB] Initializing new database.');
     _database = await _initDatabase();
     return _database!;
   }
 
   Future deleteAllPlaces() async {
+    print('[DB] Deleting all places...');
     final db = await database;
-    await db.delete('places');
+    final deletedCount = await db.delete('places');
+    print('[DB] Deleted $deletedCount places.');
   }
 
   Future deletePlace(String id) async {
+    print('[DB] Deleting place with ID: $id');
     final db = await database;
-    await db.delete('places', where: 'id = ?', whereArgs: [id]);
+    final deletedCount =
+        await db.delete('places', where: 'id = ?', whereArgs: [id]);
+    print('[DB] Deleted $deletedCount rows for ID: $id');
   }
 
   Future<Database> _initDatabase() async {
     final path = join(await getDatabasesPath(), 'mapbox_places.db');
+    print('[DB] Opening database at path: $path');
+
     return await openDatabase(
       path,
-      version: 2, // Increment version to handle schema change
+      version: 2,
       onCreate: (db, version) async {
+        print('[DB] Creating new table...');
         await db.execute('''
           CREATE TABLE places (
             id TEXT PRIMARY KEY,
@@ -41,74 +54,90 @@ class DatabaseHelper {
             timestamp INTEGER
           )
         ''');
+        print('[DB] Table created.');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
+        print(
+            '[DB] Upgrading database from version $oldVersion to $newVersion');
         if (oldVersion < 2) {
-          // Add timestamp column to existing table
+          print('[DB] Adding "timestamp" column...');
           await db.execute('ALTER TABLE places ADD COLUMN timestamp INTEGER');
-          // Update existing records with current timestamp
-          await db.execute(
-              'UPDATE places SET timestamp = ${DateTime.now().millisecondsSinceEpoch}');
+          final timestamp = DateTime.now().millisecondsSinceEpoch;
+          print('[DB] Setting timestamp for existing records: $timestamp');
+          await db.execute('UPDATE places SET timestamp = $timestamp');
         }
       },
     );
   }
 
-  Future<void> savePlace(MapBoxPlace place) async {
+  Future<void> savePlace(HerePlace place) async {
     final db = await database;
+    final jsonString = jsonEncode(place.toJson());
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    // Start a transaction for atomic operations
+    print('[DB] Saving place with ID: ${place.id}');
+    print('[DB] JSON: $jsonString');
+    print('[DB] Timestamp: $timestamp');
+
     await db.transaction((txn) async {
-      // Insert the new place with timestamp
-      final jsonString = jsonEncode(place.toJson());
+      print('[DB] Inserting place inside transaction...');
       await txn.insert(
         'places',
         {
-          'id': place.mapboxId,
+          'id': place.id,
           'data': jsonString,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'timestamp': timestamp,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+      print('[DB] Inserted/Updated place: ${place.id}');
 
-      // Get count of places
-      final count = Sqflite.firstIntValue(
-          await txn.rawQuery('SELECT COUNT(*) FROM places'));
+      final countResult = await txn.rawQuery('SELECT COUNT(*) FROM places');
+      final count = Sqflite.firstIntValue(countResult);
+      print('[DB] Current place count: $count');
 
-      // If we have more than 5 places, delete the oldest one(s)
       if (count != null && count > 5) {
-        // This query finds the oldest records by timestamp and deletes them
-        await txn.rawDelete('''
+        final toDelete = count - 5;
+        print('[DB] Deleting $toDelete oldest place(s)...');
+        final deleted = await txn.rawDelete('''
           DELETE FROM places WHERE id IN (
-            SELECT id FROM places ORDER BY timestamp ASC LIMIT ${count - 5}
+            SELECT id FROM places ORDER BY timestamp ASC LIMIT $toDelete
           )
         ''');
+        print('[DB] Deleted $deleted oldest places.');
       }
     });
   }
 
-  Future<List<MapBoxPlace>> getPlaces() async {
+  Future<List<HerePlace>> getPlaces() async {
     final db = await database;
 
+    print('[DB] Retrieving places ordered by most recent...');
     try {
-      // Query with order by timestamp descending (most recent first)
       final List<Map<String, dynamic>> maps = await db.query(
         'places',
         orderBy: 'timestamp DESC',
         limit: 5,
       );
 
-      return maps
-          .map((map) => MapBoxPlace.fromJson(jsonDecode(map['data'])))
-          .toList();
-    } catch (e) {
-      print('Error getting places: $e');
+      print('[DB] Retrieved ${maps.length} places.');
+      final places = maps.map((map) {
+        print('[DB] Decoding place ID: ${map['data']}');
+        return HerePlace.fromJson(jsonDecode(map['data']));
+      }).toList();
+
+      return places;
+    } catch (e, st) {
+      print('[DB] Error retrieving places: $st');
+      print('[DB] Error getting places: $e');
       return [];
     }
   }
 
   Future<void> clearAll() async {
+    print('[DB] Clearing all data from places table...');
     final db = await database;
-    await db.delete('places');
+    final deleted = await db.delete('places');
+    print('[DB] Cleared $deleted rows from places table.');
   }
 }

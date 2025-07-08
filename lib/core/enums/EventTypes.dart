@@ -1,5 +1,5 @@
-import 'package:letdem/core/constants/assets.dart';
 import 'package:flutter/material.dart';
+import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/extensions/locale.dart';
 
 enum EventTypes {
@@ -66,5 +66,20 @@ String getEventTypeIcon(EventTypes type) {
       return AppAssets.closeRoad;
     case EventTypes.accident:
       return AppAssets.accident;
+  }
+
+  // Police: 1E90FF
+  // Accident: FF0000
+  // Closed Road: FFA500
+}
+
+int getEventTypeIconColor(EventTypes type) {
+  switch (type) {
+    case EventTypes.police:
+      return 0xff1E90FF;
+    case EventTypes.closeRoad:
+      return 0xffFFA500;
+    case EventTypes.accident:
+      return 0xffFF0000;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
@@ -12,7 +14,7 @@ import 'package:letdem/features/activities/presentation/views/spaces/reserved_sp
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
-class ActiveReservationView extends StatelessWidget {
+class ActiveReservationView extends StatefulWidget {
   final ReservedSpacePayload payload;
 
   const ActiveReservationView({
@@ -20,25 +22,71 @@ class ActiveReservationView extends StatelessWidget {
     required this.payload,
   });
 
+  @override
+  State<ActiveReservationView> createState() => _ActiveReservationViewState();
+}
+
+class _ActiveReservationViewState extends State<ActiveReservationView> {
+  late Duration _remaining;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRemainingTime();
+    _startCountdown();
+  }
+
+  void _updateRemainingTime() {
+    final now = DateTime.now();
+    final expireAt = widget.payload.expireAt;
+    _remaining = expireAt.difference(now).isNegative
+        ? Duration.zero
+        : expireAt.difference(now);
+  }
+
+  void _startCountdown() {
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      setState(() {
+        _updateRemainingTime();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _formatDuration(Duration duration, BuildContext context) {
+    if (duration.inSeconds <= 0) return context.l10n.secondsLeft(0);
+    if (duration.inSeconds < 60) {
+      return context.l10n.secondsLeft(duration.inSeconds);
+    } else {
+      return context.l10n.minutesLeft(duration.inMinutes);
+    }
+  }
+
   void _navigateToDetails(BuildContext context) {
-    if (!payload.isOwner) {
+    if (!widget.payload.isOwner) {
       NavigatorHelper.to(
         ReservedSpaceDetailView(
-          details: payload,
+          details: widget.payload,
           space: _buildSpaceFromPayload(),
         ),
       );
     } else {
       NavigatorHelper.to(
-        ConfirmedSpaceReviewView(payload: payload),
+        ConfirmedSpaceReviewView(payload: widget.payload),
       );
     }
   }
 
   Space _buildSpaceFromPayload() {
-    final space = payload.space;
+    final space = widget.payload.space;
     return Space(
-      id: payload.id,
+      id: widget.payload.id,
       type: space.type,
       image: space.image,
       location: Location(
@@ -53,6 +101,7 @@ class ActiveReservationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final payload = widget.payload;
     return GestureDetector(
       onTap: () => _navigateToDetails(context),
       child: Container(
@@ -79,6 +128,7 @@ class ActiveReservationView extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final payload = widget.payload;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -89,6 +139,7 @@ class ActiveReservationView extends StatelessWidget {
   }
 
   Widget _buildTypeInfo(BuildContext context) {
+    final payload = widget.payload;
     return Row(
       children: [
         SvgPicture.asset(
@@ -106,7 +157,7 @@ class ActiveReservationView extends StatelessWidget {
   }
 
   Widget _buildStatusInfo(BuildContext context) {
-    final isReserved = payload.status == "RESERVED";
+    final isReserved = widget.payload.status == "RESERVED";
     return Row(
       children: [
         CircleAvatar(
@@ -123,6 +174,7 @@ class ActiveReservationView extends StatelessWidget {
   }
 
   Widget _buildDetailsRow(BuildContext context) {
+    final payload = widget.payload;
     final isReserved = payload.status == "RESERVED";
 
     return Row(
@@ -132,10 +184,8 @@ class ActiveReservationView extends StatelessWidget {
             children: [
               if (!isReserved)
                 _buildIconText(
-                    Iconsax.clock5, getTimeRemaining(payload.expireAt)),
-
+                    Iconsax.clock5, _formatDuration(_remaining, context)),
               isReserved ? const SizedBox() : Dimens.space(3),
-
               _buildIconText(
                 Iconsax.money5,
                 payload.price == null

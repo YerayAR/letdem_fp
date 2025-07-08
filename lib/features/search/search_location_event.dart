@@ -13,7 +13,7 @@ final class GetLocationListEvent extends SearchLocationEvent {
 }
 
 final class DeleteRecentLocationEvent extends SearchLocationEvent {
-  final MapBoxPlace place;
+  final HerePlace place;
 
   const DeleteRecentLocationEvent({required this.place});
 

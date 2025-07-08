@@ -51,6 +51,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
 import 'firebase_options.dart';
+import 'infrastructure/services/notification/notification.service.dart';
 
 Future _initializeHERESDK() async {
   try {
@@ -85,6 +86,12 @@ void main() async {
   await _initializeHERESDK();
   MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
   OneSignal.initialize(AppCredentials.oneSignalAppId);
+  OneSignal.Notifications.addClickListener((event) {
+    final data = event.notification.additionalData;
+    final handler =
+        NotificationHandler(NavigatorHelper.navigatorKey.currentContext!);
+    handler.handleNotification(data);
+  });
   final String defaultLocale =
       Platform.localeName; // Returns locale string in the form 'en_US'
 

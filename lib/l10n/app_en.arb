@@ -141,11 +141,11 @@
   "currency": "€",
   "showAll": "Show All",
   "noContributions": "No Contributions Yet",
-  "noContributionsDescription": "You haven't made any contributions yet. Start by publishing a space or event!",
+  "noContributionsDescription": "Your Contributions history will appear here, Publish to see them",
   "all": "All",
   "parkingSpace": "Parking Space",
   "events": "Events",
-  "verifyYourAccountFirst" : "Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.",
+  "verifyYourAccountFirst": "Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.",
   "failedToLoadActivities": "Failed to load activities: {error}",
   "@failedToLoadActivities": {
     "placeholders": {
@@ -169,7 +169,6 @@
   "location": "Location",
   "spaceDetailsTitle": "Space Details",
   "locationType": "{type} LOCATION",
-
   "setLocation": "Set {type} Location",
   "@setLocation": {
     "placeholders": {
@@ -252,11 +251,113 @@
   "newPassword": "New Password",
   "repeatPassword": "Repeat Password",
   "enterPassword": "Enter your password",
+
+  "howToPublishPaidSpaceTitle": "How do I publish a paid space?",
+  "@howToPublishPaidSpaceTitle": {
+    "description": "Title for the section about publishing a paid space"
+  },
+
+  "howToPublishPaidSpaceDescription": "To publish a paid space, you must meet the following requirements:",
+  "@howToPublishPaidSpaceDescription": {
+    "description": "Description for publishing a paid space"
+  },
+
+  "publishPaidSpaceRequirement1": "Enter your vehicle information in the app so it can be used at the time of reservation.",
+  "@publishPaidSpaceRequirement1": {
+    "description": "First requirement for publishing a paid space"
+  },
+
+  "publishPaidSpaceRequirement2": "Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.",
+  "@publishPaidSpaceRequirement2": {
+    "description": "Second requirement for publishing a paid space"
+  },
+
+  "reservationPendingNote": "If you do not confirm the space by {expiresAt}, this reservation will be cancelled and the money will be refunded to the requester.",
+  "@reservationPendingNote": {
+    "description": "Notification message shown when a reservation is pending confirmation. Includes the expiration time {expiresAt}.",
+    "placeholders": {
+      "expiresAt": {
+        "type": "String",
+        "example": "6:30 PM"
+      }
+    }
+  },
+
+
+  "howToEarnMoneyTitle": "How do I earn money from my paid space?",
+  "@howToEarnMoneyTitle": {
+    "description": "Title for the section about earning money from paid space"
+  },
+
+  "howToEarnMoneyDescription": "To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.",
+  "@howToEarnMoneyDescription": {
+    "description": "Description of how to earn money from paid space"
+  },
+
+  "earningsTransferDescription": "Once the reservation is confirmed, the amount of your reservation — minus LetDem's service fees — will be transferred to you.",
+  "@earningsTransferDescription": {
+    "description": "Description of how earnings are transferred"
+  },
+  "minutesLeft": "{minutes} minutes left",
+  "secondsLeft": "{seconds} seconds left",
+  "earningsLocationDescription": "You can see the total amount earned in the Earnings section of your profile.",
+  "@earningsLocationDescription": {
+    "description": "Description of where to find earnings information"
+  },
+
+  "howToWithdrawFundsTitle": "How do I withdraw my funds to a personal account?",
+  "@howToWithdrawFundsTitle": {
+    "description": "Title for the section about withdrawing funds"
+  },
+
+  "howToWithdrawFundsDescription": "To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you'll be able to withdraw them using one of your linked bank accounts.",
+  "@howToWithdrawFundsDescription": {
+    "description": "Description of how to withdraw funds"
+  },
+
+  "earningsSection": "Earnings",
+  "@earningsSection": {
+    "description": "Label for the earnings section"
+  },
+
+  "letdemServiceFees": "LetDem's service fees",
+  "@letdemServiceFees": {
+    "description": "Reference to LetDem service fees"
+  },
+
+"helpAndSupport" : "Help & Support",
+
+  "vehicleInformation": "vehicle information",
+  "@vehicleInformation": {
+    "description": "Reference to vehicle information"
+  },
+
+  "earningsAccount": "earnings account",
+  "@earningsAccount": {
+    "description": "Reference to earnings account"
+  },
+
+  "taxInformation": "tax information",
+  "@taxInformation": {
+    "description": "Reference to tax information"
+  },
+
+  "paymentProvider": "payment provider",
+  "@paymentProvider": {
+    "description": "Reference to payment provider"
+  },
+
+  "linkedBankAccounts": "linked bank accounts",
+  "@linkedBankAccounts": {
+    "description": "Reference to linked bank accounts"
+  },
   "passwordsDoNotMatch": "Passwords do not match",
-  "passwordRequirements": "Ensure to use at least 8 characters, with a number and a special character and uppercase letter",
+  "passwordRequirements": "Ensure to use at least 8 characters, with a number, an uppercase letter, and one of the following special characters: $, ., &, @",
+
   "emailSentTitle": "We sent you an email",
   "emailSentDescription": "We've sent an OTP to your email. Enter it below to reset your password.",
   "mailSentTo": "Mail is sent to: ",
+  "reservations" : "Reservations",
   "notYou": "Not you? ",
   "changeEmail": "Change email",
   "didntGetOtp": "Didn't get OTP? ",
@@ -280,6 +381,7 @@
   "alreadyHaveAccount": "Already have an account? ",
   "loginHere": "Login here",
   "signUpWithGoogle": "Sign up with Google",
+  "singInWithGoogle": "Sign in with Google",
   "agreeToTerms": "By continuing, I agree to LetDem ",
   "termsAndConditions": "Terms & Conditions",
   "pleaseAcceptTerms": "Please accept the terms and conditions",
@@ -371,13 +473,14 @@
   "clickToOpenCamera": "Click to open camera",
   "publishPaidSpace": "Publish Paid Space",
   "waitingTime": "Waiting Time",
-  "waitingTimeMinutes": "MM",
   "price": "Price",
   "enterPrice": "Enter price",
   "publish": "Publish",
-  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before they leave, and after this time elapses, the published space will expire.",
+  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before they leave, the time must be between 1 minute to 60 minutes, and after this time elapses, the published space will expire.",
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
+
+    "pendingFundsInfo": "There is a portion of your funds that has not yet been released by the payment provider. Therefore, the amount shown as available for withdrawal in this view corresponds only to the funds that have already been released. The remaining balance is still pending.",
   "pleaseEnterAllFields": "Please fill all fields",
   "spacePublishedSuccesfully": "Space Published Successfully",
   "spacePublishedDescription": "Your space have been published successfully, people can now have access to use space.",
@@ -704,5 +807,124 @@
         "type": "String"
       }
     }
-  }
+  },
+  "paymentMethodAddedTitle": "Payment Method Added",
+  "paymentMethodAddedSubtext": "Your payment method has been successfully added.",
+  "addPaymentMethodTitle": "Add Payment Method",
+  "cardDetails": "Card Details",
+  "enterTheNumber": "Enter the number",
+  "create": "Create",
+  "pleaseEnterYourName": "Please enter your name",
+  "paymentSuccessfulReservation": "Your Payment was successful. You will get a notification once the space is reserved. You can safely close this popup.",
+  "paymentFailedRequiresAction": "Payment failed or requires further action",
+  "connectionPending": "Connection Pending",
+  "connectionPendingMessage": "Your account connection is still pending, you will be notified when the connection is complete",
+  "goBack": "Go Back",
+  "somethingWentWrongGeneric": "Something went wrong",
+  "contactSupportMessage": "There seems to be an issue with your account. Please contact support for assistance.",
+  "insufficientBalance": "You do not have enough balance to withdraw",
+  "loading": "Loading...",
+  "retry": "Retry",
+  "continueButton": "Continue",
+  "error": "Error",
+  "warning": "Warning",
+  "confirmation": "Confirmation",
+  "ok": "OK",
+  "yes": "Yes",
+  "no": "No",
+  "successGeneric": "Success",
+  "errorOccurred": "Error occurred",
+  "pleaseTryAgain": "Please try again",
+  "networkError": "Network error",
+  "published": "Published",
+  "expired": "Expired",
+  "activeStatus": "Active",
+  "minsAgo": "mins ago",
+  "hoursAgo": "hours ago",
+  "daysAgo": "days ago",
+  "myLocation": "My Location",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out",
+  "toggleView": "Toggle View",
+  "newNotification": "New notification",
+  "tapToView": "Tap to view",
+  "markAsRead": "Mark as read",
+  "invalidCredentials": "Invalid credentials",
+  "checkInternetConnection": "Please check your internet connection",
+  "loginFailed": "Login failed",
+  "registrationSuccessful": "Registration successful",
+  "accountCreated": "Account created",
+  "welcomeToLetdem": "Welcome to LetDem",
+  "searchHere": "Search here...",
+  "noResultsFound": "No results found",
+  "recentSearches": "Recent searches",
+  "clearHistory": "Clear history",
+  "carRegisteredSuccessfully": "Car registered successfully",
+  "invalidPlateNumber": "Invalid plate number",
+  "selectValidCarType": "Please select a valid car type",
+  "accountSetupComplete": "Account setup complete",
+  "verificationPending": "Verification pending",
+  "documentsUploadedSuccessfully": "Documents uploaded successfully",
+  "defaultPayment": "Default",
+  "expires": "Expires",
+  "deleteCard": "Delete card",
+  "setAsDefault": "Set as default",
+  "bankAccount": "Bank account",
+  "verified": "Verified",
+  "pendingVerification": "Pending verification",
+  "primary": "Primary",
+  "locationPermissionDenied": "Location permission denied",
+  "gpsDisabled": "GPS is disabled",
+  "unableToGetLocation": "Unable to get location",
+  "locationServicesUnavailable": "Location services unavailable",
+  "noInternetConnection": "No internet connection",
+  "connectionTimeout": "Connection timeout",
+  "serverError": "Server error",
+  "requestFailed": "Request failed",
+  "invalidEmailFormat": "Invalid email format",
+  "passwordTooShort": "Password too short",
+  "fieldRequired": "Field is required",
+  "invalidPhoneNumber": "Invalid phone number",
+  "todayDate": "Today",
+  "yesterdayDate": "Yesterday",
+  "tomorrowDate": "Tomorrow",
+  "justNowTime": "Just now",
+  "minuteAgo": "minute ago",
+  "minutesAgoTime": "minutes ago",
+  "hourAgo": "hour ago",
+  "hoursAgoTime": "hours ago",
+  "dayAgo": "day ago",
+  "daysAgoTime": "days ago",
+  "weekAgo": "week ago",
+  "weeksAgo": "weeks ago",
+  "monthAgo": "month ago",
+  "monthsAgo": "months ago",
+  "paymentReceived": "Payment received",
+  "withdrawalProcessed": "Withdrawal processed",
+  "refundIssued": "Refund issued",
+  "transactionFailed": "Transaction failed",
+  "securitySettings": "Security Settings",
+  "changePassword": "Change Password",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone.",
+  "pleaseEnterYourPhoneNumber": "Please enter your phone number",
+  "monthJan": "Jan",
+  "monthFeb": "Feb",
+  "monthMar": "Mar",
+  "monthApr": "Apr",
+  "monthMay": "May",
+  "monthJun": "Jun",
+  "monthJul": "Jul",
+  "monthAug": "Aug",
+  "monthSep": "Sep",
+  "monthOct": "Oct",
+  "monthNov": "Nov",
+  "monthDec": "Dec",
+  "faqTitle": "FAQ",
+  "faqPublishPaidSpaceQuestion": "How do I publish a paid space?",
+  "faqPublishPaidSpaceAnswer": "To publish a paid space, you must meet the following requirements:\n\n• Enter your vehicle information in the app so it can be used at the time of reservation.\n• Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.",
+  "faqEarnMoneyQuestion": "How do I earn money from my paid space?",
+  "faqEarnMoneyAnswer": "To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.\n\nOnce the reservation is confirmed, the amount of your reservation — minus LetDem's service fees — will be transferred to you.\n\nYou can see the total amount earned in the Earnings section of your profile.",
+  "faqWithdrawFundsQuestion": "How do I withdraw my funds to a personal account?",
+  "faqWithdrawFundsAnswer": "To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you'll be able to withdraw them using one of your linked bank accounts."
 }

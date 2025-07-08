@@ -84,7 +84,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                                   last4: paymentMethod.last4,
                                   brand: getBrandName(paymentMethod.brand),
                                   expireDate:
-                                      '${paymentMethod.getMonthName()} - ${paymentMethod.expYear}',
+                                      '${paymentMethod.getMonthName(context)} - ${paymentMethod.expYear}',
                                   cardType: paymentMethod.brand,
                                   holderName: paymentMethod.holderName,
                                   isDefault: paymentMethod.isDefault,
@@ -434,13 +434,14 @@ getCardIcon(String cardType) {
 }
 
 getBrandName(String cardType) {
+  print('Card Type: $cardType');
   switch (cardType.toLowerCase()) {
     case 'visa':
       return 'Visa';
     case 'mastercard':
       return 'MasterCard';
-    case 'americanexpress':
-      return 'American Express';
+    case 'americanexpress' || 'amex' || 'american express':
+      return 'Amex';
     case 'discover':
       return 'Discover';
     default:

@@ -10,6 +10,15 @@ class FetchUserInfoEvent extends UserEvent {
   List<Object?> get props => [];
 }
 
+class UpdateUserNotificationsEvent extends UserEvent {
+  final int unreadNotificationsCount;
+
+  const UpdateUserNotificationsEvent({required this.unreadNotificationsCount});
+
+  @override
+  List<Object?> get props => [unreadNotificationsCount];
+}
+
 class ChangeLanguageEvent extends UserEvent {
   final Locale locale;
 

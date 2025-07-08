@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
@@ -88,17 +89,17 @@ class _ViewAllViewState extends State<ViewAllView> {
                 ),
                 FilterTabs<ViewAllType>(
                   values: ViewAllType.values,
-                  getName: (type) => type.name,
+                  getName: (type) => type.getName(context),
                   initialValue: viewAllType,
                   onSelected: (type) {
                     setState(() {
                       viewAllType = type;
                     });
-                    // Perform filtering logic here
                   },
                   selectedColor: AppColors.primary400,
                   unselectedTextColor: AppColors.neutral500,
                 ),
+                const SizedBox(height: 16),
                 _buildActivityList(state),
               ],
             ),
@@ -139,7 +140,7 @@ class _ViewAllViewState extends State<ViewAllView> {
           horizontal: 25,
         ),
         child: Text(
-          type.name,
+          type.getName(context),
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.neutral500,
             fontSize: 14,
@@ -183,7 +184,7 @@ class _ViewAllViewState extends State<ViewAllView> {
                 radius: 40,
                 backgroundColor: Colors.white,
                 child: Icon(
-                  Iconsax.star,
+                  Iconsax.star5,
                   size: 40,
                   color: AppColors.primary500,
                 ),
@@ -211,23 +212,68 @@ class _ViewAllViewState extends State<ViewAllView> {
       }
 
       return Expanded(
-        child: ListView.separated(
-          physics: const BouncingScrollPhysics(),
-          itemCount: activities.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final activity = activities[index];
-            final type = activity.type.toLowerCase() == "space"
-                ? ContributionType.space
-                : ContributionType.event;
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ...activities.map((activity) {
+                final type = activity.type.toLowerCase() == "space"
+                    ? ContributionType.space
+                    : ContributionType.event;
 
-            return ContributionItem(
-              activity: activity,
-              showDivider: false, // Using separator instead
-              showBackground: true,
-              type: type,
-            );
-          },
+                return ContributionItem(
+                  activity: activity,
+                  showDivider: true, // Using separator instead
+                  showBackground: true,
+                  type: type,
+                );
+              }).toList(),
+              // ListView.builder(
+              //   shrinkWrap: true,
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   itemCount: activities.length,
+              //   itemBuilder: (context, index) {
+              //     final activity = activities[index];
+              //     final type = activity.type.toLowerCase() == "space"
+              //         ? ContributionType.space
+              //         : ContributionType.event;
+              //
+              //     return ContributionItem(
+              //       activity: activity,
+              //       showDivider: false, // Using separator instead
+              //       showBackground: true,
+              //       type: type,
+              //     );
+              //   },
+              // ),
+            ],
+          ),
+          // physics: const BouncingScrollPhysics(),
+          // itemCount: 2,
+          // itemBuilder: (context, index) {
+          //   return ContributionItem(
+          //     activity: Activity(
+          //       id: '12345',
+          //       type: 'activity_type',
+          //       action: 'action_performed',
+          //       points: 10,
+          //       created: DateTime.now(),
+          //     ),
+          //     showDivider: index < activities.length - 1,
+          //     showBackground: true,
+          //     type: ContributionType.event,
+          //   );
+          //   // final activity = activities[index];
+          //   // final type = activity.type.toLowerCase() == "space"
+          //   //     ? ContributionType.space
+          //   //     : ContributionType.event;
+          //   //
+          //   // return ContributionItem(
+          //   //   activity: activity,
+          //   //   showDivider: false, // Using separator instead
+          //   //   showBackground: true,
+          //   //   type: type,
+          //   // );
+          // },
         ),
       );
     }

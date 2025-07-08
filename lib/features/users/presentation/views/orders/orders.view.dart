@@ -102,6 +102,8 @@ class OrderCard extends StatelessWidget {
           // Icon
           SvgPicture.asset(
             getSpaceTypeIcon(order.type),
+            width: 40,
+            height: 40,
           ),
           const SizedBox(width: 16),
           // Details
@@ -184,10 +186,14 @@ class OrderCard extends StatelessWidget {
       backgroundColor = AppColors.primary50;
       textColor = AppColors.primary500;
       text = context.l10n.confirmed;
-    } else if (status case ReservedStatus.canceled) {
+    } else if (status case ReservedStatus.canceled || ReservedStatus.expired) {
       backgroundColor = AppColors.red50;
       textColor = AppColors.red500;
       text = context.l10n.expired;
+    } else {
+      backgroundColor = AppColors.neutral50;
+      textColor = AppColors.neutral400;
+      text = status.name.toUpperCase();
     }
 
     return Container(

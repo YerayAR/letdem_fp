@@ -82,12 +82,14 @@ class ReservedSpacePayload {
   final String phone;
   final String confirmationCode;
   final String carPlateNumber;
+  final DateTime canceledAt;
 
   ReservedSpacePayload({
     required this.id,
     required this.price,
     required this.space,
     required this.expireAt,
+    required this.canceledAt,
     required this.status,
     required this.isOwner,
     required this.phone,
@@ -107,6 +109,8 @@ class ReservedSpacePayload {
       phone: spaceJson['phone'] ?? '',
       status: json['status'] ?? '',
       confirmationCode: json['confirmation_code'].toString(),
+      canceledAt:
+          DateTime.tryParse(json['cancelled_at'] ?? '') ?? DateTime.now(),
       carPlateNumber: json['car_plate_number'] ?? '',
     );
   }

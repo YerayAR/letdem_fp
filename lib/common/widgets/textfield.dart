@@ -89,7 +89,7 @@ class TextInputFieldState extends State<TextInputField> {
       strength++;
     }
 
-    if (RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]').hasMatch(password)) {
+    if (RegExp(r'[\$\.&@]').hasMatch(password)) {
       strength++;
     }
 
@@ -150,7 +150,7 @@ class TextInputFieldState extends State<TextInputField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return '${context.l10n.pleaseEnter}${widget.label?.toLowerCase().replaceAll("enter", "")}';
+                  return '${context.l10n.pleaseEnter }${widget.label?.toLowerCase().replaceAll("enter", "")}';
                 }
                 if (widget.inputType == TextFieldType.password &&
                     value.length < 8) {
@@ -185,7 +185,8 @@ class TextInputFieldState extends State<TextInputField> {
                   (widget.inputType == TextFieldType.number
                       ? [FilteringTextInputFormatter.digitsOnly]
                       : []),
-              textInputAction: widget.textInputAction ?? TextInputAction.newline,
+              textInputAction:
+                  widget.textInputAction ?? TextInputAction.newline,
               obscureText: widget.inputType == TextFieldType.password
                   ? !isPasswordVisible
                   : false,

@@ -18,6 +18,7 @@ import 'package:letdem/features/activities/presentation/widgets/registered_car.w
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 import '../widgets/no_car_registered.widget.dart';
@@ -118,23 +119,25 @@ class NotificationAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Fix: Add null safety check for userProfile
-    final userProfile = context.userProfile;
-    final notificationCount = userProfile?.notificationsCount ?? 0;
 
     return StyledAppBar(
-      suffix: notificationCount == 0
+      suffix: context.watch<UserBloc>().state is! UserLoaded
           ? null
-          : CircleAvatar(
-              radius: 8,
-              backgroundColor: AppColors.red500,
-              child: Text(
-                notificationCount.toString(),
-                style: Typo.smallBody.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+          : context.watch<UserBloc>().state is UserLoaded &&
+                  (context.watch<UserBloc>().state as UserLoaded)
+                          .unreadNotificationsCount ==
+                      0
+              ? null
+              : CircleAvatar(
+                  radius: 8,
+                  backgroundColor: AppColors.red500,
+                  child: Text(
+                    '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
+                    style: Typo.smallBody.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )),
       title: context.l10n.activities,
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       icon: Iconsax.notification5,

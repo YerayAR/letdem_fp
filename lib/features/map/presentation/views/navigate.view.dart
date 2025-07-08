@@ -209,7 +209,11 @@ class _NavigationViewState extends State<NavigationView> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                // CHANGE: Use red background when overspeeding, orange when normal
+                color: _isOverSpeedLimit
+                    ? Colors.redAccent
+                        .withOpacity(0.2) // Red background when overspeeding
+                    : Colors.orange.shade50, // Normal orange background
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -218,7 +222,11 @@ class _NavigationViewState extends State<NavigationView> {
                   Text(
                     (_speed * 3.6).round().toString(),
                     style: TextStyle(
-                      color: Colors.orange.shade700,
+                      // CHANGE: Use red text when overspeeding, orange when normal
+                      color: _isOverSpeedLimit
+                          ? Colors.redAccent
+                              .withOpacity(0.8) // Red text when overspeeding
+                          : Colors.orange.shade700, // Normal orange text
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
                     ),
@@ -226,7 +234,10 @@ class _NavigationViewState extends State<NavigationView> {
                   Text(
                     context.l10n.kmPerHour,
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: _isOverSpeedLimit
+                          ? Colors.redAccent
+                              .withOpacity(0.8) // Red text when overspeeding
+                          : Colors.orange.shade700, // Normal orange text
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                     ),
@@ -241,15 +252,22 @@ class _NavigationViewState extends State<NavigationView> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.red, width: 2),
+                // CHANGE: Make speed limit sign border red when overspeeding
+                border: Border.all(
+                  color: _isOverSpeedLimit ? Colors.red : Colors.red,
+                  width: _isOverSpeedLimit
+                      ? 3
+                      : 2, // Thicker border when overspeeding
+                ),
               ),
               child: Center(
                 child: _currentSpeedLimit != null &&
                         _currentSpeedLimit!.speedLimitInMetersPerSecond != null
                     ? Text(
                         "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          // CHANGE: Make speed limit text red when overspeeding
+                          color: _isOverSpeedLimit ? Colors.red : Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),

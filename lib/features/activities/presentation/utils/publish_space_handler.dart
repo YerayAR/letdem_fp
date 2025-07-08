@@ -40,6 +40,9 @@ class PublishSpaceHandler {
     final isPaidAccountExist = context.userProfile?.earningAccount != null;
 
     if (!isPaidAccountExist) {
+      final earningAccount = context.userProfile?.earningAccount;
+      final status = earningAccount?.status;
+
       _showInfoPopup(
         context,
         context.l10n.importantNotice,
@@ -47,7 +50,10 @@ class PublishSpaceHandler {
         () {
           NavigatorHelper.pop();
           NavigatorHelper.to(
-            const ConnectAccountView(status: null, remainingStep: null),
+            ConnectAccountView(
+              remainingStep: earningAccount?.step,
+              status: status,
+            ),
           );
         },
       );

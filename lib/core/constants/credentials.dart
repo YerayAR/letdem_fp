@@ -3,6 +3,9 @@ enum Environment { DEV, PROD }
 class AppCredentials {
   static const String oneSignalAppId = "5889192e-5711-44de-864b-2fa6ef568c67";
 
+  static const String hereApiKey =
+      "kYkxKanpSuMVaAc3-ts34p2usoKGoqHnMKSryeLhFi0";
+
   static const String stripePublishableKey =
       "pk_test_51RDvqzPEUIIf4s33G882VANwPqFFwMpBq5i7cNy3qtYlqBwYNaUNgmzuX1RbGqDhdlSmFoD4uaONs0KSvoYpagnm00ldkkhPFt";
   static const mapBoxAccessToken =

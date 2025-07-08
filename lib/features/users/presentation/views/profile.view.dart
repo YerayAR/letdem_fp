@@ -11,16 +11,17 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
+import 'package:letdem/features/help/views/help.view.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
+import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
@@ -61,6 +62,7 @@ class ProfileView extends StatelessWidget {
                         _ProfileHeader(user: state.user),
                         _MainActionsSection(user: state.user),
                         const _AccountSettingsSection(),
+                        const _HelpSection(),
                         const _LogoutButton(),
                       ],
                     ),
@@ -89,22 +91,26 @@ class ProfileView extends StatelessWidget {
 class _ProfileAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final notificationCount = context.userProfile?.notificationsCount ?? 0;
     return StyledAppBar(
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       title: context.l10n.profile,
-      suffix: notificationCount == 0
+      suffix: context.watch<UserBloc>().state is! UserLoaded
           ? null
-          : CircleAvatar(
-              radius: 8,
-              backgroundColor: AppColors.red500,
-              child: Text(
-                '$notificationCount',
-                style: Typo.smallBody.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-              )),
+          : context.watch<UserBloc>().state is UserLoaded &&
+                  (context.watch<UserBloc>().state as UserLoaded)
+                          .unreadNotificationsCount ==
+                      0
+              ? null
+              : CircleAvatar(
+                  radius: 8,
+                  backgroundColor: AppColors.red500,
+                  child: Text(
+                    '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
+                    style: Typo.smallBody.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )),
       icon: Iconsax.notification5,
     );
   }
@@ -205,6 +211,8 @@ class _MainActionsSection extends StatelessWidget {
               _settingsRow(context.l10n.paymentMethods, Iconsax.card, () {
                 NavigatorHelper.to(const PaymentMethodsScreen());
               }),
+              _settingsRow(
+                  context.l10n.reservations, IconlyLight.shield_done, () {}),
               _buildEarningsRow(context, user),
             ],
           ),
@@ -248,19 +256,19 @@ class _MainActionsSection extends StatelessWidget {
                   ),
                   Dimens.space(3),
                   Text(
-                    'Connection Pending',
+                    context.l10n.connectionPending,
                     style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Dimens.space(1),
                   Text(
-                    "Your account connection is still pending, you will be notified when the connection is complete",
+                    context.l10n.connectionPendingMessage,
                     textAlign: TextAlign.center,
                     style:
                         Typo.mediumBody.copyWith(color: AppColors.neutral600),
                   ),
                   Dimens.space(2),
                   PrimaryButton(
-                    text: "Go Back",
+                    text: context.l10n.goBack,
                     onTap: () {
                       NavigatorHelper.pop();
                     },
@@ -288,19 +296,19 @@ class _MainActionsSection extends StatelessWidget {
                   ),
                   Dimens.space(3),
                   Text(
-                    'Something went wrong',
+                    context.l10n.somethingWentWrong,
                     style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Dimens.space(1),
                   Text(
-                    "There seems to be an issue with your account. Please contact support for assistance.",
+                    context.l10n.contactSupportMessage,
                     textAlign: TextAlign.center,
                     style:
                         Typo.mediumBody.copyWith(color: AppColors.neutral600),
                   ),
                   Dimens.space(2),
                   PrimaryButton(
-                    text: "Go Back",
+                    text: context.l10n.goBack,
                     onTap: () {
                       NavigatorHelper.pop();
                     },
@@ -382,12 +390,45 @@ class _AccountSettingsSection extends StatelessWidget {
                   NavigatorHelper.to(const ChangeLanguageView());
                 },
               ),
+              // help
+              SettingsRow(
+                icon: IconlyLight.info_circle,
+                text: context.l10n.help,
+                onTap: () {
+                  NavigatorHelper.to(const HelpView());
+                },
+              ),
               SettingsRow(
                 icon: IconlyLight.lock,
                 text: context.l10n.security,
                 showDivider: false,
                 onTap: () {
                   NavigatorHelper.to(const SecurityView());
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HelpSection extends StatelessWidget {
+  const _HelpSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileSection(
+      child: [
+        SettingsContainer(
+          child: Column(
+            children: [
+              SettingsRow(
+                icon: IconlyLight.info_circle,
+                text: context.l10n.help,
+                onTap: () {
+                  NavigatorHelper.to(const HelpView());
                 },
               ),
             ],

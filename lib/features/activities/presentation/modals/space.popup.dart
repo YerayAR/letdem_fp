@@ -264,7 +264,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                       width: 40, height: 40),
                   Dimens.space(1),
                   Text(
-                    context.l10n.cardEndingWith(method.brand, method.last4),
+                    context.l10n.cardEndingWith(
+                        getBrandName(method.brand), method.last4),
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w600),
                   ),
@@ -303,7 +304,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         paymentIntentClientSecret: clientSecret,
       );
 
-      if (paymentIntent.status == PaymentIntentsStatus.Succeeded) {
+      if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
+          paymentIntent.status == PaymentIntentsStatus.Succeeded) {
         // Payment succeeded
         onSuccess();
       } else {
@@ -315,7 +317,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
       print('Stripe error: ${e.error.localizedMessage}');
     } catch (e) {
       onError();
-      print('Unhandled error: $e');
+      Toast.show('Unhandled error: $e');
     }
   }
 
@@ -327,20 +329,20 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
             handle3DSPayment(
               state.clientSecret!,
               () {
-                widget.onRefreshTrigger();
                 context.read<UserBloc>().add(FetchUserInfoEvent());
                 NavigatorHelper.pop();
                 AppPopup.showDialogSheet(
                   context,
                   SuccessDialog(
                     title: context.l10n.spaceReserved,
-                    subtext:
-                        "Your Payment was successful. You will get a notification once the space is reserved. You can safely close this popup.",
+                    subtext: context.l10n.paymentSuccessfulReservation,
                     onProceed: () {
                       NavigatorHelper.pop();
+                      widget.onRefreshTrigger();
                     },
                   ),
                 );
+                widget.onRefreshTrigger();
               },
               () {
                 AppPopup.showDialogSheet(

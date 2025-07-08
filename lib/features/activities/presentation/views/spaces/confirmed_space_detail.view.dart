@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/appbar.dart';
@@ -93,13 +94,43 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   }
 
   Widget _buildImagePreview() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        widget.payload.space.image,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.network(
+            widget.payload.space.image,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Column(
+          children: !widget.payload.isOwner ||
+                  widget.payload.status == "PENDING"
+              ? []
+              : [
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary50,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      context.l10n.reservationPendingNote(
+                        DateFormat('HH:mm').format(widget.payload.canceledAt),
+                      ),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.secondary600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+        ),
+      ],
     );
   }
 
@@ -218,10 +249,14 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   }
 
   Widget _buildConfirmOrderButton(BuildContext context) {
+    final bool isReserved = widget.payload.status == "RESERVED";
+
     return PrimaryButton(
+      isDisabled: widget.payload.status == "PENDING",
       text: context.l10n.confirmOrder,
-      onTap: () => _showConfirmationSheet(context),
+      onTap: isReserved ? () => _showConfirmationSheet(context) : null,
       textColor: Colors.white,
+      color: isReserved ? null : AppColors.neutral300, // Color deshabilitado
     );
   }
 
