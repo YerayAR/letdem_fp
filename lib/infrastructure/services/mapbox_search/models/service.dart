@@ -600,22 +600,28 @@ class HerePlace {
     this.resultType,
     this.addressDetails,
   });
-
   factory HerePlace.fromJson(Map<String, dynamic> json) {
-    final position = json['position'];
     final address = json['address'];
+    final categories = json['categories'];
 
     return HerePlace(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
-      address: address != null ? address['label'] : null,
-      latitude: position != null ? position['lat']?.toDouble() : null,
-      longitude: position != null ? position['lng']?.toDouble() : null,
-      category: json['categories']?.isNotEmpty == true
-          ? json['categories'][0]['name']
-          : null,
+      address: address is String
+          ? address
+          : address != null && address['label'] != null
+              ? address['label']
+              : null,
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
+      category:
+          (categories != null && categories is List && categories.isNotEmpty)
+              ? categories[0]['name']
+              : null,
       resultType: json['resultType'],
-      addressDetails: address != null ? HereAddress.fromJson(address) : null,
+      addressDetails: address is Map<String, dynamic>
+          ? HereAddress.fromJson(address)
+          : null,
     );
   }
 
