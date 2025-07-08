@@ -87,12 +87,26 @@ class UserRepository extends IUserRepository {
       endpoint: EndPoints.updateLanguageEndpoint,
     );
   }
+
+  @override
+  Future<List<UserReservationPayments>> getReservationHistory() async {
+    ApiResponse response = await ApiService.sendRequest(
+      endpoint: EndPoints.getReservationHistoryEndpoint,
+    );
+
+    return response.data['results']
+        .map<UserReservationPayments>(
+            (e) => UserReservationPayments.fromJson(e))
+        .toList();
+  }
 }
 
 abstract class IUserRepository {
   Future<void> changeLanguage(Locale locale);
   Future<void> createUser();
   Future<void> deleteUser();
+
+  Future<List<UserReservationPayments>> getReservationHistory();
 
   Future<List<Order>> getOrders();
 

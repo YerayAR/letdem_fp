@@ -346,7 +346,7 @@
   "@paymentProvider": {
     "description": "Reference to payment provider"
   },
-
+"pleaseEnterYourNumber" : "Please enter your number",
   "linkedBankAccounts": "linked bank accounts",
   "@linkedBankAccounts": {
     "description": "Reference to linked bank accounts"
@@ -370,6 +370,32 @@
       }
     }
   },
+  "howToCreateScheduledNotificationsTitle": "How to Create Scheduled Notifications",
+  "howToEarnPointsTitle": "How to earn LetDem Points?",
+
+  "publishAlertTitle": "Publish an Alert",
+  "publishAlertDescription": " +1 point if another user confirms the existence of the alert.",
+  "point": "point",
+
+
+"howToEarnPointsDescription": "Earn LetDem Points by contributing to the community through these actions:",
+  "reservePaidSpaceTitle": "Reserve a Paid Parking Space",
+  "reservePaidSpaceDescription": " +1 point to the user who reserves and pays for a space published by another user. Once this reservation is confirmed.",
+  "publishFreeSpaceTitle": "Publish a Free Parking Space",
+  "publishFreeSpaceDescription": " +1 point if another user uses it and selects “I’ll take it” as feedback after arriving at the location.",
+  "additionalNotes": "Additional Notes",
+  "pointsNote1": "The user who gives up a paid parking space doesn’t earn points, but does earn money.",
+  "pointsNote2": "In all actions, points are granted only if the contribution is useful and confirmed by another user.",
+
+  "howToCreateScheduledNotificationsDescription": "To schedule a parking notification, follow these steps:",
+  "searchDestinationTitle": "Search Destination",
+  "searchDestinationDescription": "Search for your destination using the search bar on the main screen.",
+  "selectAddressTitle": "Select Address",
+  "selectAddressDescription": "Select the desired address and tap the \"Notify me about available space\" button.",
+  "configureAlertTitle": "Configure Alert",
+  "configureAlertDescription": "Select the time range and distance from your location to receive notifications.",
+  "scheduledNotificationsManagement": "Manage your notifications from the 'Scheduled Notifications' section.",
+  "scheduledNotificationsAlert": "You’ll receive a notification whenever a space becomes available in your configured area.",
   "createNewAccount": "CREATE NEW ACCOUNT",
   "personalInformation": "Personal Information",
   "enterFullName": "Enter your full name to proceed",
@@ -514,8 +540,11 @@
   "radarAlertMessage": "You are approaching a nearby radar zone",
   "unnamedRoad": "Unnamed Road",
   "couldNotRecalculateRoute": "Could not recalculate route",
+  "closeToLocationDescription": "You're very close to this location (within 100 meters). Please pick a spot a little farther away.",
+"noPaymentsYet" : "No Payments Yet",
+    "noPaymentsDescription": "Your payments history will appear here, once you make a payment",
+
   "tooCloseToLocation": "Too Close to Location",
-  "closeToLocationDescription": "You are close to the location, Please select a different location",
   "close": "Close",
   "trafficLevel": "Traffic Level",
   "toArriveBy": "To Arrive by {time}",
@@ -528,6 +557,9 @@
   },
   "notifyAvailableSpace": "Notify me of available space in this area",
   "dateAndTime": "Date & Time",
+  "paid" : "Paid",
+  "cancelled":  "Cancelled",
+  "refunded": "Refunded",
   "notificationRadius": "Receive notifications up to (meters)",
   "startRoute": "Start Route",
   "radiusLessThan": "Radius cannot be less than {meters} meters",

@@ -19,6 +19,11 @@ class UpdateUserNotificationsEvent extends UserEvent {
   List<Object?> get props => [unreadNotificationsCount];
 }
 
+class FetchReservationHistoryEvent extends UserEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 class ChangeLanguageEvent extends UserEvent {
   final Locale locale;
 

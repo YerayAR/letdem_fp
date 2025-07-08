@@ -1,10 +1,44 @@
 import 'package:equatable/equatable.dart';
+import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/users/models/preferences.model.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
 import 'package:letdem/models/payment/payment.model.dart';
+
+class UserReservationPayments {
+  // {
+  // "price": "9.00",
+  // "type": "DISABLED",
+  // "status": "CANCELLED",
+  // "street": "10451 North Portal Avenue",
+  // "created": "2025-06-30T01:02:31.703580Z"
+  // },
+  final String price;
+  final PublishSpaceType type;
+  final String status;
+  final String street;
+  final DateTime created;
+
+  const UserReservationPayments({
+    required this.price,
+    required this.type,
+    required this.status,
+    required this.street,
+    required this.created,
+  });
+
+  factory UserReservationPayments.fromJson(Map<String, dynamic> json) {
+    return UserReservationPayments(
+      price: json['price'] ?? '',
+      type: getEnumFromText(json['type'], "PaidSpace"),
+      status: json['status'] ?? '',
+      street: json['street'] ?? '',
+      created: DateTime.parse(json['created']),
+    );
+  }
+}
 
 class LetDemUser extends Equatable {
   final String id;

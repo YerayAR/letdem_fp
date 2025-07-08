@@ -2,18 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/utils/location_utils.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/add_location.widget.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/location/local_location.model.dart';
-import 'package:letdem/core/utils/location_utils.dart';
 
 class SavedAddressComponent extends StatelessWidget {
   final bool showDivider;
@@ -48,231 +47,213 @@ class SavedAddressComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (place != null && place!.title == "")
-        ? const SizedBox()
-        : GestureDetector(
-            onTap: () {
-              if (apiPlace != null && onApiPlaceSelected != null) {
-                onApiPlaceSelected!(apiPlace!)!;
-              }
+    // Early return for empty places
+    if (place?.title == "") return const SizedBox();
 
-              if (place != null) {
-                onPlaceSelected(place!);
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: SizedBox(
-                child: Column(
+    // final hasLocation = place != null || apiPlace != null;
+    // final locationName = apiPlace?.name ?? place?.title ?? "";
+    final shouldShowEllipsis =
+        locationType != LetDemLocationType.other && apiPlace != null;
+
+    return GestureDetector(
+      onTap: () {
+        if (apiPlace != null && onApiPlaceSelected != null) {
+          onApiPlaceSelected!(apiPlace!);
+        }
+        if (place != null) {
+          onPlaceSelected(place!);
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          children: [
+            Dismissible(
+              direction: locationType == LetDemLocationType.other
+                  ? DismissDirection.endToStart
+                  : DismissDirection.none,
+              background: Container(
+                color: AppColors.red500.withOpacity(0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Dismissible(
-                      direction: locationType == LetDemLocationType.other
-                          ? DismissDirection.endToStart
-                          : DismissDirection.none,
-                      background: Container(
-                        color: AppColors.red500.withOpacity(0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Icon(
-                              IconlyBold.delete,
-                              color: AppColors.red500,
-                            ),
-                            Dimens.space(2),
-                          ],
-                        ),
-                      ),
-                      key: UniqueKey(),
-                      onDismissed: (direction) {
-                        if (apiPlace != null) {
-                          onLetDemLocationDeleted(apiPlace!);
-                        } else {
-                          onHerePlaceDeleted(place!);
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: Row(
-                              children: <Widget>[
-                                CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: AppColors.neutral50,
-                                  child: isLocationCreating
-                                      ? const CupertinoActivityIndicator()
-                                      : Icon(
-                                          locationType ==
-                                                  LetDemLocationType.other
-                                              ? Iconsax.location5
-                                              : locationType ==
-                                                      LetDemLocationType.home
-                                                  ? IconlyBold.home
-                                                  : IconlyBold.work,
-                                          color: AppColors.neutral600,
-                                        ),
-                                ),
-                                Dimens.space(2),
-                                Flexible(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                isLocationCreating
-                                                    ? context.l10n
-                                                        .updatingLocation(LocationUtils
-                                                            .getLocationTypeString(
-                                                                context,
-                                                                locationType))
-                                                        .toUpperCase()
-                                                    : place != null ||
-                                                            apiPlace != null
-                                                        ? apiPlace != null
-                                                            ? LocationUtils.getLocationTypeString(
-                                                                    context,
-                                                                    locationType)
-                                                                .toUpperCase()
-                                                            : place!
-                                                                .placeFormatted
-                                                                .toUpperCase()
-                                                        : LocationUtils.getLocationTypeString(
-                                                                context,
-                                                                locationType)
-                                                                    .toString()
-                                                                    .split(",")
-                                                                    .isNotEmpty
-                                                                ? place!.address
-                                                                    .toString()
-                                                                    .split(
-                                                                        ",")[0]
-                                                                    .toUpperCase()
-                                                                : place!.address
-                                                                    .toString()
-                                                                    .toUpperCase()
-                                                        : context.l10n
-                                                            .locationType(
-                                                                locationType
-                                                                    .name)
-                                                            .toUpperCase(),
-                                                style: Typo.smallBody.copyWith(
-                                                  fontWeight: FontWeight.w400,
-                                                  color: AppColors.neutral400,
-                                                ),
-                                              ),
-                                              Dimens.space(1),
-                                              SizedBox(
-                                                child: place != null ||
-                                                        apiPlace != null
-                                                    ? Text(
-                                                        apiPlace != null
-                                                            ? apiPlace!.name
-                                                            : place!.title,
-                                                        style: Typo.mediumBody
-                                                            .copyWith(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )
-                                                    : GestureDetector(
-                                                        onTap: () {
-                                                          AppPopup.showBottomSheet(
-                                                              context,
-                                                              AddLocationBottomSheet(
-                                                                title: context
-                                                                    .l10n
-                                                                    .setLocation(LocationUtils.getLocationTypeString(
-                                                                        context,
-                                                                        locationType)),
-                                                                onLocationSelected:
-                                                                    (HerePlace
-                                                                        place) {
-                                                                  onPlaceSelected(
-                                                                      place);
-                                                                },
-                                                              ));
-                                                        },
-                                                        child: Text(
-                                                          context.l10n.setLocation(
-                                                              LocationUtils.getLocationTypeString(
-                                                                  context,
-                                                                  locationType)),
-                                                          style: Typo.mediumBody
-                                                              .copyWith(
-                                                            color: AppColors
-                                                                .primary400,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .underline,
-                                                          ),
-                                                        ),
-                                                      ),
-                                              ),
-                                            ]),
-                                      ),
-                                      //   delete button
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (locationType != LetDemLocationType.other &&
-                              apiPlace != null)
-                            IconButton(
-                              icon: Icon(
-                                CupertinoIcons.ellipsis,
-                                color: AppColors.neutral400,
-                                size: 17,
-                              ),
-                              onPressed: () {
-                                AppPopup.showBottomSheet(
-                                    NavigatorHelper
-                                        .navigatorKey.currentState!.context,
-                                    LocationBottomSheet(
-                                      locationType: locationType,
-                                      locationName: apiPlace!.name,
-                                      onEdit: () {
-                                        if (onEditLocationTriggered != null) {
-                                          print("editting");
-                                          onEditLocationTriggered!();
-                                        }
-                                      },
-                                      onDelete: () {
-                                        onLetDemLocationDeleted(apiPlace!);
-                                        NavigatorHelper.pop();
-                                      },
-                                    ));
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      children: !showDivider
-                          ? []
-                          : [
-                              Dimens.space(1),
-                              Divider(
-                                color: AppColors.neutral50,
-                                thickness: 1,
-                              ),
-                            ],
-                    ),
+                    Icon(IconlyBold.delete, color: AppColors.red500),
+                    Dimens.space(2),
                   ],
                 ),
               ),
+              key: UniqueKey(),
+              onDismissed: (direction) {
+                if (apiPlace != null) {
+                  onLetDemLocationDeleted(apiPlace!);
+                } else {
+                  onHerePlaceDeleted(place!);
+                }
+              },
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Row(
+                      children: <Widget>[
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundColor: AppColors.neutral50,
+                          child: isLocationCreating
+                              ? const CupertinoActivityIndicator()
+                              : Icon(
+                                  _getLocationIcon(),
+                                  color: AppColors.neutral600,
+                                ),
+                        ),
+                        Dimens.space(2),
+                        Flexible(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _getLocationTypeText(context)
+                                          .toUpperCase(),
+                                      style: Typo.smallBody.copyWith(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.neutral400,
+                                      ),
+                                    ),
+                                    Dimens.space(1),
+                                    _buildLocationNameWidget(context),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (shouldShowEllipsis)
+                    IconButton(
+                      icon: Icon(
+                        CupertinoIcons.ellipsis,
+                        color: AppColors.neutral400,
+                        size: 17,
+                      ),
+                      onPressed: () => _showLocationBottomSheet(),
+                    ),
+                ],
+              ),
             ),
-          );
+            if (showDivider) ...[
+              Dimens.space(1),
+              Divider(
+                color: AppColors.neutral50,
+                thickness: 1,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+// Helper method to get location icon
+  IconData _getLocationIcon() {
+    switch (locationType) {
+      case LetDemLocationType.home:
+        return IconlyBold.home;
+      case LetDemLocationType.work:
+        return IconlyBold.work;
+      case LetDemLocationType.other:
+      default:
+        return Iconsax.location5;
+    }
+  }
+
+// Helper method to get location type text
+  String _getLocationTypeText(BuildContext context) {
+    if (isLocationCreating) {
+      return context.l10n.updatingLocation(
+          LocationUtils.getLocationTypeString(context, locationType));
+    }
+
+    if (apiPlace != null) {
+      return LocationUtils.getLocationTypeString(context, locationType);
+    }
+
+    if (place?.address != null) {
+      final address = place!.address!;
+      final parts = address.split(",");
+      return parts.isNotEmpty ? parts[0] : address;
+    }
+
+    return context.l10n.locationType(locationType.name);
+  }
+
+// Helper method to build location name widget
+  Widget _buildLocationNameWidget(BuildContext context) {
+    final hasLocation = place != null || apiPlace != null;
+
+    if (hasLocation) {
+      final locationName = apiPlace?.name ?? place!.title;
+      return Text(
+        locationName,
+        style: Typo.mediumBody.copyWith(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => _showAddLocationBottomSheet(context),
+      child: Text(
+        context.l10n.setLocation(
+            LocationUtils.getLocationTypeString(context, locationType)),
+        style: Typo.mediumBody.copyWith(
+          color: AppColors.primary400,
+          fontWeight: FontWeight.w500,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
+  }
+
+// Helper method to show add location bottom sheet
+  void _showAddLocationBottomSheet(BuildContext context) {
+    AppPopup.showBottomSheet(
+      context,
+      AddLocationBottomSheet(
+        title: context.l10n.setLocation(
+            LocationUtils.getLocationTypeString(context, locationType)),
+        onLocationSelected: (HerePlace place) {
+          onPlaceSelected(place);
+        },
+      ),
+    );
+  }
+
+// Helper method to show location bottom sheet
+  void _showLocationBottomSheet() {
+    AppPopup.showBottomSheet(
+      NavigatorHelper.navigatorKey.currentState!.context,
+      LocationBottomSheet(
+        locationType: locationType,
+        locationName: apiPlace!.name,
+        onEdit: () {
+          if (onEditLocationTriggered != null) {
+            print("editting");
+            onEditLocationTriggered!();
+          }
+        },
+        onDelete: () {
+          onLetDemLocationDeleted(apiPlace!);
+          NavigatorHelper.pop();
+        },
+      ),
+    );
   }
 }
 
@@ -322,7 +303,8 @@ class LocationBottomSheet extends StatelessWidget {
           Row(
             children: [
               Text(
-                LocationUtils.getLocationTypeString(context, locationType).toUpperCase(),
+                LocationUtils.getLocationTypeString(context, locationType)
+                    .toUpperCase(),
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 17,

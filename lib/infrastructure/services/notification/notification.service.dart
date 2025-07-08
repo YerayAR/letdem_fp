@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/views/active_reservation.view.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
+import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
+import 'package:letdem/features/users/presentation/views/reservations/reservation_list.view.dart';
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
@@ -31,6 +33,23 @@ class NotificationHandler {
         case 'reservation_details':
           _goToReservationDetails();
           break;
+        case 'reservations_list':
+          // Handle reservations list if needed
+          // TODO - Implement reservations list redirection
+          NavigatorHelper.to(
+            const ReservationHistory(),
+          );
+          print('Redirecting to reservations list is not implemented yet.');
+          break;
+        case 'orders_list':
+          // Handle orders list if needed
+          // TODO - Implement orders list redirection
+          NavigatorHelper.to(
+            const OrdersListView(),
+          );
+          print('Redirecting to orders list is not implemented yet.');
+          break;
+
         case 'contributions':
           _goToContributions();
           break;

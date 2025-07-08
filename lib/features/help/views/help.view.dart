@@ -9,14 +9,14 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 import '../../../../common/widgets/body.dart';
 
-class HelpView extends StatefulWidget {
-  const HelpView({super.key});
+class HelpScreenView extends StatefulWidget {
+  const HelpScreenView({super.key});
 
   @override
-  State<HelpView> createState() => _HelpViewState();
+  State<HelpScreenView> createState() => _HelpViewState();
 }
 
-class _HelpViewState extends State<HelpView> {
+class _HelpViewState extends State<HelpScreenView> {
   @override
   void initState() {
     super.initState();
@@ -55,8 +55,20 @@ class _HelpViewState extends State<HelpView> {
                 content: _buildWithdrawFundsContent(context),
                 icon: Icons.account_balance_wallet_outlined,
               ),
+              Dimens.space(2),
+              // New sections
+              HelpSectionItem(
+                title: context.l10n.howToEarnPointsTitle,
+                content: _buildEarnPointsContent(context),
+                icon: Icons.stars_outlined,
+              ),
+              Dimens.space(2),
+              HelpSectionItem(
+                title: context.l10n.howToCreateScheduledNotificationsTitle,
+                content: _buildScheduledNotificationsContent(context),
+                icon: Icons.schedule_outlined,
+              ),
               Dimens.space(3),
-
               Dimens.space(4),
             ],
           ),
@@ -147,6 +159,300 @@ class _HelpViewState extends State<HelpView> {
     );
   }
 
+  Widget _buildEarnPointsContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.howToEarnPointsDescription,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        Dimens.space(2),
+
+        // Point earning methods
+        _buildPointEarningItem(
+          context,
+          "1",
+          context.l10n.reservePaidSpaceTitle,
+          context.l10n.reservePaidSpaceDescription,
+          Icons.local_parking_outlined,
+        ),
+        Dimens.space(1),
+
+        _buildPointEarningItem(
+          context,
+          "2",
+          context.l10n.publishFreeSpaceTitle,
+          context.l10n.publishFreeSpaceDescription,
+          Icons.local_parking_outlined,
+        ),
+        Dimens.space(1),
+
+        _buildPointEarningItem(
+          context,
+          "3",
+          context.l10n.publishAlertTitle,
+          context.l10n.publishAlertDescription,
+          Icons.warning_outlined,
+        ),
+        Dimens.space(2),
+
+        // Additional notes
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color:
+                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  Dimens.space(1),
+                  Text(
+                    context.l10n.additionalNotes,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+              Dimens.space(1),
+              Text(
+                context.l10n.pointsNote1,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              Dimens.space(1),
+              Text(
+                context.l10n.pointsNote2,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScheduledNotificationsContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.howToCreateScheduledNotificationsDescription,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        Dimens.space(2),
+
+        // Steps
+        _buildStepItem(
+          context,
+          "1",
+          context.l10n.searchDestinationTitle,
+          context.l10n.searchDestinationDescription,
+          Icons.search_outlined,
+        ),
+        Dimens.space(1),
+
+        _buildStepItem(
+          context,
+          "2",
+          context.l10n.selectAddressTitle,
+          context.l10n.selectAddressDescription,
+          Icons.place_outlined,
+        ),
+        Dimens.space(1),
+
+        _buildStepItem(
+          context,
+          "3",
+          context.l10n.configureAlertTitle,
+          context.l10n.configureAlertDescription,
+          Icons.tune_outlined,
+        ),
+        Dimens.space(2),
+
+        // Additional info
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color:
+                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.l10n.scheduledNotificationsManagement,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              Dimens.space(1),
+              Text(
+                context.l10n.scheduledNotificationsAlert,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPointEarningItem(
+    BuildContext context,
+    String number,
+    String title,
+    String description,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.green.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.green.withOpacity(0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ),
+          Dimens.space(1),
+          // Icon(
+          //   icon,
+          //   size: 20,
+          //   color: Colors.green,
+          // ),
+          // Dimens.space(1),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      size: 16,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "+1 ${context.l10n.point}",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepItem(
+    BuildContext context,
+    String number,
+    String title,
+    String description,
+    IconData icon,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              number,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+        ),
+        Dimens.space(1),
+        Icon(
+          icon,
+          size: 20,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        Dimens.space(1),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildRequirementItem(
     BuildContext context,
     String number,
@@ -191,6 +497,7 @@ class _HelpViewState extends State<HelpView> {
   }
 }
 
+// Keep all existing classes (HelpSectionItem, HelpInfoCard, HelpStepItem) unchanged
 class HelpSectionItem extends StatefulWidget {
   final String title;
   final Widget content;

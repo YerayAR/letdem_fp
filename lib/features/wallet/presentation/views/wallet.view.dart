@@ -33,6 +33,9 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<UserBloc>().add(
+          FetchUserInfoEvent(),
+        );
     context.read<WalletBloc>().add(FetchTransactionsEvent(TransactionParams(
           startDate: DateTime.now().subtract(const Duration(days: 30)),
           endDate: DateTime.now().add(const Duration(days: 1)),
@@ -357,74 +360,92 @@ class TransactionList extends StatelessWidget {
             ),
             child: transactions.isEmpty
                 ? const EmptyTransactionsView()
-                : ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    itemCount: transactions.length,
-                    itemBuilder: (context, index) {
-                      final tx = transactions[index];
-                      return Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: isPositiveTransaction(tx.source)
-                                      ? const Color(0xFFE6F7EE)
-                                      : const Color(0xFFFFEEEE),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  isPositiveTransaction(tx.source)
-                                      ? Icons.arrow_downward_rounded
-                                      : Icons.arrow_upward_rounded,
-                                  color: tx.source != TransactionType.WITHDRAW
-                                      ? const Color(0xFF00A86B)
-                                      : const Color(0xFFFF4D4F),
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(getTransactionTypeString(tx.source),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14)),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
-                                      style: TextStyle(
-                                          color: Colors.grey.shade600,
-                                          fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                isPositiveTransaction(tx.source)
-                                    ? '+${tx.amount.toStringAsFixed(2)}€'
-                                    : '${(-tx.amount).toStringAsFixed(2)}€',
-                                style: TextStyle(
-                                  color: isPositiveTransaction(tx.source)
-                                      ? const Color(0xFF00A86B)
-                                      : const Color(0xFFFF4D4F),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Dimens.space(1),
-                          Divider(color: AppColors.neutral50, thickness: 1),
-                        ],
-                      );
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<WalletBloc>().add(FetchTransactionsEvent(
+                            TransactionParams(
+                              startDate: DateTime.now()
+                                  .subtract(const Duration(days: 30)),
+                              endDate:
+                                  DateTime.now().add(const Duration(days: 1)),
+                              pageSize: 50,
+                              page: 1,
+                            ),
+                          ));
+                      context.read<UserBloc>().add(
+                            FetchUserInfoEvent(),
+                          );
                     },
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemCount: transactions.length,
+                      itemBuilder: (context, index) {
+                        final tx = transactions[index];
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: isPositiveTransaction(tx.source)
+                                        ? const Color(0xFFE6F7EE)
+                                        : const Color(0xFFFFEEEE),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    isPositiveTransaction(tx.source)
+                                        ? Icons.arrow_downward_rounded
+                                        : Icons.arrow_upward_rounded,
+                                    color: tx.source != TransactionType.WITHDRAW
+                                        ? const Color(0xFF00A86B)
+                                        : const Color(0xFFFF4D4F),
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(getTransactionTypeString(tx.source),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14)),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  isPositiveTransaction(tx.source)
+                                      ? '+${tx.amount.toStringAsFixed(2)}€'
+                                      : '${(-tx.amount).toStringAsFixed(2)}€',
+                                  style: TextStyle(
+                                    color: isPositiveTransaction(tx.source)
+                                        ? const Color(0xFF00A86B)
+                                        : const Color(0xFFFF4D4F),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Dimens.space(1),
+                            Divider(color: AppColors.neutral50, thickness: 1),
+                          ],
+                        );
+                      },
+                    ),
                   ),
           );
         }

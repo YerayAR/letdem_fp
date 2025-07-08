@@ -36,6 +36,12 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
+  // getReservationHistoryEndpoint
+  static Endpoint getReservationHistoryEndpoint = Endpoint(
+    url: "/credits/reservations",
+    method: HTTPMethod.GET,
+  );
+
   // delete space
   static Endpoint deleteSpace(String id) => Endpoint(
         url: "/spaces/$id",

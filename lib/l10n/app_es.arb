@@ -458,6 +458,7 @@
   "publishPaidSpace": "Publicar Aparcamiento de Pago",
   "waitingTime": "Tiempo de Espera",
   "price": "Precio",
+  "pleaseEnterYourNumber" : "Por favor ingresa tu número de teléfono",
   "enterPrice": "Ingresa el precio",
   "publish": "Publicar",
   "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de salir, el tiempo debe estar entre 1 minuto a 60 minutos, una vez transcurrido este tiempo, el espacio publicado expirará.",
@@ -515,7 +516,6 @@
   },
   "couldNotRecalculateRoute": "No se pudo recalcular la ruta",
   "tooCloseToLocation": "Demasiado Cerca de la Ubicación",
-  "closeToLocationDescription": "Estás cerca de la ubicación, por favor selecciona una ubicación diferente",
   "close": "Cerrar",
   "trafficLevel": "Nivel de Tráfico",
   "toArriveBy": "Para llegar a las {time}",
@@ -526,6 +526,13 @@
       }
     }
   },
+  "closeToLocationDescription": "Estás muy cerca de esta ubicación (a menos de 100 metros). Por favor, elige un lugar un poco más alejado.",
+"paid" : "Pago",
+  "cancelled": "Cancelado",
+  "refunded": "Reembolsado",
+  "noPaymentsYet" : "Aún no hay pagos",
+  "noPaymentsDescription": "Tu historial de pagos aparecerá aquí.",
+
   "notifyAvailableSpace": "Notificarme de aparcamientos disponibles en esta área",
   "dateAndTime": "Fecha y Hora",
   "notificationRadius": "Recibir notificaciones hasta (metros)",
@@ -539,7 +546,38 @@
       }
     }
   },
-  "notificationScheduled": "Notificación Programada",
+
+  "howToCreateScheduledNotificationsTitle": "¿Cómo Crear Notificaciones Programadas?",
+  "howToEarnPointsTitle": "¿Cómo ganar Puntos LetDem?",
+
+
+
+  "howToEarnPointsDescription": "Gana Puntos LetDem contribuyendo a la comunidad con estas acciones:",
+  "reservePaidSpaceTitle": "Reservar un Aparcamiento de Pago",
+  "reservePaidSpaceDescription": " +1 punto para el usuario que reserva y paga un espacio publicado por otro usuario y una vez que la reserva es confirmada.",
+  "publishFreeSpaceTitle": "Publicar un Aparcamiento Gratuito",
+  "publishFreeSpaceDescription": " +1 punto si otro usuario lo utiliza y selecciona “Me lo quedo” como valoración al llegar al lugar.",
+  "additionalNotes": "Notas Adicionales",
+  "pointsNote1": "El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.",
+  "pointsNote2": "En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.",
+
+  "howToCreateScheduledNotificationsDescription": "Para programar una notificación de aparcamiento, sigue estos pasos:",
+  "searchDestinationTitle": "Buscar Destino",
+  "searchDestinationDescription": "Busca tu destino utilizando la barra de búsqueda en la pantalla principal.",
+  "selectAddressTitle": "Seleccionar Dirección",
+  "selectAddressDescription": "Selecciona la dirección deseada y pulsa el botón \"Avisarme por aparcamientos disponibles\".",
+  "configureAlertTitle": "Configurar Alerta",
+  "configureAlertDescription": "Selecciona la franja horaria y la distancia desde tu ubicación para recibir notificaciones.",
+  "scheduledNotificationsManagement": "Gestiona tus notificaciones desde la sección 'Notificaciones programadas'.",
+  "scheduledNotificationsAlert": "Recibirás una notificación cada vez que se publique un aparcamiento dentro del área configurada.",
+
+  "publishAlertTitle": "Publicar una Alerta",
+  "publishAlertDescription": " +1 punto si otro usuario confirma la existencia de la alerta.",
+  "point": "punto",
+
+
+
+"notificationScheduled": "Notificación Programada",
   "notificationScheduledDescription": "Se te notificará cuando haya un aparcamiento disponible en esta área",
   "minutesShort": "min",
   "hoursShort": "hrs",

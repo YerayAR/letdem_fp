@@ -21,8 +21,8 @@ import 'package:letdem/features/payment_methods/presentation/views/payment_metho
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
-import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
+import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
@@ -34,7 +34,7 @@ import 'package:letdem/models/earnings_account/earning_account.model.dart';
 import '../../../../common/popups/popup.dart';
 import '../../../../common/widgets/appbar.dart';
 import '../../../scheduled_notifications/presentation/views/scheduled_notifications.view.dart';
-import 'preferences/preferences.view.dart';
+import 'reservations/reservation_list.view.dart';
 import 'security/security.view.dart';
 
 class ProfileView extends StatelessWidget {
@@ -211,8 +211,10 @@ class _MainActionsSection extends StatelessWidget {
               _settingsRow(context.l10n.paymentMethods, Iconsax.card, () {
                 NavigatorHelper.to(const PaymentMethodsScreen());
               }),
-              _settingsRow(
-                  context.l10n.reservations, IconlyLight.shield_done, () {}),
+              _settingsRow(context.l10n.reservations, IconlyLight.shield_done,
+                  () {
+                NavigatorHelper.to(ReservationHistory());
+              }),
               _buildEarningsRow(context, user),
             ],
           ),
@@ -391,13 +393,13 @@ class _AccountSettingsSection extends StatelessWidget {
                 },
               ),
               // help
-              SettingsRow(
-                icon: IconlyLight.info_circle,
-                text: context.l10n.help,
-                onTap: () {
-                  NavigatorHelper.to(const HelpView());
-                },
-              ),
+              // SettingsRow(
+              //   icon: IconlyLight.info_circle,
+              //   text: context.l10n.help,
+              //   onTap: () {
+              //     NavigatorHelper.to(HelpScreenView());
+              //   },
+              // ),
               SettingsRow(
                 icon: IconlyLight.lock,
                 text: context.l10n.security,
@@ -425,10 +427,11 @@ class _HelpSection extends StatelessWidget {
           child: Column(
             children: [
               SettingsRow(
+                showDivider: false,
                 icon: IconlyLight.info_circle,
                 text: context.l10n.help,
                 onTap: () {
-                  NavigatorHelper.to(const HelpView());
+                  NavigatorHelper.to(HelpScreenView());
                 },
               ),
             ],

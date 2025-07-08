@@ -459,7 +459,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 
   Widget _buildContent(BuildContext context, RouteInfo routeInfo,
       LocationData location, ScheduleNotificationsState state) {
-    if (routeInfo.distance < 500) {
+    if (routeInfo.distance < 100) {
       return _buildTooCloseMessage();
     }
 
