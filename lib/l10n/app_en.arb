@@ -374,15 +374,15 @@
   "howToEarnPointsTitle": "How to earn LetDem Points?",
 
   "publishAlertTitle": "Publish an Alert",
-  "publishAlertDescription": " +1 point if another user confirms the existence of the alert.",
+  "publishAlertDescription": " f another user confirms the existence of the alert.",
   "point": "point",
 
 
 "howToEarnPointsDescription": "Earn LetDem Points by contributing to the community through these actions:",
   "reservePaidSpaceTitle": "Reserve a Paid Parking Space",
-  "reservePaidSpaceDescription": " +1 point to the user who reserves and pays for a space published by another user. Once this reservation is confirmed.",
+  "reservePaidSpaceDescription": "to the user who reserves and pays for a space published by another user. Once this reservation is confirmed.",
   "publishFreeSpaceTitle": "Publish a Free Parking Space",
-  "publishFreeSpaceDescription": " +1 point if another user uses it and selects “I’ll take it” as feedback after arriving at the location.",
+  "publishFreeSpaceDescription": " if another user uses it and selects “I’ll take it” as feedback after arriving at the location.",
   "additionalNotes": "Additional Notes",
   "pointsNote1": "The user who gives up a paid parking space doesn’t earn points, but does earn money.",
   "pointsNote2": "In all actions, points are granted only if the contribution is useful and confirmed by another user.",

@@ -554,9 +554,9 @@
 
   "howToEarnPointsDescription": "Gana Puntos LetDem contribuyendo a la comunidad con estas acciones:",
   "reservePaidSpaceTitle": "Reservar un Aparcamiento de Pago",
-  "reservePaidSpaceDescription": " +1 punto para el usuario que reserva y paga un espacio publicado por otro usuario y una vez que la reserva es confirmada.",
+  "reservePaidSpaceDescription": " para el usuario que reserva y paga un espacio publicado por otro usuario y una vez que la reserva es confirmada.",
   "publishFreeSpaceTitle": "Publicar un Aparcamiento Gratuito",
-  "publishFreeSpaceDescription": " +1 punto si otro usuario lo utiliza y selecciona “Me lo quedo” como valoración al llegar al lugar.",
+  "publishFreeSpaceDescription": "si otro usuario lo utiliza y selecciona “Me lo quedo” como valoración al llegar al lugar.",
   "additionalNotes": "Notas Adicionales",
   "pointsNote1": "El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.",
   "pointsNote2": "En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.",
@@ -572,7 +572,7 @@
   "scheduledNotificationsAlert": "Recibirás una notificación cada vez que se publique un aparcamiento dentro del área configurada.",
 
   "publishAlertTitle": "Publicar una Alerta",
-  "publishAlertDescription": " +1 punto si otro usuario confirma la existencia de la alerta.",
+  "publishAlertDescription": "si otro usuario confirma la existencia de la alerta.",
   "point": "punto",
 
 
