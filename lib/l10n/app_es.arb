@@ -475,7 +475,6 @@
   "youHaveArrived": "¡Has llegado a tu destino!",
   "navigatingToParking": "Navegando al aparcamiento de estacionamiento",
   "preparingNavigation": "Preparando tu navegación...",
-  "pendingFundsInfo"  : "Hay una parte de tu dinero que no ha sido liberado por el proveedor de pagos, por lo que en esta vista el monto que te permite retirar es el monto ya liberado por el proveedor de pagos, el resto sigue pendiente. El monto mínimo que puedes retirar es de 10€.",
   "navigationError": "No se pudo calcular la ruta. Por favor, inténtalo de nuevo.",
   "spaceDeleted": "Aparcamiento eliminado",
   "spaceDeletedSubtext": "El aparcamiento ha sido eliminado con éxito.",
@@ -526,8 +525,17 @@
       }
     }
   },
-  "closeToLocationDescription": "Estás muy cerca de esta ubicación (a menos de 100 metros). Por favor, elige un lugar un poco más alejado.",
-"paid" : "Pago",
+  "closeToLocationDescription": "Estás muy cerca de esta ubicación (a menos de {distance} metros). Por favor, elige un lugar un poco más alejado.",
+  "@closeToLocationDescription": {
+    "description": "Warning shown when user is too close to a location",
+    "placeholders": {
+      "distance": {
+        "type": "int",
+        "example": "100"
+      }
+    }
+  },
+  "paid" : "Pago",
   "cancelled": "Cancelado",
   "refunded": "Reembolsado",
   "noPaymentsYet" : "Aún no hay pagos",
@@ -550,7 +558,55 @@
   "howToCreateScheduledNotificationsTitle": "¿Cómo Crear Notificaciones Programadas?",
   "howToEarnPointsTitle": "¿Cómo ganar Puntos LetDem?",
 
+  "minWithdrawalAmountError": "Debes tener al menos {amount} para retirar.",
+  "maxWithdrawalAmountError": "No puedes retirar más de {amount} a la vez.",
+  "minWithdrawalToast": "La cantidad mínima que puedes retirar es {amount}.",
+  "maxWithdrawalToast": "La cantidad máxima que puedes retirar es {amount}.",
+  "exceedsBalanceToast": "No puedes retirar más que tu saldo disponible.",
+  "pendingFundsInfo": "Hay una parte de tus fondos que aún no ha sido liberada por el proveedor de pagos. Por lo tanto, la cantidad disponible para retirar que aparece en esta vista corresponde solo a los fondos ya liberados. El saldo restante todavía está pendiente. El monto mínimo que puedes retirar es de {minAmount} y el máximo es de {maxAmount}.",
+  "@pendingFundsInfo": {
+    "description": "Mensaje informativo sobre fondos pendientes y límites de retiro",
+    "placeholders": {
+      "minAmount": {
+        "type": "String",
+        "example": "10"
+      },
+      "maxAmount": {
+        "type": "String",
+        "example": "100000"
+      }
+    }
+  },
 
+  "timeToWaitMustBeBetween": "El tiempo de espera debe estar entre {min} y {max} minutos.",
+  "@timeToWaitMustBeBetween": {
+    "description": "Mensaje de error cuando el tiempo de espera está fuera del rango permitido",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "1"
+      },
+      "max": {
+        "type": "String",
+        "example": "60"
+      }
+    }
+  },
+
+  "priceMustBeBetween": "El precio debe estar entre €{min} y €{max}.",
+  "@priceMustBeBetween": {
+    "description": "Mensaje de error cuando el precio no está dentro del rango permitido",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "3"
+      },
+      "max": {
+        "type": "String",
+        "example": "20"
+      }
+    }
+  },
 
   "howToEarnPointsDescription": "Gana Puntos LetDem contribuyendo a la comunidad con estas acciones:",
   "reservePaidSpaceTitle": "Reservar un Aparcamiento de Pago",
@@ -883,9 +939,22 @@
   "activeStatus": "Activo",
   "minsAgo": "min atrás",
   "hoursAgo": "horas atrás",
-  "daysAgo": "días atrás",
   "myLocation": "Mi Ubicación",
   "zoomIn": "Acercar",
+  "priceTooltip": "Este es el precio de una plaza de aparcamiento. El precio máximo que puedes establecer es {max} y el mínimo es {min}.",
+  "@priceTooltip": {
+    "description": "Texto de ayuda para el precio de la plaza de aparcamiento, con valores mínimo y máximo",
+    "placeholders": {
+      "max": {
+        "type": "String",
+        "example": "100 €"
+      },
+      "min": {
+        "type": "String",
+        "example": "5 €"
+      }
+    }
+  },
   "zoomOut": "Alejar",
   "toggleView": "Cambiar Vista",
   "newNotification": "Nueva notificación",

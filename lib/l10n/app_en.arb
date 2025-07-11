@@ -506,7 +506,64 @@
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
 
-    "pendingFundsInfo": "There is a portion of your funds that has not yet been released by the payment provider. Therefore, the amount shown as available for withdrawal in this view corresponds only to the funds that have already been released. The remaining balance is still pending. The minimum amount you can withdraw is €10.",
+
+  "pendingFundsInfo": "There is a portion of your funds that has not yet been released by the payment provider. Therefore, the amount shown as available for withdrawal in this view corresponds only to the funds that have already been released. The remaining balance is still pending. The minimum amount you can withdraw is {minAmount} and the maximum is {maxAmount}.",
+  "@pendingFundsInfo": {
+    "description": "Info message explaining pending funds and withdrawal limits",
+    "placeholders": {
+      "minAmount": {
+        "type": "String",
+        "example": "10"
+      },
+      "maxAmount": {
+        "type": "String",
+        "example": "100000"
+      }
+    }
+  },
+  "minWithdrawalAmountError": "You must have at least {amount} to withdraw.",
+  "maxWithdrawalAmountError": "You cannot withdraw more than {amount} at once.",
+  "minWithdrawalToast": "The minimum amount you can withdraw is {amount}.",
+  "maxWithdrawalToast": "The maximum amount you can withdraw is {amount}.",
+  "exceedsBalanceToast": "You cannot withdraw more than your available balance.",
+  "timeToWaitMustBeBetween": "The waiting time must be between {min} and {max} minutes.",
+  "@timeToWaitMustBeBetween": {
+    "description": "Error message when the waiting time is outside the allowed range",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "1"
+      },
+      "max": {
+        "type": "String",
+        "example": "60"
+      }
+    }
+  },
+  "closeToLocationDescription": "You are very close to this location (less than {distance} meters). Please choose a spot a bit further away.",
+  "@closeToLocationDescription": {
+    "description": "Warning shown when user is too close to a location",
+    "placeholders": {
+      "distance": {
+        "type": "int",
+        "example": "100"
+      }
+    }
+  },
+  "priceMustBeBetween": "The price must be between €{min} and €{max}.",
+  "@priceMustBeBetween": {
+    "description": "Error message shown when price is not within allowed range",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "3"
+      },
+      "max": {
+        "type": "String",
+        "example": "20"
+      }
+    }
+  },
   "pleaseEnterAllFields": "Please fill all fields",
   "spacePublishedSuccesfully": "Space Published Successfully",
   "spacePublishedDescription": "Your space have been published successfully, people can now have access to use space.",
@@ -540,7 +597,6 @@
   "radarAlertMessage": "You are approaching a nearby radar zone",
   "unnamedRoad": "Unnamed Road",
   "couldNotRecalculateRoute": "Could not recalculate route",
-  "closeToLocationDescription": "You're very close to this location (within 100 meters). Please pick a spot a little farther away.",
 "noPaymentsYet" : "No Payments Yet",
     "noPaymentsDescription": "Your payments history will appear here, once you make a payment",
 
@@ -873,7 +929,21 @@
   "activeStatus": "Active",
   "minsAgo": "mins ago",
   "hoursAgo": "hours ago",
-  "daysAgo": "days ago",
+
+  "priceTooltip": "This is the price for a parking space. The maximum price you can set is {max}, and the minimum is {min}.",
+  "@priceTooltip": {
+    "description": "Tooltip explaining the price input, including min and max values for parking space",
+    "placeholders": {
+      "max": {
+        "type": "String",
+        "example": "£100"
+      },
+      "min": {
+        "type": "String",
+        "example": "£5"
+      }
+    }
+  },
   "myLocation": "My Location",
   "zoomIn": "Zoom In",
   "zoomOut": "Zoom Out",

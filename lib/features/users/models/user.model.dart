@@ -40,12 +40,79 @@ class UserReservationPayments {
   }
 }
 
+class ConstantsSettings {
+  final WithdrawalAmount withdrawalAmount;
+  final SpacePrice spacePrice;
+  final SpaceTimeToWait spaceTimeToWait;
+  final int metersToShowTooCloseModal;
+
+  ConstantsSettings({
+    required this.withdrawalAmount,
+    required this.spacePrice,
+    required this.spaceTimeToWait,
+    required this.metersToShowTooCloseModal,
+  });
+
+  factory ConstantsSettings.fromJson(Map<String, dynamic> json) {
+    return ConstantsSettings(
+      withdrawalAmount: WithdrawalAmount.fromJson(json['withdrawal_amount']),
+      spacePrice: SpacePrice.fromJson(json['space_price']),
+      spaceTimeToWait: SpaceTimeToWait.fromJson(json['space_time_to_wait']),
+      metersToShowTooCloseModal: json['meters_to_show_too_close_modal'],
+    );
+  }
+}
+
+class WithdrawalAmount {
+  final double minimum;
+  final double maximum;
+
+  WithdrawalAmount({required this.minimum, required this.maximum});
+
+  factory WithdrawalAmount.fromJson(Map<String, dynamic> json) {
+    return WithdrawalAmount(
+      minimum: double.parse(json['minimum'].toString()),
+      maximum: double.parse(json['maximum'].toString()),
+    );
+  }
+}
+
+class SpacePrice {
+  final int minimum;
+  final int maximum;
+
+  SpacePrice({required this.minimum, required this.maximum});
+
+  factory SpacePrice.fromJson(Map<String, dynamic> json) {
+    return SpacePrice(
+      minimum: json['minimum'],
+      maximum: json['maximum'],
+    );
+  }
+}
+
+class SpaceTimeToWait {
+  final int minimum;
+  final int maximum;
+
+  SpaceTimeToWait({required this.minimum, required this.maximum});
+
+  factory SpaceTimeToWait.fromJson(Map<String, dynamic> json) {
+    return SpaceTimeToWait(
+      minimum: json['minimum'],
+      maximum: json['maximum'],
+    );
+  }
+}
+
 class LetDemUser extends Equatable {
   final String id;
   final String email;
   final String firstName;
 
   final ReservedSpacePayload? activeReservation;
+
+  final ConstantsSettings constantsSettings;
   final String lastName;
 
   final PaymentMethodModel? defaultPaymentMethod;
@@ -66,6 +133,7 @@ class LetDemUser extends Equatable {
     required this.lastName,
     this.earningAccount,
     this.defaultPaymentMethod,
+    required this.constantsSettings,
     this.activeReservation,
     required this.isSocial,
     required this.totalPoints,
@@ -84,6 +152,7 @@ class LetDemUser extends Equatable {
       firstName: firstName,
       lastName: lastName,
       earningAccount: earningAccount ?? this.earningAccount,
+      constantsSettings: constantsSettings,
       isSocial: isSocial,
       totalPoints: totalPoints,
       defaultPaymentMethod: defaultPaymentMethod,
@@ -99,6 +168,7 @@ class LetDemUser extends Equatable {
       notificationPreferences:
           NotificationPreferences.fromJSON(json['notifications_preferences']),
       email: json['email'] ?? '',
+      constantsSettings: ConstantsSettings.fromJson(json['constants_settings']),
       firstName: json['first_name'] ?? '',
       earningAccount: json['earning_account'] != null
           ? EarningAccount.fromJson(json['earning_account'])
