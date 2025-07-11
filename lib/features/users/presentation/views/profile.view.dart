@@ -15,12 +15,12 @@ import 'package:letdem/features/activities/presentation/views/view_all.view.dart
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
-import 'package:letdem/features/help/views/help.view.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
+import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
@@ -431,7 +431,7 @@ class _HelpSection extends StatelessWidget {
                 icon: IconlyLight.info_circle,
                 text: context.l10n.help,
                 onTap: () {
-                  NavigatorHelper.to(HelpScreenView());
+                  NavigatorHelper.to(const HelpScreenView());
                 },
               ),
             ],
