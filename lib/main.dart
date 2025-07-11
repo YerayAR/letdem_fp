@@ -85,19 +85,26 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initializeHERESDK();
   MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
-  OneSignal.initialize(AppCredentials.oneSignalAppId);
-  OneSignal.Notifications.addClickListener((event) {
-    final data = event.notification.additionalData;
-    final handler =
-        NotificationHandler(NavigatorHelper.navigatorKey.currentContext!);
-    handler.handleNotification(data);
-  });
-  final String defaultLocale =
-      Platform.localeName; // Returns locale string in the form 'en_US'
 
+  // OneSignal initialization
+  OneSignal.initialize(AppCredentials.oneSignalAppId);
+
+  // Configure language for OneSignal notifications
+  final String defaultLocale = Platform.localeName; // Returns locale string in the form 'en_US'
   //getting the language preference and assign in into the app, if none default is japanese
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   final String? languageCode = sharedPreferences.getString('locale');
+
+  // Set OneSignal language
+  final String appLanguage = languageCode ?? defaultLocale.split('_')[0];
+  OneSignal.User.setLanguage(appLanguage);
+
+
+  OneSignal.Notifications.addClickListener((event) {
+    final data = event.notification.additionalData;
+    final handler = NotificationHandler(NavigatorHelper.navigatorKey.currentContext!);
+    handler.handleNotification(data);
+  });
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

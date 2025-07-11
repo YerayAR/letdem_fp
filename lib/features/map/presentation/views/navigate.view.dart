@@ -309,7 +309,7 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     if (!_isMuted) {
-      speech.speak("Speed limit is $speedLimitKmh kilometers per hour");
+      speech.speak(context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()));
     }
   }
 
@@ -1088,7 +1088,7 @@ class _NavigationViewState extends State<NavigationView> {
           });
         } else if (!isParkingNavigation) {
           print('🎯 Standard destination reached. Showing toast.');
-          _showToast("You have arrived at your destination!",
+          _showToast(context.l10n.arrivedAtDestination,
               backgroundColor: AppColors.green600);
 
           putParkingSpacesOnMap();
@@ -1453,7 +1453,7 @@ class _NavigationViewState extends State<NavigationView> {
                 baseColor: Colors.white.withOpacity(0.5),
                 highlightColor: Colors.grey[100]!,
                 child: Text(
-                  "Waiting for navigation to start...",
+                  context.l10n.waitingForNavigation,
                   style: TextStyle(
                       color: Colors.white.withOpacity(0.7), fontSize: 16),
                 ),

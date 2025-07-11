@@ -317,7 +317,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
       print('Stripe error: ${e.error.localizedMessage}');
     } catch (e) {
       onError();
-      Toast.show('Unhandled error: $e');
+      Toast.show('${context.l10n.unhandledError} $e');
     }
   }
 
@@ -361,10 +361,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                         }),
                       ));
                     },
-                    title: "Payment Failed",
-                    secondaryCTAText: "Change payment method",
-                    subtext:
-                        "The reservation failed because your payment didn’t go through successfully",
+                    title: context.l10n.paymentFailed,
+                    secondaryCTAText: context.l10n.changePaymentMethod,
+                    subtext: context.l10n.paymentFailedDescription,
                     onProceed: () {
                       NavigatorHelper.pop();
                     },
@@ -390,7 +389,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 },
                 title: context.l10n.errorReserveSpace,
                 subtext:
-                    "${state.error}. Please try again later. If the issue persists, contact support.",
+                    "${state.error}. ${context.l10n.errorReserveSpaceDescription}",
                 onProceed: () {
                   NavigatorHelper.pop();
                 },
