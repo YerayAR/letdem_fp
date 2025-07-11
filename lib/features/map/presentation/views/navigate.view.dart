@@ -144,8 +144,17 @@ class _NavigationViewState extends State<NavigationView> {
     // );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _configureTTSLanguage();
       _requestLocationPermission();
     });
+  }
+
+  void _configureTTSLanguage() {
+    
+    String languageCode = Localizations.localeOf(context).languageCode;
+    speech.setLanguage(languageCode);
+    
+    debugPrint('🗣️ TTS language configured to: $languageCode');
   }
 
   void _setupSpeedLimitListener() {
@@ -992,6 +1001,9 @@ class _NavigationViewState extends State<NavigationView> {
     if (_hereMapController == null) return;
 
     debugPrint('🧭 Starting visual guidance...');
+
+    _configureTTSLanguage();
+
     try {
       _visualNavigator = HERE.VisualNavigator();
       _setupRouteDeviationListener();
@@ -1442,6 +1454,7 @@ class _NavigationViewState extends State<NavigationView> {
                         speech.mute();
                       } else {
                         speech.unmute();
+                        _configureTTSLanguage();
                       }
                     },
                   ),
