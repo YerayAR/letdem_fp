@@ -11,13 +11,12 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
-import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
+import 'package:letdem/infrastructure/services/earnings/eranings.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 class PublishSpaceHandler {
@@ -26,6 +25,8 @@ class PublishSpaceHandler {
   static bool preCheck(BuildContext context) {
     final carState = context.read<CarBloc>().state;
     final isCarExist = carState is CarLoaded && carState.car != null;
+
+    bool isSuccess = false;
 
     if (!isCarExist) {
       _showInfoPopup(
@@ -37,45 +38,16 @@ class PublishSpaceHandler {
       return false;
     }
 
-    final isPaidAccountExist = context.userProfile?.earningAccount != null;
+    final earningAccount = context.userProfile?.earningAccount;
+    EarningAccountService.handleEarningAccountTap(
+      context: context,
+      earningAccount: earningAccount,
+      onSuccess: () {
+        isSuccess = true;
+      },
+    );
 
-    if (!isPaidAccountExist) {
-      final earningAccount = context.userProfile?.earningAccount;
-      final status = earningAccount?.status;
-
-      _showInfoPopup(
-        context,
-        context.l10n.importantNotice,
-        context.l10n.createEarningAccountFirst,
-        () {
-          NavigatorHelper.pop();
-          NavigatorHelper.to(
-            ConnectAccountView(
-              remainingStep: earningAccount?.step,
-              status: status,
-            ),
-          );
-        },
-      );
-      return false;
-    }
-
-    if (context.userProfile!.earningAccount?.status != EarningStatus.accepted) {
-      _showInfoPopup(
-        context,
-        context.l10n.importantNotice,
-        context.l10n.verifyYourAccountFirst,
-        () {
-          NavigatorHelper.pop();
-          NavigatorHelper.to(
-            const ConnectAccountView(status: null, remainingStep: null),
-          );
-        },
-      );
-      return false;
-    }
-
-    return true;
+    return isSuccess;
   }
 
   static void showSpaceOptions(BuildContext context, void Function() onAdded) {

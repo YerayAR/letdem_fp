@@ -17,9 +17,8 @@ class BaseApiService {
 
     if (mustAuthenticated) {
       try {
-        String? token = true
-            ? "44cb3ac1d21652682d6ab8e4082ade7ad5287f67"
-            : await SecureStorageHelper().read(tokenKey ?? 'access_token');
+        String? token =
+            await SecureStorageHelper().read(tokenKey ?? 'access_token');
         if (token == null || token.isEmpty) {
           throw ApiError(
               message: 'Token not found', status: ErrorStatus.unauthorized);
