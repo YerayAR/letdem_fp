@@ -460,8 +460,21 @@
   "price": "Precio",
   "pleaseEnterYourNumber" : "Por favor ingresa tu número de teléfono",
   "enterPrice": "Ingresa el precio",
-  "publish": "Publicar",
-  "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de salir, el tiempo debe estar entre 1 minuto a 60 minutos, una vez transcurrido este tiempo, el espacio publicado expirará.",
+  "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de salir. El tiempo debe estar entre {min} y {max} minutos. Una vez transcurrido este tiempo, el espacio publicado expirará.",
+  "@waitingTimeTooltip": {
+    "description": "Tooltip que muestra el rango de tiempo de espera permitido",
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "example": "1"
+      },
+      "max": {
+        "type": "int",
+        "example": "60"
+      }
+    },
+    "publish": "Publicar"
+  },
   "whatIsThisWaitingTime": "¿En qué consiste?",
   "fetchingLocation": "Obteniendo ubicación...",
   "pleaseEnterAllFields": "Por favor completa todos los campos",
@@ -490,6 +503,10 @@
   "fatigueAlertVoice": "Has estado conduciendo durante tres horas. Por favor toma un descanso.",
   "addEvent": "Agregar evento",
   "ahead": "por delante",
+  "activeReservationExists": "Hay una reserva activa en tu cuenta. Debe completarse o cancelarse antes de que puedas publicar un nuevo espacio de pago.",
+  "@activeReservationExists": {
+    "description": "Se muestra cuando un usuario intenta publicar un nuevo espacio de pago pero ya tiene una reserva activa."
+  },
   "navigateToSpaceButton": "Navegar al Aparcamiento",
   "locationPermissionDenied": "Permiso de ubicación denegado",
   "locationPermissionDeniedPermanently": "Permisos de ubicación denegados permanentemente, por favor habilítalos en configuración",
@@ -593,7 +610,7 @@
     }
   },
 
-  "priceMustBeBetween": "El precio debe estar entre €{min} y €{max}.",
+  "priceMustBeBetween": "El precio debe estar entre {min} y {max}.",
   "@priceMustBeBetween": {
     "description": "Mensaje de error cuando el precio no está dentro del rango permitido",
     "placeholders": {

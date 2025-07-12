@@ -54,19 +54,6 @@ class _HomeViewState extends State<HomeView>
   static const double TRIGGER_DISTANCE_METERS = 250.0;
 
   // ---------------------------------------------------------------------------
-  // Stationary Detection & Auto-refresh State
-  // ---------------------------------------------------------------------------
-  Timer? _stationaryRefreshTimer;
-  GeoCoordinates? _lastLocationForStationaryCheck;
-  DateTime? _lastMovementTime;
-  bool _isUserStationary = false;
-  static const Duration _stationaryThreshold =
-      Duration(seconds: 30); // Time before considered stationary
-  static const Duration _autoRefreshInterval =
-      Duration(seconds: 5); // Refresh every 5 seconds when stationary
-  static const double _movementThreshold = 10.0; // 10 meters movement threshold
-
-  // ---------------------------------------------------------------------------
   // Refresh Button State
   // ---------------------------------------------------------------------------
   bool _showRefreshButton = false;
@@ -110,7 +97,6 @@ class _HomeViewState extends State<HomeView>
     _mapController = null;
     _isListeningToLocation = false;
     _refreshButtonTimer?.cancel();
-    _stationaryRefreshTimer?.cancel(); // Cleanup stationary timer
     super.dispose();
   }
 
@@ -124,69 +110,6 @@ class _HomeViewState extends State<HomeView>
     setState(() => isLoadingAssets = true);
     await _assetsProvider.loadAssets();
     setState(() => isLoadingAssets = false);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Stationary Detection Methods
-  // ---------------------------------------------------------------------------
-  void _checkIfUserIsStationary(GeoCoordinates newPosition) {
-    if (_lastLocationForStationaryCheck == null) {
-      _lastLocationForStationaryCheck = newPosition;
-      _lastMovementTime = DateTime.now();
-      return;
-    }
-
-    final distanceMoved = geolocator.Geolocator.distanceBetween(
-      _lastLocationForStationaryCheck!.latitude,
-      _lastLocationForStationaryCheck!.longitude,
-      newPosition.latitude,
-      newPosition.longitude,
-    );
-
-    if (distanceMoved >= _movementThreshold) {
-      // User is moving
-      _lastLocationForStationaryCheck = newPosition;
-      _lastMovementTime = DateTime.now();
-
-      if (_isUserStationary) {
-        _stopStationaryRefresh();
-      }
-    } else {
-      // User hasn't moved significantly
-      final timeSinceLastMovement =
-          DateTime.now().difference(_lastMovementTime!);
-
-      if (timeSinceLastMovement >= _stationaryThreshold && !_isUserStationary) {
-        _startStationaryRefresh();
-      }
-    }
-  }
-
-  void _startStationaryRefresh() {
-    setState(() {
-      _isUserStationary = true;
-    });
-
-    debugPrint("User is stationary - starting auto-refresh");
-
-    _stationaryRefreshTimer?.cancel();
-    _stationaryRefreshTimer = Timer.periodic(_autoRefreshInterval, (timer) {
-      if (_currentPosition != null && _isUserStationary) {
-        debugPrint("Auto-refreshing map data (user stationary)");
-        _fetchNearbyPlaces(_currentPosition!);
-      }
-    });
-  }
-
-  void _stopStationaryRefresh() {
-    setState(() {
-      _isUserStationary = false;
-    });
-
-    debugPrint("User is moving - stopping auto-refresh");
-
-    _stationaryRefreshTimer?.cancel();
-    _stationaryRefreshTimer = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -302,9 +225,6 @@ class _HomeViewState extends State<HomeView>
         }
 
         _checkDistanceAndFetchIfNeeded(location.coordinates);
-
-        // Check if user is stationary for auto-refresh
-        _checkIfUserIsStationary(location.coordinates);
       });
 
       _locationEngine.addLocationListener(_locationListener!);
@@ -485,44 +405,6 @@ class _HomeViewState extends State<HomeView>
   }
 
   // ---------------------------------------------------------------------------
-  // Stationary Indicator Widget
-  // ---------------------------------------------------------------------------
-  Widget _buildStationaryIndicator() {
-    if (!_isUserStationary) return const SizedBox.shrink();
-
-    return Positioned(
-      top: 60,
-      left: 16,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.refresh,
-              color: Colors.white,
-              size: 14,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              "Auto-refreshing",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
   // Map Lifecycle
   // ---------------------------------------------------------------------------
   void _onMapCreated(HereMapController controller) {
@@ -590,8 +472,6 @@ class _HomeViewState extends State<HomeView>
                           }
                         },
                       ),
-                      // Stationary indicator
-                      _buildStationaryIndicator(),
                       // Refresh chip on top - only shown when map is moved
                       if (_showRefreshButton)
                         Positioned(

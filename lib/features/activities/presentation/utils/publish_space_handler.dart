@@ -13,6 +13,7 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
@@ -25,6 +26,21 @@ class PublishSpaceHandler {
   static bool preCheck(BuildContext context) {
     final carState = context.read<CarBloc>().state;
     final isCarExist = carState is CarLoaded && carState.car != null;
+    final activeReservation = context.userProfile?.activeReservation != null;
+
+    if (activeReservation) {
+      _showInfoPopup(
+        context,
+        context.l10n.importantNotice,
+        context.l10n.activeReservationExists,
+        () => NavigatorHelper.to(ReservedSpaceDetailView(
+          details: context.userProfile!.activeReservation!,
+          space: context.userProfile!.activeReservation!.space,
+        )),
+        context.l10n.viewDetails,
+      );
+      return false;
+    }
 
     bool isSuccess = false;
 
@@ -109,12 +125,9 @@ class PublishSpaceHandler {
         : _imagePicker.pickImage(source: ImageSource.camera);
   }
 
-  static void _showInfoPopup(
-    BuildContext context,
-    String title,
-    String message,
-    VoidCallback onContinue,
-  ) {
+  static void _showInfoPopup(BuildContext context, String title, String message,
+      VoidCallback onContinue,
+      [String? continueText]) {
     AppPopup.showBottomSheet(
       context,
       Container(
@@ -157,7 +170,7 @@ class PublishSpaceHandler {
               width: double.infinity,
               child: PrimaryButton(
                 onTap: onContinue,
-                text: context.l10n.continuee,
+                text: continueText ?? context.l10n.continuee,
               ),
             ),
           ],

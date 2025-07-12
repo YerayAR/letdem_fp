@@ -382,10 +382,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   NavigatorHelper.pop();
                   context.read<ActivitiesBloc>().add(
                         ReserveSpaceEvent(
-                          spaceID: widget.space.id,
-                          paymentMethodID: context.userProfile!
-                              .defaultPaymentMethod!.paymentMethodId,
-                        ),
+                            spaceID: widget.space.id,
+                            paymentMethodID:
+                                _selectedPaymentMethod!.paymentMethodId),
                       );
                 },
                 title: context.l10n.errorReserveSpace,
@@ -425,8 +424,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 context.read<ActivitiesBloc>().add(
                       ReserveSpaceEvent(
                         spaceID: widget.space.id,
-                        paymentMethodID: context
-                            .userProfile!.defaultPaymentMethod!.paymentMethodId,
+                        paymentMethodID:
+                            _selectedPaymentMethod!.paymentMethodId,
                       ),
                     );
               }

@@ -88,31 +88,36 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       _moveToNextPage();
       return;
     }
+
     if (widget.isPaid) {
-      var maxPrice =
-          context.userProfile?.constantsSettings?.spacePrice?.maximum ?? 100;
-      var minPrice =
-          context.userProfile?.constantsSettings?.spacePrice?.minimum ?? 0;
-
-      if (int.tryParse(price) == null ||
-          int.tryParse(price)! < minPrice ||
-          int.tryParse(price)! > maxPrice) {
-        Toast.showError(context.l10n
-            .priceMustBeBetween(minPrice.toString(), maxPrice.toString()));
-        return;
-      }
-
       var maxWaitTimeInMin =
-          context.userProfile?.constantsSettings?.spaceTimeToWait?.maximum ??
-              60;
+          context.userProfile!.constantsSettings.spaceTimeToWait.maximum;
       var minWaitTimeInMin =
-          context.userProfile?.constantsSettings?.spaceTimeToWait?.minimum ?? 0;
+          context.userProfile!.constantsSettings.spaceTimeToWait.minimum;
 
       if (waitingTime.isEmpty ||
           int.parse(waitingTime) < minWaitTimeInMin ||
           int.parse(waitingTime) > maxWaitTimeInMin) {
         Toast.showError(context.l10n.timeToWaitMustBeBetween(
             minWaitTimeInMin.toString(), maxWaitTimeInMin.toString()));
+        return;
+      }
+
+      var maxPrice = context.userProfile!.constantsSettings.spacePrice.maximum;
+      var minPrice =
+          context.userProfile!.constantsSettings?.spacePrice?.minimum ?? 0;
+
+      print("Max Price: $maxPrice");
+      print("Min Price: $minPrice");
+
+      if (int.tryParse(price) == null ||
+          int.tryParse(price)! < minPrice ||
+          int.tryParse(price)! > maxPrice) {
+        Toast.showError(context.l10n.priceMustBeBetween(
+            minPrice.formatPrice(context),
+            maxPrice.formatPrice(
+              context,
+            )));
         return;
       }
 
@@ -358,7 +363,17 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                             ),
                                             Dimens.space(2),
                                             Text(
-                                              context.l10n.waitingTimeTooltip,
+                                              context.l10n.waitingTimeTooltip(
+                                                  context
+                                                      .userProfile!
+                                                      .constantsSettings
+                                                      .spaceTimeToWait
+                                                      .minimum,
+                                                  context
+                                                      .userProfile!
+                                                      .constantsSettings
+                                                      .spaceTimeToWait
+                                                      .maximum),
                                               style: Typo.mediumBody,
                                               textAlign: TextAlign.center,
                                             ),

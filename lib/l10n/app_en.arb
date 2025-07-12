@@ -502,7 +502,25 @@
   "price": "Price",
   "enterPrice": "Enter price",
   "publish": "Publish",
-  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before they leave, the time must be between 1 minute to 60 minutes, and after this time elapses, the published space will expire.",
+
+  "waitingTimeTooltip": "This is the maximum amount of time the publisher can wait before leaving. The time must be between {min} and {max} minutes. After this time passes, the published space will expire.",
+  "@waitingTimeTooltip": {
+    "description": "Tooltip showing allowed waiting time range",
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "example": "1"
+      },
+      "max": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "activeReservationExists": "There’s an active reservation on your account. It needs to be finished or cancelled before you can publish a new paid space.",
+  "@activeReservationExists": {
+    "description": "Shown when a user tries to publish a new paid space but already has an active reservation."
+  },
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
 
@@ -550,7 +568,7 @@
       }
     }
   },
-  "priceMustBeBetween": "The price must be between €{min} and €{max}.",
+  "priceMustBeBetween": "The price must be between {min} and {max}.",
   "@priceMustBeBetween": {
     "description": "Error message shown when price is not within allowed range",
     "placeholders": {
