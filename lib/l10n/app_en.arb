@@ -169,7 +169,7 @@
   "location": "Location",
   "spaceDetailsTitle": "Space Details",
   "locationType": "{type} LOCATION",
-  "setLocation": "Set {type} Location",
+  "setLocation": "Set {type}",
   "@setLocation": {
     "placeholders": {
       "type": {

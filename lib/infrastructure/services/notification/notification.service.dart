@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:letdem/core/extensions/user.dart';
-import 'package:letdem/features/activities/presentation/views/active_reservation.view.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
 import 'package:letdem/features/users/presentation/views/reservations/reservation_list.view.dart';
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
+import '../../../features/activities/presentation/views/spaces/reserved_space.view.dart';
 import '../../../features/map/presentation/views/route.view.dart';
 
 class NotificationHandler {
@@ -84,7 +84,8 @@ class NotificationHandler {
     final activeReservation = context.userProfile?.activeReservation;
     if (activeReservation == null) return;
 
-    NavigatorHelper.to(ActiveReservationView(payload: activeReservation));
+    NavigatorHelper.to(ReservedSpaceDetailView(
+        details: activeReservation, space: activeReservation.space));
   }
 
   void _goToContributions() {
