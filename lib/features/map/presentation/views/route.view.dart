@@ -16,6 +16,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
@@ -459,7 +460,10 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 
   Widget _buildContent(BuildContext context, RouteInfo routeInfo,
       LocationData location, ScheduleNotificationsState state) {
-    if (routeInfo.distance < 100) {
+    print(
+        "Route Info: ${routeInfo.distance < context.userProfile!.constantsSettings.metersToShowTooCloseModal}");
+    if (routeInfo.distance <
+        context.userProfile!.constantsSettings.metersToShowTooCloseModal) {
       return _buildTooCloseMessage();
     }
 
@@ -509,7 +513,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           ),
           const SizedBox(height: 8),
           Text(
-            context.l10n.closeToLocationDescription,
+            context.l10n.closeToLocationDescription(context
+                .userProfile!.constantsSettings.metersToShowTooCloseModal),
             style: Typo.mediumBody,
             textAlign: TextAlign.center,
           ),

@@ -604,6 +604,8 @@ class HerePlace {
     final address = json['address'];
     final categories = json['categories'];
 
+    final position = json['position'];
+
     return HerePlace(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
@@ -612,8 +614,8 @@ class HerePlace {
           : address != null && address['label'] != null
               ? address['label']
               : null,
-      latitude: json['latitude']?.toDouble(),
-      longitude: json['longitude']?.toDouble(),
+      latitude: position?['lat']?.toDouble(),
+      longitude: position?['lng']?.toDouble(),
       category:
           (categories != null && categories is List && categories.isNotEmpty)
               ? categories[0]['name']

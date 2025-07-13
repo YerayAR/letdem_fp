@@ -19,6 +19,7 @@ import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/location/local_location.model.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
@@ -67,8 +68,16 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       if (query.isNotEmpty) {
         setState(() => _isSearching = true);
         try {
+          // Usar el método de geocoding que garantiza ordenamiento por distancia
           var results =
-              await HereSearchApiService().getLocationResults(query, context);
+              await HereSearchApiService().getGeocodingResults(query, context);
+
+          // Si no hay resultados del geocoding, usar el método de autosuggestion
+          if (results.isEmpty) {
+            results =
+                await HereSearchApiService().getLocationResults(query, context);
+          }
+
           setState(() {
             _searchResults = results;
             _isSearching = false;
@@ -155,6 +164,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     );
   }
 
+  // TODO - Refactor this to avoid code duplication
   Widget _buildLocationTypeComponent({
     required LetDemLocationType locationType,
     required List<LetDemLocation> locations,
@@ -167,7 +177,22 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           locationType: locationType,
           apiPlace: filtered.isEmpty ? null : filtered.first,
           showDivider: filtered.isNotEmpty,
-          onPlaceSelected: (_) {},
+          onPlaceSelected: (place) {
+            NavigatorHelper.pop();
+
+            if (place.latitude == null || place.longitude == null) {
+              Toast.show("Location coordinates are not available.");
+              return;
+            }
+
+            context.read<SearchLocationBloc>().add(CreateLocationEvent(
+                  isUpdating: filtered.isNotEmpty,
+                  locationType: locationType,
+                  name: place.title,
+                  latitude: place.latitude ?? 0.0,
+                  longitude: place.longitude ?? 0.0,
+                ));
+          },
           onApiPlaceSelected: _onLetDemLocationSelected,
           onLetDemLocationDeleted: (_) {
             context
@@ -176,29 +201,25 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           },
           onHerePlaceDeleted: (_) {},
           onEditLocationTriggered: () async {
-            final place = await AppPopup.showBottomSheet(
+            final HerePlace? place = await AppPopup.showBottomSheet(
               NavigatorHelper.navigatorKey.currentState!.context,
               AddLocationBottomSheet(
                 title: context.l10n
                     .setLocation(toBeginningOfSentenceCase(locationType.name)!),
-                onLocationSelected: (HerePlace selectedPlace) {
-                  Navigator.pop(context, selectedPlace);
+                onLocationSelected: (HerePlace loc) {
+                  NavigatorHelper.pop(loc);
                 },
               ),
             );
 
             if (place != null) {
-              final fullName = '${place.name} ${place.placeFormatted}';
-              final coords = await MapboxService.getLatLng(fullName);
-              if (coords != null) {
-                context.read<SearchLocationBloc>().add(CreateLocationEvent(
-                      isUpdating: filtered.isNotEmpty,
-                      locationType: locationType,
-                      name: fullName,
-                      latitude: coords.latitude,
-                      longitude: coords.longitude,
-                    ));
-              }
+              context.read<SearchLocationBloc>().add(CreateLocationEvent(
+                    isUpdating: filtered.isNotEmpty,
+                    locationType: locationType,
+                    name: place.title,
+                    latitude: place.latitude!,
+                    longitude: place.longitude!,
+                  ));
             }
           },
         ),

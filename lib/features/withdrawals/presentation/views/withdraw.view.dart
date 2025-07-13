@@ -6,6 +6,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/price.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/payout_methods/payout_method_bloc.dart';
 import 'package:letdem/features/payout_methods/presentation/empty_states/empty_payout.view.dart';
@@ -152,47 +153,93 @@ class _WithdrawViewState extends State<WithdrawView> {
         ),
         Dimens.space(2),
         BlocConsumer<WithdrawalBloc, WithdrawalState>(
-          listener: (context, state) {
-            print('Withdrawal state: $state');
-            if (state is WithdrawalFailure) {
-              Toast.showError(state.message);
-            }
-            if (state is WithdrawalSuccess) {
-              context.read<UserBloc>().add(FetchUserInfoEvent());
-              AppPopup.showDialogSheet(
-                  NavigatorHelper.navigatorKey.currentContext!,
-                  SuccessDialog(
-                    title: context.l10n.success,
-                    subtext: context.l10n.withdrawalRequestSuccess,
-                    onProceed: () {
-                      NavigatorHelper.pop();
-                      NavigatorHelper.pop();
-                      NavigatorHelper.pop();
-                    },
-                  ));
-            }
+            listener: (context, state) {
+          print('Withdrawal state: $state');
+          if (state is WithdrawalFailure) {
+            Toast.showError(state.message);
+          }
+          if (state is WithdrawalSuccess) {
+            context.read<UserBloc>().add(FetchUserInfoEvent());
+            AppPopup.showDialogSheet(
+                NavigatorHelper.navigatorKey.currentContext!,
+                SuccessDialog(
+                  title: context.l10n.success,
+                  subtext: context.l10n.withdrawalRequestSuccess,
+                  onProceed: () {
+                    NavigatorHelper.pop();
+                    NavigatorHelper.pop();
+                    NavigatorHelper.pop();
+                  },
+                ));
+          }
 
-            // TODO: implement listener
-          },
-          builder: (context, state) {
-            return PrimaryButton(
+          // TODO: implement listener
+        }, builder: (context, state) {
+          final constants =
+              context.userProfile!.constantsSettings.withdrawalAmount;
+          final availableBalance =
+              context.userProfile!.earningAccount!.availableBalance;
+          final isLoading =
+              context.watch<WithdrawalBloc>().state is WithdrawalLoading;
+
+          return Column(
+            children: [
+              PrimaryButton(
                 text: context.l10n.withdraw,
-                isDisabled: selectedMethod == null,
-                isLoading:
-                    context.watch<WithdrawalBloc>().state is WithdrawalLoading,
+                isDisabled: selectedMethod == null ||
+                    amount < constants.minimum ||
+                    amount > constants.maximum ||
+                    amount > availableBalance,
+                isLoading: isLoading,
                 onTap: () {
-                  if (context.userProfile!.earningAccount!.availableBalance <=
-                      0) {
-                    Toast.showError(context.l10n.insufficientBalance);
+                  if (amount < constants.minimum) {
+                    Toast.showError(
+                      context.l10n.minWithdrawalToast(
+                          constants.minimum.formatPrice(context)),
+                    );
                     return;
                   }
 
-                  context
-                      .read<WithdrawalBloc>()
-                      .add(WithdrawMoneyEvent(selectedMethod!, amount));
-                });
-          },
-        ),
+                  if (amount > constants.maximum) {
+                    Toast.showError(
+                      context.l10n.maxWithdrawalToast(
+                          constants.maximum.formatPrice(context)),
+                    );
+                    return;
+                  }
+
+                  if (amount > availableBalance) {
+                    Toast.showError(context.l10n.exceedsBalanceToast);
+                    return;
+                  }
+
+                  context.read<WithdrawalBloc>().add(
+                        WithdrawMoneyEvent(selectedMethod!, amount),
+                      );
+                },
+              ),
+              Dimens.space(1),
+              if (availableBalance < constants.minimum)
+                Text(
+                  context.l10n.minWithdrawalAmountError(
+                      constants.minimum.formatPrice(context)),
+                  style: Typo.mediumBody.copyWith(
+                    color: AppColors.red500,
+                    fontSize: 13,
+                  ),
+                ),
+              if (availableBalance >= constants.maximum)
+                Text(
+                  context.l10n.maxWithdrawalAmountError(
+                      constants.maximum.formatPrice(context)),
+                  style: Typo.mediumBody.copyWith(
+                    color: AppColors.red500,
+                    fontSize: 13,
+                  ),
+                ),
+            ],
+          );
+        }),
       ],
     ));
   }

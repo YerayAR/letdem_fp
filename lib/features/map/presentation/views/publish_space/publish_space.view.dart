@@ -18,6 +18,8 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/price.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/users/user_bloc.dart';
@@ -86,7 +88,39 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       _moveToNextPage();
       return;
     }
+
     if (widget.isPaid) {
+      var maxWaitTimeInMin =
+          context.userProfile!.constantsSettings.spaceTimeToWait.maximum;
+      var minWaitTimeInMin =
+          context.userProfile!.constantsSettings.spaceTimeToWait.minimum;
+
+      if (waitingTime.isEmpty ||
+          int.parse(waitingTime) < minWaitTimeInMin ||
+          int.parse(waitingTime) > maxWaitTimeInMin) {
+        Toast.showError(context.l10n.timeToWaitMustBeBetween(
+            minWaitTimeInMin.toString(), maxWaitTimeInMin.toString()));
+        return;
+      }
+
+      var maxPrice = context.userProfile!.constantsSettings.spacePrice.maximum;
+      var minPrice =
+          context.userProfile!.constantsSettings?.spacePrice?.minimum ?? 0;
+
+      print("Max Price: $maxPrice");
+      print("Min Price: $minPrice");
+
+      if (int.tryParse(price) == null ||
+          int.tryParse(price)! < minPrice ||
+          int.tryParse(price)! > maxPrice) {
+        Toast.showError(context.l10n.priceMustBeBetween(
+            minPrice.formatPrice(context),
+            maxPrice.formatPrice(
+              context,
+            )));
+        return;
+      }
+
       print("Phone Number: $phoneNumber");
       print("Country Code: $countryCode");
 
@@ -299,7 +333,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                             children: [
                               TextInputField(
                                 label: context.l10n.waitingTime,
-                                placeHolder: "MM:SS",
+                                placeHolder: "MM",
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                   FilteringTextInputFormatter.allow(
@@ -329,7 +363,17 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                             ),
                                             Dimens.space(2),
                                             Text(
-                                              context.l10n.waitingTimeTooltip,
+                                              context.l10n.waitingTimeTooltip(
+                                                  context
+                                                      .userProfile!
+                                                      .constantsSettings
+                                                      .spaceTimeToWait
+                                                      .minimum,
+                                                  context
+                                                      .userProfile!
+                                                      .constantsSettings
+                                                      .spaceTimeToWait
+                                                      .maximum),
                                               style: Typo.mediumBody,
                                               textAlign: TextAlign.center,
                                             ),
@@ -380,6 +424,55 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                     price = value;
                                   });
                                 },
+                                child: IconButton(
+                                  icon: Icon(
+                                    Iconsax.info_circle,
+                                    color: AppColors.neutral200,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    AppPopup.showDialogSheet(
+                                      context,
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            context.l10n.price,
+                                            style: Typo.heading4,
+                                          ),
+                                          Dimens.space(1),
+                                          Text(
+                                            context.l10n.priceTooltip(
+                                              context
+                                                      .userProfile
+                                                      ?.constantsSettings
+                                                      ?.spacePrice
+                                                      ?.maximum
+                                                      ?.formatPrice(context) ??
+                                                  '0.00',
+                                              context
+                                                      .userProfile
+                                                      ?.constantsSettings
+                                                      ?.spacePrice
+                                                      ?.minimum
+                                                      ?.formatPrice(context) ??
+                                                  '0.00',
+                                            ),
+                                            style: Typo.mediumBody,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          Dimens.space(2),
+                                          PrimaryButton(
+                                            onTap: () {
+                                              NavigatorHelper.pop();
+                                            },
+                                            text: context.l10n.gotIt,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                               Dimens.space(2),
                               PhoneField(
@@ -558,7 +651,7 @@ class PaidSpaceForm extends StatelessWidget {
         children: [
           TextInputField(
             label: context.l10n.waitingTime,
-            placeHolder: 'MM:SS',
+            placeHolder: 'MM',
             prefixIcon: Iconsax.clock5,
             onChanged: (value) {},
           ),

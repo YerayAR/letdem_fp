@@ -4,6 +4,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/price.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
@@ -122,7 +123,14 @@ class _AmountInputCardState extends State<AmountInputCard> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          context.l10n.pendingFundsInfo,
+                          context.l10n.pendingFundsInfo(
+                            context.userProfile!.constantsSettings
+                                .withdrawalAmount.minimum
+                                .formatPrice(context),
+                            context.userProfile!.constantsSettings
+                                .withdrawalAmount.maximum
+                                .formatPrice(context),
+                          ),
                           style: Typo.mediumBody,
                           textAlign: TextAlign.center,
                         ),

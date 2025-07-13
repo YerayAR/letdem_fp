@@ -11,13 +11,13 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/core/enums/EarningStatus.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
-import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 import 'package:letdem/features/map/presentation/views/publish_space/publish_space.view.dart';
+import 'package:letdem/infrastructure/services/earnings/eranings.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 class PublishSpaceHandler {
@@ -26,6 +26,23 @@ class PublishSpaceHandler {
   static bool preCheck(BuildContext context) {
     final carState = context.read<CarBloc>().state;
     final isCarExist = carState is CarLoaded && carState.car != null;
+    final activeReservation = context.userProfile?.activeReservation != null;
+
+    if (activeReservation) {
+      _showInfoPopup(
+        context,
+        context.l10n.importantNotice,
+        context.l10n.activeReservationExists,
+        () => NavigatorHelper.to(ReservedSpaceDetailView(
+          details: context.userProfile!.activeReservation!,
+          space: context.userProfile!.activeReservation!.space,
+        )),
+        context.l10n.viewDetails,
+      );
+      return false;
+    }
+
+    bool isSuccess = false;
 
     if (!isCarExist) {
       _showInfoPopup(
@@ -37,45 +54,16 @@ class PublishSpaceHandler {
       return false;
     }
 
-    final isPaidAccountExist = context.userProfile?.earningAccount != null;
+    final earningAccount = context.userProfile?.earningAccount;
+    EarningAccountService.handleEarningAccountTap(
+      context: context,
+      earningAccount: earningAccount,
+      onSuccess: () {
+        isSuccess = true;
+      },
+    );
 
-    if (!isPaidAccountExist) {
-      final earningAccount = context.userProfile?.earningAccount;
-      final status = earningAccount?.status;
-
-      _showInfoPopup(
-        context,
-        context.l10n.importantNotice,
-        context.l10n.createEarningAccountFirst,
-        () {
-          NavigatorHelper.pop();
-          NavigatorHelper.to(
-            ConnectAccountView(
-              remainingStep: earningAccount?.step,
-              status: status,
-            ),
-          );
-        },
-      );
-      return false;
-    }
-
-    if (context.userProfile!.earningAccount?.status != EarningStatus.accepted) {
-      _showInfoPopup(
-        context,
-        context.l10n.importantNotice,
-        context.l10n.verifyYourAccountFirst,
-        () {
-          NavigatorHelper.pop();
-          NavigatorHelper.to(
-            const ConnectAccountView(status: null, remainingStep: null),
-          );
-        },
-      );
-      return false;
-    }
-
-    return true;
+    return isSuccess;
   }
 
   static void showSpaceOptions(BuildContext context, void Function() onAdded) {
@@ -137,12 +125,9 @@ class PublishSpaceHandler {
         : _imagePicker.pickImage(source: ImageSource.camera);
   }
 
-  static void _showInfoPopup(
-    BuildContext context,
-    String title,
-    String message,
-    VoidCallback onContinue,
-  ) {
+  static void _showInfoPopup(BuildContext context, String title, String message,
+      VoidCallback onContinue,
+      [String? continueText]) {
     AppPopup.showBottomSheet(
       context,
       Container(
@@ -185,7 +170,7 @@ class PublishSpaceHandler {
               width: double.infinity,
               child: PrimaryButton(
                 onTap: onContinue,
-                text: context.l10n.continuee,
+                text: continueText ?? context.l10n.continuee,
               ),
             ),
           ],

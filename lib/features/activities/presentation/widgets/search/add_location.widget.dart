@@ -14,11 +14,9 @@ import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
 
-import '../../../../../infrastructure/services/res/navigator.dart';
-
 class AddLocationBottomSheet extends StatefulWidget {
   final String title;
-  final Function(HerePlace) onLocationSelected;
+  final Function(HerePlace p) onLocationSelected;
   const AddLocationBottomSheet(
       {super.key, required this.onLocationSelected, required this.title});
 
@@ -122,7 +120,6 @@ class _AddLocationBottomSheetState extends State<AddLocationBottomSheet> {
                                       place: e,
                                       onPlaceSelected: (HerePlace p) {
                                         widget.onLocationSelected(p);
-                                        NavigatorHelper.pop();
                                       },
                                       onHerePlaceDeleted: (HerePlace place) {},
                                       onLetDemLocationDeleted:

@@ -223,6 +223,7 @@ class SavedAddressComponent extends StatelessWidget {
 
 // Helper method to show add location bottom sheet
   void _showAddLocationBottomSheet(BuildContext context) {
+    print("showing add location bottom sheet for ${locationType.name}");
     AppPopup.showBottomSheet(
       context,
       AddLocationBottomSheet(

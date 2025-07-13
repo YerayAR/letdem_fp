@@ -172,6 +172,7 @@ class ReservationPaymentCard extends StatelessWidget {
             ),
           ),
 
+          const SizedBox(width: 16),
           // Amount and status
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -211,6 +212,8 @@ class ReservationPaymentCard extends StatelessWidget {
         break;
       case 'PAID':
       case 'COMPLETED':
+      case 'RESERVED':
+      case 'CONFIRMED':
         backgroundColor = AppColors.green50;
         textColor = AppColors.green500;
         text = context.l10n.paid;
@@ -257,6 +260,9 @@ class ReservationPaymentCard extends StatelessWidget {
   String _formatDate(DateTime date, BuildContext context) {
     final now = DateTime.now();
     final difference = now.difference(date);
+
+    print(
+        'Date: $date, Now: $now, Difference: ${difference.inDays} days, ${difference.inHours} hours, ${difference.inMinutes} minutes');
 
     if (difference.inMinutes < 5) {
       return context.l10n.justNow;

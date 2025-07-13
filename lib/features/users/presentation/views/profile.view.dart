@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/body.dart';
-import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
@@ -14,11 +13,9 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/car/car_bloc.dart';
-import 'package:letdem/features/earning_account/presentation/views/connect_account.view.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
 import 'package:letdem/features/users/models/user.model.dart';
-import 'package:letdem/features/users/presentation/modals/money_laundry.popup.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
 import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
@@ -28,10 +25,10 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
+import 'package:letdem/infrastructure/services/earnings/eranings.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
 
-import '../../../../common/popups/popup.dart';
 import '../../../../common/widgets/appbar.dart';
 import '../../../scheduled_notifications/presentation/views/scheduled_notifications.view.dart';
 import 'reservations/reservation_list.view.dart';
@@ -238,102 +235,13 @@ class _MainActionsSection extends StatelessWidget {
       showDivider: false,
       leading: isAccepted ? null : _statusChip(context, earningAccount),
       onTap: () {
-        if (earningAccount != null &&
-            earningAccount.status == EarningStatus.pending) {
-          AppPopup.showBottomSheet(
-            context,
-            Padding(
-              padding: EdgeInsets.all(Dimens.defaultMargin),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 37,
-                    backgroundColor: AppColors.secondary50,
-                    child: Icon(
-                      Icons.info,
-                      color: AppColors.secondary500,
-                      size: 50,
-                    ),
-                  ),
-                  Dimens.space(3),
-                  Text(
-                    context.l10n.connectionPending,
-                    style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  Dimens.space(1),
-                  Text(
-                    context.l10n.connectionPendingMessage,
-                    textAlign: TextAlign.center,
-                    style:
-                        Typo.mediumBody.copyWith(color: AppColors.neutral600),
-                  ),
-                  Dimens.space(2),
-                  PrimaryButton(
-                    text: context.l10n.goBack,
-                    onTap: () {
-                      NavigatorHelper.pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-          return;
-        }
-        if (earningAccount != null &&
-            (earningAccount?.status == EarningStatus.rejected ||
-                earningAccount?.status == EarningStatus.rejected)) {
-          AppPopup.showBottomSheet(
-            context,
-            Padding(
-              padding: EdgeInsets.all(Dimens.defaultMargin),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.info,
-                    color: AppColors.red500,
-                    size: 55,
-                  ),
-                  Dimens.space(3),
-                  Text(
-                    context.l10n.somethingWentWrong,
-                    style: Typo.heading4.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  Dimens.space(1),
-                  Text(
-                    context.l10n.contactSupportMessage,
-                    textAlign: TextAlign.center,
-                    style:
-                        Typo.mediumBody.copyWith(color: AppColors.neutral600),
-                  ),
-                  Dimens.space(2),
-                  PrimaryButton(
-                    text: context.l10n.goBack,
-                    onTap: () {
-                      NavigatorHelper.pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-          return;
-        }
-        if (isAccepted) {
-          NavigatorHelper.to(const WalletScreen());
-        } else {
-          AppPopup.showBottomSheet(
-            context,
-            MoneyLaundryPopup(onContinue: () {
-              NavigatorHelper.to(ConnectAccountView(
-                remainingStep: earningAccount?.step,
-                status: status,
-              ));
-            }),
-          );
-        }
+        EarningAccountService.handleEarningAccountTap(
+          context: context,
+          earningAccount: earningAccount,
+          onSuccess: () {
+            NavigatorHelper.to(const WalletScreen());
+          },
+        );
       },
     );
   }
