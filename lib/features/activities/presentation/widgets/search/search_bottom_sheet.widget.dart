@@ -68,8 +68,16 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       if (query.isNotEmpty) {
         setState(() => _isSearching = true);
         try {
+          // Usar el método de geocoding que garantiza ordenamiento por distancia
           var results =
-              await HereSearchApiService().getLocationResults(query, context);
+              await HereSearchApiService().getGeocodingResults(query, context);
+
+          // Si no hay resultados del geocoding, usar el método de autosuggestion
+          if (results.isEmpty) {
+            results =
+                await HereSearchApiService().getLocationResults(query, context);
+          }
+
           setState(() {
             _searchResults = results;
             _isSearching = false;
