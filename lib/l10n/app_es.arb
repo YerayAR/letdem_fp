@@ -134,8 +134,6 @@
       }
     }
   },
-
-
   "reservationPendingNote": "Si no confirmas el espacio antes de {expiresAt}, esta reserva será cancelada y el dinero será reembolsado al solicitante.",
   "@reservationPendingNote": {
     "description": "Mensaje de notificación que se muestra cuando una reserva está pendiente de confirmación. Usa la hora de expiración {expiresAt} para indicar el límite.",
@@ -146,11 +144,7 @@
       }
     }
   },
-
-
-
-
-"selectFilterActivities": "Selecciona un filtro para ver actividades",
+  "selectFilterActivities": "Selecciona un filtro para ver actividades",
   "searchLocation": "Buscar ubicación",
   "back": "Atrás",
   "updatingLocation": "ACTUALIZANDO UBICACIÓN DE {type}",
@@ -250,95 +244,76 @@
   "enterPassword": "Ingresa tu contraseña",
   "passwordsDoNotMatch": "Las contraseñas no coinciden",
   "emailSentTitle": "Te enviamos un correo",
-  "reservations" : "Reservas",
+  "reservations": "Reservas",
   "emailSentDescription": "Hemos enviado un código OTP a tu correo. Ingrésalo abajo para restablecer tu contraseña.",
   "mailSentTo": "Correo enviado a: ",
   "notYou": "¿No eres tú? ",
   "changeEmail": "Cambiar correo",
-
   "howToPublishPaidSpaceTitle": "¿Cómo puedo publicar un espacio de pago?",
   "@howToPublishPaidSpaceTitle": {
     "description": "Title for the section about publishing a paid space"
   },
-
   "howToPublishPaidSpaceDescription": "Para publicar un espacio de pago, debes cumplir con los siguientes requisitos:",
   "@howToPublishPaidSpaceDescription": {
     "description": "Description for publishing a paid space"
   },
-
   "publishPaidSpaceRequirement1": "Registrar los datos de tu vehículo en la aplicación, ya que serán necesarios al momento de la reserva.",
   "@publishPaidSpaceRequirement1": {
     "description": "First requirement for publishing a paid space"
   },
-
   "publishPaidSpaceRequirement2": "Crear una cuenta de beneficios desde tu perfil. Para ello, deberás ingresar tu información fiscal, la cual es obligatoria para recibir pagos en la aplicación conforme a la normativa europea de prevención de lavado de dinero.",
   "@publishPaidSpaceRequirement2": {
     "description": "Second requirement for publishing a paid space"
   },
-
   "howToEarnMoneyTitle": "¿Cómo obtengo ganancias por mi espacio de pago?",
   "@howToEarnMoneyTitle": {
     "description": "Title for the section about earning money from paid space"
   },
-
   "howToEarnMoneyDescription": "Para generar ganancias con tu espacio, este debe ser reservado por otro usuario. Una vez realizada la reserva, deberás confirmar la operación ingresando el código de confirmación que se le proporciona al usuario que reservó. Tras recibir el código, podrás confirmar la reserva.",
   "@howToEarnMoneyDescription": {
     "description": "Description of how to earn money from paid space"
   },
-
   "earningsTransferDescription": "Cuando la reserva es confirmada, recibirás el importe correspondiente menos las comisiones aplicadas por LetDem por la operación.",
   "@earningsTransferDescription": {
     "description": "Description of how earnings are transferred"
   },
-
   "earningsLocationDescription": "El monto total de tus ganancias se reflejará en la sección Ganancias de tu perfil.",
   "@earningsLocationDescription": {
     "description": "Description of where to find earnings information"
   },
-
   "howToWithdrawFundsTitle": "¿Cómo retiro mis fondos a una cuenta personal?",
   "@howToWithdrawFundsTitle": {
     "description": "Title for the section about withdrawing funds"
   },
-
   "howToWithdrawFundsDescription": "Para retirar tus fondos, estos deben ser liberados previamente por el proveedor de pagos. Este proceso suele tardar aproximadamente 10 días. Una vez liberados, los fondos estarán disponibles en la app y podrás retirarlos utilizando una de las cuentas bancarias que hayas asociado previamente.",
   "@howToWithdrawFundsDescription": {
     "description": "Description of how to withdraw funds"
   },
-
   "earningsSection": "Ganancias",
   "@earningsSection": {
     "description": "Label for the earnings section"
   },
-
   "letdemServiceFees": "comisiones aplicadas por LetDem",
   "@letdemServiceFees": {
     "description": "Reference to LetDem service fees"
   },
-
-
-  "helpAndSupport" : "Ayuda y Soporte",
-
+  "helpAndSupport": "Ayuda y Soporte",
   "vehicleInformation": "datos de tu vehículo",
   "@vehicleInformation": {
     "description": "Reference to vehicle information"
   },
-
   "earningsAccount": "cuenta de beneficios",
   "@earningsAccount": {
     "description": "Reference to earnings account"
   },
-
   "taxInformation": "información fiscal",
   "@taxInformation": {
     "description": "Reference to tax information"
   },
-
   "paymentProvider": "proveedor de pagos",
   "@paymentProvider": {
     "description": "Reference to payment provider"
   },
-
   "linkedBankAccounts": "cuentas bancarias asociadas",
   "@linkedBankAccounts": {
     "description": "Reference to linked bank accounts"
@@ -346,8 +321,6 @@
   "didntGetOtp": "¿No recibiste el código? ",
   "tapToResend": "Toca para reenviar.",
   "passwordRequirements": "Asegúrate de usar al menos 8 caracteres, con un número, una letra mayúscula y uno de los siguientes caracteres especiales: $, ., &, @",
-
-
   "resendIn": "Reenviar en 00:{seconds}",
   "@resendIn": {
     "placeholders": {
@@ -458,7 +431,7 @@
   "publishPaidSpace": "Publicar Aparcamiento de Pago",
   "waitingTime": "Tiempo de Espera",
   "price": "Precio",
-  "pleaseEnterYourNumber" : "Por favor ingresa tu número de teléfono",
+  "pleaseEnterYourNumber": "Por favor ingresa tu número de teléfono",
   "enterPrice": "Ingresa el precio",
   "waitingTimeTooltip": "Este es el tiempo máximo que el publicador puede esperar antes de salir. El tiempo debe estar entre {min} y {max} minutos. Una vez transcurrido este tiempo, el espacio publicado expirará.",
   "@waitingTimeTooltip": {
@@ -555,9 +528,8 @@
   "paid" : "Pago",
   "cancelled": "Cancelado",
   "refunded": "Reembolsado",
-  "noPaymentsYet" : "Aún no hay pagos",
+  "noPaymentsYet": "Aún no hay pagos",
   "noPaymentsDescription": "Tu historial de pagos aparecerá aquí.",
-
   "notifyAvailableSpace": "Notificarme de aparcamientos disponibles en esta área",
   "dateAndTime": "Fecha y Hora",
   "notificationRadius": "Recibir notificaciones hasta (metros)",
@@ -571,7 +543,6 @@
       }
     }
   },
-
   "howToCreateScheduledNotificationsTitle": "¿Cómo Crear Notificaciones Programadas?",
   "howToEarnPointsTitle": "¿Cómo ganar Puntos LetDem?",
 
@@ -633,7 +604,6 @@
   "additionalNotes": "Notas Adicionales",
   "pointsNote1": "El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.",
   "pointsNote2": "En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.",
-
   "howToCreateScheduledNotificationsDescription": "Para programar una notificación de aparcamiento, sigue estos pasos:",
   "searchDestinationTitle": "Buscar Destino",
   "searchDestinationDescription": "Busca tu destino utilizando la barra de búsqueda en la pantalla principal.",
@@ -643,14 +613,10 @@
   "configureAlertDescription": "Selecciona la franja horaria y la distancia desde tu ubicación para recibir notificaciones.",
   "scheduledNotificationsManagement": "Gestiona tus notificaciones desde la sección 'Notificaciones programadas'.",
   "scheduledNotificationsAlert": "Recibirás una notificación cada vez que se publique un aparcamiento dentro del área configurada.",
-
   "publishAlertTitle": "Publicar una Alerta",
   "publishAlertDescription": "si otro usuario confirma la existencia de la alerta.",
   "point": "punto",
-
-
-
-"notificationScheduled": "Notificación Programada",
+  "notificationScheduled": "Notificación Programada",
   "notificationScheduledDescription": "Se te notificará cuando haya un aparcamiento disponible en esta área",
   "minutesShort": "min",
   "hoursShort": "hrs",
@@ -763,7 +729,6 @@
   "thankYouForInput": "¡Gracias por tu aporte!",
   "eventFeedback": "Comentarios sobre el evento",
   "stillThere": "Todavía está ahí",
-
   "arrivalTitle": "¡Has llegado!",
   "arrivalSubtitle": "Las plazas de aparcamiento cercanas ahora están visibles en el mapa. Pulsa una para iniciar la navegación.",
   "notThere": "Ya no está ahí",
@@ -1076,5 +1041,21 @@
   "helpScheduledNotificationsStep3Detail1": "• La franja horaria en la que deseas recibir notificaciones.",
   "helpScheduledNotificationsStep3Detail2": "• La distancia en metros desde la ubicación seleccionada que se debe considerar como área de notificación.",
   "helpScheduledNotificationsInfo1": "Una vez creada la alerta, podrás gestionarla desde tu perfil, en la sección \"Notificaciones programadas\", donde verás todas tus alertas activas o expiradas.",
-  "helpScheduledNotificationsInfo2": "Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar."
+  "helpScheduledNotificationsInfo2": "Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar.",
+  "unhandledError": "Error no controlado",
+  "paymentFailed": "Pago Fallido",
+  "changePaymentMethod": "Cambiar método de pago",
+  "paymentFailedDescription": "La reserva falló porque tu pago no se procesó correctamente",
+  "errorReserveSpaceDescription": "Por favor, inténtalo de nuevo más tarde. Si el problema persiste, contacta con soporte.",
+  "speedLimitVoiceAlert": "El límite de velocidad es {speedLimit} kilómetros por hora",
+  "@speedLimitVoiceAlert": {
+    "description": "Mensaje de voz para alerta de límite de velocidad",
+    "placeholders": {
+      "speedLimit": {
+        "type": "String",
+        "description": "El límite de velocidad en km/h"
+      }
+    }
+  },
+  "waitingForNavigation": "Esperando a que inicie la navegación..."
 }

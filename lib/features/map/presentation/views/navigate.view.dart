@@ -144,8 +144,17 @@ class _NavigationViewState extends State<NavigationView> {
     // );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _configureTTSLanguage();
       _requestLocationPermission();
     });
+  }
+
+  void _configureTTSLanguage() {
+    
+    String languageCode = Localizations.localeOf(context).languageCode;
+    speech.setLanguage(languageCode);
+    
+    debugPrint('🗣️ TTS language configured to: $languageCode');
   }
 
   void _setupSpeedLimitListener() {
@@ -309,7 +318,7 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     if (!_isMuted) {
-      speech.speak("Speed limit is $speedLimitKmh kilometers per hour");
+      speech.speak(context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()));
     }
   }
 
@@ -992,6 +1001,9 @@ class _NavigationViewState extends State<NavigationView> {
     if (_hereMapController == null) return;
 
     debugPrint('🧭 Starting visual guidance...');
+
+    _configureTTSLanguage();
+
     try {
       _visualNavigator = HERE.VisualNavigator();
       _setupRouteDeviationListener();
@@ -1088,7 +1100,7 @@ class _NavigationViewState extends State<NavigationView> {
           });
         } else if (!isParkingNavigation) {
           print('🎯 Standard destination reached. Showing toast.');
-          _showToast("You have arrived at your destination!",
+          _showToast(context.l10n.arrivedAtDestination,
               backgroundColor: AppColors.green600);
 
           putParkingSpacesOnMap();
@@ -1442,6 +1454,7 @@ class _NavigationViewState extends State<NavigationView> {
                         speech.mute();
                       } else {
                         speech.unmute();
+                        _configureTTSLanguage();
                       }
                     },
                   ),
@@ -1453,7 +1466,7 @@ class _NavigationViewState extends State<NavigationView> {
                 baseColor: Colors.white.withOpacity(0.5),
                 highlightColor: Colors.grey[100]!,
                 child: Text(
-                  "Waiting for navigation to start...",
+                  context.l10n.waitingForNavigation,
                   style: TextStyle(
                       color: Colors.white.withOpacity(0.7), fontSize: 16),
                 ),
