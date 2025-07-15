@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/appbar.dart';
+import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/users/user_bloc.dart';
@@ -28,47 +32,53 @@ class _OrdersListViewState extends State<OrdersListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          context.l10n.orders,
-        ),
-        centerTitle: true,
-      ),
-      body: BlocConsumer<UserBloc, UserState>(
-        listener: (context, state) {
-          // TODO: implement listener
-        },
-        builder: (context, state) {
-          if (state is UserLoaded) {
-            if (state.isOrdersLoading) {
-              return const OrdersLoadingView();
-            }
-
-            final orders = state.orders;
-            if (orders.isEmpty) {
-              return const EmptyOrdersView();
-            }
-            return RefreshIndicator(
-              onRefresh: () async {
-                // Simulate refresh
-                await Future.delayed(const Duration(seconds: 1));
+      body: StyledBody(
+        children: [
+          StyledAppBar(
+            title: context.l10n.orders,
+            onTap: () => Navigator.of(context).pop(),
+            icon: Iconsax.close_circle5,
+          ),
+          Dimens.space(2),
+          Expanded(
+            child: BlocConsumer<UserBloc, UserState>(
+              listener: (context, state) {
+                // TODO: implement listener
               },
-              child: ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: orders.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 6),
-                itemBuilder: (context, index) {
-                  final order = orders[index];
-                  return OrderCard(order: order);
-                },
-              ),
-            );
-          }
+              builder: (context, state) {
+                if (state is UserLoaded) {
+                  if (state.isOrdersLoading) {
+                    return const OrdersLoadingView();
+                  }
 
-          return Center(
-            child: Text(context.l10n.errorLoadingOrders),
-          );
-        },
+                  final orders = state.orders;
+                  if (orders.isEmpty) {
+                    return const EmptyOrdersView();
+                  }
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      // Simulate refresh
+                      await Future.delayed(const Duration(seconds: 1));
+                    },
+                    child: ListView.separated(
+                      itemCount: orders.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 6),
+                      itemBuilder: (context, index) {
+                        final order = orders[index];
+                        return OrderCard(order: order);
+                      },
+                    ),
+                  );
+                }
+
+                return Center(
+                  child: Text(context.l10n.errorLoadingOrders),
+                );
+              },
+            ),
+          )
+        ],
       ),
     );
   }

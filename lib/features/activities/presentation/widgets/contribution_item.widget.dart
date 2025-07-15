@@ -64,7 +64,9 @@ class ContributionItem extends StatelessWidget {
                         children: [
                           Text(
                             type == ContributionType.space
-                                ? context.l10n.spacePublished
+                                ? activity.action == 'SPACE_OCCUPIED'
+                                    ? context.l10n.spaceOccupied
+                                    : context.l10n.spacePublished
                                 : context.l10n.eventPublished,
                             style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700,

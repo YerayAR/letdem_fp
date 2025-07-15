@@ -9,6 +9,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
@@ -198,46 +199,47 @@ class ReservationPaymentCard extends StatelessWidget {
     return AppColors.neutral400;
   }
 
-  Widget _buildStatusChip(String status, BuildContext context) {
+  Widget _buildStatusChip(ReservedSpaceStatus status, BuildContext context) {
     late Color backgroundColor;
     late Color textColor;
     late String text;
 
-    switch (status.toUpperCase()) {
-      // expired
-      case 'EXPIRED':
+    // pending,
+    // reserved,
+    // confirmed,
+    // expired,
+    // cancelled;
+
+    switch (status) {
+      case ReservedSpaceStatus.expired:
         backgroundColor = AppColors.neutral50;
-        textColor = AppColors.neutral500;
+        textColor = AppColors.neutral400;
         text = context.l10n.expired;
         break;
-      case 'PAID':
-      case 'COMPLETED':
-      case 'RESERVED':
-      case 'CONFIRMED':
-        backgroundColor = AppColors.green50;
-        textColor = AppColors.green500;
-        text = context.l10n.paid;
-        break;
-      case 'PENDING':
+      case ReservedSpaceStatus.confirmed:
         backgroundColor = AppColors.primary50;
         textColor = AppColors.primary500;
+        text = context.l10n.confirmed;
+        break;
+      case ReservedSpaceStatus.reserved:
+        backgroundColor = AppColors.green50;
+        textColor = AppColors.green500;
+        text = context.l10n.reserved;
+        break;
+      case ReservedSpaceStatus.pending:
+        backgroundColor = AppColors.green50;
+        textColor = AppColors.green500;
         text = context.l10n.pending;
         break;
-      case 'CANCELLED':
-      case 'FAILED':
+      case ReservedSpaceStatus.cancelled:
         backgroundColor = AppColors.red50;
         textColor = AppColors.red500;
         text = context.l10n.cancelled;
         break;
-      case 'REFUNDED':
-        backgroundColor = AppColors.neutral50;
-        textColor = AppColors.neutral500;
-        text = context.l10n.refunded;
-        break;
-      default:
+      default: // ReservedSpaceStatus.expired
         backgroundColor = AppColors.neutral50;
         textColor = AppColors.neutral400;
-        text = status.toLowerCase();
+        text = status.name.toLowerCase();
     }
 
     return Container(
