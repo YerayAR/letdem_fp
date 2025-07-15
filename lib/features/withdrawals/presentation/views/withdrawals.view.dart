@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/models/withdrawals/withdrawal.model.dart';
@@ -26,43 +28,50 @@ class _WithdrawListViewState extends State<WithdrawListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          context.l10n.withdrawals,
-        ),
-      ),
-      body: BlocConsumer<WithdrawalBloc, WithdrawalState>(
-        listener: (context, state) {
-          if (state is WithdrawalFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is WithdrawalLoading) {
-            return const WithdrawalLoadingView();
-          } else if (state is WithdrawalSuccess) {
-            if (state.withdrawals.isEmpty) {
-              return const EmptyWithdrawalView();
-            }
-            return StyledBody(children: [
-              Expanded(
-                  child: WithdrawalListWidget(withdrawals: state.withdrawals))
-            ]);
-          } else if (state is WithdrawalFailure) {
-            return WithdrawalErrorView(
-              message: state.message,
-              onRetry: () {
-                context.read<WithdrawalBloc>().add(const FetchWithdrawals());
-              },
-            );
-          }
-          return const WithdrawalLoadingView();
-        },
+      body: StyledBody(
+        children: [
+          StyledAppBar(
+            title: context.l10n.withdrawals,
+            onTap: () => Navigator.of(context).pop(),
+            icon: Iconsax.close_circle5,
+          ),
+          Dimens.space(2),
+          BlocConsumer<WithdrawalBloc, WithdrawalState>(
+            listener: (context, state) {
+              if (state is WithdrawalFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state is WithdrawalLoading) {
+                return const WithdrawalLoadingView();
+              } else if (state is WithdrawalSuccess) {
+                if (state.withdrawals.isEmpty) {
+                  return const Expanded(
+                      child: Center(child: EmptyWithdrawalView()));
+                }
+                return Expanded(
+                    child:
+                        WithdrawalListWidget(withdrawals: state.withdrawals));
+              } else if (state is WithdrawalFailure) {
+                return WithdrawalErrorView(
+                  message: state.message,
+                  onRetry: () {
+                    context
+                        .read<WithdrawalBloc>()
+                        .add(const FetchWithdrawals());
+                  },
+                );
+              }
+              return const WithdrawalLoadingView();
+            },
+          ),
+        ],
       ),
     );
   }
@@ -164,7 +173,7 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${withdrawal.amount.abs().toStringAsFixed(1)} €',
+                '-${withdrawal.amount.abs().toStringAsFixed(1)} €',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

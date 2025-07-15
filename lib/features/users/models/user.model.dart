@@ -17,7 +17,8 @@ class UserReservationPayments {
   // },
   final String price;
   final PublishSpaceType type;
-  final String status;
+  final ReservedSpaceStatus status;
+
   final String street;
   final DateTime created;
 
@@ -33,7 +34,8 @@ class UserReservationPayments {
     return UserReservationPayments(
       price: json['price'] ?? '',
       type: getEnumFromText(json['type'], "PaidSpace"),
-      status: json['status'] ?? '',
+      status: ReservedSpaceStatus.fromString(json['status']) ??
+          ReservedSpaceStatus.cancelled,
       street: json['street'] ?? '',
       created: DateTime.parse(json['created']),
     );

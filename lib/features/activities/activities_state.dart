@@ -72,6 +72,27 @@ final class SpaceReserved extends ActivitiesState {
   List<Object?> get props => [spaceID];
 }
 
+enum ReservedSpaceStatus {
+  pending,
+  reserved,
+  confirmed,
+  expired,
+  cancelled;
+
+  // Convert enum to string (UPPERCASE)
+  String fromEnum() {
+    return name.toUpperCase();
+  }
+
+  // Convert string to enum (case-insensitive)
+  static ReservedSpaceStatus? fromString(String value) {
+    return ReservedSpaceStatus.values.firstWhere(
+      (e) => e.name.toUpperCase() == value.toUpperCase(),
+      orElse: () => ReservedSpaceStatus.pending,
+    );
+  }
+}
+
 class ReservedSpacePayload {
   final String id;
   final double price;
