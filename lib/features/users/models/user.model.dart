@@ -5,6 +5,7 @@ import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/users/models/preferences.model.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
+import 'package:letdem/models/orders/order.model.dart';
 import 'package:letdem/models/payment/payment.model.dart';
 
 class UserReservationPayments {
@@ -17,7 +18,7 @@ class UserReservationPayments {
   // },
   final String price;
   final PublishSpaceType type;
-  final ReservedSpaceStatus status;
+  final ReservedStatus status;
 
   final String street;
   final DateTime created;
@@ -34,8 +35,7 @@ class UserReservationPayments {
     return UserReservationPayments(
       price: json['price'] ?? '',
       type: getEnumFromText(json['type'], "PaidSpace"),
-      status: ReservedSpaceStatus.fromString(json['status']) ??
-          ReservedSpaceStatus.cancelled,
+      status: reservedStatusFromString(json['status']),
       street: json['street'] ?? '',
       created: DateTime.parse(json['created']),
     );

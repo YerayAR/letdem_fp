@@ -75,6 +75,14 @@ class DatabaseHelper {
     final jsonString = jsonEncode(place.toJson());
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
+    if (place.latitude == null || place.longitude == null) {
+      print('[DB] Cannot save null place.');
+      throw Exception('Place latitude or longitude is null');
+    }
+
+    print(
+        '[DB] Saving place with latitude: ${place.latitude}, longitude: ${place.longitude}');
+
     print('[DB] Saving place with ID: ${place.id}');
     print('[DB] JSON: $jsonString');
     print('[DB] Timestamp: $timestamp');

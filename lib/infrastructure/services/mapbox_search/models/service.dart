@@ -606,6 +606,21 @@ class HerePlace {
 
     final position = json['position'];
 
+    // log latitude and longitude if they are not null
+
+    var latitude = position != null
+        ? position['lat'] != null
+            ? position['lat'].toDouble()
+            : json['latitude']?.toDouble()
+        : json['latitude']?.toDouble();
+    var longitude = position != null
+        ? position['lng'] != null
+            ? position['lng'].toDouble()
+            : json['longitude']?.toDouble()
+        : json['longitude']?.toDouble();
+
+    print("Latitude: $latitude, Longitude: $longitude");
+
     return HerePlace(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
@@ -614,8 +629,8 @@ class HerePlace {
           : address != null && address['label'] != null
               ? address['label']
               : null,
-      latitude: position?['lat']?.toDouble(),
-      longitude: position?['lng']?.toDouble(),
+      latitude: latitude,
+      longitude: longitude,
       category:
           (categories != null && categories is List && categories.isNotEmpty)
               ? categories[0]['name']

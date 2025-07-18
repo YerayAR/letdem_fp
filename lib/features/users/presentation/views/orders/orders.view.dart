@@ -188,22 +188,36 @@ class OrderCard extends StatelessWidget {
     late Color textColor;
     late String text;
 
-    if (status case ReservedStatus.reserved || ReservedStatus.pending) {
-      backgroundColor = AppColors.green50;
-      textColor = AppColors.green500;
-      text = context.l10n.active;
-    } else if (status case ReservedStatus.confirmed) {
-      backgroundColor = AppColors.primary50;
-      textColor = AppColors.primary500;
-      text = context.l10n.confirmed;
-    } else if (status case ReservedStatus.canceled || ReservedStatus.expired) {
-      backgroundColor = AppColors.red50;
-      textColor = AppColors.red500;
-      text = context.l10n.expired;
-    } else {
-      backgroundColor = AppColors.neutral50;
-      textColor = AppColors.neutral400;
-      text = status.name.toUpperCase();
+    switch (status) {
+      case ReservedStatus.expired:
+        backgroundColor = AppColors.neutral50;
+        textColor = AppColors.neutral400;
+        text = context.l10n.expired;
+        break;
+      case ReservedStatus.confirmed:
+        backgroundColor = AppColors.primary50;
+        textColor = AppColors.primary500;
+        text = context.l10n.confirmed;
+        break;
+      case ReservedStatus.reserved:
+        backgroundColor = AppColors.green50;
+        textColor = AppColors.green500;
+        text = context.l10n.reserved;
+        break;
+      case ReservedStatus.pending:
+        backgroundColor = AppColors.green50;
+        textColor = AppColors.green500;
+        text = context.l10n.pending;
+        break;
+      case ReservedStatus.canceled:
+        backgroundColor = AppColors.red50;
+        textColor = AppColors.red500;
+        text = context.l10n.cancelled;
+        break;
+      default:
+        backgroundColor = AppColors.neutral50;
+        textColor = AppColors.neutral400;
+        text = status.name.toLowerCase();
     }
 
     return Container(

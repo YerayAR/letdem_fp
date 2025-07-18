@@ -17,7 +17,6 @@ import 'package:letdem/features/activities/presentation/widgets/search/add_locat
 import 'package:letdem/features/activities/presentation/widgets/search/address_component.widget.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
-import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/location/local_location.model.dart';
@@ -110,11 +109,13 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
 
   void _onHerePlaceSelected(HerePlace place) async {
     var fullName = '${place.title} ';
-    DatabaseHelper().savePlace(place);
-    var coordinates = await MapboxService.getLatLng(fullName);
-    if (coordinates != null) {
-      _navigateToRoute(coordinates.latitude, coordinates.longitude, fullName);
+
+    if (place.latitude == null || place.longitude == null) {
+      Toast.show("Location coordinates are not available.");
+      return;
     }
+    DatabaseHelper().savePlace(place);
+    _navigateToRoute(place.latitude!, place.longitude!, fullName);
   }
 
   // ---------------------------------------------------------------------------
