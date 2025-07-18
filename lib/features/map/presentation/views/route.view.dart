@@ -540,7 +540,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
         Row(
           children: [
             Text(
-              "Traffic Level",
+              context.l10n.trafficLevel,
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
@@ -749,11 +749,15 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 }
 
 String parseMeters(double distance) {
-  if (distance < 1000) {
-    return "${distance.toStringAsFixed(0)} meters";
-  } else {
-    return "${(distance / 1000).toStringAsFixed(1)} m";
-  }
+  // distance is in km
+  return distance < 1000
+      ? "${distance.toStringAsFixed(0)} m"
+      : "${(distance / 1000).toStringAsFixed(1)} km";
+  // if (distance < 1000) {
+  //   return "${distance.toStringAsFixed(0)} meters";
+  // } else {
+  //   return "${(distance / 1000).toStringAsFixed(1)} m";
+  // }
 }
 
 String parseHours(BuildContext context, int min) {
