@@ -8,6 +8,7 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
@@ -49,8 +50,18 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
     _timer = Timer.periodic(Duration(seconds: 1), (_) {
       setState(() {
         _updateRemainingTime();
+        if (_remaining.inSeconds <= 0) {
+          _timer?.cancel(); // Stop the timer
+          _onTimerComplete(); // Call your function
+        }
       });
     });
+  }
+
+  void _onTimerComplete() {
+    // Handle the timer completion, e.g., show a notification or update the UI
+    // For example, you can show a dialog or a snackbar
+    context.loadUser();
   }
 
   @override

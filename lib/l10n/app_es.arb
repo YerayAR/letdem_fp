@@ -896,6 +896,8 @@
   "enterTheNumber": "Ingresa el número",
   "create": "Crear",
   "pleaseEnterYourName": "Por favor ingresa tu nombre",
+  "logoutConfirmation": "¿Estás seguro de que quieres cerrar sesión?",
+
   "paymentSuccessfulReservation": "Tu pago se ha realizado con éxito. El aparcamiento ya está reservado.",
   "paymentFailedRequiresAction": "El pago falló o requiere acción adicional",
   "connectionPending": "Conexión Pendiente",

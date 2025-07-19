@@ -967,6 +967,7 @@
   "documentsUploadedSuccessfully": "Documents uploaded successfully",
   "defaultPayment": "Default",
   "expires": "Expires",
+  "logoutConfirmation": "Are you sure you want to log out?",
   "deleteCard": "Delete card",
   "setAsDefault": "Set as default",
   "bankAccount": "Bank account",

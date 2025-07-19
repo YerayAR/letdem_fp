@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +34,7 @@ import 'package:letdem/features/map/presentation/widgets/navigation/event_feedba
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -64,13 +66,12 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
-  static const int _distanceTriggerThreshold = 200;
+  static const int _distanceTriggerThreshold = 60;
 
   DateTime? _navigationStartTime;
   bool _hasShownFatigueAlert = false;
 
   HereMapController? _hereMapController;
-  late final AppLifecycleListener _lifecycleListener;
   HERE.RoutingEngine? _routingEngine;
   HERE.VisualNavigator? _visualNavigator;
   HERE.LocationEngine? _locationEngine;
@@ -150,10 +151,9 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _configureTTSLanguage() {
-    
     String languageCode = Localizations.localeOf(context).languageCode;
     speech.setLanguage(languageCode);
-    
+
     debugPrint('🗣️ TTS language configured to: $languageCode');
   }
 
@@ -689,6 +689,9 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
+    if (kDebugMode) {
+      Toast.showWarning('Distance trigger: $_distanceTraveled meters traveled');
+    }
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
     context.read<MapBloc>().add(
           GetNearbyPlaces(

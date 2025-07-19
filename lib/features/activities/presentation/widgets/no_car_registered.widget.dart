@@ -10,6 +10,7 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/CarTagType.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -63,7 +64,6 @@ class NoCarRegisteredWidget extends StatelessWidget {
     );
   }
 }
-
 
 CarTagType fromJsonToTag(String tagType) {
   switch (tagType.toLowerCase()) {
@@ -123,6 +123,7 @@ class _RegisterCarViewState extends State<RegisterCarView> {
     return BlocConsumer<CarBloc, CarState>(
       listener: (context, state) {
         if (state is CarLoaded) {
+          context.loadUser();
           NavigatorHelper.pop();
         }
         if (state is CarError) {
@@ -149,14 +150,16 @@ class _RegisterCarViewState extends State<RegisterCarView> {
                         );
                   }
                 },
-                text: widget.car != null ? context.l10n.update : context.l10n.register,
+                text: widget.car != null
+                    ? context.l10n.update
+                    : context.l10n.register,
               ),
             ),
           ),
           appBar: AppBar(
             title: Text(
-              widget.car != null 
-                  ? context.l10n.updateCarDetails 
+              widget.car != null
+                  ? context.l10n.updateCarDetails
                   : context.l10n.registerCar,
             ),
           ),
@@ -343,31 +346,31 @@ class EmissionsTagScreen extends StatelessWidget {
     );
   }
 
-Widget _buildCategorySection({
-  required String title,
-  required List<String> items,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+  Widget _buildCategorySection({
+    required String title,
+    required List<String> items,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
-        ...items.map((item) => _buildBulletPoint(item)),
-      ],
-    ),
-  );
-}
+          ...items.map((item) => _buildBulletPoint(item)),
+        ],
+      ),
+    );
+  }
 
   Widget _buildBulletPoint(String text) {
     return Padding(

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
@@ -357,8 +359,53 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        BlocProvider.of<CarBloc>(context).add(const ClearCarEvent());
-        BlocProvider.of<UserBloc>(context).add(UserLoggedOutEvent());
+        AppPopup.showDialogSheet(
+          context,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                context.l10n.logout,
+                style: Typo.largeBody
+                    .copyWith(fontWeight: FontWeight.w700, fontSize: 23),
+                textAlign: TextAlign.center,
+              ),
+              Dimens.space(1),
+              Text(
+                context.l10n.logoutConfirmation,
+                style: Typo.mediumBody,
+                textAlign: TextAlign.center,
+              ),
+              Dimens.space(3),
+              Row(
+                children: [
+                  Flexible(
+                    child: PrimaryButton(
+                      color: AppColors.red500,
+                      onTap: () {
+                        BlocProvider.of<CarBloc>(context)
+                            .add(const ClearCarEvent());
+                        BlocProvider.of<UserBloc>(context)
+                            .add(UserLoggedOutEvent());
+                      },
+                      text: context.l10n.yes,
+                    ),
+                  ),
+                  Dimens.space(1),
+                  Flexible(
+                    child: PrimaryButton(
+                      outline: true,
+                      onTap: () {
+                        NavigatorHelper.pop();
+                      },
+                      text: context.l10n.cancel,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),

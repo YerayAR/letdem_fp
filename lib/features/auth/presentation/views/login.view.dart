@@ -71,6 +71,7 @@ class _LoginViewState extends State<LoginView> {
             Toast.showError(state.error);
           }
           if (state is LoginSuccess) {
+            NavigatorHelper.popAll();
             NavigatorHelper.replaceAll(const SplashView());
           }
           // TODO: implement listener

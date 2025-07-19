@@ -36,6 +36,7 @@ class _SplashViewState extends State<SplashView> {
         listener: (context, state) {
           if (state is UserLoaded) {
             context.read<CarBloc>().add(const GetCarEvent());
+            NavigatorHelper.popAll();
             NavigatorHelper.replaceAll(const BaseView());
           }
           if (state is UserError) {
