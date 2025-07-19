@@ -59,80 +59,86 @@ class _RequestForgotPasswordViewState extends State<RequestForgotPasswordView> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          bottomNavigationBar: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(Dimens.defaultMargin),
-              child: PrimaryButton(
-                isLoading: state is FindForgotPasswordAccountLoading,
-                onTap: () {
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
-                  context.read<AuthBloc>().add(FindForgotPasswordAccountEvent(
-                        email: _emailCTRL.text,
-                      ));
-                },
-                text: context.l10n.proceed,
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          behavior: HitTestBehavior.opaque,
+          child: Scaffold(
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(Dimens.defaultMargin),
+                child: PrimaryButton(
+                  isLoading: state is FindForgotPasswordAccountLoading,
+                  onTap: () {
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+                    context.read<AuthBloc>().add(FindForgotPasswordAccountEvent(
+                          email: _emailCTRL.text,
+                        ));
+                  },
+                  text: context.l10n.proceed,
+                ),
               ),
             ),
-          ),
-          body: BlocConsumer<AuthBloc, AuthState>(
-            listener: (context, state) {
-              if (state is LoginError) {
-                Toast.showError(state.error);
-              }
-              // TODO: implement listener
-            },
-            builder: (context, state) {
-              return Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    StyledBody(
-                      children: [
-                        // custom app bar
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: const Icon(IconlyLight.arrow_left),
-                              color: const Color(0xff445D6F),
-                              onPressed: () {
-                                NavigatorHelper.pop();
-                              },
-                            ),
-                            DecoratedChip(
-                              backgroundColor: AppColors.secondary50,
-                              text: context.l10n.getHelp,
-                              color: AppColors.secondary600,
-                            ),
-                          ],
-                        ),
-                        Dimens.space(3),
-                        Text(
-                          context.l10n.forgotPassword,
-                          style: Typo.heading4
-                              .copyWith(color: AppColors.neutral600),
-                        ),
-                        Dimens.space(1),
-                        Text(context.l10n.enterEmailToReset,
-                            style: Typo.largeBody
-                                .copyWith(color: AppColors.neutral500)),
-                        Dimens.space(5),
-                        TextInputField(
-                          prefixIcon: Iconsax.sms,
-                          controller: _emailCTRL,
-                          inputType: TextFieldType.email,
-                          label: context.l10n.emailAddress,
-                          placeHolder: context.l10n.enterEmailAddress,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
+            body: BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is LoginError) {
+                  Toast.showError(state.error);
+                }
+                // TODO: implement listener
+              },
+              builder: (context, state) {
+                return Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: [
+                      StyledBody(
+                        children: [
+                          // custom app bar
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(IconlyLight.arrow_left),
+                                color: const Color(0xff445D6F),
+                                onPressed: () {
+                                  NavigatorHelper.pop();
+                                },
+                              ),
+                              DecoratedChip(
+                                backgroundColor: AppColors.secondary50,
+                                text: context.l10n.getHelp,
+                                color: AppColors.secondary600,
+                              ),
+                            ],
+                          ),
+                          Dimens.space(3),
+                          Text(
+                            context.l10n.forgotPassword,
+                            style: Typo.heading4
+                                .copyWith(color: AppColors.neutral600),
+                          ),
+                          Dimens.space(1),
+                          Text(context.l10n.enterEmailToReset,
+                              style: Typo.largeBody
+                                  .copyWith(color: AppColors.neutral500)),
+                          Dimens.space(5),
+                          TextInputField(
+                            prefixIcon: Iconsax.sms,
+                            controller: _emailCTRL,
+                            inputType: TextFieldType.email,
+                            label: context.l10n.emailAddress,
+                            placeHolder: context.l10n.enterEmailAddress,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         );
       },

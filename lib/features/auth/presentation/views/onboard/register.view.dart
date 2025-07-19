@@ -55,233 +55,240 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(Dimens.defaultMargin),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PrimaryButton(
-                isLoading: context.watch<AuthBloc>().state is RegisterLoading,
-                onTap: () {
-                  if (_formKey.currentState!.validate()) {
-                    if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
-                      Toast.showError(context.l10n.passwordsDoNotMatch);
-                      return;
-                    }
-                    if (_passwordCTRL.text.length < 8) {
-                      Toast.showError(context.l10n.passwordMinLength);
-                      return;
-                    }
-
-                    if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
-                        .hasMatch(_repeatPasswordCTRL.text)) {
-                      Toast.showError(context.l10n.passwordRequireSpecial);
-                      return;
-                    }
-
-                    context.read<AuthBloc>().add(RegisterEvent(
-                        email: _emailCTRL.text, password: _passwordCTRL.text));
-                  }
-                },
-                isDisabled: !isChecked,
-                text: context.l10n.continuee,
-              ),
-              Dimens.space(1),
-              PrimaryButton(
-                outline: true,
-                onTap: () {
-                  if (!isChecked) {
-                    Toast.showError(context.l10n.pleaseAcceptTerms);
-                    return;
-                  }
-                  context.read<AuthBloc>().add(const GoogleRegisterEvent());
-                },
-                color: Colors.white,
-                widgetImage: SvgPicture.asset(AppAssets.google),
-                textColor: const Color(0xFF344054),
-                borderColor: AppColors.neutral50,
-                text: context.l10n.signUpWithGoogle,
-              ),
-              Dimens.space(1),
-
-              //By continuing, I agree to LetDem Terms & Conditions
-              Row(
-                children: [
-                  CustomCheckbox(
-                    value: isChecked,
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked = value;
-                      });
-                    },
-                    activeColor: AppColors.primary500,
-                    size: 21.0,
-                    borderRadius: 7.0,
-                  ),
-                  Dimens.space(1),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: context.l10n.agreeToTerms,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 13,
-                            ),
-                          ),
-                          TextSpan(
-                            text: context.l10n.termsAndConditions,
-                            style: TextStyle(
-                              color: AppColors.primary500,
-                              fontSize: 13,
-                              decoration: TextDecoration.underline,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                // handle tap here
-                              },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // Text.rich(
-              //   TextSpan(
-
-              // You can add more widgets here like:
-              // SizedBox(height: 12),
-              // PrimaryButton(...),
-              // Text(...),
-            ],
-          ),
-        ),
-      ),
-      body: Form(
-        key: _formKey,
-        child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is RegisterError) {
-              Toast.showError(state.error);
-              return;
-            }
-            if (state is OTPVerificationSuccess) {
-              NavigatorHelper.to(const BasicInfoView());
-              return;
-            }
-            if (state is ResendVerificationCodeError) {
-              Toast.showError(context.l10n.unableToResendVerification);
-              return;
-            }
-            if (state is RegisterSuccess) {
-              NavigatorHelper.to(VerifyAccountView(
-                email: _emailCTRL.text,
-              ));
-            }
-            // TODO: implement listener
-          },
-          builder: (context, state) {
-            return ListView(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Scaffold(
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(Dimens.defaultMargin),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                StyledBody(
-                  children: [
-                    // custom app bar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        DecoratedChip(
-                          backgroundColor: AppColors.secondary50,
-                          text: context.l10n.createNewAccount,
-                          color: AppColors.secondary600,
-                        ),
-                        SizedBox(
-                          // check if a screen behind is exist
+                PrimaryButton(
+                  isLoading: context.watch<AuthBloc>().state is RegisterLoading,
+                  onTap: () {
+                    if (_formKey.currentState!.validate()) {
+                      if (_passwordCTRL.text != _repeatPasswordCTRL.text) {
+                        Toast.showError(context.l10n.passwordsDoNotMatch);
+                        return;
+                      }
+                      if (_passwordCTRL.text.length < 8) {
+                        Toast.showError(context.l10n.passwordMinLength);
+                        return;
+                      }
 
-                          child: Navigator.canPop(context)
-                              ? IconButton(
-                                  icon: const Icon(Iconsax.close_circle5),
-                                  color: AppColors.neutral100,
-                                  onPressed: () {
-                                    NavigatorHelper.pop();
-                                  },
-                                )
-                              : null,
-                        ),
-                      ],
+                      if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
+                          .hasMatch(_repeatPasswordCTRL.text)) {
+                        Toast.showError(context.l10n.passwordRequireSpecial);
+                        return;
+                      }
+
+                      context.read<AuthBloc>().add(RegisterEvent(
+                          email: _emailCTRL.text,
+                          password: _passwordCTRL.text));
+                    }
+                  },
+                  isDisabled: !isChecked,
+                  text: context.l10n.continuee,
+                ),
+                Dimens.space(1),
+                PrimaryButton(
+                  outline: true,
+                  onTap: () {
+                    if (!isChecked) {
+                      Toast.showError(context.l10n.pleaseAcceptTerms);
+                      return;
+                    }
+                    context.read<AuthBloc>().add(const GoogleRegisterEvent());
+                  },
+                  color: Colors.white,
+                  widgetImage: SvgPicture.asset(AppAssets.google),
+                  textColor: const Color(0xFF344054),
+                  borderColor: AppColors.neutral50,
+                  text: context.l10n.signUpWithGoogle,
+                ),
+                Dimens.space(1),
+
+                //By continuing, I agree to LetDem Terms & Conditions
+                Row(
+                  children: [
+                    CustomCheckbox(
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value;
+                        });
+                      },
+                      activeColor: AppColors.primary500,
+                      size: 21.0,
+                      borderRadius: 7.0,
                     ),
                     Dimens.space(1),
-                    Text(
-                      context.l10n.getStarted,
-                      style:
-                          Typo.heading4.copyWith(color: AppColors.neutral600),
-                    ),
-                    Dimens.space(1),
-                    Text.rich(
-                      TextSpan(
-                        text: context.l10n.alreadyHaveAccount,
-                        // Default style for this text
-                        style: Typo.largeBody.copyWith(),
-                        children: [
-                          TextSpan(
-                            text: context.l10n.loginHere,
-                            style: Typo.largeBody.copyWith(
-                              color: AppColors.primary400,
-                              decoration: TextDecoration.underline,
-                              decorationColor: AppColors.primary400,
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: context.l10n.agreeToTerms,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 13,
+                              ),
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                NavigatorHelper.replaceAll(const LoginView());
-                                // NavigatorHelper.to(RegisterView());
-                              },
-                          ),
-                        ],
+                            TextSpan(
+                              text: context.l10n.termsAndConditions,
+                              style: TextStyle(
+                                color: AppColors.primary500,
+                                fontSize: 13,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  // handle tap here
+                                },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Dimens.space(5),
-                    TextInputField(
-                      prefixIcon: Iconsax.sms,
-                      label: context.l10n.emailAddress,
-                      placeHolder: context.l10n.enterEmailAddress,
-                      controller: _emailCTRL,
-                    ),
-                    Dimens.space(1),
-                    TextInputField(
-                      prefixIcon: Iconsax.lock,
-                      label: context.l10n.password,
-                      controller: _passwordCTRL,
-                      inputType: TextFieldType.password,
-                      showPasswordStrengthIndicator: true,
-                      placeHolder: context.l10n.enterPassword,
-                    ),
-                    Dimens.space(1),
-                    TextInputField(
-                      prefixIcon: Iconsax.lock,
-                      controller: _repeatPasswordCTRL,
-                      label: context.l10n.repeatPassword,
-                      showPasswordStrengthIndicator: true,
-                      inputType: TextFieldType.password,
-                      placeHolder: context.l10n.enterPassword,
-                    ),
-                    Dimens.space(2),
-                    Text(
-                      context.l10n.passwordRequirements,
-                      style: Typo.smallBody.copyWith(
-                        color: AppColors.neutral400,
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
+
+                // Text.rich(
+                //   TextSpan(
+
+                // You can add more widgets here like:
+                // SizedBox(height: 12),
+                // PrimaryButton(...),
+                // Text(...),
               ],
-            );
-          },
+            ),
+          ),
+        ),
+        body: Form(
+          key: _formKey,
+          child: BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is RegisterError) {
+                Toast.showError(state.error);
+                return;
+              }
+              if (state is OTPVerificationSuccess) {
+                NavigatorHelper.to(const BasicInfoView());
+                return;
+              }
+              if (state is ResendVerificationCodeError) {
+                Toast.showError(context.l10n.unableToResendVerification);
+                return;
+              }
+              if (state is RegisterSuccess) {
+                NavigatorHelper.to(VerifyAccountView(
+                  email: _emailCTRL.text,
+                ));
+              }
+              // TODO: implement listener
+            },
+            builder: (context, state) {
+              return ListView(
+                children: [
+                  StyledBody(
+                    children: [
+                      // custom app bar
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          DecoratedChip(
+                            backgroundColor: AppColors.secondary50,
+                            text: context.l10n.createNewAccount,
+                            color: AppColors.secondary600,
+                          ),
+                          SizedBox(
+                            // check if a screen behind is exist
+
+                            child: Navigator.canPop(context)
+                                ? IconButton(
+                                    icon: const Icon(Iconsax.close_circle5),
+                                    color: AppColors.neutral100,
+                                    onPressed: () {
+                                      NavigatorHelper.pop();
+                                    },
+                                  )
+                                : null,
+                          ),
+                        ],
+                      ),
+                      Dimens.space(1),
+                      Text(
+                        context.l10n.getStarted,
+                        style:
+                            Typo.heading4.copyWith(color: AppColors.neutral600),
+                      ),
+                      Dimens.space(1),
+                      Text.rich(
+                        TextSpan(
+                          text: context.l10n.alreadyHaveAccount,
+                          // Default style for this text
+                          style: Typo.largeBody.copyWith(),
+                          children: [
+                            TextSpan(
+                              text: context.l10n.loginHere,
+                              style: Typo.largeBody.copyWith(
+                                color: AppColors.primary400,
+                                decoration: TextDecoration.underline,
+                                decorationColor: AppColors.primary400,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  NavigatorHelper.replaceAll(const LoginView());
+                                  // NavigatorHelper.to(RegisterView());
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Dimens.space(5),
+                      TextInputField(
+                        prefixIcon: Iconsax.sms,
+                        label: context.l10n.emailAddress,
+                        placeHolder: context.l10n.enterEmailAddress,
+                        controller: _emailCTRL,
+                      ),
+                      Dimens.space(1),
+                      TextInputField(
+                        prefixIcon: Iconsax.lock,
+                        label: context.l10n.password,
+                        controller: _passwordCTRL,
+                        inputType: TextFieldType.password,
+                        showPasswordStrengthIndicator: true,
+                        placeHolder: context.l10n.enterPassword,
+                      ),
+                      Dimens.space(1),
+                      TextInputField(
+                        prefixIcon: Iconsax.lock,
+                        controller: _repeatPasswordCTRL,
+                        label: context.l10n.repeatPassword,
+                        showPasswordStrengthIndicator: true,
+                        inputType: TextFieldType.password,
+                        placeHolder: context.l10n.enterPassword,
+                      ),
+                      Dimens.space(2),
+                      Text(
+                        context.l10n.passwordRequirements,
+                        style: Typo.smallBody.copyWith(
+                          color: AppColors.neutral400,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
