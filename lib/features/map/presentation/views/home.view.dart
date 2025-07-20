@@ -8,6 +8,7 @@ import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_bottom_section.widget.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
@@ -85,6 +86,22 @@ class _HomeViewState extends State<HomeView>
 
       handler.handleNotification(data);
     });
+    OneSignal.Notifications.addForegroundWillDisplayListener(
+      (event) {
+        event.preventDefault();
+
+        // Extract title and body
+        final data = event.notification.additionalData;
+
+        if (data != null && data['page_to_redirect'] != null) {
+          if (data['page_to_redirect'] == 'wallet') {
+            context.loadUser();
+          }
+        }
+
+        // Handle in-app messages if needed
+      },
+    );
   }
 
   @override

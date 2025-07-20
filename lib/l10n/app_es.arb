@@ -6,6 +6,7 @@
   "publishSpace": "Publicar aparcamiento",
   "publishEvent": "Publicar evento",
   "home": "Inicio",
+  "homeLocationShort": "Casa",
   "activities": "Actividades",
   "profile": "Perfil",
   "contributions": "Contribuciones",
@@ -156,7 +157,7 @@
     }
   },
   "location": "Ubicación",
-  "setLocation": "Establecer Ubicación de {type}",
+  "setLocation": "Establecer {type}",
   "@setLocation": {
     "placeholders": {
       "type": {
@@ -169,6 +170,7 @@
   "locationType": "Ubicación de {type}",
   "spaceDetailsTitle": "Detalles del Aparcamiento",
   "edit": "Editar",
+  "work": "Trabajo",
   "delete": "Eliminar",
   "otherLocation": "Otra Ubicación",
   "homeLocation": "Ubicación de Casa",

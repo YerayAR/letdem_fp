@@ -21,6 +21,11 @@ class NotificationHandler {
 
     if (data['page_to_redirect'] != null) {
       switch (data['page_to_redirect']) {
+        case 'profile':
+          // Handle profile redirection if needed
+          // TODO - Implement profile redirection
+          NavigatorHelper.navigatorKey.currentState!.context.loadUser();
+          break;
         case 'wallet':
           _goToWallet();
           break;

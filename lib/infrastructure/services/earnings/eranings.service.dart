@@ -123,6 +123,7 @@ class EarningAccountService {
       context,
       MoneyLaundryPopup(
         onContinue: () {
+          NavigatorHelper.pop();
           NavigatorHelper.to(
             ConnectAccountView(
               remainingStep: earningAccount?.step,

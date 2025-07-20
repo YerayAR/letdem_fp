@@ -188,7 +188,9 @@ class SavedAddressComponent extends StatelessWidget {
       return parts.isNotEmpty ? parts[0] : address;
     }
 
-    return context.l10n.locationType(locationType.name);
+    return context.l10n.locationType(locationType == LetDemLocationType.home
+        ? context.l10n.homeLocationShort
+        : context.l10n.work);
   }
 
 // Helper method to build location name widget

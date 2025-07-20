@@ -75,12 +75,6 @@ class _RegisterViewState extends State<RegisterView> {
                       return;
                     }
 
-                    if (!RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%]')
-                        .hasMatch(_repeatPasswordCTRL.text)) {
-                      Toast.showError(context.l10n.passwordRequireSpecial);
-                      return;
-                    }
-
                     context.read<AuthBloc>().add(RegisterEvent(
                         email: _emailCTRL.text, password: _passwordCTRL.text));
                   }
