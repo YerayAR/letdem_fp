@@ -30,6 +30,7 @@ class _RequestPermissionViewState extends State<RequestPermissionView> {
     var status = await Geolocator.checkPermission();
     if (status == LocationPermission.always ||
         status == LocationPermission.whileInUse) {
+      NavigatorHelper.popAll();
       NavigatorHelper.replaceAll(const BaseView());
       return;
     } else if (status == LocationPermission.deniedForever) {
@@ -67,25 +68,21 @@ class _RequestPermissionViewState extends State<RequestPermissionView> {
           Text(
             context.l10n.geolocationPermission,
             textAlign: TextAlign.center,
-            style: Typo.heading4.copyWith(
-              color: AppColors.neutral600
-            ),
+            style: Typo.heading4.copyWith(color: AppColors.neutral600),
           ),
           Dimens.space(1),
           Text(
             context.l10n.enableGeolocationDescription,
             textAlign: TextAlign.center,
-            style: Typo.mediumBody.copyWith(
-              color: AppColors.neutral400
-            ),
+            style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
           ),
           Dimens.space(15),
           PrimaryButton(
             onTap: _isDeniedForever
                 ? () => Geolocator.openLocationSettings()
                 : _requestPermission,
-            text: _isDeniedForever 
-                ? context.l10n.openSettings 
+            text: _isDeniedForever
+                ? context.l10n.openSettings
                 : context.l10n.enableGeolocation,
           ),
           Dimens.space(1),

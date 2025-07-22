@@ -819,7 +819,7 @@
   "stripeTermsOfService": "Términos de Servicio de Stripe",
   "accountInformationChanged": "Información de cuenta cambiada correctamente",
   "accountInformationChangedDescription": "La información de tu cuenta ha sido cambiada correctamente,",
-  "orders": "Pedidos",
+  "orders": "Reservas",
   "errorLoadingOrders": "Error al cargar pedidos",
   "confirmed": "Confirmado",
   "today": "Hoy",
@@ -835,7 +835,8 @@
   "oneWeekAgo": "hace 1 semana",
   "twoWeeksAgo": "hace 2 semanas",
   "threeWeeksAgo": "hace 3 semanas",
-  "noOrdersYet": "Aún no hay pedidos",
+
+  "noOrdersYet": "Aún no hay reservas",
   "noOrdersDescription": "Aún no has realizado ningún pedido.\n¡Comienza a explorar y haz tu primer pedido!",
   "alerts": "Alertas",
   "emailNotifications": "Notificaciones por correo",
