@@ -51,7 +51,7 @@ class SearchLocationBloc
       emit(currentState.copyWith(isLocationCreating: true));
 
       try {
-        await DatabaseHelper().deletePlace(event.place.id);
+        await DatabaseHelper().deletePlace(event.place.placeId ?? '');
         emit(currentState.copyWith(
           recentPlaces: currentState.recentPlaces
               .where((element) => element != event.place)
@@ -95,12 +95,26 @@ class SearchLocationBloc
       final currentState = state as SearchLocationLoaded;
       emit(currentState.copyWith(isLocationCreating: true));
 
+      late double latitude;
+      late double longitude;
+      // get lat and lng from recent places if available
+      var value =
+          await HereSearchApiService().getPlaceDetailsLatLng(event.placeID);
+
+      if (value != null) {
+        latitude = value['lat'] as double;
+        longitude = value['lng'] as double;
+      } else {
+        // Fallback to default values if not found
+        latitude = 0.0;
+        longitude = 0.0;
+      }
       try {
         final location = await searchLocationRepository.postLocation(
           PostLetDemoLocationDTO(
             name: event.name,
-            latitude: event.latitude,
-            longitude: event.longitude,
+            latitude: latitude,
+            longitude: longitude,
             type: event.locationType,
           ),
         );

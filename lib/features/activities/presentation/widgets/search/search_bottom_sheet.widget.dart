@@ -18,8 +18,8 @@ import 'package:letdem/features/activities/presentation/widgets/search/address_c
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
-import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/location/local_location.model.dart';
+import 'package:letdem/models/map/coordinate.model.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
@@ -69,7 +69,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
         try {
           // Usar el método de geocoding que garantiza ordenamiento por distancia
           var results =
-              await HereSearchApiService().getGeocodingResults(query, context);
+              await HereSearchApiService().getLocationResults(query, context);
 
           // Si no hay resultados del geocoding, usar el método de autosuggestion
           if (results.isEmpty) {
@@ -93,29 +93,26 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     });
   }
 
-  void _navigateToRoute(double lat, double lng, String streetName) {
+  void _navigateToRoute(String streetName, String? googlePlaceID,
+      [CoordinatesData? coordinates]) {
     NavigatorHelper.to(NavigationMapScreen(
       destinationStreetName: streetName,
       hideToggle: false,
-      latitude: lat,
-      longitude: lng,
+      googlePlaceID: googlePlaceID,
+      latitude: coordinates?.latitude ?? null,
+      longitude: coordinates?.longitude ?? null,
     ));
   }
 
   void _onLetDemLocationSelected(LetDemLocation location) {
-    _navigateToRoute(location.coordinates.latitude,
-        location.coordinates.longitude, location.name);
+    _navigateToRoute(location.name, null, location.coordinates);
   }
 
   void _onHerePlaceSelected(HerePlace place) async {
-    var fullName = '${place.title} ';
+    var fullName = '${place.description} ';
 
-    if (place.latitude == null || place.longitude == null) {
-      Toast.show("Location coordinates are not available.");
-      return;
-    }
     DatabaseHelper().savePlace(place);
-    _navigateToRoute(place.latitude!, place.longitude!, fullName);
+    _navigateToRoute(fullName, place.placeId);
   }
 
   // ---------------------------------------------------------------------------
@@ -181,18 +178,11 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           onPlaceSelected: (place) {
             NavigatorHelper.pop();
 
-            if (place.latitude == null || place.longitude == null) {
-              Toast.show("Location coordinates are not available.");
-              return;
-            }
-
             context.read<SearchLocationBloc>().add(CreateLocationEvent(
-                  isUpdating: filtered.isNotEmpty,
-                  locationType: locationType,
-                  name: place.title,
-                  latitude: place.latitude ?? 0.0,
-                  longitude: place.longitude ?? 0.0,
-                ));
+                isUpdating: filtered.isNotEmpty,
+                locationType: locationType,
+                name: place.description!,
+                placeID: place.placeId));
           },
           onApiPlaceSelected: _onLetDemLocationSelected,
           onLetDemLocationDeleted: (_) {
@@ -217,9 +207,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
               context.read<SearchLocationBloc>().add(CreateLocationEvent(
                     isUpdating: filtered.isNotEmpty,
                     locationType: locationType,
-                    name: place.title,
-                    latitude: place.latitude!,
-                    longitude: place.longitude!,
+                    name: place.description ?? "",
+                    placeID: place.placeId,
                   ));
             }
           },

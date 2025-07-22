@@ -48,7 +48,7 @@ class SavedAddressComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Early return for empty places
-    if (place?.title == "") return const SizedBox();
+    if (place?.description == "") return const SizedBox();
 
     // final hasLocation = place != null || apiPlace != null;
     // final locationName = apiPlace?.name ?? place?.title ?? "";
@@ -182,8 +182,8 @@ class SavedAddressComponent extends StatelessWidget {
       return LocationUtils.getLocationTypeString(context, locationType);
     }
 
-    if (place?.address != null) {
-      final address = place!.address!;
+    if (place?.description != null) {
+      final address = place!.description!;
       final parts = address.split(",");
       return parts.isNotEmpty ? parts[0] : address;
     }
@@ -198,7 +198,7 @@ class SavedAddressComponent extends StatelessWidget {
     final hasLocation = place != null || apiPlace != null;
 
     if (hasLocation) {
-      final locationName = apiPlace?.name ?? place!.title;
+      final locationName = apiPlace?.name ?? place!.description ?? "";
       return Text(
         locationName,
         style: Typo.mediumBody.copyWith(

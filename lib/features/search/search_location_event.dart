@@ -42,20 +42,18 @@ final class ClearRecentLocationEvent extends SearchLocationEvent {
 final class CreateLocationEvent extends SearchLocationEvent {
   final LetDemLocationType locationType;
   final String name;
-  final double latitude;
-  final double longitude;
 
+  final String placeID;
   final bool isUpdating;
 
   const CreateLocationEvent({
     required this.locationType,
     required this.name,
     required this.isUpdating,
-    required this.latitude,
-    required this.longitude,
+    required this.placeID,
   });
 
   @override
   // TODO: implement props
-  List<Object?> get props => [locationType, name, latitude, longitude];
+  List<Object?> get props => [locationType, name, placeID];
 }

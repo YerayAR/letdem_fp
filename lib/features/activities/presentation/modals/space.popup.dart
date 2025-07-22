@@ -433,6 +433,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 NavigationMapScreen(
                   hideToggle: true,
                   spaceDetails: widget.space,
+                  googlePlaceID: null,
                   destinationStreetName: widget.space.location.streetName,
                   latitude: widget.space.location.point.lat,
                   longitude: widget.space.location.point.lng,

@@ -25,6 +25,7 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
 
@@ -43,12 +44,15 @@ class NavigationMapScreen extends StatefulWidget {
   final String? spaceID;
   final Space? spaceDetails;
 
+  final String? googlePlaceID;
+
   const NavigationMapScreen({
     super.key,
     required this.latitude,
     this.spaceID,
     required this.longitude,
     required this.hideToggle,
+    required this.googlePlaceID,
     required this.destinationStreetName,
     this.spaceDetails,
   });
@@ -79,13 +83,16 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   @override
   void initState() {
     super.initState();
+
+    print("Google Place ID: ${widget.googlePlaceID}");
+    print("Space ID: ${widget.spaceID}");
+    print("Latitude: ${widget.latitude}");
+    print("Longitude: ${widget.longitude}");
+
     // if latitude and longitude and space details are not provided, call a special method to get the location info from space id;
-    if (widget.latitude == null &&
-        widget.longitude == null &&
-        widget.spaceDetails == null) {
-      if (widget.spaceID != null) {
-        getInfoFromSpaceID(widget.spaceID!);
-      }
+    if (widget.latitude == null && widget.longitude == null) {
+      getInfoFromSpaceID(widget.spaceID);
+      // }
     } else {
       _initializeRouting();
     }
@@ -94,21 +101,43 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   bool isError = false;
 
   void getInfoFromSpaceID(
-    String spaceID,
+    String? spaceID,
   ) async {
     try {
+      print("Fetching space details for ID: $spaceID");
       setState(() {
         _isLoading = true;
       });
-      var response = await ApiService.sendRequest(
-          endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
 
-      var spaceDetails = Space.fromJson(response.data);
+      late double _latitudeDelta;
+      late double _longitudeDelta;
+
+      if (widget.googlePlaceID != null) {
+        var spaceInfo = await HereSearchApiService()
+            .getPlaceDetailsLatLng(widget.googlePlaceID ?? '');
+        if (spaceInfo != null) {
+          _latitudeDelta = spaceInfo['lat'] as double;
+          _longitudeDelta = spaceInfo['lng'] as double;
+        } else {}
+      }
+
+      if (spaceID != null) {
+        var response = await ApiService.sendRequest(
+            endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
+
+        var spaceDetails = Space.fromJson(response.data);
+        _latitudeDelta = spaceDetails.location.point.lat;
+        _longitudeDelta = spaceDetails.location.point.lng;
+
+        setState(() {
+          _spaceDetails = spaceDetails;
+          _destinationStreetName = spaceDetails.location.streetName;
+        });
+      }
+
       setState(() {
-        _spaceDetails = spaceDetails;
-        _latitude = spaceDetails.location.point.lat;
-        _longitude = spaceDetails.location.point.lng;
-        _destinationStreetName = spaceDetails.location.streetName;
+        _latitude = _latitudeDelta;
+        _longitude = _longitudeDelta;
       });
 
       if (_latitude != null && _longitude != null) {
@@ -551,7 +580,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary500,
               ),
-              color: AppColors.primary500,
+              color: routeInfo.tafficLevel == 'moderate'
+                  ? AppColors.primary500
+                  : AppColors.red500,
             ),
           ],
         ),

@@ -55,81 +55,87 @@ class _EditBasicInfoViewState extends State<EditBasicInfoView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocConsumer<UserBloc, UserState>(
-        listener: (context, state) {
-          if (state is UserError) {
-            Toast.showError(state.error);
-          }
-          if (state is UserLoaded) {
-            AppPopup.showDialogSheet(
-              context,
-              SuccessDialog(
-                title: context.l10n.accountInformationChanged,
-                onProceed: () {
-                  NavigatorHelper.pop();
-                },
-                subtext: context.l10n.accountInformationChangedDescription,
-                buttonText: context.l10n.goBack,
-              ),
-            );
-          }
-          // TODO: implement listener
-        },
-        builder: (context, state) {
-          return ListView(
-            children: [
-              Form(
-                key: _formKey,
-                child: StyledBody(
-                  children: [
-                    StyledAppBar(
-                      title: context.l10n.personalInformation,
-                      onTap: () {
-                        NavigatorHelper.pop();
-                      },
-                      icon: Icons.close,
-                    ),
-                    // custom app bar
-
-                    Dimens.space(3),
-                    TextInputField(
-                      prefixIcon: Iconsax.user,
-                      label: context.l10n.firstName,
-                      controller: _firstNameCTRL,
-                      placeHolder: context.l10n.enterFirstName,
-                    ),
-                    Dimens.space(1),
-                    TextInputField(
-                      prefixIcon: Iconsax.user,
-                      controller: _lastNameCTRL,
-                      label: context.l10n.lastName,
-                      placeHolder: context.l10n.enterLastName,
-                    ),
-
-                    Dimens.space(2),
-
-                    PrimaryButton(
-                      isLoading: state is UserLoading,
-                      onTap: () {
-                        if (!_formKey.currentState!.validate()) {
-                          return;
-                        }
-                        context.read<UserBloc>().add(
-                              EditBasicInfoEvent(
-                                firstName: _firstNameCTRL.text,
-                                lastName: _lastNameCTRL.text,
-                              ),
-                            );
-                      },
-                      text: context.l10n.save,
-                    ),
-                  ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Scaffold(
+        body: BlocConsumer<UserBloc, UserState>(
+          listener: (context, state) {
+            if (state is UserError) {
+              Toast.showError(state.error);
+            }
+            if (state is UserLoaded) {
+              AppPopup.showDialogSheet(
+                context,
+                SuccessDialog(
+                  title: context.l10n.accountInformationChanged,
+                  onProceed: () {
+                    NavigatorHelper.pop();
+                  },
+                  subtext: context.l10n.accountInformationChangedDescription,
+                  buttonText: context.l10n.goBack,
                 ),
-              ),
-            ],
-          );
-        },
+              );
+            }
+            // TODO: implement listener
+          },
+          builder: (context, state) {
+            return ListView(
+              children: [
+                Form(
+                  key: _formKey,
+                  child: StyledBody(
+                    children: [
+                      StyledAppBar(
+                        title: context.l10n.personalInformation,
+                        onTap: () {
+                          NavigatorHelper.pop();
+                        },
+                        icon: Icons.close,
+                      ),
+                      // custom app bar
+
+                      Dimens.space(3),
+                      TextInputField(
+                        prefixIcon: Iconsax.user,
+                        label: context.l10n.firstName,
+                        controller: _firstNameCTRL,
+                        placeHolder: context.l10n.enterFirstName,
+                      ),
+                      Dimens.space(1),
+                      TextInputField(
+                        prefixIcon: Iconsax.user,
+                        controller: _lastNameCTRL,
+                        label: context.l10n.lastName,
+                        placeHolder: context.l10n.enterLastName,
+                      ),
+
+                      Dimens.space(2),
+
+                      PrimaryButton(
+                        isLoading: state is UserLoading,
+                        onTap: () {
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
+                          context.read<UserBloc>().add(
+                                EditBasicInfoEvent(
+                                  firstName: _firstNameCTRL.text,
+                                  lastName: _lastNameCTRL.text,
+                                ),
+                              );
+                        },
+                        text: context.l10n.save,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -77,6 +77,7 @@ class NotificationHandler {
       spaceID: spaceId,
       latitude: null,
       longitude: null,
+      googlePlaceID: null,
       hideToggle: false,
       destinationStreetName: '',
     ));

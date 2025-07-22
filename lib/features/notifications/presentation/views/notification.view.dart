@@ -635,6 +635,7 @@ class NotificationItem extends StatelessWidget {
                             DecoratedChip(
                               onTap: () {
                                 NavigatorHelper.to(NavigationMapScreen(
+                                  googlePlaceID: null,
                                   latitude:
                                       notificationObject.location.point.lat,
                                   longitude:
