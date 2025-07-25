@@ -793,8 +793,13 @@ String parseMeters(double distance) {
 
 String parseHours(BuildContext context, int min) {
   if (min < 60) {
+    if (min == 0) {
+      return "1 min";
+    }
     return "$min ${context.l10n.minutesShort}";
   } else {
+    // if zero then return 1 minute
+
     return "${(min / 60).toStringAsFixed(0)} ${context.l10n.hoursShort}";
   }
 }

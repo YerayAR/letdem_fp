@@ -26,6 +26,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/time.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
+import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
@@ -34,7 +35,6 @@ import 'package:letdem/features/map/presentation/widgets/navigation/event_feedba
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
-import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -110,7 +110,7 @@ class _NavigationViewState extends State<NavigationView> {
   int _lastRerouteTime = 0;
   String normalManuevers = "";
 
-  int DISTANCE_THREESHOLD = 10;
+  int DISTANCE_THREESHOLD = 5;
 
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
@@ -689,9 +689,6 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
-    if (kDebugMode) {
-      Toast.showWarning('Distance trigger: $_distanceTraveled meters traveled');
-    }
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
     context.read<MapBloc>().add(
           GetNearbyPlaces(
@@ -708,6 +705,41 @@ class _NavigationViewState extends State<NavigationView> {
   showSpacePopup({
     required Space space,
   }) {
+    print('🅿️ Showing space popup for: ${space.location.streetName}');
+    if (space.isPremium) {
+      AppPopup.showBottomSheet(
+          context,
+          SpacePopupSheet(
+            space: space,
+            currentPosition: HERE.GeoCoordinates(
+              _currentLocation!.latitude,
+              _currentLocation!.longitude,
+            ),
+            onRefreshTrigger: () {
+              context.read<MapBloc>().add(GetNearbyPlaces(
+                    queryParams: MapQueryParams(
+                      currentPoint:
+                          "${_currentLocation!.latitude},${_currentLocation!.longitude}",
+                      // "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                      radius: 8000,
+                      drivingMode: false,
+                      options: ['spaces', 'events'],
+                    ),
+                  ));
+              NavigatorHelper.pop();
+              NavigatorHelper.pop();
+
+              // _switchToNewDestination(space);
+            },
+          ));
+      return;
+    }
+    // if (context.userProfile!.activeReservation != null) {
+    //   Toast.showError(
+    //     "You cannot navigate to a space while you have an active reservation.",
+    //   );
+    //   return;
+    // }
     AppPopup.showBottomSheet(
       context,
       Padding(
@@ -1089,16 +1121,36 @@ class _NavigationViewState extends State<NavigationView> {
 
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              AppPopup.showBottomSheet(
-                  context,
-                  ParkingRatingWidget(
-                    spaceID: _currentSpace!.id,
-                    onSubmit: () {
-                      NavigatorHelper.pop();
-                      _isPopupDisplayed = false;
-                      _hasShownParkingRating = false;
-                    },
-                  ));
+              if (_currentSpace!.isPremium) {
+                // check the users active reservatoon exist
+
+                AppPopup.showBottomSheet(
+                    context,
+                    SpacePopupSheet(
+                      space: _currentSpace!,
+                      currentPosition: HERE.GeoCoordinates(
+                        _currentLocation!.latitude,
+                        _currentLocation!.longitude,
+                      ),
+                      onRefreshTrigger: () {
+                        NavigatorHelper.pop();
+                        _isPopupDisplayed = false;
+                        _hasShownParkingRating = false;
+                      },
+                    ));
+                return;
+              } else {
+                AppPopup.showBottomSheet(
+                    context,
+                    ParkingRatingWidget(
+                      spaceID: _currentSpace!.id,
+                      onSubmit: () {
+                        NavigatorHelper.pop();
+                        _isPopupDisplayed = false;
+                        _hasShownParkingRating = false;
+                      },
+                    ));
+              }
             }
           });
         } else if (!isParkingNavigation) {

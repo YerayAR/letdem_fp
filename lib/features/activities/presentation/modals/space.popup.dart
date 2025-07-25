@@ -35,6 +35,8 @@ class SpacePopupSheet extends StatefulWidget {
 
   final VoidCallback onRefreshTrigger;
 
+
+
   const SpacePopupSheet({
     required this.space,
     required this.onRefreshTrigger,
