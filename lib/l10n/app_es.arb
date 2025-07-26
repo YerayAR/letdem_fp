@@ -102,7 +102,7 @@
   "locationPermissionDescription": "Necesitamos acceder a tus servicios de ubicación para realizar cualquier acción en la aplicación",
   "openSystemSettings": "Abrir Configuración del Sistema",
   "spaceDetails": "Detalles del Aparcamiento",
-  "confirmOrder": "Confirmar",
+  "confirmOrder": "Confirmar Orden",
   "spaceReserved": "Aparcamiento Reservado",
   "spaceReservedSuccessfully": "Tu aparcamiento ha sido reservado exitosamente.",
   "confirmationCode": "Código de Confirmación",
@@ -563,7 +563,7 @@
   "minWithdrawalToast": "La cantidad mínima que puedes retirar es {amount}.",
   "maxWithdrawalToast": "La cantidad máxima que puedes retirar es {amount}.",
   "exceedsBalanceToast": "No puedes retirar más que tu saldo disponible.",
-  "pendingFundsInfo": "Hay una parte de tus fondos que aún no ha sido liberada por el proveedor de pagos. Por lo tanto, la cantidad disponible para retirar que aparece en esta vista corresponde solo a los fondos ya liberados. El saldo restante todavía está pendiente. El monto mínimo que puedes retirar es de {minAmount} y el máximo es de {maxAmount}.",
+  "pendingFundsInfo": "Una parte de tus fondos aún no ha sido liberada por el proveedor de pagos, por lo que la cantidad disponible para retirar solo incluye los fondos ya liberados. Puedes retirar entre {minAmount} y {maxAmount}. Ten en cuenta que los fondos pendientes pueden tardar hasta 10 días en liberarse, según el proveedor.",
   "@pendingFundsInfo": {
     "description": "Mensaje informativo sobre fondos pendientes y límites de retiro",
     "placeholders": {
@@ -727,7 +727,7 @@
       }
     }
   },
-  "metersAway": "{distance} de distancia",
+  "metersAway": "{distance} meters de distancia",
   "@metersAway": {
     "placeholders": {
       "distance": {
@@ -863,7 +863,7 @@
   "walletBalance": "Saldo de Cartera",
   "withdraw": "Retirar",
   "withdrawals": "Retiros",
-  "payouts": "Bankos",
+  "payouts": "Bancos",
   "transactionHistory": "Historial de Transacciones",
   "seeAll": "Ver todo",
   "noTransactionsYet": "No hay transacciones todavía",

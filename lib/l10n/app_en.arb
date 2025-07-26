@@ -504,8 +504,8 @@
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
 
+  "pendingFundsInfo": "Some of your funds have not yet been released by the payment provider, so the amount available to withdraw only includes the released funds. You can withdraw between {minAmount} and {maxAmount}. Please note that pending funds may take up to 10 days to be released, depending on the provider.",
 
-  "pendingFundsInfo": "There is a portion of your funds that has not yet been released by the payment provider. Therefore, the amount shown as available for withdrawal in this view corresponds only to the funds that have already been released. The remaining balance is still pending. The minimum amount you can withdraw is {minAmount} and the maximum is {maxAmount}.",
   "@pendingFundsInfo": {
     "description": "Info message explaining pending funds and withdrawal limits",
     "placeholders": {
