@@ -106,7 +106,7 @@
   "locationPermissionDescription": "We need to get access to your location services to perform any action in the app",
   "openSystemSettings": "Open System Settings",
   "spaceDetails": "Space Details",
-  "confirmOrder": "Confirm Order",
+  "confirmOrder": "Confirm",
   "spaceReserved": "Space Reserved",
   "spaceReservedSuccessfully": "Your space has been reserved successfully.",
   "confirmationCode": "Confirmation Code",

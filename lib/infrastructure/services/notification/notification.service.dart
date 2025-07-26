@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
 import 'package:letdem/features/users/presentation/views/reservations/reservation_list.view.dart';
@@ -90,10 +91,21 @@ class NotificationHandler {
     final activeReservation = context.userProfile?.activeReservation;
     if (activeReservation == null) return;
 
-    NavigatorHelper.to(ReservedSpaceDetailView(
-      details: activeReservation,
-      space: activeReservation.space,
-    ));
+    var isOwner = context.userProfile!.activeReservation!.space.isOwner;
+
+    if (!isOwner) {
+      NavigatorHelper.to(
+        ReservedSpaceDetailView(
+          details: context.userProfile!.activeReservation!,
+          space: context.userProfile!.activeReservation!.space,
+        ),
+      );
+    } else {
+      NavigatorHelper.to(
+        ConfirmedSpaceReviewView(
+            payload: context.userProfile!.activeReservation!),
+      );
+    }
   }
 
   void _goToContributions() {

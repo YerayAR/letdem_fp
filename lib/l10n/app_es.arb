@@ -102,7 +102,7 @@
   "locationPermissionDescription": "Necesitamos acceder a tus servicios de ubicación para realizar cualquier acción en la aplicación",
   "openSystemSettings": "Abrir Configuración del Sistema",
   "spaceDetails": "Detalles del Aparcamiento",
-  "confirmOrder": "Confirmar Orden",
+  "confirmOrder": "Confirmar",
   "spaceReserved": "Aparcamiento Reservado",
   "spaceReservedSuccessfully": "Tu aparcamiento ha sido reservado exitosamente.",
   "confirmationCode": "Código de Confirmación",
