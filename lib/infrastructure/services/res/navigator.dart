@@ -5,6 +5,9 @@ class NavigatorHelper {
 
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+  // Returns the current context of the navigator.
+  static BuildContext? get context => navigatorKey.currentContext;
+
   // Navigates to a new screen.
   static Future? to(Widget path) {
     final context = navigatorKey.currentContext;

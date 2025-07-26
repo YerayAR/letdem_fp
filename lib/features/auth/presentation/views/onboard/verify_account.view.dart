@@ -241,13 +241,14 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
                         )
                       : Text.rich(
                           TextSpan(
-                           text: context.l10n.didntGetOtp,
+                            text: context.l10n.didntGetOtp,
                             style: Typo.mediumBody.copyWith(),
                             children: [
                               TextSpan(
                                 text: _isResendEnabled
                                     ? context.l10n.tapToResend
-                                    : context.l10n.resendIn(_secondsRemaining.toString()),
+                                    : context.l10n
+                                        .resendIn(_secondsRemaining.toString()),
                                 style: Typo.mediumBody.copyWith(
                                   color: AppColors.primary400,
                                   fontWeight: FontWeight.w600,

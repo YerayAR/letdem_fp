@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
@@ -61,7 +61,6 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
   void _onTimerComplete() {
     // Handle the timer completion, e.g., show a notification or update the UI
     // For example, you can show a dialog or a snackbar
-    context.loadUser();
   }
 
   @override
@@ -112,7 +111,6 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
 
   @override
   Widget build(BuildContext context) {
-    final payload = widget.payload;
     return GestureDetector(
       onTap: () => _navigateToDetails(context),
       child: Container(
@@ -132,6 +130,48 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
             _buildHeader(context),
             Dimens.space(2),
             _buildDetailsRow(context),
+            Dimens.space(1),
+            Divider(
+              color: AppColors.neutral50,
+              height: 1,
+            ),
+            Dimens.space(1),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Row(
+                    children: [
+                      Icon(
+                        IconlyBold.location,
+                        color: AppColors.neutral500,
+                        size: 16,
+                      ),
+                      Dimens.space(1),
+                      Flexible(
+                        child: Text(
+                          widget.payload.space.location.streetName,
+                          maxLines: 2,
+                          style: Typo.mediumBody.copyWith(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: AppColors.neutral500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  context.l10n.viewDetails,
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primary500,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -204,14 +244,6 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
                     : "${payload.price}${context.l10n.currency}",
               ),
             ],
-          ),
-        ),
-        Text(
-          context.l10n.viewDetails,
-          style: Typo.mediumBody.copyWith(
-            fontWeight: FontWeight.w400,
-            color: AppColors.primary400,
-            decoration: TextDecoration.underline,
           ),
         ),
       ],

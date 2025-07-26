@@ -81,20 +81,28 @@ class _ActivitiesViewState extends State<ActivitiesView> {
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {},
         builder: (context, state) {
+          // loading state
+          if (state is ActivitiesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (context.watch<UserBloc>().state is UserLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (context.watch<CarBloc>().state is CarLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           var w = StyledBody(
             isBottomPadding: false,
-            children: context.userProfile?.activeReservation != null ||
-                    (context.watch<CarBloc>().state is CarLoaded &&
-                        (context.watch<CarBloc>().state as CarLoaded).car !=
-                            null)
+            children: context.userProfile?.activeReservation != null
                 ? [
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: () async {
-                          // context.loadUser();
                           context.read<ActivitiesBloc>().add(
                                 GetActivitiesEvent(),
                               );
+                          context.read<UserBloc>().add(FetchUserInfoEvent());
                           context.read<CarBloc>().add(const GetCarEvent());
                         },
                         child: ListView(
@@ -165,17 +173,18 @@ class CarSection extends StatelessWidget {
     return BlocConsumer<CarBloc, CarState>(
       listener: (context, state) {
         //   load user if car loaded
-        if (state is CarLoaded && state.car != null) {
-          context.read<UserBloc>().add(FetchUserInfoEvent());
-        }
+        // if (state is CarLoaded && state.car != null) {
+        //   // context.read<ActivitiesBloc>().add(
+        //   //       GetActivitiesEvent(),
+        //   //     );
+        //   context.read<UserBloc>().add(FetchUserInfoEvent());
+        // }
       },
       builder: (context, state) {
         if (state is CarLoaded && state.car != null) {
           return ProfileSection(
             child: [
               RegisteredCarWidget(car: state.car!),
-              Dimens.space(1),
-              LastParkedWidget(lastParked: state.car!.lastParkingLocation),
             ],
           );
         }

@@ -35,8 +35,6 @@ class SpacePopupSheet extends StatefulWidget {
 
   final VoidCallback onRefreshTrigger;
 
-
-
   const SpacePopupSheet({
     required this.space,
     required this.onRefreshTrigger,
@@ -449,12 +447,14 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   }
 
   String _distanceToSpace(BuildContext context) {
-    return parseMeters(geolocator.Geolocator.distanceBetween(
+    var d = parseMeters(geolocator.Geolocator.distanceBetween(
       widget.currentPosition.latitude,
       widget.currentPosition.longitude,
       widget.space.location.point.lat,
       widget.space.location.point.lng,
     ));
+
+    return d;
   }
 }
 

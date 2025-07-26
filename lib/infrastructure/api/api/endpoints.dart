@@ -36,6 +36,14 @@ class EndPoints {
     method: HTTPMethod.PUT,
   );
 
+  // resendVerificationCodeForgotPasswordEndpoint
+  static Endpoint<EmailDTO> resendVerificationCodeForgotPasswordEndpoint =
+      Endpoint(
+    url: "/auth/password-reset/resend-otp",
+    method: HTTPMethod.POST,
+    isProtected: false,
+  );
+
   // getReservationHistoryEndpoint
   static Endpoint getReservationHistoryEndpoint = Endpoint(
     url: "/credits/reservations",

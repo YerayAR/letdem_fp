@@ -53,7 +53,8 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
         return;
       }
       if (state is ResetPasswordSuccess) {
-        NavigatorHelper.to(const LoginView());
+        NavigatorHelper.popAll();
+        // NavigatorHelper.replaceAll(const LoginView());
       }
     }, builder: (context, snapshot) {
       return GestureDetector(
@@ -91,7 +92,8 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                   return;
                 }
                 if (state is ResetPasswordSuccess) {
-                  NavigatorHelper.to(const LoginView());
+                  NavigatorHelper.popAll();
+                  NavigatorHelper.replaceAll(const LoginView());
                 }
               },
               builder: (context, state) {

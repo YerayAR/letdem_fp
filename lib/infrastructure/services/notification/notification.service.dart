@@ -91,7 +91,9 @@ class NotificationHandler {
     if (activeReservation == null) return;
 
     NavigatorHelper.to(ReservedSpaceDetailView(
-        details: activeReservation, space: activeReservation.space));
+      details: activeReservation,
+      space: activeReservation.space,
+    ));
   }
 
   void _goToContributions() {

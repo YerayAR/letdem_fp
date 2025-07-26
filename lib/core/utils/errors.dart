@@ -1,6 +1,10 @@
+import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+
 class ErrorMessageHelper {
-  static String getMessage(String code,
-      {bool isSpanish = false, String serverMessage = ""}) {
+  static String getMessage(String code, {String serverMessage = ""}) {
+    var isSpanish =
+        NavigatorHelper.navigatorKey.currentState!.context.isSpanish;
     final messages = isSpanish ? _spanishMessages : _englishMessages;
 
     if (messages.containsKey(code)) {
@@ -86,6 +90,7 @@ class ErrorMessageHelper {
   static const Map<String, String> _spanishMessages = {
     // Accounts
     'INVALID_CREDENTIALS': 'Credenciales inválidas. Intenta nuevamente.',
+    'ACCOUNT_ALREADY_ACTIVATED': 'La cuenta ya está activada.',
     'card_declined':
         'Tu tarjeta fue rechazada. Verifica los detalles de tu pago.',
     'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',
@@ -97,7 +102,6 @@ class ErrorMessageHelper {
     'EMAIL_ALREADY_EXISTS': 'Este correo electrónico ya está registrado.',
     'INVALID_SOCIAL_TOKEN': 'Token de inicio de sesión social inválido.',
     'INVALID_OTP': 'Código OTP inválido.',
-    'ACCOUNT_ALREADY_ACTIVATED': 'La cuenta ya está activada.',
     'EMAIL_NOT_FOUND': 'Correo electrónico no encontrado.',
     'OTP_NOT_VALIDATED': 'El OTP no ha sido validado.',
     'CAR_ALREADY_CREATED': 'Ya has añadido un coche.',

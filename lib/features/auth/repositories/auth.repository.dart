@@ -26,6 +26,12 @@ class AuthRepository extends AuthInterface {
         endpoint: EndPoints.registerEndpoint.copyWithDTO(registerDTO));
   }
 
+  Future resendVerificationCodeForgotPassword(EmailDTO dto) async {
+    return ApiService.sendRequest(
+        endpoint: EndPoints.resendVerificationCodeForgotPasswordEndpoint
+            .copyWithDTO(dto));
+  }
+
   @override
   Future<Tokens> verifyEmailEvent(VerifyEmailDTO dto) async {
     ApiResponse res = await ApiService.sendRequest(

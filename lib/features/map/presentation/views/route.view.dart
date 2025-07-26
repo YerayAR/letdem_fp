@@ -580,9 +580,12 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary500,
               ),
-              color: routeInfo.tafficLevel == 'moderate'
-                  ? AppColors.primary500
-                  : AppColors.red500,
+              // low, moderate, heavy
+              color: routeInfo.tafficLevel == 'low'
+                  ? AppColors.green500
+                  : routeInfo.tafficLevel == 'moderate'
+                      ? AppColors.neutral500
+                      : AppColors.red500,
             ),
           ],
         ),
@@ -779,11 +782,16 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
   }
 }
 
-String parseMeters(double distance) {
+String parseMeters(
+  double distance, [
+  bool longFormat = false,
+]) {
   // distance is in km
-  return distance < 1000
-      ? "${distance.toStringAsFixed(0)} m"
-      : "${(distance / 1000).toStringAsFixed(1)} km";
+  return distance < 1
+      ? "${(1).toStringAsFixed(0)} meters"
+      : distance < 1000
+          ? "${distance.toStringAsFixed(0)} meters"
+          : "${(distance / 1000).toStringAsFixed(1)} km";
   // if (distance < 1000) {
   //   return "${distance.toStringAsFixed(0)} meters";
   // } else {

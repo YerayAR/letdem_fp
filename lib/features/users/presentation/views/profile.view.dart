@@ -46,6 +46,7 @@ class ProfileView extends StatelessWidget {
       child: RefreshIndicator(
         onRefresh: () async {
           context.read<UserBloc>().add(FetchUserInfoEvent());
+          context.read<CarBloc>().add(const GetCarEvent());
         },
         child: StyledBody(
           isBottomPadding: false,

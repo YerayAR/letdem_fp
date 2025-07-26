@@ -448,9 +448,18 @@
         "type": "int",
         "example": "60"
       }
-    },
-    "publish": "Publicar"
+    }
+
+
   },
+  "unableToLogin": "No se pudo iniciar sesión",
+  "unableToRegister": "No se pudo registrar",
+  "unableToVerifyEmail": "No se pudo verificar el correo electrónico",
+  "unableToResetPassword": "No se pudo restablecer la contraseña",
+  "unableToValidateReset": "No se pudo validar la contraseña",
+  "unableToFindAccount": "No se pudo encontrar la cuenta de recuperación",
+  "unableToResendCode": "No se pudo reenviar el código",
+  "publish": "Publicar",
   "whatIsThisWaitingTime": "¿En qué consiste?",
   "fetchingLocation": "Obteniendo ubicación...",
   "pleaseEnterAllFields": "Por favor completa todos los campos",
@@ -718,11 +727,11 @@
       }
     }
   },
-  "metersAway": "{distance}m de distancia",
+  "metersAway": "{distance} de distancia",
   "@metersAway": {
     "placeholders": {
       "distance": {
-        "type": "int"
+        "type": "String"
       }
     }
   },

@@ -451,6 +451,15 @@ class _NavigationViewState extends State<NavigationView> {
         TapListener((HERE.Point2D touchPoint) {
       _pickMapMarker(touchPoint);
     });
+    // add map marker for destination
+
+    var icon = _assetsProvider.destinationMarkerLarge;
+
+    final marker = MapMarker(
+      HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(marker);
     _hereMapController?.gestures.panListener = PanListener((GestureState state,
         HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
       if (state == GestureState.begin) {

@@ -723,11 +723,11 @@
     }
   },
   "preparingYourNavigation": "Preparing your navigation...",
-  "metersAway": "{distance}m away",
+  "metersAway": "{distance} away",
   "@metersAway": {
     "placeholders": {
       "distance": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -742,6 +742,13 @@
   "itsInUse": "It's in use",
   "notUseful": "Not useful",
   "prohibited": "Prohibited",
+  "unableToLogin": "Unable to Login",
+  "unableToRegister": "Unable to Register",
+  "unableToVerifyEmail": "Unable to Verify Email",
+  "unableToResetPassword": "Unable to Reset Password",
+  "unableToValidateReset": "Unable to Validate Reset Password",
+  "unableToFindAccount": "Unable to Find Forgot Password Account",
+  "unableToResendCode": "Unable to Resend Verification Code",
   "arrivedAtDestination": "You have arrived at your destination.",
   "rateThisParkingSpace": "How would you like to rate this parking space?",
   "customNavigation": "Custom Navigation",

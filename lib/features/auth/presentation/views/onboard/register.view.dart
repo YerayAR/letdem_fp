@@ -170,7 +170,7 @@ class _RegisterViewState extends State<RegisterView> {
                 Toast.showError(state.error);
                 return;
               }
-              if (state is OTPVerificationSuccess) {
+              if (state is OTPVerificationSuccess && state.isGoogleLogin) {
                 NavigatorHelper.to(const BasicInfoView());
                 return;
               }

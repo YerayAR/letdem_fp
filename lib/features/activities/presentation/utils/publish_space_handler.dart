@@ -13,6 +13,7 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
 import 'package:letdem/features/activities/presentation/widgets/no_car_registered.widget.dart';
 import 'package:letdem/features/car/car_bloc.dart';
@@ -29,14 +30,30 @@ class PublishSpaceHandler {
     final activeReservation = context.userProfile?.activeReservation != null;
 
     if (activeReservation) {
+      print(
+          'Active reservation exists: ${context.userProfile!.activeReservation}');
+      print('Space: ${context.userProfile!.activeReservation!.space.isOwner}');
       _showInfoPopup(
         context,
         context.l10n.importantNotice,
         context.l10n.activeReservationExists,
-        () => NavigatorHelper.to(ReservedSpaceDetailView(
-          details: context.userProfile!.activeReservation!,
-          space: context.userProfile!.activeReservation!.space,
-        )),
+        () {
+          var isOwner = context.userProfile!.activeReservation!.space.isOwner;
+
+          if (!isOwner) {
+            NavigatorHelper.to(
+              ReservedSpaceDetailView(
+                details: context.userProfile!.activeReservation!,
+                space: context.userProfile!.activeReservation!.space,
+              ),
+            );
+          } else {
+            NavigatorHelper.to(
+              ConfirmedSpaceReviewView(
+                  payload: context.userProfile!.activeReservation!),
+            );
+          }
+        },
         context.l10n.viewDetails,
       );
       return false;
@@ -49,7 +66,10 @@ class PublishSpaceHandler {
         context,
         context.l10n.importantNotice,
         context.l10n.createCarProfileFirst,
-        () => NavigatorHelper.to(const RegisterCarView()),
+        () {
+          NavigatorHelper.pop();
+          NavigatorHelper.to(const RegisterCarView());
+        },
       );
       return false;
     }

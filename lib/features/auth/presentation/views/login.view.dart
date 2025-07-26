@@ -77,7 +77,7 @@ class _LoginViewState extends State<LoginView> {
             }
             if (state is LoginSuccess) {
               NavigatorHelper.popAll();
-            NavigatorHelper.replaceAll(const SplashView());
+              NavigatorHelper.replaceAll(const SplashView());
             }
             // TODO: implement listener
           },

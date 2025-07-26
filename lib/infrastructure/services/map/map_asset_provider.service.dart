@@ -16,6 +16,7 @@ class MapAssetsProvider {
   late Uint8List currentLocationMarker;
 
   late Uint8List destinationMarker;
+  late Uint8List destinationMarkerLarge;
   late Uint8List accidentMarker, closedRoadMarker, policeMarker;
 
   Future<void> loadAssets() async {
@@ -24,6 +25,8 @@ class MapAssetsProvider {
     greenMarker = await _loadImage(AppAssets.greenMapMarker);
     blueMarker = await _loadImage(AppAssets.blueMapMarker);
     disasterMarker = await _loadImage(AppAssets.disabledMapMarker);
+    destinationMarkerLarge =
+        await _loadImage(AppAssets.destinationMapMarkerLarge);
 
     currentLocationMarker =
         await _loadImage(AppAssets.currentLocationMapMarker);
@@ -47,6 +50,8 @@ class MapAssetsProvider {
 
     // return byteData.buffer.asUint8List();
   }
+
+  Uint8List get destinationMarkerImageData => destinationMarkerLarge;
 
   Uint8List getImageForType(PublishSpaceType type) {
     print("type: $type");
@@ -73,7 +78,7 @@ class MapAssetsProvider {
   static String getAssetEvent(EventTypes type) {
     switch (type) {
       case EventTypes.accident:
-        return AppAssets.accident;
+        return AppAssets.accidentMapMarker;
       case EventTypes.police:
         return AppAssets.policeMapMarker;
       case EventTypes.closeRoad:
