@@ -27,7 +27,22 @@
   "cardholderName": "Cardholder Name",
   "enterYourName": "Enter your name",
   "cancel": "Cancel",
+  "notificationPaidSpaceReserved": "Paid Space Reserved",
+  "notificationNewSpacePublished": "New space published",
+  "notificationSpaceOccupied": "Space Occupied",
+  "notificationDisabled": "Disabled",
+  "notificationFree": "Free",
+  "notificationBlue": "Blue",
+  "notificationGreen": "Green",
   "done": "Done",
+  "noPendingFundsMessage": "You have no pending funds to be released. You can withdraw between {min} and {max}.",
+  "@noPendingFundsMessage": {
+    "description": "Message shown when user has no pending funds and withdrawal limits",
+    "placeholders": {
+      "min": {},
+      "max": {}
+    }
+  },
   "selectDuration": "Select Duration",
   "minutes": "MIN",
   "sec": "SEC",
@@ -46,7 +61,25 @@
   "passwordGood": "Good",
   "passwordStrong": "Strong",
   "missingInfo": "Missing Info",
+  "reservationExpired": "Reservation expired",
+  "lessThanAMinuteLeft": "Less than a minute left",
+  "minutesLeftToReserve": "{minutes} mins left to reserve space",
+  "@minutesLeftToReserve": {
+    "description": "Message showing remaining minutes to reserve a space",
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "meters": "meters",
+  "trafficLow": "Low",
+  "trafficModerate": "Moderate",
+  "trafficHeavy": "Heavy",
   "homeLocationShort": "Home",
+  "transactionSpacePayment": "Payment Received for Space",
+  "transactionWithdraw": "Withdrawal",
+  "transactionSpaceTransfer": "Space Transfer",
+  "transactionSpaceWithdrawal": "Space Withdrawal",
+  "transactionSpaceDeposit": "Space Deposit",
   "pending": "Pending",
   "rejected": "Rejected",
   "blocked": "Blocked",

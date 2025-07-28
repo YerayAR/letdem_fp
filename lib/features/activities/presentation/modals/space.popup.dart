@@ -218,7 +218,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
 
     return DecoratedChip(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      text: getTimeLeftMessage(DateTime.now(), widget.space.expirationDate!),
+      text: getTimeLeftMessage(
+          DateTime.now(), widget.space.expirationDate!, context),
       textStyle: Typo.smallBody.copyWith(
         fontWeight: FontWeight.w600,
         color: AppColors.primary500,

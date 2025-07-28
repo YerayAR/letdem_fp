@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:letdem/core/enums/EventTypes.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
+import 'package:letdem/core/extensions/locale.dart';
 
 class MapNearbyPayload {
   final List<Space> spaces;
@@ -42,15 +44,19 @@ class MapNearbyPayload {
   }
 }
 
-String getTimeLeftMessage(DateTime now, DateTime reservationEndTime) {
+String getTimeLeftMessage(
+  DateTime now,
+  DateTime reservationEndTime,
+  BuildContext context,
+) {
   final difference = reservationEndTime.difference(now);
 
   if (difference.isNegative) {
-    return 'Reservation expired';
+    return context.l10n.reservationExpired;
   } else if (difference.inMinutes < 1) {
-    return 'Less than a minute left';
+    return context.l10n.lessThanAMinuteLeft;
   } else {
-    return '${difference.inMinutes} mins left to reserve space';
+    return context.l10n.minutesLeftToReserve(difference.inMinutes);
   }
 }
 

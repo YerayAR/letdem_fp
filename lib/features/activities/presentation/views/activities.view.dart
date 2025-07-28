@@ -39,6 +39,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
   @override
   void initState() {
     super.initState();
+    context.loadUser();
     // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
   }
 

@@ -102,22 +102,50 @@
   "locationPermissionDescription": "Necesitamos acceder a tus servicios de ubicación para realizar cualquier acción en la aplicación",
   "openSystemSettings": "Abrir Configuración del Sistema",
   "spaceDetails": "Detalles del Aparcamiento",
-  "confirmOrder": "Confirmar Orden",
+  "confirmOrder": "Confirmar",
+
   "spaceReserved": "Aparcamiento Reservado",
   "spaceReservedSuccessfully": "Tu aparcamiento ha sido reservado exitosamente.",
   "confirmationCode": "Código de Confirmación",
   "enterConfirmationCode": "El solicitante del aparcamiento te dará un número de confirmación de 6 dígitos, ingrésalo aquí.",
   "confirmationCodeWarning": "Por favor, asegúrate de que el código de confirmación funcione antes de entregar el aparcamiento",
   "pleaseEnterConfirmationCode": "Por favor ingresa el código de confirmación",
+  "reservationExpired": "Reserva expirada",
+  "lessThanAMinuteLeft": "Queda menos de un minuto",
+  "minutesLeftToReserve": "Quedan {minutes} minutos para reservar el espacio",
+  "@minutesLeftToReserve": {
+    "description": "Mensaje que muestra los minutos restantes para reservar un espacio",
+    "placeholders": {
+      "minutes": {}
+    }
+  },
   "reserved": "Reservado",
+  "meters": "metros",
+
   "waiting": "Esperando",
   "reservedSpace": "Aparcamiento Reservado",
+  "notificationPaidSpaceReserved": "Espacio de pago reservado",
+  "notificationNewSpacePublished": "Nuevo espacio publicado",
+  "notificationSpaceOccupied": "Espacio ocupado",
+  "notificationDisabled": "Deshabilitado",
+  "notificationFree": "Gratis",
+  "notificationBlue": "Azul",
+  "notificationGreen": "Verde",
   "confirmationCodeTitle": "Código de Confirmación",
   "shareCodeOwner": "Comparte este código con el propietario del aparcamiento",
   "ownerPlateNumber": "Matrícula del Propietario: ",
   "callSpaceOwner": "Llamar al Propietario",
   "couldNotLaunchDialer": "No se pudo abrir el marcador",
   "viewDetails": "Ver detalles",
+  "noPendingFundsMessage": "No tienes fondos pendientes de liberar. Puedes retirar entre {min} y {max}.",
+  "@noPendingFundsMessage": {
+    "description": "Mensaje mostrado cuando el usuario no tiene fondos pendientes y límites de retiro",
+    "placeholders": {
+      "min": {},
+      "max": {}
+    }
+  },
+
   "free": "Gratuito",
   "timeRemaining": "Tiempo restante",
   "currency": "€",
@@ -488,7 +516,7 @@
   "fatigueAlertVoice": "Has estado conduciendo durante tres horas. Por favor toma un descanso.",
   "addEvent": "Agregar evento",
   "ahead": "por delante",
-  "activeReservationExists": "Hay una reserva activa en tu cuenta. Debe completarse o cancelarse antes de que puedas publicar un nuevo espacio de pago.",
+  "activeReservationExists": "Hay una reserva activa en tu cuenta. Debe completarse o cancelarse antes de que puedas publicar un nuevo aparcamiento de pago.",
   "@activeReservationExists": {
     "description": "Se muestra cuando un usuario intenta publicar un nuevo espacio de pago pero ya tiene una reserva activa."
   },
@@ -727,7 +755,7 @@
       }
     }
   },
-  "metersAway": "{distance} meters de distancia",
+  "metersAway": "{distance} metros de distancia",
   "@metersAway": {
     "placeholders": {
       "distance": {
@@ -741,6 +769,9 @@
   "thankYouForInput": "¡Gracias por tu aporte!",
   "eventFeedback": "Comentarios sobre el evento",
   "stillThere": "Todavía está ahí",
+  "trafficLow": "Bajo",
+  "trafficModerate": "Moderado",
+  "trafficHeavy": "Intenso",
   "arrivalTitle": "¡Has llegado!",
   "arrivalSubtitle": "Las plazas de aparcamiento cercanas ahora están visibles en el mapa. Pulsa una para iniciar la navegación.",
   "notThere": "Ya no está ahí",
@@ -757,6 +788,11 @@
   "colorButton": "Color",
   "unread": "No leídas",
   "notifications": "Notificaciones",
+  "transactionSpacePayment": "Pago recibido por el espacio",
+  "transactionWithdraw": "Retiro",
+  "transactionSpaceTransfer": "Transferencia de espacio",
+  "transactionSpaceWithdrawal": "Retiro de espacio",
+  "transactionSpaceDeposit": "Depósito de espacio",
   "yourSpaceLocatedAt": "Tu aparcamiento ubicado en ",
   "hasBeenOccupied": " ha sido ocupado",
   "aNewSpaceHasBeenPublished": "Se ha publicado un nuevo aparcamiento dentro de ",

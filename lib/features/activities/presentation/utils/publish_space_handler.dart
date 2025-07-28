@@ -102,6 +102,7 @@ class PublishSpaceHandler {
 
               final XFile? image = await _pickImage();
               if (image != null) {
+                NavigatorHelper.pop();
                 NavigatorHelper.to(
                   PublishSpaceScreen(
                     onAdded: onAdded,

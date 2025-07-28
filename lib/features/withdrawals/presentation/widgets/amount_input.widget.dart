@@ -113,49 +113,64 @@ class _AmountInputCardState extends State<AmountInputCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                icon: Icon(Icons.info_outline,
-                    color: AppColors.neutral300, size: 18),
-                onPressed: () {
-                  AppPopup.showDialogSheet(
-                    context,
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          context.l10n.pendingFundsInfo(
-                            context.userProfile!.constantsSettings
-                                .withdrawalAmount.minimum
-                                .formatPrice(context),
-                            context.userProfile!.constantsSettings
-                                .withdrawalAmount.maximum
-                                .formatPrice(context),
-                          ),
-                          style: Typo.mediumBody,
-                          textAlign: TextAlign.center,
-                        ),
-                        Dimens.space(3),
-                        PrimaryButton(
-                          onTap: () {
-                            NavigatorHelper.pop();
-                          },
-                          text: context.l10n.gotIt,
-                        ),
-                      ],
-                    ),
-                  );
-                },
+              SizedBox(
+                child: context.userProfile!.earningAccount!.pendingBalance < 0
+                    ? null
+                    : IconButton(
+                        icon: Icon(Icons.info_outline,
+                            color: AppColors.neutral300, size: 18),
+                        onPressed: () {
+                          AppPopup.showDialogSheet(
+                            context,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  context.l10n.pendingFundsInfo(
+                                    context.userProfile!.constantsSettings
+                                        .withdrawalAmount.minimum
+                                        .formatPrice(context),
+                                    context.userProfile!.constantsSettings
+                                        .withdrawalAmount.maximum
+                                        .formatPrice(context),
+                                  ),
+                                  style: Typo.mediumBody,
+                                  textAlign: TextAlign.center,
+                                ),
+                                Dimens.space(3),
+                                PrimaryButton(
+                                  onTap: () {
+                                    NavigatorHelper.pop();
+                                  },
+                                  text: context.l10n.gotIt,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
               ),
-              Text(
-                _errorText ??
-                    context.l10n.pendingToBeCleared(context
-                        .userProfile!.earningAccount!.pendingBalance
-                        .toStringAsFixed(2)),
-                style: Typo.mediumBody.copyWith(
-                  fontSize: 13,
-                  color: _errorText != null
-                      ? AppColors.red500
-                      : AppColors.neutral300,
+              Flexible(
+                child: Text(
+                  context.userProfile!.earningAccount!.pendingBalance < 0
+                      ? context.l10n.noPendingFundsMessage(
+                          context.userProfile!.constantsSettings
+                              .withdrawalAmount.minimum
+                              .formatPrice(context),
+                          context.userProfile!.constantsSettings
+                              .withdrawalAmount.maximum
+                              .formatPrice(context),
+                        )
+                      : context.l10n.pendingToBeCleared(context
+                          .userProfile!.earningAccount!.pendingBalance
+                          .toStringAsFixed(2)),
+                  textAlign: TextAlign.center,
+                  style: Typo.mediumBody.copyWith(
+                    fontSize: 13,
+                    color: _errorText != null
+                        ? AppColors.red500
+                        : AppColors.neutral300,
+                  ),
                 ),
               ),
               //   info button

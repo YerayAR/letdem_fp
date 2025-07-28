@@ -21,8 +21,7 @@ class LocationWebSocketService {
     final wsUrl =
         Uri.parse('ws://api-staging.letdem.org/ws/maps/nearby?token=${token}');
 
-    _channel = WebSocketChannel.connect((wsUrl));
-
+    _channel = WebSocketChannel.connect(wsUrl);
     _log('✅ Connected to WebSocket');
 
     _channel!.stream.listen(
@@ -32,15 +31,49 @@ class LocationWebSocketService {
       },
       onDone: () {
         _log('🔌 Disconnected from WebSocket (onDone)');
+        _handleReconnect(
+          latitude: latitude,
+          longitude: longitude,
+          onEvent: onEvent,
+          onDone: onDone,
+          onError: onError,
+        );
         onDone?.call();
       },
       onError: (error) {
         _log('❌ WebSocket Error: $error', type: 'error');
+        _handleReconnect(
+          latitude: latitude,
+          longitude: longitude,
+          onEvent: onEvent,
+          onDone: onDone,
+          onError: onError,
+        );
         onError?.call(error);
       },
     );
 
     sendLocation(latitude, longitude);
+  }
+
+  /// Reconnects after a short delay
+  void _handleReconnect({
+    required double latitude,
+    required double longitude,
+    required void Function(MapNearbyPayload event) onEvent,
+    void Function()? onDone,
+    void Function(dynamic error)? onError,
+  }) {
+    Future.delayed(Duration(seconds: 5), () {
+      _log('🔁 Attempting to reconnect...');
+      connectAndSendInitialLocation(
+        latitude: latitude,
+        longitude: longitude,
+        onEvent: onEvent,
+        onDone: onDone,
+        onError: onError,
+      );
+    });
   }
 
   /// Sends a location update over the WebSocket

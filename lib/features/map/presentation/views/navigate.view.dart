@@ -365,7 +365,6 @@ class _NavigationViewState extends State<NavigationView> {
 
   Future<void> _requestLocationPermission() async {
     setState(() => _isLoading = true);
-    await _assetsProvider.loadAssets();
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -390,8 +389,9 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() => _isLoading = false);
   }
 
-  void _onMapCreated(HereMapController hereMapController) {
+  void _onMapCreated(HereMapController hereMapController) async {
     debugPrint('🗺️ Map created!');
+    await _assetsProvider.loadAssets();
     _hereMapController = hereMapController;
 
     _hereMapController?.gestures.enableDefaultAction(GestureType.pan);

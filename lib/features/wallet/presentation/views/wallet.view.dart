@@ -39,7 +39,7 @@ class _WalletScreenState extends State<WalletScreen> {
     context.read<WalletBloc>().add(FetchTransactionsEvent(TransactionParams(
           startDate: DateTime.now().subtract(const Duration(days: 30)),
           endDate: DateTime.now().add(const Duration(days: 1)),
-          pageSize: 50,
+          pageSize: 5,
           page: 1,
         )));
   }
@@ -411,7 +411,9 @@ class TransactionList extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(getTransactionTypeString(tx.source),
+                                      Text(
+                                          getTransactionTypeString(
+                                              tx.source, context),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14)),

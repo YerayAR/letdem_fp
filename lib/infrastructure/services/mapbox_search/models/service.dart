@@ -20,6 +20,8 @@ class HereSearchApiService {
   // Replace with your Google Places API key
   static const String googleApiKey = "AIzaSyC7GS-4uZ8LUCoTfItD740nr48KpuL6P9g";
   Future<Map<String, dynamic>?> getPlaceDetailsLatLng(String placeId) async {
+    // get current country
+
     final url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry&key=$googleApiKey';
 
@@ -99,9 +101,16 @@ class HereSearchApiService {
       print("🔍 [GOOGLE API] Starting location search for query: '$query'");
     }
 
+    var countryCode =
+        WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+
     // Build Google Places Autocomplete URL
     final String url =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Uri.encodeQueryComponent(query)}&key=$googleApiKey&language=en';
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json'
+        '?input=${Uri.encodeQueryComponent(query)}'
+        '&key=$googleApiKey'
+        '&language=en'
+        '&components=country:${countryCode}';
 
     try {
       if (kDebugMode) {

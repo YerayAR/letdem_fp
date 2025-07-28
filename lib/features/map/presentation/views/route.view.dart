@@ -574,16 +574,20 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
             ),
             const SizedBox(width: 8),
             DecoratedChip(
-              text: toBeginningOfSentenceCase(routeInfo.tafficLevel) ?? "--",
+              text: formatTrafficLevel(routeInfo.tafficLevel, context) ?? "--",
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.primary500,
+                color: routeInfo.tafficLevel == TrafficLevel.low
+                    ? AppColors.green500
+                    : routeInfo.tafficLevel == TrafficLevel.moderate
+                        ? AppColors.neutral500
+                        : AppColors.red500,
               ),
               // low, moderate, heavy
-              color: routeInfo.tafficLevel == 'low'
+              color: routeInfo.tafficLevel == TrafficLevel.low
                   ? AppColors.green500
-                  : routeInfo.tafficLevel == 'moderate'
+                  : routeInfo.tafficLevel == TrafficLevel.moderate
                       ? AppColors.neutral500
                       : AppColors.red500,
             ),

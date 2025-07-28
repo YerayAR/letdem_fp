@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:letdem/core/extensions/locale.dart';
+
 class TransactionParams {
   final DateTime startDate;
   final DateTime endDate;
@@ -19,18 +22,18 @@ enum TransactionType {
   SPACE_DEPOSIT,
 }
 
-String getTransactionTypeString(TransactionType type) {
+String getTransactionTypeString(TransactionType type, BuildContext context) {
   switch (type) {
     case TransactionType.SPACE_PAYMENT:
-      return 'Payment Received for Space';
+      return context.l10n.transactionSpacePayment;
     case TransactionType.WITHDRAW:
-      return 'Withdrawal';
+      return context.l10n.transactionWithdraw;
     case TransactionType.SPACE_TRANSFER:
-      return 'Space Transfer';
+      return context.l10n.transactionSpaceTransfer;
     case TransactionType.SPACE_WITHDRAWAL:
-      return 'Space Withdrawal';
+      return context.l10n.transactionSpaceWithdrawal;
     case TransactionType.SPACE_DEPOSIT:
-      return 'Space Deposit';
+      return context.l10n.transactionSpaceDeposit;
   }
 }
 
@@ -74,11 +77,10 @@ class Transaction {
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
-      amount: getTransactionType(json['source']) == TransactionType.WITHDRAW
-          ? double.parse(json['amount'].toString())
-          : double.parse(json['amount'].toString()),
-      source: getTransactionType(json['source']),
-      created: DateTime.parse(json['created']),
-    );
+        amount: getTransactionType(json['source']) == TransactionType.WITHDRAW
+            ? double.parse(json['amount'].toString())
+            : double.parse(json['amount'].toString()),
+        source: getTransactionType(json['source']),
+        created: DateTime.parse(json['created']).toLocal());
   }
 }
