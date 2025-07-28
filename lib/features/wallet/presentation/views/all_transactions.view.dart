@@ -42,7 +42,7 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                     page: 1,
                   )));
             },
-            title: 'Transaction History',
+            title: context.l10n.transactionTitle,
             icon: Iconsax.close_circle5,
           ),
           Expanded(
@@ -56,7 +56,7 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                       Row(
                         children: [
                           PlatformDatePickerButton(
-                              label: 'From',
+                              label: context.l10n.fromDate,
                               initialDate: _fromDate,
                               maximumDate: _toDate,
                               minimumDate: DateTime.now()
@@ -76,7 +76,7 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                               }),
                           Dimens.space(2),
                           PlatformDatePickerButton(
-                              label: 'To',
+                              label: context.l10n.toDate,
                               maximumDate: DateTime.now(),
                               minimumDate: _fromDate,
                               initialDate: _toDate,
@@ -102,7 +102,7 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                 } else if (state is WalletFailure) {
                   return Center(child: Text('Error: ${state.message}'));
                 }
-                return Center(child: Text('No transactions found.'));
+                return Center(child: Text(context.l10n.noTransactionsYet));
               },
             ),
           ),
