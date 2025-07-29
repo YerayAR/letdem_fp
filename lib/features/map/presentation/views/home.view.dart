@@ -83,24 +83,35 @@ class _HomeViewState extends State<HomeView>
     _loadAssets();
     _getCurrentLocation();
 
+    // Handle notification clicks (when user taps the notification)
     OneSignal.Notifications.addClickListener((event) {
+      event.preventDefault();
+
       final data = event.notification.additionalData;
       final handler = NotificationHandler(context);
 
+      // Only handle navigation on click
       handler.handleNotification(data);
+      event.notification.display();
     });
+
+    // Handle foreground notifications (when app is open)
     OneSignal.Notifications.addForegroundWillDisplayListener(
       (event) {
-        // Extract title and body
+        event.preventDefault();
+
         final data = event.notification.additionalData;
 
+        // Only handle specific data updates, NOT navigation
         if (data != null && data['page_to_redirect'] != null) {
           if (data['page_to_redirect'] == 'wallet') {
+            // Just refresh user data, don't navigate
             context.loadUser();
           }
+          // Add other data refresh cases here if needed
         }
 
-        // Handle in-app messages if needed
+        event.notification.display();
       },
     );
   }

@@ -228,8 +228,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     ];
 
     try {
-      _addMarker(start, _assetsProvider.currentLocationMarker);
-      _addMarker(end, _assetsProvider.destinationMarker);
       _calculateRoute(_waypoints);
     } catch (e) {
       print("Error building route: $e");
@@ -250,6 +248,22 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
       if (error == null && routes != null && routes.isNotEmpty) {
         _currentRoute = routes.first;
         _renderRoute(_currentRoute!);
+        _addMarker(
+          GeoCoordinates(
+            _currentRoute!.geometry.vertices.last.latitude,
+            _currentRoute!.geometry.vertices.last.longitude,
+          ),
+          _assetsProvider.destinationMarker,
+        );
+        _addMarker(
+          GeoCoordinates(
+            _currentRoute!.geometry.vertices.first.latitude,
+            _currentRoute!.geometry.vertices.first.longitude,
+          ),
+          _assetsProvider.currentLocationMarker,
+        );
+
+        ;
       } else {
         print(
             "Route calculation failed: ${error?.toString() ?? 'Unknown error'}");
@@ -672,13 +686,28 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
               initialDate: _fromDate,
               onDateSelected: (date) => setState(() => _fromDate = date),
             ),
+            Dimens.space(1),
             PlatformTimePickerButton(
               initialTime: _fromTime,
               onTimeSelected: (time) => setState(() => _fromTime = time),
             ),
           ],
         ),
-        Dimens.space(1),
+        Row(
+          children: [
+            Dimens.space(5),
+            Flexible(child: Divider(color: Colors.grey.withOpacity(0.2))),
+            Dimens.space(1),
+            Text(context.l10n.toDate,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                )),
+            Dimens.space(1),
+            Flexible(child: Divider(color: Colors.grey.withOpacity(0.2))),
+            Dimens.space(5),
+          ],
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -686,6 +715,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
               initialDate: _toDate,
               onDateSelected: (date) => setState(() => _toDate = date),
             ),
+            Dimens.space(1),
             PlatformTimePickerButton(
               initialTime: _toTime,
               onTimeSelected: (time) => setState(() => _toTime = time),

@@ -77,10 +77,12 @@ class ContributionItem extends StatelessWidget {
                             spacing: 5,
                             children: [
                               Text(
-                                DateFormat("dd MMM. yyyy").format(
-                                  (activity.created.toLocal()),
-                                ),
-                                // "12 Jan. 2025",
+                                DateFormat(
+                                        context.isSpanish
+                                            ? "dd 'de' MMM. yyyy"
+                                            : "dd MMM. yyyy",
+                                        context.isSpanish ? 'es' : 'en')
+                                    .format(activity.created.toLocal()),
                                 style: Typo.mediumBody.copyWith(
                                   fontSize: 14,
                                   color: AppColors.neutral400,

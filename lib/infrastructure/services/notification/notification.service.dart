@@ -12,19 +12,25 @@ import '../../../features/map/presentation/views/route.view.dart';
 
 class NotificationHandler {
   final BuildContext context;
+  static bool _isNavigating = false; // Prevent multiple navigations
 
   NotificationHandler(this.context);
 
   void handleNotification(Map<String, dynamic>? data) {
-    if (data == null) {
+    if (data == null || _isNavigating) {
       return;
     }
+
+    _isNavigating = true;
+
+    // Reset the flag after a short delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _isNavigating = false;
+    });
 
     if (data['page_to_redirect'] != null) {
       switch (data['page_to_redirect']) {
         case 'profile':
-          // Handle profile redirection if needed
-          // TODO - Implement profile redirection
           NavigatorHelper.navigatorKey.currentState!.context.loadUser();
           break;
         case 'wallet':
@@ -40,22 +46,11 @@ class NotificationHandler {
           _goToReservationDetails();
           break;
         case 'reservations_list':
-          // Handle reservations list if needed
-          // TODO - Implement reservations list redirection
-          NavigatorHelper.to(
-            const ReservationHistory(),
-          );
-          print('Redirecting to reservations list is not implemented yet.');
+          NavigatorHelper.to(const ReservationHistory());
           break;
         case 'orders_list':
-          // Handle orders list if needed
-          // TODO - Implement orders list redirection
-          NavigatorHelper.to(
-            const OrdersListView(),
-          );
-          print('Redirecting to orders list is not implemented yet.');
+          NavigatorHelper.to(const OrdersListView());
           break;
-
         case 'contributions':
           _goToContributions();
           break;
@@ -66,13 +61,11 @@ class NotificationHandler {
   }
 
   void _goToWallet() {
-    // Fetch wallet info here
     print('Fetching wallet info...');
     NavigatorHelper.to(WalletScreen());
   }
 
   void _goToDestinationDetails(String spaceId) {
-    // Call new endpoint /v1/spaces/<spaceId>
     print('Fetching space details for $spaceId...');
     NavigatorHelper.to(NavigationMapScreen(
       spaceID: spaceId,
@@ -85,7 +78,6 @@ class NotificationHandler {
   }
 
   void _goToReservationDetails() {
-    // Fetch active reservation
     BuildContext context = NavigatorHelper.navigatorKey.currentState!.context;
 
     final activeReservation = context.userProfile?.activeReservation;
@@ -109,7 +101,6 @@ class NotificationHandler {
   }
 
   void _goToContributions() {
-    // Fetch contributions
     print('Fetching contributions...');
     NavigatorHelper.to(ViewAllView());
   }
