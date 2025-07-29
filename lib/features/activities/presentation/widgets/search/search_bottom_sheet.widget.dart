@@ -17,9 +17,9 @@ import 'package:letdem/features/activities/presentation/widgets/search/add_locat
 import 'package:letdem/features/activities/presentation/widgets/search/address_component.widget.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
-import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
+import 'package:letdem/models/map/coordinate.model.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
@@ -67,8 +67,16 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       if (query.isNotEmpty) {
         setState(() => _isSearching = true);
         try {
+          // Usar el método de geocoding que garantiza ordenamiento por distancia
           var results =
               await HereSearchApiService().getLocationResults(query, context);
+
+          // Si no hay resultados del geocoding, usar el método de autosuggestion
+          if (results.isEmpty) {
+            results =
+                await HereSearchApiService().getLocationResults(query, context);
+          }
+
           setState(() {
             _searchResults = results;
             _isSearching = false;
@@ -85,27 +93,26 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     });
   }
 
-  void _navigateToRoute(double lat, double lng, String streetName) {
+  void _navigateToRoute(String streetName, String? googlePlaceID,
+      [CoordinatesData? coordinates]) {
     NavigatorHelper.to(NavigationMapScreen(
       destinationStreetName: streetName,
       hideToggle: false,
-      latitude: lat,
-      longitude: lng,
+      googlePlaceID: googlePlaceID,
+      latitude: coordinates?.latitude ?? null,
+      longitude: coordinates?.longitude ?? null,
     ));
   }
 
   void _onLetDemLocationSelected(LetDemLocation location) {
-    _navigateToRoute(location.coordinates.latitude,
-        location.coordinates.longitude, location.name);
+    _navigateToRoute(location.name, null, location.coordinates);
   }
 
   void _onHerePlaceSelected(HerePlace place) async {
-    var fullName = '${place.title} ';
+    var fullName = '${place.description} ';
+
     DatabaseHelper().savePlace(place);
-    var coordinates = await MapboxService.getLatLng(fullName);
-    if (coordinates != null) {
-      _navigateToRoute(coordinates.latitude, coordinates.longitude, fullName);
-    }
+    _navigateToRoute(fullName, place.placeId);
   }
 
   // ---------------------------------------------------------------------------
@@ -155,6 +162,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     );
   }
 
+  // TODO - Refactor this to avoid code duplication
   Widget _buildLocationTypeComponent({
     required LetDemLocationType locationType,
     required List<LetDemLocation> locations,
@@ -167,7 +175,15 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           locationType: locationType,
           apiPlace: filtered.isEmpty ? null : filtered.first,
           showDivider: filtered.isNotEmpty,
-          onPlaceSelected: (_) {},
+          onPlaceSelected: (place) {
+            NavigatorHelper.pop();
+
+            context.read<SearchLocationBloc>().add(CreateLocationEvent(
+                isUpdating: filtered.isNotEmpty,
+                locationType: locationType,
+                name: place.description!,
+                placeID: place.placeId));
+          },
           onApiPlaceSelected: _onLetDemLocationSelected,
           onLetDemLocationDeleted: (_) {
             context
@@ -176,29 +192,24 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           },
           onHerePlaceDeleted: (_) {},
           onEditLocationTriggered: () async {
-            final place = await AppPopup.showBottomSheet(
+            final HerePlace? place = await AppPopup.showBottomSheet(
               NavigatorHelper.navigatorKey.currentState!.context,
               AddLocationBottomSheet(
                 title: context.l10n
                     .setLocation(toBeginningOfSentenceCase(locationType.name)!),
-                onLocationSelected: (HerePlace selectedPlace) {
-                  Navigator.pop(context, selectedPlace);
+                onLocationSelected: (HerePlace loc) {
+                  NavigatorHelper.pop(loc);
                 },
               ),
             );
 
             if (place != null) {
-              final fullName = '${place.name} ${place.placeFormatted}';
-              final coords = await MapboxService.getLatLng(fullName);
-              if (coords != null) {
-                context.read<SearchLocationBloc>().add(CreateLocationEvent(
-                      isUpdating: filtered.isNotEmpty,
-                      locationType: locationType,
-                      name: fullName,
-                      latitude: coords.latitude,
-                      longitude: coords.longitude,
-                    ));
-              }
+              context.read<SearchLocationBloc>().add(CreateLocationEvent(
+                    isUpdating: filtered.isNotEmpty,
+                    locationType: locationType,
+                    name: place.description ?? "",
+                    placeID: place.placeId,
+                  ));
             }
           },
         ),

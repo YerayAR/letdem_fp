@@ -43,16 +43,27 @@ class OptionItem extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: AppColors.primary50.withOpacity(0.5),
-                    radius: 26,
-                    child: Center(
-                      child: Icon(
-                        Iconsax.building,
-                        color: AppColors.primary500,
-                        size: 24,
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: AppColors.primary50.withOpacity(0.5),
+                        radius: 26,
+                        child: Center(
+                          child: Icon(
+                            Iconsax.building,
+                            color: AppColors.primary500,
+                            size: 24,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      if (method.isDefault)
+                        DecoratedChip(
+                          text: context.l10n.defaultt,
+                          textSize: 10,
+                          color: AppColors.secondary600,
+                        ),
+                    ],
                   ),
                   const Spacer(),
                   const SizedBox(width: 8),
@@ -97,13 +108,6 @@ class OptionItem extends StatelessWidget {
                             fontSize: 16,
                           ),
                         ),
-                        const Spacer(),
-                        if (method.isDefault)
-                          DecoratedChip(
-                            text: context.l10n.defaultt,
-                            textSize: 10,
-                            color: AppColors.secondary600,
-                          )
                       ],
                     ),
                     const SizedBox(height: 4),

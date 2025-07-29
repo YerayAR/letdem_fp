@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 
 class NotificationResult {
@@ -30,12 +32,26 @@ class NotificationResult {
   }
 
   factory NotificationResult.fromJson(Map<String, dynamic> json) =>
+
+      // if notification object is not present, make dummy object
+
       NotificationResult(
         id: json['id'],
         type: notificationTypeFromString(json['type']),
         read: json['read'],
-        notificationObject:
-            NotificationObject.fromJson(json['notification_object']),
+        notificationObject: json['notification_object'] == null
+            ? NotificationObject(
+                id: '',
+                type: '',
+                image: '',
+                location: Location(
+                  streetName: '',
+                  point: Point(lng: 0.0, lat: 0.0),
+                ),
+                created: DateTime.now(),
+                resourceType: '',
+              )
+            : NotificationObject.fromJson(json['notification_object']),
         created: DateTime.parse(json['created']),
       );
 }
@@ -51,22 +67,25 @@ enum NotificationPayloadType {
   green
 }
 
-String formatedNotificationType(NotificationPayloadType type) {
+String formatedNotificationType(
+  NotificationPayloadType type,
+  BuildContext context,
+) {
   switch (type) {
     case NotificationPayloadType.spaceReserved:
-      return 'Paid Space Reserved';
+      return context.l10n.notificationPaidSpaceReserved;
     case NotificationPayloadType.spaceNearby:
-      return 'New space published';
+      return context.l10n.notificationNewSpacePublished;
     case NotificationPayloadType.spaceOccupied:
-      return 'Space Occupied';
+      return context.l10n.notificationSpaceOccupied;
     case NotificationPayloadType.disabled:
-      return 'Disabled';
+      return context.l10n.notificationDisabled;
     case NotificationPayloadType.free:
-      return 'Free';
+      return context.l10n.notificationFree;
     case NotificationPayloadType.blue:
-      return 'Blue';
+      return context.l10n.notificationBlue;
     case NotificationPayloadType.green:
-      return 'Green';
+      return context.l10n.notificationGreen;
   }
 }
 
@@ -106,7 +125,7 @@ class NotificationObject {
         type: (json['type']),
         image: json['image'],
         location: Location.fromJson(json['location']),
-        created: DateTime.parse(json['created']),
+        created: DateTime.parse(json['created']).toLocal(),
         resourceType: json['resourcetype'] ?? "",
       );
 }

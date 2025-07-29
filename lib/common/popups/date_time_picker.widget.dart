@@ -392,9 +392,14 @@ class _PlatformDatePickerButtonState extends State<PlatformDatePickerButton> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Replace this section in your build method:
                   Text(
-                    // 11/2/2025
-                    DateFormat('MM/dd/yyyy').format(selectedDate),
+                    // Conditional date formatting based on locale
+                    context.isSpanish
+                        ? DateFormat('dd/MM/yyyy').format(
+                            selectedDate) // Spanish format: day/month/year
+                        : DateFormat('MM/dd/yyyy').format(
+                            selectedDate), // English format: month/day/year
                     style: TextStyle(
                       color: widget.isSelected ? Colors.purple : Colors.black,
                       fontWeight: widget.isSelected

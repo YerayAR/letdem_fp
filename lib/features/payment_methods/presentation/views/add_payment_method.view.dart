@@ -60,6 +60,7 @@ class _AddPaymentMethodState extends State<AddPaymentMethod> {
               context.read<PaymentMethodBloc>().add(
                     const FetchPaymentMethods(),
                   );
+
               context.read<UserBloc>().add(FetchUserInfoEvent());
               AppPopup.showDialogSheet(
                   context,

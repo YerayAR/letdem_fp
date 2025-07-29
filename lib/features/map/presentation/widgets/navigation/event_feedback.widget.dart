@@ -14,6 +14,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
+import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
@@ -41,6 +42,7 @@ class _EventFeedbackState extends State<EventFeedback> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.event.type);
     return Padding(
         padding: EdgeInsets.all(Dimens.defaultMargin + 5),
         child: Column(
@@ -66,19 +68,6 @@ class _EventFeedbackState extends State<EventFeedback> {
                           style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700, fontSize: 18),
                         ),
-                        Dimens.space(2),
-                        DecoratedChip(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 5),
-                          text: context.l10n
-                              .metersAway(widget.currentDistance.floor()),
-                          textStyle: Typo.smallBody.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.green600,
-                          ),
-                          icon: Iconsax.clock,
-                          color: AppColors.green500,
-                        )
                       ],
                     ),
                     Text(
@@ -91,6 +80,19 @@ class _EventFeedbackState extends State<EventFeedback> {
                   ],
                 ),
               ],
+            ),
+            Dimens.space(2),
+            DecoratedChip(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              text: context.l10n.metersAway(parseMeters(
+                  widget.currentDistance < 1 ? 1 : widget.currentDistance,
+                  true)),
+              textStyle: Typo.smallBody.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.green600,
+              ),
+              icon: Iconsax.clock,
+              color: AppColors.green500,
             ),
             Dimens.space(4),
             Row(

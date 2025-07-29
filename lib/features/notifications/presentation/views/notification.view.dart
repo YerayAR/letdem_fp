@@ -285,7 +285,8 @@ class _NotificationsViewState extends State<NotificationsView> {
                       return NotificationItem(
                         type: notification.type,
                         notificationObject: notification.notificationObject,
-                        title: formatedNotificationType(notification.type),
+                        title: formatedNotificationType(
+                            notification.type, context),
                         message: getDynamicTextFromType(
                             notification.type,
                             notification.notificationObject,
@@ -635,6 +636,7 @@ class NotificationItem extends StatelessWidget {
                             DecoratedChip(
                               onTap: () {
                                 NavigatorHelper.to(NavigationMapScreen(
+                                  googlePlaceID: null,
                                   latitude:
                                       notificationObject.location.point.lat,
                                   longitude:

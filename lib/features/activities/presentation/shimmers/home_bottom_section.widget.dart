@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
@@ -78,6 +77,7 @@ class HomeMapBottomSection extends StatelessWidget {
             Row(
               children: [
                 Flexible(
+                  flex: context.isSpanish ? 6 : 1,
                   child: PrimaryButton(
                     onTap: () async {
                       PublishSpaceHandler.showSpaceOptions(context, () {
@@ -85,12 +85,13 @@ class HomeMapBottomSection extends StatelessWidget {
                         onRefreshTriggered();
                       });
                     },
-                    icon: Iconsax.location5,
+                    icon: !context.isSpanish ? IconlyBold.location : null,
                     text: context.l10n.publishSpace,
                   ),
                 ),
                 Dimens.space(1),
                 Flexible(
+                  flex: context.isSpanish ? 4 : 1,
                   child: PrimaryButton(
                     outline: true,
                     background: AppColors.primary50,
@@ -99,7 +100,7 @@ class HomeMapBottomSection extends StatelessWidget {
                       AppPopup.showBottomSheet(
                           context, const AddEventBottomSheet());
                     },
-                    icon: IconlyBold.star,
+                    icon: !context.isSpanish ? IconlyBold.star : null,
                     color: AppColors.primary500,
                     text: context.l10n.publishEvent,
                   ),

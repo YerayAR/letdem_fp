@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/core/constants/credentials.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
@@ -145,8 +147,38 @@ class MapboxService {
   }
 }
 
+enum TrafficLevel {
+  low,
+  moderate,
+  heavy,
+}
+
+String formatTrafficLevel(TrafficLevel level, BuildContext context) {
+  switch (level) {
+    case TrafficLevel.low:
+      return context.l10n.trafficLow;
+    case TrafficLevel.moderate:
+      return context.l10n.trafficModerate;
+    case TrafficLevel.heavy:
+      return context.l10n.trafficHeavy;
+  }
+}
+
+TrafficLevel fromString(String value) {
+  switch (value) {
+    case 'low':
+      return TrafficLevel.low;
+    case 'moderate':
+      return TrafficLevel.moderate;
+    case 'heavy':
+      return TrafficLevel.heavy;
+    default:
+      return TrafficLevel.moderate; // Default case
+  }
+}
+
 class RouteInfo {
-  final String tafficLevel;
+  final TrafficLevel tafficLevel;
   final double distance;
 
   final int duration;
@@ -161,7 +193,7 @@ class RouteInfo {
 
   factory RouteInfo.fromMap(Map<String, dynamic> map) {
     return RouteInfo(
-      tafficLevel: map['traffic_level'],
+      tafficLevel: fromString(map['traffic_level'] as String),
       distance: double.parse(map['distance'].toString()),
       duration: int.parse(map['duration'].toString()),
       arrivingAt: DateTime.parse(map['arriving_at']),

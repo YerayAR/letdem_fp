@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +26,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/time.dart';
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
+import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
@@ -64,13 +66,12 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
-  static const int _distanceTriggerThreshold = 200;
+  static const int _distanceTriggerThreshold = 60;
 
   DateTime? _navigationStartTime;
   bool _hasShownFatigueAlert = false;
 
   HereMapController? _hereMapController;
-  late final AppLifecycleListener _lifecycleListener;
   HERE.RoutingEngine? _routingEngine;
   HERE.VisualNavigator? _visualNavigator;
   HERE.LocationEngine? _locationEngine;
@@ -109,7 +110,7 @@ class _NavigationViewState extends State<NavigationView> {
   int _lastRerouteTime = 0;
   String normalManuevers = "";
 
-  int DISTANCE_THREESHOLD = 10;
+  int DISTANCE_THREESHOLD = 5;
 
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
@@ -144,8 +145,16 @@ class _NavigationViewState extends State<NavigationView> {
     // );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _configureTTSLanguage();
       _requestLocationPermission();
     });
+  }
+
+  void _configureTTSLanguage() {
+    String languageCode = Localizations.localeOf(context).languageCode;
+    speech.setLanguage(languageCode);
+
+    debugPrint('🗣️ TTS language configured to: $languageCode');
   }
 
   void _setupSpeedLimitListener() {
@@ -309,7 +318,7 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     if (!_isMuted) {
-      speech.speak("Speed limit is $speedLimitKmh kilometers per hour");
+      speech.speak(context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()));
     }
   }
 
@@ -356,7 +365,6 @@ class _NavigationViewState extends State<NavigationView> {
 
   Future<void> _requestLocationPermission() async {
     setState(() => _isLoading = true);
-    await _assetsProvider.loadAssets();
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -381,8 +389,9 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() => _isLoading = false);
   }
 
-  void _onMapCreated(HereMapController hereMapController) {
+  void _onMapCreated(HereMapController hereMapController) async {
     debugPrint('🗺️ Map created!');
+    await _assetsProvider.loadAssets();
     _hereMapController = hereMapController;
 
     _hereMapController?.gestures.enableDefaultAction(GestureType.pan);
@@ -442,6 +451,15 @@ class _NavigationViewState extends State<NavigationView> {
         TapListener((HERE.Point2D touchPoint) {
       _pickMapMarker(touchPoint);
     });
+    // add map marker for destination
+
+    var icon = _assetsProvider.destinationMarkerLarge;
+
+    final marker = MapMarker(
+      HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(marker);
     _hereMapController?.gestures.panListener = PanListener((GestureState state,
         HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
       if (state == GestureState.begin) {
@@ -696,6 +714,41 @@ class _NavigationViewState extends State<NavigationView> {
   showSpacePopup({
     required Space space,
   }) {
+    print('🅿️ Showing space popup for: ${space.location.streetName}');
+    if (space.isPremium) {
+      AppPopup.showBottomSheet(
+          context,
+          SpacePopupSheet(
+            space: space,
+            currentPosition: HERE.GeoCoordinates(
+              _currentLocation!.latitude,
+              _currentLocation!.longitude,
+            ),
+            onRefreshTrigger: () {
+              context.read<MapBloc>().add(GetNearbyPlaces(
+                    queryParams: MapQueryParams(
+                      currentPoint:
+                          "${_currentLocation!.latitude},${_currentLocation!.longitude}",
+                      // "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                      radius: 8000,
+                      drivingMode: false,
+                      options: ['spaces', 'events'],
+                    ),
+                  ));
+              NavigatorHelper.pop();
+              NavigatorHelper.pop();
+
+              // _switchToNewDestination(space);
+            },
+          ));
+      return;
+    }
+    // if (context.userProfile!.activeReservation != null) {
+    //   Toast.showError(
+    //     "You cannot navigate to a space while you have an active reservation.",
+    //   );
+    //   return;
+    // }
     AppPopup.showBottomSheet(
       context,
       Padding(
@@ -992,6 +1045,9 @@ class _NavigationViewState extends State<NavigationView> {
     if (_hereMapController == null) return;
 
     debugPrint('🧭 Starting visual guidance...');
+
+    _configureTTSLanguage();
+
     try {
       _visualNavigator = HERE.VisualNavigator();
       _setupRouteDeviationListener();
@@ -1074,21 +1130,41 @@ class _NavigationViewState extends State<NavigationView> {
 
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              AppPopup.showBottomSheet(
-                  context,
-                  ParkingRatingWidget(
-                    spaceID: _currentSpace!.id,
-                    onSubmit: () {
-                      NavigatorHelper.pop();
-                      _isPopupDisplayed = false;
-                      _hasShownParkingRating = false;
-                    },
-                  ));
+              if (_currentSpace!.isPremium) {
+                // check the users active reservatoon exist
+
+                AppPopup.showBottomSheet(
+                    context,
+                    SpacePopupSheet(
+                      space: _currentSpace!,
+                      currentPosition: HERE.GeoCoordinates(
+                        _currentLocation!.latitude,
+                        _currentLocation!.longitude,
+                      ),
+                      onRefreshTrigger: () {
+                        NavigatorHelper.pop();
+                        _isPopupDisplayed = false;
+                        _hasShownParkingRating = false;
+                      },
+                    ));
+                return;
+              } else {
+                AppPopup.showBottomSheet(
+                    context,
+                    ParkingRatingWidget(
+                      spaceID: _currentSpace!.id,
+                      onSubmit: () {
+                        NavigatorHelper.pop();
+                        _isPopupDisplayed = false;
+                        _hasShownParkingRating = false;
+                      },
+                    ));
+              }
             }
           });
         } else if (!isParkingNavigation) {
           print('🎯 Standard destination reached. Showing toast.');
-          _showToast("You have arrived at your destination!",
+          _showToast(context.l10n.arrivedAtDestination,
               backgroundColor: AppColors.green600);
 
           putParkingSpacesOnMap();
@@ -1442,6 +1518,7 @@ class _NavigationViewState extends State<NavigationView> {
                         speech.mute();
                       } else {
                         speech.unmute();
+                        _configureTTSLanguage();
                       }
                     },
                   ),
@@ -1453,7 +1530,7 @@ class _NavigationViewState extends State<NavigationView> {
                 baseColor: Colors.white.withOpacity(0.5),
                 highlightColor: Colors.grey[100]!,
                 child: Text(
-                  "Waiting for navigation to start...",
+                  context.l10n.waitingForNavigation,
                   style: TextStyle(
                       color: Colors.white.withOpacity(0.7), fontSize: 16),
                 ),

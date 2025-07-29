@@ -132,8 +132,11 @@ final class OTPVerificationLoading extends AuthState {
 }
 
 final class OTPVerificationSuccess extends AuthState {
+  final bool isGoogleLogin;
+
+  const OTPVerificationSuccess({required this.isGoogleLogin});
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [isGoogleLogin];
 }
 
 final class PersonalInfoLoading extends AuthState {

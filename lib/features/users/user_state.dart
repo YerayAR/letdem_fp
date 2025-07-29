@@ -31,7 +31,10 @@ class UserInfoChanged extends UserState {
 
 class UserLoaded extends UserState {
   final LetDemUser user;
+
   final int points;
+
+  final List<UserReservationPayments> reservationHistory;
 
   final int unreadNotificationsCount;
 
@@ -48,6 +51,7 @@ class UserLoaded extends UserState {
     required this.isLocationPermissionGranted,
     required this.points,
     this.isOrdersLoading = false,
+    this.reservationHistory = const [],
     required this.unreadNotificationsCount,
     this.orders = const [],
   });
@@ -57,12 +61,14 @@ class UserLoaded extends UserState {
     bool? isLocationPermissionGranted,
     bool? isOrdersLoading,
     bool? isUpdateLoading,
+    List<UserReservationPayments>? reservationHistory,
     int? unreadNotificationsCount,
     List<Order>? orders,
     int? points,
   }) {
     return UserLoaded(
       user: user ?? this.user,
+      reservationHistory: reservationHistory ?? this.reservationHistory,
       unreadNotificationsCount:
           unreadNotificationsCount ?? this.unreadNotificationsCount,
       isOrdersLoading: isOrdersLoading ?? this.isOrdersLoading,
@@ -82,6 +88,7 @@ class UserLoaded extends UserState {
         isUpdateLoading,
         isOrdersLoading,
         unreadNotificationsCount,
+        reservationHistory,
         orders,
         points,
       ];

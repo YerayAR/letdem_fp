@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/mapview.dart';
+import 'package:iconly/iconly.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/assets.dart';
@@ -98,6 +99,80 @@ class RegisteredCarWidget extends StatelessWidget {
                     textSize: 11,
                     color: AppColors.primary500,
                   ),
+                ),
+
+                Column(
+                  children: car.lastParkingLocation == null
+                      ? []
+                      : [
+                          Dimens.space(2),
+                          Divider(
+                            color: AppColors.neutral50,
+                            height: 1,
+                          ),
+                          Dimens.space(1),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      IconlyBold.location,
+                                      color: AppColors.neutral500,
+                                      size: 16,
+                                    ),
+                                    Dimens.space(1),
+                                    Flexible(
+                                      child: Text(
+                                        car.lastParkingLocation?.streetName ??
+                                            context.l10n.unknown,
+                                        maxLines: 2,
+                                        style: Typo.mediumBody.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                          color: AppColors.neutral500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Dimens.space(2),
+                              GestureDetector(
+                                onTap: () {
+                                  if (car.lastParkingLocation == null) {
+                                  } else {
+                                    NavigatorHelper.to(NavigationView(
+                                      destinationLat:
+                                          car.lastParkingLocation!.lat ?? 0,
+                                      destinationLng:
+                                          car.lastParkingLocation!.lng ?? 0,
+                                    ));
+                                  }
+                                },
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      context.l10n.navigateToCar,
+                                      style: Typo.mediumBody.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primary500,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Dimens.space(1),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      color: AppColors.primary500,
+                                      size: 15,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                 ),
               ],
             ),
@@ -201,7 +276,8 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
                           ),
                           Dimens.space(1),
                           Text(
-                            widget.lastParked?.streetName ?? context.l10n.unknown,
+                            widget.lastParked?.streetName ??
+                                context.l10n.unknown,
                             style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w500,
                             ),

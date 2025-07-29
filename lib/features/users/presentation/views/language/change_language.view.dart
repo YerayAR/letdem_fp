@@ -9,6 +9,7 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:provider/provider.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Language {
   final String name;
@@ -35,7 +36,13 @@ class _ChangeLanguageViewState extends State<ChangeLanguageView> {
           child: PrimaryButton(
             text: context.l10n.save,
             onTap: () {
-              // Here you would update the app's language using your UserBloc
+              final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+              final selectedLocale = localeProvider.getDefaultLocale;
+              
+              if (selectedLocale != null) {
+                // Update OneSignal language
+                OneSignal.User.setLanguage(selectedLocale.languageCode);
+              }
               NavigatorHelper.pop();
             },
           ),

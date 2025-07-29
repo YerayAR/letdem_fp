@@ -66,75 +66,81 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
         // TODO: implement listener
       },
       builder: (context, state) {
-        return Scaffold(
-          bottomNavigationBar: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(Dimens.defaultMargin),
-              child: PrimaryButton(
-                isLoading: state is UserLoaded && state.isUpdateLoading,
-                onTap: () {
-                  if (_newPasswordCTRL.text != _confirmPasswordCTRL.text) {
-                    Toast.showError("Passwords do not match");
-                    return;
-                  }
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
-                  context.read<UserBloc>().add(
-                        ChangePasswordEvent(
-                          oldPassword: _oldPasswordCTRL.text,
-                          newPassword: _newPasswordCTRL.text,
-                        ),
-                      );
-                },
-                text: 'Change Password',
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          behavior: HitTestBehavior.opaque,
+          child: Scaffold(
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(Dimens.defaultMargin),
+                child: PrimaryButton(
+                  isLoading: state is UserLoaded && state.isUpdateLoading,
+                  onTap: () {
+                    if (_newPasswordCTRL.text != _confirmPasswordCTRL.text) {
+                      Toast.showError("Passwords do not match");
+                      return;
+                    }
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+                    context.read<UserBloc>().add(
+                          ChangePasswordEvent(
+                            oldPassword: _oldPasswordCTRL.text,
+                            newPassword: _newPasswordCTRL.text,
+                          ),
+                        );
+                  },
+                  text: 'Change Password',
+                ),
               ),
             ),
-          ),
-          body: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                StyledBody(
-                  children: [
-                    // custom app bar
-                    StyledAppBar(
-                      title: 'Change Password',
-                      onTap: () {
-                        NavigatorHelper.pop();
-                      },
-                      icon: Icons.close,
-                    ),
+            body: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  StyledBody(
+                    children: [
+                      // custom app bar
+                      StyledAppBar(
+                        title: 'Change Password',
+                        onTap: () {
+                          NavigatorHelper.pop();
+                        },
+                        icon: Icons.close,
+                      ),
 
-                    Dimens.space(5),
-                    TextInputField(
-                      prefixIcon: Iconsax.sms,
-                      controller: _oldPasswordCTRL,
-                      inputType: TextFieldType.password,
-                      label: 'Old Password',
-                      placeHolder: 'Enter your old password',
-                    ),
-                    Dimens.space(1),
-                    TextInputField(
-                      prefixIcon: Iconsax.lock,
-                      controller: _newPasswordCTRL,
-                      label: 'New Password',
-                      showPasswordStrengthIndicator: true,
-                      inputType: TextFieldType.password,
-                      placeHolder: 'Enter your new password',
-                    ),
-                    Dimens.space(1),
-                    TextInputField(
-                      prefixIcon: Iconsax.lock,
-                      controller: _confirmPasswordCTRL,
-                      showPasswordStrengthIndicator: true,
-                      label: 'Confirm Password',
-                      inputType: TextFieldType.password,
-                      placeHolder: 'Confirm your new password',
-                    ),
-                  ],
-                ),
-              ],
+                      Dimens.space(5),
+                      TextInputField(
+                        prefixIcon: Iconsax.sms,
+                        controller: _oldPasswordCTRL,
+                        inputType: TextFieldType.password,
+                        label: 'Old Password',
+                        placeHolder: 'Enter your old password',
+                      ),
+                      Dimens.space(1),
+                      TextInputField(
+                        prefixIcon: Iconsax.lock,
+                        controller: _newPasswordCTRL,
+                        label: 'New Password',
+                        showPasswordStrengthIndicator: true,
+                        inputType: TextFieldType.password,
+                        placeHolder: 'Enter your new password',
+                      ),
+                      Dimens.space(1),
+                      TextInputField(
+                        prefixIcon: Iconsax.lock,
+                        controller: _confirmPasswordCTRL,
+                        showPasswordStrengthIndicator: true,
+                        label: 'Confirm Password',
+                        inputType: TextFieldType.password,
+                        placeHolder: 'Confirm your new password',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

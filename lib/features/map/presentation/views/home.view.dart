@@ -8,6 +8,7 @@ import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
 import 'package:letdem/core/constants/colors.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_bottom_section.widget.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
@@ -18,6 +19,7 @@ import 'package:letdem/features/auth/models/nearby_payload.model.dart'
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/notification/notification.service.dart';
+import 'package:letdem/infrastructure/ws/web_socket.service.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../../../../common/popups/popup.dart';
@@ -51,13 +53,13 @@ class _HomeViewState extends State<HomeView>
   LocationIndicator? _locationIndicator;
   LocationListener? _locationListener;
 
-  static const double TRIGGER_DISTANCE_METERS = 250.0;
+  static const double TRIGGER_DISTANCE_METERS = 200.0;
 
   // ---------------------------------------------------------------------------
   // Refresh Button State
   // ---------------------------------------------------------------------------
   bool _showRefreshButton = false;
-  Timer? _refreshButtonTimer;
+  // Timer? _refreshButtonTimer;
   GeoCoordinates? _lastCameraPosition;
   static const Duration _refreshButtonHideDuration = Duration(seconds: 3);
 
@@ -70,6 +72,8 @@ class _HomeViewState extends State<HomeView>
   final Map<MapMarker, Space> _spaceMarkers = {};
   final Map<MapMarker, Event> _eventMarkers = {};
 
+  late LocationWebSocketService _locationWebSocketService;
+
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
@@ -79,12 +83,37 @@ class _HomeViewState extends State<HomeView>
     _loadAssets();
     _getCurrentLocation();
 
+    // Handle notification clicks (when user taps the notification)
     OneSignal.Notifications.addClickListener((event) {
+      event.preventDefault();
+
       final data = event.notification.additionalData;
       final handler = NotificationHandler(context);
 
+      // Only handle navigation on click
       handler.handleNotification(data);
+      event.notification.display();
     });
+
+    // Handle foreground notifications (when app is open)
+    OneSignal.Notifications.addForegroundWillDisplayListener(
+      (event) {
+        event.preventDefault();
+
+        final data = event.notification.additionalData;
+
+        // Only handle specific data updates, NOT navigation
+        if (data != null && data['page_to_redirect'] != null) {
+          if (data['page_to_redirect'] == 'wallet') {
+            // Just refresh user data, don't navigate
+            context.loadUser();
+          }
+          // Add other data refresh cases here if needed
+        }
+
+        event.notification.display();
+      },
+    );
   }
 
   @override
@@ -96,7 +125,7 @@ class _HomeViewState extends State<HomeView>
     _locationIndicator = null;
     _mapController = null;
     _isListeningToLocation = false;
-    _refreshButtonTimer?.cancel();
+    // _refreshButtonTimer?.cancel();
     super.dispose();
   }
 
@@ -112,45 +141,65 @@ class _HomeViewState extends State<HomeView>
     setState(() => isLoadingAssets = false);
   }
 
+  initializeWebSocketService() {
+    _locationWebSocketService = LocationWebSocketService();
+    _locationWebSocketService.connectAndSendInitialLocation(
+      latitude: _currentPosition?.latitude ?? 37.3318,
+      longitude: _currentPosition?.longitude ?? -122.0312,
+      onEvent: (event) {
+        var payload = event;
+        _addMapMarkers(payload.spaces!, payload.events!);
+        // Handle incoming WebSocket events if needed
+        debugPrint("WebSocket event received: $event");
+      },
+      onDone: () {
+        debugPrint("WebSocket connection closed.");
+      },
+      onError: (error) {
+        debugPrint("WebSocket error: $error");
+      },
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Refresh Button Logic
   // ---------------------------------------------------------------------------
-  void _showRefreshButtonTemporarily() {
-    _refreshButtonTimer?.cancel();
-
-    if (!_showRefreshButton) {
-      setState(() => _showRefreshButton = true);
-    }
-
-    _refreshButtonTimer = Timer(_refreshButtonHideDuration, () {
-      if (mounted) {
-        setState(() => _showRefreshButton = false);
-      }
-    });
-  }
-
-  void _hideRefreshButton() {
-    _refreshButtonTimer?.cancel();
-    if (_showRefreshButton) {
-      setState(() => _showRefreshButton = false);
-    }
-  }
+  // void _showRefreshButtonTemporarily() {
+  //   // _refreshButtonTimer?.cancel();
+  //
+  //   if (!_showRefreshButton) {
+  //     setState(() => _showRefreshButton = true);
+  //   }
+  //
+  //   _refreshButtonTimer = Timer(_refreshButtonHideDuration, () {
+  //     if (mounted) {
+  //       setState(() => _showRefreshButton = false);
+  //     }
+  //   });
+  // }
+  //
+  // void _hideRefreshButton() {
+  //   _refreshButtonTimer?.cancel();
+  //   if (_showRefreshButton) {
+  //     setState(() => _showRefreshButton = false);
+  //   }
+  // }
 
   void _onCameraPositionChanged(GeoCoordinates newPosition) {
     // Only show refresh button if map was manually moved (not by location updates)
-    if (_lastCameraPosition != null) {
-      final distance = geolocator.Geolocator.distanceBetween(
-        _lastCameraPosition!.latitude,
-        _lastCameraPosition!.longitude,
-        newPosition.latitude,
-        newPosition.longitude,
-      );
+    // if (_lastCameraPosition != null) {
+    //   // final distance = geolocator.Geolocator.distanceBetween(
+    //   //   _lastCameraPosition!.latitude,
+    //   //   _lastCameraPosition!.longitude,
+    //   //   newPosition.latitude,
+    //   //   newPosition.longitude,
+    //   );
 
-      // Show refresh button if camera moved more than 10 meters
-      if (distance > 10) {
-        _showRefreshButtonTemporarily();
-      }
-    }
+    // Show refresh button if camera moved more than 10 meters
+    // if (distance > 10) {
+    //   _showRefreshButtonTemporarily();
+    // }
+    // }
     _lastCameraPosition = newPosition;
   }
 
@@ -192,6 +241,7 @@ class _HomeViewState extends State<HomeView>
 
       _currentPosition = GeoCoordinates(position.latitude, position.longitude);
       setState(() => isLocationLoading = false);
+      initializeWebSocketService();
 
       if (_mapController != null && _currentPosition != null) {
         _addMyLocationToMap(Location.withCoordinates(_currentPosition!));
@@ -282,7 +332,7 @@ class _HomeViewState extends State<HomeView>
     if (_currentPosition != null && _mapController != null) {
       _mapController!.camera.lookAtPoint(_currentPosition!);
       _lastCameraPosition = _currentPosition;
-      _hideRefreshButton();
+      // _hideRefreshButton();
     }
   }
 
@@ -291,21 +341,15 @@ class _HomeViewState extends State<HomeView>
   // ---------------------------------------------------------------------------
   void _fetchNearbyPlaces(GeoCoordinates position) {
     _lastFetchPosition = position;
-    context.read<MapBloc>().add(GetNearbyPlaces(
-          queryParams: MapQueryParams(
-            currentPoint: "${position.latitude},${position.longitude}",
-            radius: 8000,
-            drivingMode: false,
-            options: ['spaces', 'events'],
-          ),
-        ));
+    _locationWebSocketService.sendLocation(
+        position.latitude, position.longitude);
   }
 
   void _onRefreshPressed() {
     if (_mapController != null) {
       final cameraPosition = _mapController!.camera.state.targetCoordinates;
       _fetchNearbyPlaces(cameraPosition);
-      _hideRefreshButton();
+      // _hideRefreshButton();
     }
   }
 
@@ -446,9 +490,9 @@ class _HomeViewState extends State<HomeView>
             ? const NoMapPermissionSection()
             : BlocConsumer<MapBloc, MapState>(
                 listener: (context, state) {
-                  if (state is MapLoaded && _mapController != null) {
-                    _addMapMarkers(state.payload.spaces, state.payload.events);
-                  }
+                  // if (state is MapLoaded && _mapController != null) {
+                  //   _addMapMarkers(state.payload.spaces, state.payload.events);
+                  // }
                 },
                 builder: (context, state) {
                   return Stack(
@@ -460,15 +504,15 @@ class _HomeViewState extends State<HomeView>
                       HomeMapBottomSection(
                         onRefreshTriggered: () {
                           if (_currentPosition != null) {
-                            context.read<MapBloc>().add(GetNearbyPlaces(
-                                  queryParams: MapQueryParams(
-                                    currentPoint:
-                                        "${_currentPosition!.latitude},${_currentPosition!.longitude}",
-                                    radius: 8000,
-                                    drivingMode: false,
-                                    options: ['spaces', 'events'],
-                                  ),
-                                ));
+                            // context.read<MapBloc>().add(GetNearbyPlaces(
+                            //       queryParams: MapQueryParams(
+                            //         currentPoint:
+                            //             "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                            //         radius: 8000,
+                            //         drivingMode: false,
+                            //         options: ['spaces', 'events'],
+                            //       ),
+                            //     ));
                           }
                         },
                       ),

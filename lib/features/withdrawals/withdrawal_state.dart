@@ -27,3 +27,10 @@ final class WithdrawalFailure extends WithdrawalState {
   @override
   List<Object> get props => [message];
 }
+
+class WithdrawalFinished extends WithdrawalState {
+  const WithdrawalFinished();
+
+  @override
+  List<Object> get props => [];
+}

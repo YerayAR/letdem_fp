@@ -64,7 +64,9 @@ class ContributionItem extends StatelessWidget {
                         children: [
                           Text(
                             type == ContributionType.space
-                                ? context.l10n.spacePublished
+                                ? activity.action == 'SPACE_OCCUPIED'
+                                    ? context.l10n.spaceOccupied
+                                    : context.l10n.spacePublished
                                 : context.l10n.eventPublished,
                             style: Typo.largeBody.copyWith(
                               fontWeight: FontWeight.w700,
@@ -75,10 +77,12 @@ class ContributionItem extends StatelessWidget {
                             spacing: 5,
                             children: [
                               Text(
-                                DateFormat("dd MMM. yyyy").format(
-                                  (activity.created.toLocal()),
-                                ),
-                                // "12 Jan. 2025",
+                                DateFormat(
+                                        context.isSpanish
+                                            ? "dd 'de' MMM. yyyy"
+                                            : "dd MMM. yyyy",
+                                        context.isSpanish ? 'es' : 'en')
+                                    .format(activity.created.toLocal()),
                                 style: Typo.mediumBody.copyWith(
                                   fontSize: 14,
                                   color: AppColors.neutral400,

@@ -61,8 +61,8 @@ class ScheduledNotification {
     return ScheduledNotification(
       id: json['id'],
       radius: json['radius'],
-      startsAt: DateTime.parse(json['starts_at']).toUtc(),
-      endsAt: DateTime.parse(json['ends_at']).toUtc(),
+      startsAt: DateTime.parse(json['starts_at']).toLocal(),
+      endsAt: DateTime.parse(json['ends_at']).toLocal(),
       isExpired: json['is_expired'],
       location: LocationData.fromJson(json['location']),
     );

@@ -16,6 +16,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
@@ -24,6 +25,7 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
 
@@ -42,12 +44,15 @@ class NavigationMapScreen extends StatefulWidget {
   final String? spaceID;
   final Space? spaceDetails;
 
+  final String? googlePlaceID;
+
   const NavigationMapScreen({
     super.key,
     required this.latitude,
     this.spaceID,
     required this.longitude,
     required this.hideToggle,
+    required this.googlePlaceID,
     required this.destinationStreetName,
     this.spaceDetails,
   });
@@ -78,13 +83,16 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   @override
   void initState() {
     super.initState();
+
+    print("Google Place ID: ${widget.googlePlaceID}");
+    print("Space ID: ${widget.spaceID}");
+    print("Latitude: ${widget.latitude}");
+    print("Longitude: ${widget.longitude}");
+
     // if latitude and longitude and space details are not provided, call a special method to get the location info from space id;
-    if (widget.latitude == null &&
-        widget.longitude == null &&
-        widget.spaceDetails == null) {
-      if (widget.spaceID != null) {
-        getInfoFromSpaceID(widget.spaceID!);
-      }
+    if (widget.latitude == null && widget.longitude == null) {
+      getInfoFromSpaceID(widget.spaceID);
+      // }
     } else {
       _initializeRouting();
     }
@@ -93,21 +101,43 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   bool isError = false;
 
   void getInfoFromSpaceID(
-    String spaceID,
+    String? spaceID,
   ) async {
     try {
+      print("Fetching space details for ID: $spaceID");
       setState(() {
         _isLoading = true;
       });
-      var response = await ApiService.sendRequest(
-          endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
 
-      var spaceDetails = Space.fromJson(response.data);
+      late double _latitudeDelta;
+      late double _longitudeDelta;
+
+      if (widget.googlePlaceID != null) {
+        var spaceInfo = await HereSearchApiService()
+            .getPlaceDetailsLatLng(widget.googlePlaceID ?? '');
+        if (spaceInfo != null) {
+          _latitudeDelta = spaceInfo['lat'] as double;
+          _longitudeDelta = spaceInfo['lng'] as double;
+        } else {}
+      }
+
+      if (spaceID != null) {
+        var response = await ApiService.sendRequest(
+            endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
+
+        var spaceDetails = Space.fromJson(response.data);
+        _latitudeDelta = spaceDetails.location.point.lat;
+        _longitudeDelta = spaceDetails.location.point.lng;
+
+        setState(() {
+          _spaceDetails = spaceDetails;
+          _destinationStreetName = spaceDetails.location.streetName;
+        });
+      }
+
       setState(() {
-        _spaceDetails = spaceDetails;
-        _latitude = spaceDetails.location.point.lat;
-        _longitude = spaceDetails.location.point.lng;
-        _destinationStreetName = spaceDetails.location.streetName;
+        _latitude = _latitudeDelta;
+        _longitude = _longitudeDelta;
       });
 
       if (_latitude != null && _longitude != null) {
@@ -198,8 +228,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     ];
 
     try {
-      _addMarker(start, _assetsProvider.currentLocationMarker);
-      _addMarker(end, _assetsProvider.destinationMarker);
       _calculateRoute(_waypoints);
     } catch (e) {
       print("Error building route: $e");
@@ -220,6 +248,22 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
       if (error == null && routes != null && routes.isNotEmpty) {
         _currentRoute = routes.first;
         _renderRoute(_currentRoute!);
+        _addMarker(
+          GeoCoordinates(
+            _currentRoute!.geometry.vertices.last.latitude,
+            _currentRoute!.geometry.vertices.last.longitude,
+          ),
+          _assetsProvider.destinationMarker,
+        );
+        _addMarker(
+          GeoCoordinates(
+            _currentRoute!.geometry.vertices.first.latitude,
+            _currentRoute!.geometry.vertices.first.longitude,
+          ),
+          _assetsProvider.currentLocationMarker,
+        );
+
+        ;
       } else {
         print(
             "Route calculation failed: ${error?.toString() ?? 'Unknown error'}");
@@ -459,7 +503,10 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 
   Widget _buildContent(BuildContext context, RouteInfo routeInfo,
       LocationData location, ScheduleNotificationsState state) {
-    if (routeInfo.distance < 500) {
+    print(
+        "Route Info: ${routeInfo.distance < context.userProfile!.constantsSettings.metersToShowTooCloseModal}");
+    if (routeInfo.distance <
+        context.userProfile!.constantsSettings.metersToShowTooCloseModal) {
       return _buildTooCloseMessage();
     }
 
@@ -509,7 +556,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           ),
           const SizedBox(height: 8),
           Text(
-            context.l10n.closeToLocationDescription,
+            context.l10n.closeToLocationDescription(context
+                .userProfile!.constantsSettings.metersToShowTooCloseModal),
             style: Typo.mediumBody,
             textAlign: TextAlign.center,
           ),
@@ -535,18 +583,27 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
         Row(
           children: [
             Text(
-              "Traffic Level",
+              context.l10n.trafficLevel,
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
             DecoratedChip(
-              text: toBeginningOfSentenceCase(routeInfo.tafficLevel) ?? "--",
+              text: formatTrafficLevel(routeInfo.tafficLevel, context) ?? "--",
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.primary500,
+                color: routeInfo.tafficLevel == TrafficLevel.low
+                    ? AppColors.green500
+                    : routeInfo.tafficLevel == TrafficLevel.moderate
+                        ? AppColors.neutral500
+                        : AppColors.red500,
               ),
-              color: AppColors.primary500,
+              // low, moderate, heavy
+              color: routeInfo.tafficLevel == TrafficLevel.low
+                  ? AppColors.green500
+                  : routeInfo.tafficLevel == TrafficLevel.moderate
+                      ? AppColors.neutral500
+                      : AppColors.red500,
             ),
           ],
         ),
@@ -629,13 +686,28 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
               initialDate: _fromDate,
               onDateSelected: (date) => setState(() => _fromDate = date),
             ),
+            Dimens.space(1),
             PlatformTimePickerButton(
               initialTime: _fromTime,
               onTimeSelected: (time) => setState(() => _fromTime = time),
             ),
           ],
         ),
-        Dimens.space(1),
+        Row(
+          children: [
+            Dimens.space(5),
+            Flexible(child: Divider(color: Colors.grey.withOpacity(0.2))),
+            Dimens.space(1),
+            Text(context.l10n.toDate,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                )),
+            Dimens.space(1),
+            Flexible(child: Divider(color: Colors.grey.withOpacity(0.2))),
+            Dimens.space(5),
+          ],
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -643,6 +715,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
               initialDate: _toDate,
               onDateSelected: (date) => setState(() => _toDate = date),
             ),
+            Dimens.space(1),
             PlatformTimePickerButton(
               initialTime: _toTime,
               onTimeSelected: (time) => setState(() => _toTime = time),
@@ -743,18 +816,33 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
   }
 }
 
-String parseMeters(double distance) {
-  if (distance < 1000) {
-    return "${distance.toStringAsFixed(0)} meters";
-  } else {
-    return "${(distance / 1000).toStringAsFixed(1)} m";
-  }
+String parseMeters(
+  double distance, [
+  bool longFormat = false,
+]) {
+  var context = NavigatorHelper.navigatorKey.currentState!.context;
+  // distance is in km
+  return distance < 1
+      ? "${(1).toStringAsFixed(0)} ${context.l10n.meters}"
+      : distance < 1000
+          ? "${distance.toStringAsFixed(0)} ${context.l10n.meters}"
+          : "${(distance / 1000).toStringAsFixed(1)} km";
+  // if (distance < 1000) {
+  //   return "${distance.toStringAsFixed(0)} meters";
+  // } else {
+  //   return "${(distance / 1000).toStringAsFixed(1)} m";
+  // }
 }
 
 String parseHours(BuildContext context, int min) {
   if (min < 60) {
+    if (min == 0) {
+      return "1 min";
+    }
     return "$min ${context.l10n.minutesShort}";
   } else {
+    // if zero then return 1 minute
+
     return "${(min / 60).toStringAsFixed(0)} ${context.l10n.hoursShort}";
   }
 }

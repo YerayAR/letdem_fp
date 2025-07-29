@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/auth/dto/email.dto.dart';
 import 'package:letdem/features/auth/dto/login.dto.dart';
 import 'package:letdem/features/auth/dto/password_reset.dto.dart';
@@ -11,6 +12,8 @@ import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/infrastructure/services/google/google.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../infrastructure/services/res/navigator.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -41,12 +44,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await authRepository.googleSignup(TokenDTO(token: at!));
 
       await tokens.write();
-      emit(OTPVerificationSuccess());
+      emit(OTPVerificationSuccess(isGoogleLogin: true));
     } on ApiError catch (err) {
       emit(RegisterError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const RegisterError(error: 'Unable to Register'));
+      emit(RegisterError(
+          error: NavigatorHelper.context!.l10n.somethingWentWrong));
     }
   }
 
@@ -64,7 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LoginError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const LoginError(error: 'Unable to Login'));
+      emit(LoginError(error: NavigatorHelper.context!.l10n.somethingWentWrong));
     }
   }
 
@@ -80,7 +84,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(ResetPasswordError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const ResetPasswordError(error: 'Unable to Reset Password'));
+      emit(ResetPasswordError(
+          error: NavigatorHelper.context!.l10n.unableToResetPassword));
     }
   }
 
@@ -96,8 +101,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(ValidateResetPasswordError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const ValidateResetPasswordError(
-          error: 'Unable to Validate Reset Password'));
+      emit(ValidateResetPasswordError(
+          error: NavigatorHelper.context!.l10n.unableToResetPassword));
     }
   }
 
@@ -106,15 +111,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       Emitter<AuthState> emit) async {
     try {
       emit(ResendVerificationCodeLoading());
-      await authRepository.resendVerificationCode(EmailDTO(email: event.email));
+      await authRepository
+          .resendVerificationCodeForgotPassword(EmailDTO(email: event.email));
 
       emit(ResendVerificationCodeSuccess());
     } on ApiError catch (err) {
       emit(FindForgotPasswordAccountError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const FindForgotPasswordAccountError(
-          error: 'Unable to Resend Verification Code'));
+      emit(FindForgotPasswordAccountError(
+          error: NavigatorHelper.context!.l10n.unableToResendCode));
     }
   }
 
@@ -130,8 +136,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(FindForgotPasswordAccountError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const FindForgotPasswordAccountError(
-          error: 'Unable to Find Forgot Password Account'));
+      emit(FindForgotPasswordAccountError(
+          error: NavigatorHelper.context!.l10n.unableToFindAccount));
     }
   }
 
@@ -146,7 +152,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(RegisterError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const RegisterError(error: 'Unable to Resend Verification Code'));
+      emit(RegisterError(
+          error: NavigatorHelper.context!.l10n.unableToResendCode));
     }
   }
 
@@ -159,12 +166,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       await tokens.write();
 
-      emit(OTPVerificationSuccess());
+      emit(OTPVerificationSuccess(isGoogleLogin: false));
     } on ApiError catch (err) {
       emit(RegisterError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const RegisterError(error: 'Unable to Verify Email'));
+      // emit(const RegisterError(error: 'Unable to Verify Email'));
+      emit(RegisterError(
+          error: NavigatorHelper.context!.l10n.unableToVerifyEmail));
     }
   }
 
@@ -185,7 +194,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(RegisterError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const RegisterError(error: 'Unable to Register'));
+      // emit(const RegisterError(error: 'Unable to Register'));
+      emit(
+          RegisterError(error: NavigatorHelper.context!.l10n.unableToRegister));
     }
   }
 
@@ -202,7 +213,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LoginError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(const LoginError(error: 'Unable to Login'));
+      // emit(const LoginError(error: 'Unable to Login'));
+      emit(LoginError(error: NavigatorHelper.context!.l10n.unableToLogin));
     }
   }
 }

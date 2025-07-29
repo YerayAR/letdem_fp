@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
@@ -10,92 +11,96 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/orders/order.model.dart';
 
-class OrdersListView extends StatefulWidget {
-  const OrdersListView({super.key});
+import '../../../models/user.model.dart';
+
+class ReservationHistory extends StatefulWidget {
+  const ReservationHistory({super.key});
 
   @override
-  State<OrdersListView> createState() => _OrdersListViewState();
+  State<ReservationHistory> createState() => _ReservationHistoryState();
 }
 
-class _OrdersListViewState extends State<OrdersListView> {
-  // Mock data
-
+class _ReservationHistoryState extends State<ReservationHistory> {
   @override
   initState() {
     super.initState();
-    // Simulate fetching orders
-    BlocProvider.of<UserBloc>(context).add(const LoadOrdersEvent());
+    context.read<UserBloc>().add(FetchReservationHistoryEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StyledBody(
-        children: [
-          StyledAppBar(
-            title: context.l10n.orders,
-            onTap: () => Navigator.of(context).pop(),
-            icon: Iconsax.close_circle5,
-          ),
-          Dimens.space(2),
-          Expanded(
-            child: BlocConsumer<UserBloc, UserState>(
-              listener: (context, state) {
-                // TODO: implement listener
-              },
-              builder: (context, state) {
-                if (state is UserLoaded) {
-                  if (state.isOrdersLoading) {
-                    return const OrdersLoadingView();
-                  }
-
-                  final orders = state.orders;
-                  if (orders.isEmpty) {
-                    return const EmptyOrdersView();
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      // Simulate refresh
-                      await Future.delayed(const Duration(seconds: 1));
-                    },
-                    child: ListView.separated(
-                      itemCount: orders.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 6),
-                      itemBuilder: (context, index) {
-                        final order = orders[index];
-                        return OrderCard(order: order);
-                      },
-                    ),
-                  );
-                }
-
-                return Center(
-                  child: Text(context.l10n.errorLoadingOrders),
-                );
-              },
-            ),
-          )
-        ],
+      body: BlocConsumer<UserBloc, UserState>(
+        listener: (context, state) {
+          if (state is UserError) {
+            Toast.showError(state.error);
+          }
+        },
+        builder: (context, state) {
+          return StyledBody(
+            children: [
+              StyledAppBar(
+                title: context.l10n.reservations,
+                onTap: () {
+                  NavigatorHelper.pop();
+                },
+                icon: Icons.close,
+              ),
+              Dimens.space(3),
+              Expanded(
+                child: state is UserLoaded
+                    ? state.isUpdateLoading
+                        ? const ReservationPaymentsLoadingView()
+                        :
+                        // If no reservations, show empty state
+                        (state).reservationHistory.isEmpty
+                            ? const EmptyReservationPaymentsView()
+                            : RefreshIndicator(
+                                onRefresh: () async {
+                                  context
+                                      .read<UserBloc>()
+                                      .add(FetchReservationHistoryEvent());
+                                },
+                                child: ListView.builder(
+                                  itemCount: state.reservationHistory.length,
+                                  itemBuilder: (context, index) {
+                                    final item =
+                                        state.reservationHistory[index];
+                                    return ReservationPaymentCard(
+                                        payment: item);
+                                  },
+                                ),
+                              )
+                    : const Center(
+                        child: CupertinoActivityIndicator(),
+                      ),
+              ),
+              // Visa Card Item (Default)
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class OrderCard extends StatelessWidget {
-  final Order order;
+class ReservationPaymentCard extends StatelessWidget {
+  final UserReservationPayments payment;
 
-  const OrderCard({
+  const ReservationPaymentCard({
     super.key,
-    required this.order,
+    required this.payment,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -107,71 +112,95 @@ class OrderCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Icon
-          SvgPicture.asset(
-            getSpaceTypeIcon(order.type),
-            width: 40,
-            height: 40,
-          ),
-          const SizedBox(width: 16),
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  order.street,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+          Row(
+            children: [
+              // Icon
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  // color: _getIconBackgroundColor(payment.type),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    getSpaceTypeIcon(payment.type),
+                    width: 34,
+                    height: 34,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
+              ),
+              const SizedBox(width: 16),
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      getSpaceTypeText(order.type, context),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                      payment.street,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                    Text(
-                      ' • ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Text(
-                      _formatDate(order.created, context),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          getSpaceTypeText(payment.type, context),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: 16),
+              // Amount and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${double.parse(payment.price).toStringAsFixed(2)} €',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildStatusChip(payment.status, context),
+                ],
+              ),
+            ],
           ),
-          // Amount and status
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Divider(
+            color: AppColors.neutral200.withOpacity(0.2),
+            thickness: 1,
+            height: 24,
+          ),
+          Row(
             children: [
+              Icon(
+                Iconsax.clock5,
+                size: 16,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(width: 8),
               Text(
-                '${double.parse(order.price).toStringAsFixed(2)} €',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                _formatDate(payment.created, context),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 8),
-              _buildStatusChip(order.status, context),
             ],
           ),
         ],
@@ -179,14 +208,20 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Color _getIconColor(Order order) {
-    return Colors.white;
+  Color _getIconBackgroundColor(PublishSpaceType type) {
+    return AppColors.neutral400;
   }
 
   Widget _buildStatusChip(ReservedStatus status, BuildContext context) {
     late Color backgroundColor;
     late Color textColor;
     late String text;
+
+    // pending,
+    // reserved,
+    // confirmed,
+    // expired,
+    // cancelled;
 
     switch (status) {
       case ReservedStatus.expired:
@@ -241,6 +276,9 @@ class OrderCard extends StatelessWidget {
     final now = DateTime.now();
     final difference = now.difference(date);
 
+    print(
+        'Date: $date, Now: $now, Difference: ${difference.inDays} days, ${difference.inHours} hours, ${difference.inMinutes} minutes');
+
     if (difference.inMinutes < 5) {
       return context.l10n.justNow;
     } else if (difference.inDays == 0) {
@@ -280,24 +318,23 @@ class OrderCard extends StatelessWidget {
 }
 
 // Loading state widget
-class OrdersLoadingView extends StatelessWidget {
-  const OrdersLoadingView({super.key});
+class ReservationPaymentsLoadingView extends StatelessWidget {
+  const ReservationPaymentsLoadingView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
       itemCount: 6,
       separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        return const OrderShimmerCard();
+        return const ReservationPaymentShimmerCard();
       },
     );
   }
 }
 
-class OrderShimmerCard extends StatelessWidget {
-  const OrderShimmerCard({super.key});
+class ReservationPaymentShimmerCard extends StatelessWidget {
+  const ReservationPaymentShimmerCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -305,7 +342,7 @@ class OrderShimmerCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -318,11 +355,11 @@ class OrderShimmerCard extends StatelessWidget {
         children: [
           // Shimmer icon
           Container(
-            width: 48,
-            height: 48,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
           const SizedBox(width: 16),
@@ -381,8 +418,8 @@ class OrderShimmerCard extends StatelessWidget {
 }
 
 // Empty state widget
-class EmptyOrdersView extends StatelessWidget {
-  const EmptyOrdersView({super.key});
+class EmptyReservationPaymentsView extends StatelessWidget {
+  const EmptyReservationPaymentsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -394,7 +431,7 @@ class EmptyOrdersView extends StatelessWidget {
             radius: 40,
             backgroundColor: Colors.white,
             child: SvgPicture.asset(
-              AppAssets.location,
+              AppAssets.card, // You may need to update this icon
               width: 40,
               height: 40,
               color: AppColors.primary500,
@@ -402,7 +439,7 @@ class EmptyOrdersView extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            context.l10n.noOrdersYet,
+            context.l10n.noPaymentsYet,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -410,7 +447,7 @@ class EmptyOrdersView extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            context.l10n.noOrdersDescription,
+            context.l10n.noPaymentsDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

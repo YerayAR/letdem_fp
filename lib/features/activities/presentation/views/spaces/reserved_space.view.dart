@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
@@ -107,6 +108,13 @@ class ReservedSpaceDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildShareNote(context),
+          const SizedBox(height: 16),
+          DecoratedChip(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            text: details.space.location.streetName,
+            icon: IconlyBold.location,
+            color: AppColors.primary500,
+          ),
           Dimens.space(3),
           _buildOwnerPlate(context),
         ],

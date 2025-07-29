@@ -1,6 +1,10 @@
+import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+
 class ErrorMessageHelper {
-  static String getMessage(String code,
-      {bool isSpanish = false, String serverMessage = ""}) {
+  static String getMessage(String code, {String serverMessage = ""}) {
+    var isSpanish =
+        NavigatorHelper.navigatorKey.currentState!.context.isSpanish;
     final messages = isSpanish ? _spanishMessages : _englishMessages;
 
     if (messages.containsKey(code)) {
@@ -17,6 +21,7 @@ class ErrorMessageHelper {
     // Accounts
     'INVALID_CREDENTIALS': 'Invalid credentials. Please try again.',
     'INVALID_CURRENT_PASSWORD': 'The current password is incorrect.',
+    'ACTIVE_RESERVATION_ALREADY_EXIST': 'An active reservation already exists.',
     'REPEATED_PASSWORD': 'New password cannot be the same as the old password.',
     'INACTIVE_ACCOUNT': 'Your account is inactive.',
     'EMAIL_ALREADY_EXISTS': 'This email is already registered.',
@@ -43,7 +48,6 @@ class ErrorMessageHelper {
     'EARNING_ACCOUNT_ALREADY_EXISTS': 'Earning account already exists.',
     'EARNING_ACCOUNT_REQUIRED': 'Earning account is required.',
     'EARNING_ACCOUNT_IS_NOT_ACCEPTED': 'Earning account is not accepted.',
-    'ACTIVE_RESERVATION_ALREADY_EXIST': 'An active reservation already exists.',
     'COUNTRY_NOT_SUPPORTED': 'This country is not supported.',
     'BAD_REQUEST_FOR_CURRENT_STEP': 'Invalid request for the current step.',
     'INVALID_ADDRESS_COUNTRY': 'The address country is invalid.',
@@ -86,8 +90,10 @@ class ErrorMessageHelper {
   static const Map<String, String> _spanishMessages = {
     // Accounts
     'INVALID_CREDENTIALS': 'Credenciales inválidas. Intenta nuevamente.',
+    'ACCOUNT_ALREADY_ACTIVATED': 'La cuenta ya está activada.',
     'card_declined':
         'Tu tarjeta fue rechazada. Verifica los detalles de tu pago.',
+    'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',
     'INVALID_CURRENT_PASSWORD': 'La contraseña actual es incorrecta.',
     'REPEATED_PASSWORD':
         'La nueva contraseña no puede ser igual a la anterior.',
@@ -96,7 +102,6 @@ class ErrorMessageHelper {
     'EMAIL_ALREADY_EXISTS': 'Este correo electrónico ya está registrado.',
     'INVALID_SOCIAL_TOKEN': 'Token de inicio de sesión social inválido.',
     'INVALID_OTP': 'Código OTP inválido.',
-    'ACCOUNT_ALREADY_ACTIVATED': 'La cuenta ya está activada.',
     'EMAIL_NOT_FOUND': 'Correo electrónico no encontrado.',
     'OTP_NOT_VALIDATED': 'El OTP no ha sido validado.',
     'CAR_ALREADY_CREATED': 'Ya has añadido un coche.',
@@ -138,7 +143,6 @@ class ErrorMessageHelper {
         'Los propietarios del evento no pueden enviar reseñas.',
 
     // Reservations
-    'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',
     'SPACE_ALREADY_RESERVED': 'Este espacio ya está reservado.',
     'SPACE_OWNER_CANNOT_RESERVE': 'No puedes reservar tu propio espacio.',
     'RESERVATION_NOT_FOUND': 'Reserva no encontrada.',

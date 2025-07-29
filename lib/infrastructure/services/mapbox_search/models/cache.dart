@@ -84,7 +84,7 @@ class DatabaseHelper {
       await txn.insert(
         'places',
         {
-          'id': place.id,
+          'id': place.placeId,
           'data': jsonString,
           'timestamp': timestamp,
         },

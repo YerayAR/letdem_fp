@@ -39,6 +39,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
   @override
   void initState() {
     super.initState();
+    context.loadUser();
     // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
   }
 
@@ -81,19 +82,43 @@ class _ActivitiesViewState extends State<ActivitiesView> {
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {},
         builder: (context, state) {
+          // loading state
+          if (state is ActivitiesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (context.watch<UserBloc>().state is UserLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (context.watch<CarBloc>().state is CarLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           var w = StyledBody(
             isBottomPadding: false,
-            children: context.userProfile?.activeReservation != null
+            children: context.watch<UserBloc>().state is UserLoaded &&
+                    (context.watch<UserBloc>().state as UserLoaded)
+                            .user
+                            .activeReservation !=
+                        null
                 ? [
                     Expanded(
-                      child: ListView(
-                        children: [
-                          const NotificationAppBar(),
-                          const CarSection(),
-                          const ActiveReservationSection(),
-                          _buidShowAllButton(state),
-                          _buildFooter(state, true),
-                        ],
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          context.read<ActivitiesBloc>().add(
+                                GetActivitiesEvent(),
+                              );
+                          context.read<UserBloc>().add(FetchUserInfoEvent());
+                          context.read<CarBloc>().add(const GetCarEvent());
+                        },
+                        child: ListView(
+                          children: [
+                            const NotificationAppBar(),
+                            const CarSection(),
+                            const ActiveReservationSection(),
+                            _buidShowAllButton(state),
+                            _buildFooter(state, true),
+                          ],
+                        ),
                       ),
                     ),
                   ]
@@ -151,14 +176,20 @@ class CarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CarBloc, CarState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        //   load user if car loaded
+        // if (state is CarLoaded && state.car != null) {
+        //   // context.read<ActivitiesBloc>().add(
+        //   //       GetActivitiesEvent(),
+        //   //     );
+        //   context.read<UserBloc>().add(FetchUserInfoEvent());
+        // }
+      },
       builder: (context, state) {
         if (state is CarLoaded && state.car != null) {
           return ProfileSection(
             child: [
               RegisteredCarWidget(car: state.car!),
-              Dimens.space(1),
-              LastParkedWidget(lastParked: state.car!.lastParkingLocation),
             ],
           );
         }
@@ -177,10 +208,16 @@ class ActiveReservationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeReservation = context.userProfile?.activeReservation;
-    if (activeReservation == null) return const SizedBox();
-
-    return ActiveReservationView(payload: activeReservation);
+    return context.watch<UserBloc>().state is UserLoaded &&
+            (context.watch<UserBloc>().state as UserLoaded)
+                    .user
+                    .activeReservation !=
+                null
+        ? ActiveReservationView(
+            payload: (context.watch<UserBloc>().state as UserLoaded)
+                .user
+                .activeReservation!)
+        : const SizedBox.shrink();
   }
 }
 
@@ -199,7 +236,14 @@ class ContributionsSection extends StatelessWidget {
 
         return Container(
           margin: const EdgeInsets.only(top: 5),
-          height: context.userProfile?.activeReservation != null ? 400 : null,
+          // height: context.userProfile?.activeReservation != null ? 400 : null,
+          height: context.watch<UserBloc>().state is UserLoaded &&
+                  (context.watch<UserBloc>().state as UserLoaded)
+                          .user
+                          .activeReservation !=
+                      null
+              ? 400
+              : null,
           width: double.infinity,
           // Fix: Add constraints to prevent unbounded height issues
           constraints: const BoxConstraints(

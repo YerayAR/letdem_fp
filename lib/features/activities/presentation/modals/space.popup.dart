@@ -218,7 +218,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
 
     return DecoratedChip(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      text: getTimeLeftMessage(DateTime.now(), widget.space.expirationDate!),
+      text: getTimeLeftMessage(
+          DateTime.now(), widget.space.expirationDate!, context),
       textStyle: Typo.smallBody.copyWith(
         fontWeight: FontWeight.w600,
         color: AppColors.primary500,
@@ -317,7 +318,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
       print('Stripe error: ${e.error.localizedMessage}');
     } catch (e) {
       onError();
-      Toast.show('Unhandled error: $e');
+      Toast.show('${context.l10n.unhandledError} $e');
     }
   }
 
@@ -361,10 +362,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                         }),
                       ));
                     },
-                    title: "Payment Failed",
-                    secondaryCTAText: "Change payment method",
-                    subtext:
-                        "The reservation failed because your payment didn’t go through successfully",
+                    title: context.l10n.paymentFailed,
+                    secondaryCTAText: context.l10n.changePaymentMethod,
+                    subtext: context.l10n.paymentFailedDescription,
                     onProceed: () {
                       NavigatorHelper.pop();
                     },
@@ -382,15 +382,14 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   NavigatorHelper.pop();
                   context.read<ActivitiesBloc>().add(
                         ReserveSpaceEvent(
-                          spaceID: widget.space.id,
-                          paymentMethodID: context.userProfile!
-                              .defaultPaymentMethod!.paymentMethodId,
-                        ),
+                            spaceID: widget.space.id,
+                            paymentMethodID:
+                                _selectedPaymentMethod!.paymentMethodId),
                       );
                 },
                 title: context.l10n.errorReserveSpace,
                 subtext:
-                    "${state.error}. Please try again later. If the issue persists, contact support.",
+                    "${state.error}. ${context.l10n.errorReserveSpaceDescription}",
                 onProceed: () {
                   NavigatorHelper.pop();
                 },
@@ -425,8 +424,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 context.read<ActivitiesBloc>().add(
                       ReserveSpaceEvent(
                         spaceID: widget.space.id,
-                        paymentMethodID: context
-                            .userProfile!.defaultPaymentMethod!.paymentMethodId,
+                        paymentMethodID:
+                            _selectedPaymentMethod!.paymentMethodId,
                       ),
                     );
               }
@@ -435,6 +434,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 NavigationMapScreen(
                   hideToggle: true,
                   spaceDetails: widget.space,
+                  googlePlaceID: null,
                   destinationStreetName: widget.space.location.streetName,
                   latitude: widget.space.location.point.lat,
                   longitude: widget.space.location.point.lng,
@@ -448,12 +448,14 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   }
 
   String _distanceToSpace(BuildContext context) {
-    return parseMeters(geolocator.Geolocator.distanceBetween(
+    var d = parseMeters(geolocator.Geolocator.distanceBetween(
       widget.currentPosition.latitude,
       widget.currentPosition.longitude,
       widget.space.location.point.lat,
       widget.space.location.point.lng,
     ));
+
+    return d;
   }
 }
 

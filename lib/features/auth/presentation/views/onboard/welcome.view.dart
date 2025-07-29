@@ -49,7 +49,9 @@ class WelcomeView extends StatelessWidget {
               Dimens.space(3),
               PrimaryButton(
                 onTap: () {
-                  NavigatorHelper.to(const RegisterView());
+                  NavigatorHelper.popAll();
+
+                  NavigatorHelper.replaceAll(const RegisterView());
                 },
                 iconRight: Icons.arrow_forward,
                 text: context.l10n.getStarted,
@@ -71,7 +73,9 @@ class WelcomeView extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          NavigatorHelper.to(const LoginView());
+                          NavigatorHelper.popAll();
+
+                          NavigatorHelper.replaceAll(const LoginView());
                         },
                     ),
                   ],

@@ -105,30 +105,31 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           ),
         ),
         Column(
-          children: !widget.payload.isOwner ||
-                  widget.payload.status == "PENDING"
-              ? []
-              : [
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary50,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      context.l10n.reservationPendingNote(
-                        DateFormat('HH:mm').format(widget.payload.canceledAt),
+          children:
+              !widget.payload.isOwner || widget.payload.status == "PENDING"
+                  ? []
+                  : [
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary50,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          context.l10n.reservationPendingNote(
+                            DateFormat('HH:mm')
+                                .format(widget.payload.canceledAt.toLocal()),
+                          ),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.secondary600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.secondary600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+                    ],
         ),
       ],
     );

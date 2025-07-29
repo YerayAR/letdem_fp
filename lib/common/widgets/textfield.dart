@@ -150,7 +150,7 @@ class TextInputFieldState extends State<TextInputField> {
                   return null;
                 }
                 if (value == null || value.isEmpty) {
-                  return '${context.l10n.pleaseEnter }${widget.label?.toLowerCase().replaceAll("enter", "")}';
+                  return '${context.l10n.pleaseEnter}${widget.label?.toLowerCase().replaceAll("enter", "")}';
                 }
                 if (widget.inputType == TextFieldType.password &&
                     value.length < 8) {
@@ -161,10 +161,11 @@ class TextInputFieldState extends State<TextInputField> {
                   return context.l10n.passwordRequireNumber;
                 }
                 if (widget.inputType == TextFieldType.password &&
-                    !RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$]')
+                    !RegExp(r'[!@#<>?":_`~;\[\]\\|=+\)\(\*&^%\$\.]')
                         .hasMatch(value)) {
                   return context.l10n.passwordRequireSpecial;
                 }
+
                 if (widget.inputType == TextFieldType.password &&
                     !RegExp(r'[A-Z]').hasMatch(value)) {
                   return context.l10n.passwordRequireUppercase;

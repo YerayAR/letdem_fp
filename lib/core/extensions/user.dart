@@ -6,6 +6,11 @@ import 'package:letdem/features/users/user_bloc.dart';
 extension UserBlocExtension on BuildContext {
   UserBloc get userBloc => BlocProvider.of<UserBloc>(this);
 
+  // load user
+  void loadUser() {
+    userBloc.add(FetchUserInfoEvent());
+  }
+
   LetDemUser? get userProfile {
     final state = userBloc.state;
     if (state is UserLoaded) {

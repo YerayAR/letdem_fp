@@ -45,10 +45,21 @@ enum ReservedStatus {
 }
 
 ReservedStatus reservedStatusFromString(String status) {
-  return ReservedStatus.values.firstWhere(
-    (e) => e.name.toLowerCase() == status.toLowerCase(),
-    orElse: () => ReservedStatus.pending,
-  );
+  print('Converting status: $status');
+  switch (status.toLowerCase()) {
+    case 'confirmed':
+      return ReservedStatus.confirmed;
+    case 'pending':
+      return ReservedStatus.pending;
+    case 'reserved':
+      return ReservedStatus.reserved;
+    case 'cancelled':
+      return ReservedStatus.canceled;
+    case 'expired':
+      return ReservedStatus.expired;
+    default:
+      throw ArgumentError('Unknown reserved status: $status');
+  }
 }
 
 String reservedStatusToString(ReservedStatus status) {

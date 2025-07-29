@@ -27,13 +27,40 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<EditBasicInfoEvent>(_onEditBasicInfo);
     on<IncreaseUserPointEvent>(_onIncreaseUserPoint);
     on<ChangePasswordEvent>(_onChangePassword);
+    on<LoadOrdersEvent>(_onLoadOrdererInfo);
     on<ChangeLanguageEvent>(_onChangeLanguage);
     on<UpdateEarningAccountEvent>(_onUpdateEarningAccount);
     on<UpdateUserNotificationsEvent>(_onUpdateNotificationCount);
     on<DeleteAccountEvent>(_onDeleteAccount);
-    on<LoadOrdersEvent>(_onLoadOrdererInfo);
+    on<FetchReservationHistoryEvent>(_onLoadReserveInfo);
     on<UpdatePreferencesEvent>(_onUpdatePreferences);
     on<UpdateNotificationPreferencesEvent>(_onUpdateNotificationPreferences);
+  }
+
+  Future<void> _onLoadReserveInfo(
+      FetchReservationHistoryEvent event, Emitter<UserState> emit) async {
+    try {
+      if (state is UserLoaded) {
+        UserLoaded userLoaded = state as UserLoaded;
+        emit(userLoaded.copyWith(
+          isUpdateLoading: true,
+        ));
+
+        var orders = await userRepository.getReservationHistory();
+
+        print(orders);
+
+        emit(userLoaded.copyWith(
+          isOrdersLoading: false,
+          reservationHistory: orders,
+        ));
+      }
+    } catch (err, st) {
+      print(err);
+      print(st);
+
+      add(FetchUserInfoEvent());
+    }
   }
 
   Future<void> _onUpdateNotificationCount(
