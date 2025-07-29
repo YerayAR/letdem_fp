@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/core/constants/assets.dart';
@@ -111,83 +112,95 @@ class ReservationPaymentCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Icon
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              // color: _getIconBackgroundColor(payment.type),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                getSpaceTypeIcon(payment.type),
-                width: 34,
-                height: 34,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  payment.street,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+          Row(
+            children: [
+              // Icon
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  // color: _getIconBackgroundColor(payment.type),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    getSpaceTypeIcon(payment.type),
+                    width: 34,
+                    height: 34,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
+              ),
+              const SizedBox(width: 16),
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      getSpaceTypeText(payment.type, context),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                      payment.street,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                    Text(
-                      ' • ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Text(
-                      _formatDate(payment.created, context),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          getSpaceTypeText(payment.type, context),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          const SizedBox(width: 16),
-          // Amount and status
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+              const SizedBox(width: 16),
+              // Amount and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${double.parse(payment.price).toStringAsFixed(2)} €',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildStatusChip(payment.status, context),
+                ],
+              ),
+            ],
+          ),
+          Divider(
+            color: AppColors.neutral200.withOpacity(0.2),
+            thickness: 1,
+            height: 24,
+          ),
+          Row(
             children: [
+              Icon(
+                Iconsax.clock5,
+                size: 16,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(width: 8),
               Text(
-                '${double.parse(payment.price).toStringAsFixed(2)} €',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                _formatDate(payment.created, context),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 8),
-              _buildStatusChip(payment.status, context),
             ],
           ),
         ],

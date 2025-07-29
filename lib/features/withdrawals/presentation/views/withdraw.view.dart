@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/popups/success_dialog.dart';
+import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
+import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
@@ -13,14 +16,10 @@ import 'package:letdem/features/payout_methods/presentation/empty_states/empty_p
 import 'package:letdem/features/payout_methods/presentation/views/add/add_payout.view.dart';
 import 'package:letdem/features/payout_methods/presentation/widgets/payout_item.widget.dart';
 import 'package:letdem/features/payout_methods/repository/payout.repository.dart';
-import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/withdrawals/presentation/widgets/amount_input.widget.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 
-import '../../../../common/popups/popup.dart';
-import '../../../../common/widgets/appbar.dart';
-import '../../../../common/widgets/button.dart';
-import '../../../../infrastructure/services/res/navigator.dart';
 import '../../../../infrastructure/toast/toast/toast.dart';
 
 class WithdrawView extends StatefulWidget {
@@ -38,7 +37,6 @@ class _WithdrawViewState extends State<WithdrawView> {
   }
 
   PayoutMethod? selectedMethod;
-  double amount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -64,12 +62,7 @@ class _WithdrawViewState extends State<WithdrawView> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               AmountInputCard(
-                onChange: (value) {
-                  setState(() {
-                    amount = double.tryParse(value) ?? 0;
-                  });
-                  // Handle amount change
-                },
+                onChange: (value) {},
               ),
             ],
           ),
@@ -158,14 +151,16 @@ class _WithdrawViewState extends State<WithdrawView> {
           if (state is WithdrawalFailure) {
             Toast.showError(state.message);
           }
-          if (state is WithdrawalSuccess) {
-            context.read<UserBloc>().add(FetchUserInfoEvent());
+          if (state is WithdrawalFinished) {
+            // context.read<UserBloc>().add(FetchUserInfoEvent());
+
             AppPopup.showDialogSheet(
                 NavigatorHelper.navigatorKey.currentContext!,
                 SuccessDialog(
                   title: context.l10n.success,
                   subtext: context.l10n.withdrawalRequestSuccess,
                   onProceed: () {
+                    // context.read<WithdrawalBloc>().add(FetchWithdrawals());
                     NavigatorHelper.pop();
                     NavigatorHelper.pop();
                     NavigatorHelper.pop();
@@ -176,34 +171,36 @@ class _WithdrawViewState extends State<WithdrawView> {
           // TODO: implement listener
         }, builder: (context, state) {
           final constants =
-              context.userProfile!.constantsSettings.withdrawalAmount;
+              context.userProfile?.constantsSettings.withdrawalAmount;
+
           final availableBalance =
-              context.userProfile!.earningAccount!.availableBalance;
-          final isLoading =
-              context.watch<WithdrawalBloc>().state is WithdrawalLoading;
+              context.userProfile?.earningAccount!.availableBalance ?? 0;
+
+          final amount =
+              context.userProfile?.earningAccount?.availableBalance ?? 0;
 
           return Column(
             children: [
               PrimaryButton(
                 text: context.l10n.withdraw,
                 isDisabled: selectedMethod == null ||
-                    amount < constants.minimum ||
-                    amount > constants.maximum ||
+                    amount < (constants?.minimum ?? 0) ||
+                    amount > (constants?.maximum ?? 0) ||
                     amount > availableBalance,
-                isLoading: isLoading,
+                isLoading: state is WithdrawalLoading,
                 onTap: () {
-                  if (amount < constants.minimum) {
+                  if (amount < (constants?.minimum ?? 0)) {
                     Toast.showError(
                       context.l10n.minWithdrawalToast(
-                          constants.minimum.formatPrice(context)),
+                          (constants?.minimum ?? 0).formatPrice(context)),
                     );
                     return;
                   }
 
-                  if (amount > constants.maximum) {
+                  if (amount > (constants?.maximum ?? 0)) {
                     Toast.showError(
                       context.l10n.maxWithdrawalToast(
-                          constants.maximum.formatPrice(context)),
+                          (constants?.maximum ?? 0).formatPrice(context)),
                     );
                     return;
                   }
@@ -219,19 +216,19 @@ class _WithdrawViewState extends State<WithdrawView> {
                 },
               ),
               Dimens.space(1),
-              if (availableBalance < constants.minimum)
+              if (availableBalance < (constants?.minimum ?? 0))
                 Text(
                   context.l10n.minWithdrawalAmountError(
-                      constants.minimum.formatPrice(context)),
+                      (constants?.minimum ?? 0).formatPrice(context)),
                   style: Typo.mediumBody.copyWith(
                     color: AppColors.red500,
                     fontSize: 13,
                   ),
                 ),
-              if (availableBalance >= constants.maximum)
+              if (availableBalance >= (constants?.maximum ?? 0))
                 Text(
                   context.l10n.maxWithdrawalAmountError(
-                      constants.maximum.formatPrice(context)),
+                      (constants?.maximum ?? 0).formatPrice(context)),
                   style: Typo.mediumBody.copyWith(
                     color: AppColors.red500,
                     fontSize: 13,

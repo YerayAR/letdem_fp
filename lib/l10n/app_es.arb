@@ -755,7 +755,7 @@
       }
     }
   },
-  "metersAway": "{distance} metros de distancia",
+  "metersAway": "{distance} de distancia",
   "@metersAway": {
     "placeholders": {
       "distance": {
