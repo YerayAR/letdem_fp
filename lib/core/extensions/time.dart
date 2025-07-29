@@ -1,3 +1,6 @@
+import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+
 extension TimeFormatter on int {
   String toFormattedTime() {
     if (this < 60) {
@@ -17,7 +20,7 @@ extension TimeFormatter on int {
       final km = (this / 1000).round();
       return "$km km";
     } else {
-      return "$this meters";
+      return "$this ${NavigatorHelper.navigatorKey.currentContext!.l10n.meters}";
     }
   }
 }

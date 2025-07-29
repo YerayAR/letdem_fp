@@ -73,7 +73,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   return const EmptyTransactionsView();
                 }
                 if (state is WalletSuccess && state.transactions.isNotEmpty) {
-                  return const TransactionList();
+                  return const TransactionList(limit: 5);
                 }
                 return const EmptyTransactionsView();
               },
@@ -340,7 +340,8 @@ class TransactionHeader extends StatelessWidget {
 }
 
 class TransactionList extends StatelessWidget {
-  const TransactionList({super.key});
+  final int? limit;
+  const TransactionList({super.key, this.limit});
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +380,7 @@ class TransactionList extends StatelessWidget {
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
-                      itemCount: transactions.length,
+                      itemCount: limit ?? transactions.length,
                       itemBuilder: (context, index) {
                         final tx = transactions[index];
                         return Column(

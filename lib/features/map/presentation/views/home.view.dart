@@ -91,8 +91,6 @@ class _HomeViewState extends State<HomeView>
     });
     OneSignal.Notifications.addForegroundWillDisplayListener(
       (event) {
-        event.preventDefault();
-
         // Extract title and body
         final data = event.notification.additionalData;
 

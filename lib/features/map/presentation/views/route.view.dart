@@ -790,11 +790,12 @@ String parseMeters(
   double distance, [
   bool longFormat = false,
 ]) {
+  var context = NavigatorHelper.navigatorKey.currentState!.context;
   // distance is in km
   return distance < 1
-      ? "${(1).toStringAsFixed(0)} meters"
+      ? "${(1).toStringAsFixed(0)} ${context.l10n.meters}"
       : distance < 1000
-          ? "${distance.toStringAsFixed(0)} meters"
+          ? "${distance.toStringAsFixed(0)} ${context.l10n.meters}"
           : "${(distance / 1000).toStringAsFixed(1)} km";
   // if (distance < 1000) {
   //   return "${distance.toStringAsFixed(0)} meters";

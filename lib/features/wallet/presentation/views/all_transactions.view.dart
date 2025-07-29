@@ -22,6 +22,22 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
 
   DateTime _fromDate = DateTime.now().subtract(const Duration(days: 30));
 
+  initialization() {
+    // Initializing the date range for transactions
+    context.read<WalletBloc>().add(FetchTransactionsEvent(TransactionParams(
+          startDate: _fromDate,
+          endDate: _toDate,
+          pageSize: 50,
+          page: 1,
+        )));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialization();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

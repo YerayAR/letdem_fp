@@ -95,7 +95,11 @@ class _ActivitiesViewState extends State<ActivitiesView> {
 
           var w = StyledBody(
             isBottomPadding: false,
-            children: context.userProfile?.activeReservation != null
+            children: context.watch<UserBloc>().state is UserLoaded &&
+                    (context.watch<UserBloc>().state as UserLoaded)
+                            .user
+                            .activeReservation !=
+                        null
                 ? [
                     Expanded(
                       child: RefreshIndicator(
@@ -210,7 +214,9 @@ class ActiveReservationSection extends StatelessWidget {
                     .activeReservation !=
                 null
         ? ActiveReservationView(
-            payload: context.userProfile!.activeReservation!)
+            payload: (context.watch<UserBloc>().state as UserLoaded)
+                .user
+                .activeReservation!)
         : const SizedBox.shrink();
   }
 }
@@ -230,7 +236,14 @@ class ContributionsSection extends StatelessWidget {
 
         return Container(
           margin: const EdgeInsets.only(top: 5),
-          height: context.userProfile?.activeReservation != null ? 400 : null,
+          // height: context.userProfile?.activeReservation != null ? 400 : null,
+          height: context.watch<UserBloc>().state is UserLoaded &&
+                  (context.watch<UserBloc>().state as UserLoaded)
+                          .user
+                          .activeReservation !=
+                      null
+              ? 400
+              : null,
           width: double.infinity,
           // Fix: Add constraints to prevent unbounded height issues
           constraints: const BoxConstraints(
