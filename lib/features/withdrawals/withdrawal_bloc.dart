@@ -23,7 +23,7 @@ class WithdrawalBloc extends Bloc<WithdrawalEvent, WithdrawalState> {
     emit(WithdrawalLoading());
     try {
       await withdrawalRepository.withdrawMoney(event.methodId, event.amount);
-      emit(WithdrawalFailure('e.message'));
+      emit(WithdrawalFinished()); // or whatever success state you have
     } on ApiError catch (e) {
       emit(WithdrawalFailure(e.message));
     } catch (e, sr) {

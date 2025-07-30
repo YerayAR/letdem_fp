@@ -344,17 +344,21 @@ class _NavigationViewState extends State<NavigationView> {
   void dispose() {
     debugPrint('🗑️ Disposing NavigationView...');
 
-    // Cleanup navigation first
+    // Cancel all timers first
+    _rerouteDebounceTimer?.cancel();
+    _rerouteDebounceTimer = null;
+
+    // Cleanup navigation with better error handling
     _cleanupNavigation();
 
-    // Cancel timers
-    _rerouteDebounceTimer?.cancel();
+    // Dispose speech service
+
+    // Clear all map markers
+    _spaceMarkers.clear();
+    _eventMarkers.clear();
 
     // Dispose notifiers
     _distanceNotifier.dispose();
-
-    // Dispose lifecycle listener
-    // _lifecycleListener.dispose();
 
     // Disable wakelock
     WakelockPlus.disable();
@@ -528,9 +532,9 @@ class _NavigationViewState extends State<NavigationView> {
   void _cleanupNavigation() {
     debugPrint('🧹 Starting comprehensive navigation cleanup...');
 
-    // Stop and cleanup VisualNavigator
-    if (_visualNavigator != null) {
-      try {
+    try {
+      // Stop and cleanup VisualNavigator with null checks
+      if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
         _visualNavigator!.routeProgressListener = null;
         _visualNavigator!.speedLimitListener = null;
@@ -538,66 +542,56 @@ class _NavigationViewState extends State<NavigationView> {
         _visualNavigator!.eventTextListener = null;
         _visualNavigator!.cameraBehavior = null;
         _visualNavigator!.route = null;
+        _visualNavigator = null;
         debugPrint('✅ VisualNavigator cleaned up');
-      } catch (e) {
-        debugPrint('⚠️ Error cleaning up VisualNavigator: $e');
       }
-      _visualNavigator = null;
-    }
 
-    // Stop and cleanup LocationEngine
-    if (_locationEngine != null) {
-      try {
+      // Stop and cleanup LocationEngine with proper error handling
+      if (_locationEngine != null) {
         _locationEngine!.stop();
-        // Clear all location listeners
         _locationEngine = null;
         debugPrint('✅ LocationEngine stopped and cleaned up');
-      } catch (e) {
-        debugPrint('⚠️ Error stopping LocationEngine: $e');
       }
-    }
 
-    // NEW: Clean up map scene and remove all markers/indicators
-    if (_hereMapController != null) {
-      try {
-        // NEW: Reset camera behavior to default
+      // Clean up map scene safely
+      if (_hereMapController != null) {
+        // Remove all markers safely
+        final allMarkers = [..._spaceMarkers.keys, ..._eventMarkers.keys];
+        if (allMarkers.isNotEmpty) {
+          _hereMapController!.mapScene.removeMapMarkers(allMarkers);
+        }
+
+        // Reset camera behavior safely
         _hereMapController!.camera
             .setOrientationAtTarget(HERE.GeoOrientationUpdate(0, 0));
-
-        debugPrint(
-            '✅ Map scene cleaned up - removed markers, polylines, and reset camera');
-      } catch (e) {
-        debugPrint('⚠️ Error cleaning up map scene: $e');
+        debugPrint('✅ Map scene cleaned up');
       }
-    }
 
-    // Cleanup RoutingEngine
-    if (_routingEngine != null) {
-      _routingEngine = null;
-      debugPrint('✅ RoutingEngine cleaned up');
-    }
-
-    // Reset state variables
-    if (mounted) {
-      setState(() {
-        _isNavigating = false;
-        _isLoading = false;
-        _navigationInstruction = "";
-        _currentSpeedLimit = null;
-        _isOverSpeedLimit = false;
-        _hasShownArrivalNotification = false;
-        _hasShownParkingRating = false;
-        _isPopupDisplayed = false;
-        _isRecalculatingRoute = false;
-        _isCameraLocked = true;
-        _isUserPanning = false;
-        _speed = 0;
-        _totalRouteTime = 0;
-        _nextManuoverDistance = 0;
-        normalManuevers = "";
-        _lastSpokenInstruction = "";
-        _currentLocation = null; // NEW: Reset current location
-      });
+      // Reset all state variables safely
+      if (mounted) {
+        setState(() {
+          _isNavigating = false;
+          _isLoading = false;
+          _navigationInstruction = "";
+          _currentSpeedLimit = null;
+          _isOverSpeedLimit = false;
+          _hasShownArrivalNotification = false;
+          _hasShownParkingRating = false;
+          _isPopupDisplayed = false;
+          _isRecalculatingRoute = false;
+          _isCameraLocked = true;
+          _isUserPanning = false;
+          _speed = 0;
+          _totalRouteTime = 0;
+          _nextManuoverDistance = 0;
+          normalManuevers = "";
+          _lastSpokenInstruction = "";
+          _currentLocation = null;
+          _errorMessage = "";
+        });
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error during cleanup: $e');
     }
 
     debugPrint('🧹 Navigation cleanup completed');
@@ -1362,6 +1356,21 @@ class _NavigationViewState extends State<NavigationView> {
     name ??= maneuver.roadTexts.names.getDefaultValue();
 
     return name ?? context.l10n.unnamedRoad;
+  }
+
+  HERE.GeoCoordinates? getRouteDestination() {
+    if (_visualNavigator?.route != null) {
+      final route = _visualNavigator!.route!;
+      if (route.sections.isNotEmpty) {
+        final lastSection = route.sections.last;
+        // return lastSection.geometry.vertices.last.latitude
+        return HERE.GeoCoordinates(
+          lastSection.geometry.vertices.last.latitude,
+          lastSection.geometry.vertices.last.longitude,
+        );
+      }
+    }
+    return null;
   }
 
   void _setupLocationSource(

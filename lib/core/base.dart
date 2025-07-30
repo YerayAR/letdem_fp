@@ -7,6 +7,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 import 'package:letdem/features/users/presentation/views/profile.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
 
 import '../features/map/presentation/views/home.view.dart';
 
@@ -34,6 +35,8 @@ class _BaseViewState extends State<BaseView> {
         break;
       case 1:
         context.read<ActivitiesBloc>().add(GetActivitiesEvent());
+        context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+
       case 2:
         break;
       default:
