@@ -451,6 +451,21 @@ class _HomeViewState extends State<HomeView>
   // ---------------------------------------------------------------------------
   // Map Lifecycle
   // ---------------------------------------------------------------------------
+
+  static const double MIN_ZOOM_LEVEL =
+      10.0; // More zoomed out (lower values = more zoomed out)
+  static const double MAX_ZOOM_LEVEL =
+      20.0; // More zoomed in (higher values = more zoomed in)
+
+// Add this method to set up zoom limits
+  void _setupZoomLimits() {
+    if (_mapController == null) return;
+
+    // Set zoom range using MapCameraLimits
+    _mapController!.camera.limits.zoomRange = MapMeasureRange(
+        MapMeasureKind.zoomLevel, MIN_ZOOM_LEVEL, MAX_ZOOM_LEVEL);
+  }
+
   void _onMapCreated(HereMapController controller) {
     _mapController = controller;
     _setTapGestureHandler();
@@ -463,6 +478,7 @@ class _HomeViewState extends State<HomeView>
       }
 
       final target = _currentPosition ?? GeoCoordinates(37.3318, -122.0312);
+      _setupZoomLimits();
       _mapController!.camera.lookAtPointWithMeasure(
         target,
         MapMeasure(MapMeasureKind.distanceInMeters, 14000),
