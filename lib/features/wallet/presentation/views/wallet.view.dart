@@ -380,7 +380,11 @@ class TransactionList extends StatelessWidget {
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
-                      itemCount: limit ?? transactions.length,
+                      itemCount: limit != null
+                          ? transactions.length > limit!
+                              ? limit!
+                              : transactions.length
+                          : transactions.length,
                       itemBuilder: (context, index) {
                         final tx = transactions[index];
                         return Column(

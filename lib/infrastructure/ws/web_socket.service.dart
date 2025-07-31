@@ -8,7 +8,12 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class LocationWebSocketService {
   WebSocketChannel? _channel;
 
+  bool get isConnected => _channel != null && _channel!.closeCode == null;
+
   /// Connects to the WebSocket and sends the initial location
+  ///
+  ///
+  ///
   void connectAndSendInitialLocation({
     required double latitude,
     required double longitude,

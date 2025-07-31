@@ -213,7 +213,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${DateFormat(context.isSpanish ? 'd MMM HH:mm' : 'd MMM HH:mm').format(notification.startsAt)} - ${DateFormat(context.isSpanish ? 'd MMM HH:mm' : 'd MMM HH:mm').format(notification.endsAt)}',
+                      '${DateFormat(context.isSpanish ? 'd MMM HH:mm' : 'd MMM HH:mm', context.isSpanish ? 'es_ES' : 'en_US').format(notification.startsAt)} - ${DateFormat(context.isSpanish ? 'd MMM HH:mm' : 'd MMM HH:mm').format(notification.endsAt)}',
                       style: Typo.mediumBody.copyWith(
                         color: AppColors.neutral500,
                       ),

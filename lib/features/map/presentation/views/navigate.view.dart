@@ -37,6 +37,7 @@ import 'package:letdem/infrastructure/services/map/map_asset_provider.service.da
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
+import 'package:letdem/infrastructure/ws/web_socket.service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -105,12 +106,83 @@ class _NavigationViewState extends State<NavigationView> {
 
   String _lastSpokenInstruction = "";
   final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
+  final LocationWebSocketService _locationWebSocketService =
+      LocationWebSocketService();
+
   int _nextManuoverDistance = 0;
   Timer? _rerouteDebounceTimer;
   int _lastRerouteTime = 0;
   String normalManuevers = "";
 
   int DISTANCE_THREESHOLD = 5;
+
+  // Method to initialize WebSocket connection
+  void _initializeWebSocketConnection() {
+    if (_currentLocation == null) {
+      debugPrint('⚠️ Current location is null, cannot initialize WebSocket');
+      return;
+    }
+
+    debugPrint('🔌 Initializing WebSocket connection...');
+
+    _locationWebSocketService.connectAndSendInitialLocation(
+      latitude: _currentLocation!.latitude,
+      longitude: _currentLocation!.longitude,
+      onEvent: (MapNearbyPayload payload) {
+        debugPrint(
+            '📥 Received WebSocket data: ${payload.spaces.length} spaces, ${payload.events.length} events');
+
+        // Update map with real-time data
+        if (mounted) {
+          _addMapMarkers(payload.events, payload.spaces);
+
+          // Handle alerts from WebSocket
+          // if (payload.alerts.isNotEmpty) {
+          //   for (var alert in payload.alerts) {
+          //     AlertHelper.showWarning(
+          //       context: context,
+          //       title: alert.type.toLowerCase() == "camera"
+          //           ? context.l10n.cameraAlertTitle
+          //           : context.l10n.radarAlertTitle,
+          //       subtext: alert.type.toLowerCase() == "camera"
+          //           ? context.l10n.cameraAlertMessage
+          //           : context.l10n.radarAlertMessage,
+          //     );
+          //   }
+          // }
+        }
+      },
+      onError: (error) {
+        debugPrint('❌ WebSocket error: $error');
+        // Optionally show error to user or fallback to HTTP requests
+      },
+      onDone: () {
+        debugPrint('🔌 WebSocket connection closed');
+      },
+    );
+  }
+
+  // Method to send location updates via WebSocket
+  void _sendLocationUpdateViaWebSocket(double latitude, double longitude) {
+    if (_locationWebSocketService.isConnected) {
+      _locationWebSocketService.sendLocation(latitude, longitude);
+    } else {
+      debugPrint('⚠️ WebSocket not connected, attempting to connect...');
+      // If not connected, try to connect first
+      _locationWebSocketService.connectAndSendInitialLocation(
+        latitude: latitude,
+        longitude: longitude,
+        onEvent: (MapNearbyPayload payload) {
+          if (mounted) {
+            _addMapMarkers(payload.events, payload.spaces);
+          }
+        },
+        onError: (error) {
+          debugPrint('❌ WebSocket error during reconnect: $error');
+        },
+      );
+    }
+  }
 
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
@@ -652,6 +724,8 @@ class _NavigationViewState extends State<NavigationView> {
       _distanceTraveled = 0;
       _lastTriggerDistance = 0;
 
+      _initializeWebSocketConnection();
+
       _calculateRoute(
         _currentLocation!,
         HERE.GeoCoordinates(destLat, destLng),
@@ -690,6 +764,27 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
+  Widget _buildWebSocketStatusIndicator() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 160,
+      right: _mapPadding,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: _locationWebSocketService.isConnected
+              ? Colors.green.withOpacity(0.8)
+              : Colors.red.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          _locationWebSocketService.isConnected ? Icons.wifi : Icons.wifi_off,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
+    );
+  }
+
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
@@ -700,7 +795,7 @@ class _NavigationViewState extends State<NavigationView> {
             previousPoint: "$_lastLatitude,$_lastLongitude",
             radius: 400,
             drivingMode: true,
-            options: ['events', 'alerts', 'spaces'],
+            options: ['alerts'],
           )),
         );
   }
@@ -708,7 +803,6 @@ class _NavigationViewState extends State<NavigationView> {
   showSpacePopup({
     required Space space,
   }) {
-    print('🅿️ Showing space popup for: ${space.location.streetName}');
     if (space.isPremium) {
       AppPopup.showBottomSheet(
           context,
@@ -1398,6 +1492,12 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.latitude,
             location.coordinates.longitude,
           );
+          // Send location update via WebSocket instead of HTTP request
+          _sendLocationUpdateViaWebSocket(
+            location.coordinates.latitude,
+            location.coordinates.longitude,
+          );
+
           locationListener.onLocationUpdated(location);
         }),
       );
@@ -1686,6 +1786,7 @@ class _NavigationViewState extends State<NavigationView> {
               children: [
                 HereMap(onMapCreated: _onMapCreated),
                 _buildSpeedLimitIndicator(),
+                if (kDebugMode) _buildWebSocketStatusIndicator(),
                 if (_isLoading) _buildLoadingIndicator(),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 200,

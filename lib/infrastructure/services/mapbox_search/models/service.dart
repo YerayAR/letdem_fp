@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 class HereSearchApiService {
   static final HereSearchApiService _instance =
@@ -111,7 +113,7 @@ class HereSearchApiService {
         'https://maps.googleapis.com/maps/api/place/autocomplete/json'
         '?input=${Uri.encodeQueryComponent(query)}'
         '&key=$googleApiKey'
-        '&language=en'
+        '&language=${NavigatorHelper.navigatorKey.currentContext!.isSpanish ? 'sp' : 'en'}'
         '&location=${currentLocation.latitude},${currentLocation.longitude}'
         '&radius=50000' // 50 km radius
         '&components=country:$countryCode';
