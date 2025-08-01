@@ -333,7 +333,15 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> _onFetchUserInfo(
       FetchUserInfoEvent event, Emitter<UserState> emit) async {
     try {
-      emit(UserLoading());
+      // Only skip loading state if silent AND currently loaded
+      bool shouldSkipLoading = event.isSilent && state is UserLoaded;
+
+      print("Fetching user info...");
+      print("Is silent: ${event.isSilent}");
+
+      if (!shouldSkipLoading) {
+        emit(UserLoading());
+      }
 
       print("OneSignal User ID: ${OneSignal.User.pushSubscription.id}");
       print(OneSignal.User.pushSubscription.id);
@@ -346,6 +354,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       bool isLocationPermissionGranted = await NavigatorHelper
           .navigatorKey.currentState!.context.hasLocationPermission;
 
+      // Always emit the loaded state (whether silent or not)
       emit(UserLoaded(
         points: user.totalPoints,
         unreadNotificationsCount: user.notificationsCount,

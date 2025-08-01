@@ -148,24 +148,25 @@ class _WithdrawViewState extends State<WithdrawView> {
         BlocConsumer<WithdrawalBloc, WithdrawalState>(
             listener: (context, state) {
           print('Withdrawal state: $state');
+          print('State runtimeType: ${state.runtimeType}');
+
           if (state is WithdrawalFailure) {
+            print('Showing error toast: ${state.message}');
             Toast.showError(state.message);
           }
-          if (state is WithdrawalFinished) {
-            // context.read<UserBloc>().add(FetchUserInfoEvent());
 
+          if (state is WithdrawalFinished) {
             AppPopup.showDialogSheet(
-                NavigatorHelper.navigatorKey.currentContext!,
-                SuccessDialog(
-                  title: context.l10n.success,
-                  subtext: context.l10n.withdrawalRequestSuccess,
-                  onProceed: () {
-                    // context.read<WithdrawalBloc>().add(FetchWithdrawals());
-                    NavigatorHelper.pop();
-                    NavigatorHelper.pop();
-                    NavigatorHelper.pop();
-                  },
-                ));
+              context,
+              SuccessDialog(
+                title: context.l10n.success,
+                subtext: context.l10n.withdrawalRequestSuccess,
+                onProceed: () {
+                  NavigatorHelper.pop();
+                  NavigatorHelper.pop();
+                },
+              ),
+            );
           }
 
           // TODO: implement listener

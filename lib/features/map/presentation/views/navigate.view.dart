@@ -37,6 +37,7 @@ import 'package:letdem/infrastructure/services/map/map_asset_provider.service.da
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
+import 'package:letdem/infrastructure/ws/web_socket.service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -105,12 +106,83 @@ class _NavigationViewState extends State<NavigationView> {
 
   String _lastSpokenInstruction = "";
   final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
+  final LocationWebSocketService _locationWebSocketService =
+      LocationWebSocketService();
+
   int _nextManuoverDistance = 0;
   Timer? _rerouteDebounceTimer;
   int _lastRerouteTime = 0;
   String normalManuevers = "";
 
   int DISTANCE_THREESHOLD = 5;
+
+  // Method to initialize WebSocket connection
+  void _initializeWebSocketConnection() {
+    if (_currentLocation == null) {
+      debugPrint('⚠️ Current location is null, cannot initialize WebSocket');
+      return;
+    }
+
+    debugPrint('🔌 Initializing WebSocket connection...');
+
+    _locationWebSocketService.connectAndSendInitialLocation(
+      latitude: _currentLocation!.latitude,
+      longitude: _currentLocation!.longitude,
+      onEvent: (MapNearbyPayload payload) {
+        debugPrint(
+            '📥 Received WebSocket data: ${payload.spaces.length} spaces, ${payload.events.length} events');
+
+        // Update map with real-time data
+        if (mounted) {
+          _addMapMarkers(payload.events, payload.spaces);
+
+          // Handle alerts from WebSocket
+          // if (payload.alerts.isNotEmpty) {
+          //   for (var alert in payload.alerts) {
+          //     AlertHelper.showWarning(
+          //       context: context,
+          //       title: alert.type.toLowerCase() == "camera"
+          //           ? context.l10n.cameraAlertTitle
+          //           : context.l10n.radarAlertTitle,
+          //       subtext: alert.type.toLowerCase() == "camera"
+          //           ? context.l10n.cameraAlertMessage
+          //           : context.l10n.radarAlertMessage,
+          //     );
+          //   }
+          // }
+        }
+      },
+      onError: (error) {
+        debugPrint('❌ WebSocket error: $error');
+        // Optionally show error to user or fallback to HTTP requests
+      },
+      onDone: () {
+        debugPrint('🔌 WebSocket connection closed');
+      },
+    );
+  }
+
+  // Method to send location updates via WebSocket
+  void _sendLocationUpdateViaWebSocket(double latitude, double longitude) {
+    if (_locationWebSocketService.isConnected) {
+      _locationWebSocketService.sendLocation(latitude, longitude);
+    } else {
+      debugPrint('⚠️ WebSocket not connected, attempting to connect...');
+      // If not connected, try to connect first
+      _locationWebSocketService.connectAndSendInitialLocation(
+        latitude: latitude,
+        longitude: longitude,
+        onEvent: (MapNearbyPayload payload) {
+          if (mounted) {
+            _addMapMarkers(payload.events, payload.spaces);
+          }
+        },
+        onError: (error) {
+          debugPrint('❌ WebSocket error during reconnect: $error');
+        },
+      );
+    }
+  }
 
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
@@ -344,17 +416,21 @@ class _NavigationViewState extends State<NavigationView> {
   void dispose() {
     debugPrint('🗑️ Disposing NavigationView...');
 
-    // Cleanup navigation first
+    // Cancel all timers first
+    _rerouteDebounceTimer?.cancel();
+    _rerouteDebounceTimer = null;
+
+    // Cleanup navigation with better error handling
     _cleanupNavigation();
 
-    // Cancel timers
-    _rerouteDebounceTimer?.cancel();
+    // Dispose speech service
+
+    // Clear all map markers
+    _spaceMarkers.clear();
+    _eventMarkers.clear();
 
     // Dispose notifiers
     _distanceNotifier.dispose();
-
-    // Dispose lifecycle listener
-    // _lifecycleListener.dispose();
 
     // Disable wakelock
     WakelockPlus.disable();
@@ -528,9 +604,9 @@ class _NavigationViewState extends State<NavigationView> {
   void _cleanupNavigation() {
     debugPrint('🧹 Starting comprehensive navigation cleanup...');
 
-    // Stop and cleanup VisualNavigator
-    if (_visualNavigator != null) {
-      try {
+    try {
+      // Stop and cleanup VisualNavigator with null checks
+      if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
         _visualNavigator!.routeProgressListener = null;
         _visualNavigator!.speedLimitListener = null;
@@ -538,66 +614,56 @@ class _NavigationViewState extends State<NavigationView> {
         _visualNavigator!.eventTextListener = null;
         _visualNavigator!.cameraBehavior = null;
         _visualNavigator!.route = null;
+        _visualNavigator = null;
         debugPrint('✅ VisualNavigator cleaned up');
-      } catch (e) {
-        debugPrint('⚠️ Error cleaning up VisualNavigator: $e');
       }
-      _visualNavigator = null;
-    }
 
-    // Stop and cleanup LocationEngine
-    if (_locationEngine != null) {
-      try {
+      // Stop and cleanup LocationEngine with proper error handling
+      if (_locationEngine != null) {
         _locationEngine!.stop();
-        // Clear all location listeners
         _locationEngine = null;
         debugPrint('✅ LocationEngine stopped and cleaned up');
-      } catch (e) {
-        debugPrint('⚠️ Error stopping LocationEngine: $e');
       }
-    }
 
-    // NEW: Clean up map scene and remove all markers/indicators
-    if (_hereMapController != null) {
-      try {
-        // NEW: Reset camera behavior to default
+      // Clean up map scene safely
+      if (_hereMapController != null) {
+        // Remove all markers safely
+        final allMarkers = [..._spaceMarkers.keys, ..._eventMarkers.keys];
+        if (allMarkers.isNotEmpty) {
+          _hereMapController!.mapScene.removeMapMarkers(allMarkers);
+        }
+
+        // Reset camera behavior safely
         _hereMapController!.camera
             .setOrientationAtTarget(HERE.GeoOrientationUpdate(0, 0));
-
-        debugPrint(
-            '✅ Map scene cleaned up - removed markers, polylines, and reset camera');
-      } catch (e) {
-        debugPrint('⚠️ Error cleaning up map scene: $e');
+        debugPrint('✅ Map scene cleaned up');
       }
-    }
 
-    // Cleanup RoutingEngine
-    if (_routingEngine != null) {
-      _routingEngine = null;
-      debugPrint('✅ RoutingEngine cleaned up');
-    }
-
-    // Reset state variables
-    if (mounted) {
-      setState(() {
-        _isNavigating = false;
-        _isLoading = false;
-        _navigationInstruction = "";
-        _currentSpeedLimit = null;
-        _isOverSpeedLimit = false;
-        _hasShownArrivalNotification = false;
-        _hasShownParkingRating = false;
-        _isPopupDisplayed = false;
-        _isRecalculatingRoute = false;
-        _isCameraLocked = true;
-        _isUserPanning = false;
-        _speed = 0;
-        _totalRouteTime = 0;
-        _nextManuoverDistance = 0;
-        normalManuevers = "";
-        _lastSpokenInstruction = "";
-        _currentLocation = null; // NEW: Reset current location
-      });
+      // Reset all state variables safely
+      if (mounted) {
+        setState(() {
+          _isNavigating = false;
+          _isLoading = false;
+          _navigationInstruction = "";
+          _currentSpeedLimit = null;
+          _isOverSpeedLimit = false;
+          _hasShownArrivalNotification = false;
+          _hasShownParkingRating = false;
+          _isPopupDisplayed = false;
+          _isRecalculatingRoute = false;
+          _isCameraLocked = true;
+          _isUserPanning = false;
+          _speed = 0;
+          _totalRouteTime = 0;
+          _nextManuoverDistance = 0;
+          normalManuevers = "";
+          _lastSpokenInstruction = "";
+          _currentLocation = null;
+          _errorMessage = "";
+        });
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error during cleanup: $e');
     }
 
     debugPrint('🧹 Navigation cleanup completed');
@@ -658,6 +724,8 @@ class _NavigationViewState extends State<NavigationView> {
       _distanceTraveled = 0;
       _lastTriggerDistance = 0;
 
+      _initializeWebSocketConnection();
+
       _calculateRoute(
         _currentLocation!,
         HERE.GeoCoordinates(destLat, destLng),
@@ -696,6 +764,27 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
+  Widget _buildWebSocketStatusIndicator() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 160,
+      right: _mapPadding,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: _locationWebSocketService.isConnected
+              ? Colors.green.withOpacity(0.8)
+              : Colors.red.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          _locationWebSocketService.isConnected ? Icons.wifi : Icons.wifi_off,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
+    );
+  }
+
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
@@ -706,7 +795,7 @@ class _NavigationViewState extends State<NavigationView> {
             previousPoint: "$_lastLatitude,$_lastLongitude",
             radius: 400,
             drivingMode: true,
-            options: ['events', 'alerts', 'spaces'],
+            options: ['alerts'],
           )),
         );
   }
@@ -714,7 +803,6 @@ class _NavigationViewState extends State<NavigationView> {
   showSpacePopup({
     required Space space,
   }) {
-    print('🅿️ Showing space popup for: ${space.location.streetName}');
     if (space.isPremium) {
       AppPopup.showBottomSheet(
           context,
@@ -1364,6 +1452,21 @@ class _NavigationViewState extends State<NavigationView> {
     return name ?? context.l10n.unnamedRoad;
   }
 
+  HERE.GeoCoordinates? getRouteDestination() {
+    if (_visualNavigator?.route != null) {
+      final route = _visualNavigator!.route!;
+      if (route.sections.isNotEmpty) {
+        final lastSection = route.sections.last;
+        // return lastSection.geometry.vertices.last.latitude
+        return HERE.GeoCoordinates(
+          lastSection.geometry.vertices.last.latitude,
+          lastSection.geometry.vertices.last.longitude,
+        );
+      }
+    }
+    return null;
+  }
+
   void _setupLocationSource(
       HERE.LocationListener locationListener, HERE.Route route) {
     debugPrint('📍 Setting up navigation with visual map...');
@@ -1389,6 +1492,12 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.latitude,
             location.coordinates.longitude,
           );
+          // Send location update via WebSocket instead of HTTP request
+          _sendLocationUpdateViaWebSocket(
+            location.coordinates.latitude,
+            location.coordinates.longitude,
+          );
+
           locationListener.onLocationUpdated(location);
         }),
       );
@@ -1677,6 +1786,7 @@ class _NavigationViewState extends State<NavigationView> {
               children: [
                 HereMap(onMapCreated: _onMapCreated),
                 _buildSpeedLimitIndicator(),
+                if (kDebugMode) _buildWebSocketStatusIndicator(),
                 if (_isLoading) _buildLoadingIndicator(),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 200,

@@ -146,7 +146,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   Future<void> _onGetActivities(
       GetActivitiesEvent event, Emitter<ActivitiesState> emit) async {
     try {
-      emit(ActivitiesLoading());
+      if (state is! ActivitiesLoaded) {
+        emit(ActivitiesLoading());
+      }
       var activities = await activityRepository.getActivities();
       emit(ActivitiesLoaded(activities: activities.results));
     } on ApiError catch (err) {

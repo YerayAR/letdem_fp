@@ -470,9 +470,20 @@ class NotificationItem extends StatelessWidget {
     if (isRecent) {
       return context.l10n.justNow;
     } else if (now.difference(timestamp).inDays == 0) {
-      return DateFormat('hh:mm a').format(timestamp);
+      return DateFormat(
+        context.isSpanish ? 'd MMMM, yyyy · hh:mm a' : 'dd MMM, yyyy · hh:mm a',
+        context.isSpanish ? 'es_ES' : 'en_US',
+
+        // 'dd MMM, yyyy · hh:mm a'
+      ).format(timestamp);
+      // return DateFormat('hh:mm a').format(timestamp);
     } else {
-      return DateFormat('dd MMM, yyyy · hh:mm a').format(timestamp);
+      return DateFormat(
+        context.isSpanish ? 'd MMMM, yyyy · hh:mm a' : 'dd MMM, yyyy · hh:mm a',
+        context.isSpanish ? 'es_ES' : 'en_US',
+
+        // 'dd MMM, yyyy · hh:mm a'
+      ).format(timestamp);
     }
   }
 
