@@ -8,7 +8,6 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/core/utils/dates.dart';
 import 'package:letdem/features/commons/presentations/widgets/date_time_display.widget.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/models/withdrawals/withdrawal.model.dart';
@@ -35,7 +34,7 @@ class _WithdrawListViewState extends State<WithdrawListView> {
           StyledAppBar(
             title: context.l10n.withdrawals,
             onTap: () => Navigator.of(context).pop(),
-            icon: Iconsax.close_circle5,
+            icon: Icons.close,
           ),
           Dimens.space(2),
           BlocConsumer<WithdrawalBloc, WithdrawalState>(

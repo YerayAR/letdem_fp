@@ -39,7 +39,7 @@ class _OrdersListViewState extends State<OrdersListView> {
           StyledAppBar(
             title: context.l10n.orders,
             onTap: () => Navigator.of(context).pop(),
-            icon: Iconsax.close_circle5,
+            icon: Icons.close,
           ),
           Dimens.space(2),
           Expanded(
