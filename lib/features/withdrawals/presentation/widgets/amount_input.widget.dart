@@ -54,8 +54,6 @@ class _AmountInputCardState extends State<AmountInputCard> {
 
   @override
   Widget build(BuildContext context) {
-    final balance = context.userProfile!.earningAccount?.balance ?? 0;
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(Dimens.defaultMargin),
@@ -75,7 +73,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
           ),
           Dimens.space(1),
           Text(
-            '${balance.toStringAsFixed(2)} €',
+            '${context.userProfile!.earningAccount?.availableBalance ?? 0.toStringAsFixed(2)} €',
             style: Typo.heading3.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 36,
