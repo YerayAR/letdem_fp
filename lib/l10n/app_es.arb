@@ -106,6 +106,7 @@
   "spaceReserved": "Aparcamiento reservado",
   "spaceReservedSuccessfully": "Tu aparcamiento ha sido reservado exitosamente.",
   "confirmationCode": "Código de confirmación",
+  "codeConfirmation": "Código",
   "enterConfirmationCode": "El solicitante del aparcamiento te dará un número de confirmación de 6 dígitos, ingrésalo aquí.",
   "confirmationCodeWarning": "Por favor, asegúrate de que el código de confirmación funcione antes de entregar el aparcamiento",
   "pleaseEnterConfirmationCode": "Por favor ingresa el código de confirmación",

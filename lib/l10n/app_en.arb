@@ -600,6 +600,7 @@
   "speedLimitWarning": "You are driving at speed limit, slow down",
   "kmPerHour": "Km/h",
   "speedLimit": "Speed limit",
+  "codeConfirmation": "Code",
   "recalculatingRoute": "Recalculating route...",
   "youHaveArrived": "You have arrived at your destination!",
   "navigatingToParking": "Navigating to parking space",
