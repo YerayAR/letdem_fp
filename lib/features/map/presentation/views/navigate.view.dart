@@ -788,6 +788,10 @@ class _NavigationViewState extends State<NavigationView> {
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
+    _sendLocationUpdateViaWebSocket(
+      _lastLatitude!,
+      _lastLongitude!,
+    );
     context.read<MapBloc>().add(
           GetNearbyPlaces(
               queryParams: MapQueryParams(
@@ -1493,10 +1497,6 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.longitude,
           );
           // Send location update via WebSocket instead of HTTP request
-          _sendLocationUpdateViaWebSocket(
-            location.coordinates.latitude,
-            location.coordinates.longitude,
-          );
 
           locationListener.onLocationUpdated(location);
         }),
