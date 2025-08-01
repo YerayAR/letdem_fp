@@ -305,7 +305,7 @@ class TransactionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(context.l10n.transactionHistory,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         BlocBuilder<WalletBloc, WalletState>(
           builder: (context, state) {
             bool hasTransactions = false;
@@ -325,8 +325,8 @@ class TransactionHeader extends StatelessWidget {
                 ),
                 child: Text(
                   context.l10n.seeAll,
-                  style: const TextStyle(
-                      color: Color(0xFF8A3FFC),
+                  style: TextStyle(
+                      color: AppColors.primary500,
                       fontWeight: FontWeight.w500,
                       fontSize: 14),
                 ),

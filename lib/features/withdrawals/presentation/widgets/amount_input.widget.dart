@@ -70,7 +70,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
           Text(
             context.l10n.amountToReceive,
             style: Typo.mediumBody.copyWith(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withValues(alpha: 0.6),
             ),
           ),
           Dimens.space(1),
@@ -110,15 +110,15 @@ class _AmountInputCardState extends State<AmountInputCard> {
           //   onChanged: _validateAmount,
           // ),
           Dimens.space(1),
-          Row(
+          context.userProfile!.earningAccount!.pendingBalance <= 0
+          ? const SizedBox()
+          : Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                child: context.userProfile!.earningAccount!.pendingBalance < 0
-                    ? null
-                    : IconButton(
+                child: IconButton(
                         icon: Icon(Icons.info_outline,
-                            color: AppColors.neutral300, size: 18),
+                            color: AppColors.primary400, size: 18),
                         onPressed: () {
                           AppPopup.showDialogSheet(
                             context,
@@ -152,16 +152,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
               ),
               Flexible(
                 child: Text(
-                  context.userProfile!.earningAccount!.pendingBalance < 0
-                      ? context.l10n.noPendingFundsMessage(
-                          context.userProfile!.constantsSettings
-                              .withdrawalAmount.minimum
-                              .formatPrice(context),
-                          context.userProfile!.constantsSettings
-                              .withdrawalAmount.maximum
-                              .formatPrice(context),
-                        )
-                      : context.l10n.pendingToBeCleared(context
+                  context.l10n.pendingToBeCleared(context
                           .userProfile!.earningAccount!.pendingBalance
                           .toStringAsFixed(2)),
                   textAlign: TextAlign.center,

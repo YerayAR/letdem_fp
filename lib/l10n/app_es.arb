@@ -597,7 +597,7 @@
   "minWithdrawalToast": "La cantidad mínima que puedes retirar es {amount}.",
   "maxWithdrawalToast": "La cantidad máxima que puedes retirar es {amount}.",
   "exceedsBalanceToast": "No puedes retirar más que tu saldo disponible.",
-  "pendingFundsInfo": "Puedes retirar entre {minAmount} y {maxAmount}. Ten en cuenta que los fondos que puedan estar retenidos por el proveedor de pagos tardarían hasta 10 días en estar disponibles.",
+  "pendingFundsInfo": "Puedes retirar entre {minAmount} y {maxAmount}. Los fondos retenidos por el proveedor de pagos estarán disponibles en un plazo máximo de 10 días.",
   "@pendingFundsInfo": {
     "description": "Mensaje informativo sobre fondos pendientes y límites de retiro",
     "placeholders": {
@@ -938,7 +938,7 @@
     }
   },
   "amountToReceive": "Monto a recibir",
-  "pendingToBeCleared": "{amount} € Pendientes de liberar",
+  "pendingToBeCleared": "{amount} € Pendiente de liberar",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {
@@ -948,7 +948,7 @@
   },
   "paymentMethodAddedTitle": "Método de pago añadido",
   "paymentMethodAddedSubtext": "Tu método de pago ha sido agregado correctamente.",
-  "addPaymentMethodTitle": "Agregar un método de pago",
+  "addPaymentMethodTitle": "Agregar método de pago",
   "cardDetails": "Detalles de la tarjeta",
   "enterTheNumber": "Ingresa el número",
   "create": "Crear",

@@ -237,8 +237,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                         context.l10n.clearAll,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.primary400,
                         ),
                       ),

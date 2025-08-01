@@ -536,7 +536,7 @@
   },
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
-  "pendingFundsInfo": "You can withdraw between {minAmount} and {maxAmount}. Please note that any funds held by the payment provider may take up to 10 days to become available.",
+  "pendingFundsInfo": "You can withdraw between {minAmount} and {maxAmount}. Funds held by the payment provider will be available within a maximum of 10 days.",
   "@pendingFundsInfo": {
     "description": "Info message explaining pending funds and withdrawal limits",
     "placeholders": {

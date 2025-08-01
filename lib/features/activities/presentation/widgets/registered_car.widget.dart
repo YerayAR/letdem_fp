@@ -47,6 +47,7 @@ class RegisteredCarWidget extends StatelessWidget {
                   style: Typo.smallBody.copyWith(
                     color: AppColors.neutral500,
                     fontWeight: FontWeight.w700,
+                    fontSize: 14
                   ),
                 ),
                 Dimens.space(1),
@@ -110,7 +111,7 @@ class RegisteredCarWidget extends StatelessWidget {
                             color: AppColors.neutral50,
                             height: 1,
                           ),
-                          Dimens.space(1),
+                          Dimens.space(2),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

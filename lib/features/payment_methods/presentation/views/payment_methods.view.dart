@@ -167,7 +167,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                     onTap: () {
                       AppPopup.showBottomSheet(
                           context,
-                          _buildPayoutOptionsSheet(
+                          _buildPaymentMethodOptionsSheet(
                             context,
                             cardId,
                             // Show options sheet
@@ -183,12 +183,13 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               ),
             ],
           ),
+          Dimens.space(1),
           Text(
             context.l10n.expireDate(expireDate),
             style: Typo.smallBody.copyWith(
                 fontWeight: FontWeight.w500, color: AppColors.neutral400),
           ),
-          Dimens.space(3),
+          Dimens.space(2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -210,7 +211,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     );
   }
 
-  Widget _buildPayoutOptionsSheet(
+  Widget _buildPaymentMethodOptionsSheet(
     BuildContext context,
     String cardId,
   ) {
@@ -324,6 +325,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               );
             },
           ),
+          Dimens.space(3),
         ],
       ),
     );

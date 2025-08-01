@@ -55,6 +55,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
         context.l10n.contributions,
         style: Typo.mediumBody.copyWith(
           fontWeight: FontWeight.w600,
+          fontSize: 18,
         ),
       ),
       if (state is ActivitiesLoaded && state.activities.isNotEmpty)
@@ -66,8 +67,8 @@ class _ActivitiesViewState extends State<ActivitiesView> {
             context.l10n.showAll,
             style: Typo.smallBody.copyWith(
               color: AppColors.primary500,
-              fontWeight: FontWeight.w600,
-              decoration: TextDecoration.underline,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
             ),
           ),
         ),
@@ -158,6 +159,7 @@ class NotificationAppBar extends StatelessWidget {
                     '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
                     style: Typo.smallBody.copyWith(
                       color: Colors.white,
+                      fontSize: 9,
                       fontWeight: FontWeight.w700,
                     ),
                   )),
