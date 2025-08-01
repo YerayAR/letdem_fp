@@ -7,8 +7,11 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/utils/dates.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
+import 'package:letdem/features/commons/presentations/widgets/date_time_display.widget.dart';
+
 
 class ContributionItem extends StatelessWidget {
   final ContributionType type;
@@ -73,36 +76,7 @@ class ContributionItem extends StatelessWidget {
                             ),
                           ),
                           Dimens.space(1),
-                          Row(
-                            spacing: 5,
-                            children: [
-                              Text(
-                                DateFormat(
-                                        context.isSpanish
-                                            ? "dd 'de' MMM. yyyy"
-                                            : "dd MMM. yyyy",
-                                        context.isSpanish ? 'es' : 'en')
-                                    .format(activity.created.toLocal()),
-                                style: Typo.mediumBody.copyWith(
-                                  fontSize: 14,
-                                  color: AppColors.neutral400,
-                                ),
-                              ),
-                              CircleAvatar(
-                                radius: 3,
-                                backgroundColor: AppColors.neutral200,
-                              ),
-                              Text(
-                                DateFormat("HH:mm").format(
-                                  (activity.created.toLocal()),
-                                ),
-                                style: Typo.mediumBody.copyWith(
-                                  fontSize: 14,
-                                  color: AppColors.neutral400,
-                                ),
-                              ),
-                            ],
-                          ),
+                          DateTimeDisplay(date: activity.created)
                         ]),
                   ],
                 ),

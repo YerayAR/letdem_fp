@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/features/commons/presentations/widgets/date_time_display.widget.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/notifications/models/notification.model.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
@@ -237,8 +237,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                         context.l10n.clearAll,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.primary400,
                         ),
                       ),
@@ -278,7 +277,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               if (state is NotificationsLoaded) {
                 return Expanded(
                   child: ListView.builder(
-                    itemCount: state.unreadNotifications.count,
+                    itemCount: state.unreadNotifications.results.length,
                     itemBuilder: (context, index) {
                       var notification =
                           state.unreadNotifications.results[index];
@@ -465,28 +464,6 @@ class NotificationItem extends StatelessWidget {
     this.onActionPressed,
   });
 
-  String _getFormattedTime(BuildContext context) {
-    final now = DateTime.now();
-    if (isRecent) {
-      return context.l10n.justNow;
-    } else if (now.difference(timestamp).inDays == 0) {
-      return DateFormat(
-        context.isSpanish ? 'd MMMM, yyyy · hh:mm a' : 'dd MMM, yyyy · hh:mm a',
-        context.isSpanish ? 'es_ES' : 'en_US',
-
-        // 'dd MMM, yyyy · hh:mm a'
-      ).format(timestamp);
-      // return DateFormat('hh:mm a').format(timestamp);
-    } else {
-      return DateFormat(
-        context.isSpanish ? 'd MMMM, yyyy · hh:mm a' : 'dd MMM, yyyy · hh:mm a',
-        context.isSpanish ? 'es_ES' : 'en_US',
-
-        // 'dd MMM, yyyy · hh:mm a'
-      ).format(timestamp);
-    }
-  }
-
   Widget getSubIcon(NotificationPayloadType type) {
     switch (type) {
       case NotificationPayloadType.spaceOccupied:
@@ -613,14 +590,7 @@ class NotificationItem extends StatelessWidget {
                       Row(
                         children: [
                           // Timestamp
-                          Text(
-                            _getFormattedTime(context),
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 12,
-                            ),
-                          ),
-
+                          DateTimeDisplay(date: timestamp),
                           // Amount if available
                           if (amount != null) ...[
                             const Spacer(),

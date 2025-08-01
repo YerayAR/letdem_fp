@@ -1013,22 +1013,22 @@ class _NavigationViewState extends State<NavigationView> {
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
     _hereMapController?.mapScene.removeMapMarkers(_spaceMarkers.keys.toList());
     _spaceMarkers.clear();
-    for (var space in events) {
+    for (var event in events) {
       try {
-        Uint8List imageData = _assetsProvider.getEventIcon(space.type);
+        Uint8List imageData = _assetsProvider.getEventIcon(event.type);
 
         MapImage mapImage =
             MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
 
         final marker = MapMarker(
           HERE.GeoCoordinates(
-              space.location.point.lat, space.location.point.lng),
+              event.location.point.lat, event.location.point.lng),
           mapImage,
         );
-        marker.fadeDuration = const Duration(seconds: 2);
+        marker.fadeDuration = const Duration(seconds: 1);
 
         _hereMapController?.mapScene.addMapMarker(marker);
-        _eventMarkers[marker] = space;
+        _eventMarkers[marker] = event;
       } catch (e) {
         print("Error adding space marker: $e");
       }
@@ -1041,7 +1041,7 @@ class _NavigationViewState extends State<NavigationView> {
               space.location.point.lat, space.location.point.lng),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
-        marker.fadeDuration = const Duration(seconds: 2);
+        marker.fadeDuration = const Duration(seconds: 1);
 
         _hereMapController?.mapScene.addMapMarker(marker);
         _spaceMarkers[marker] = space;

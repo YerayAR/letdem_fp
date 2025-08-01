@@ -43,14 +43,13 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {
           if (state is ActivitiesPublished) {
-            context.read<UserBloc>().add(FetchUserInfoEvent());
+            context.read<UserBloc>().add(const FetchUserInfoEvent());
             // Handle successful space reservation confirmation
             AppPopup.showDialogSheet(
               context,
-              const SuccessDialog(
-                title: "Action Successful",
-                subtext:
-                    "Your space was ordered successfully, we will update your account shortly.",
+              SuccessDialog(
+                title: context.l10n.reservationConfirmedTitle,
+                subtext: context.l10n.reservationConfirmedDescription,
                 onProceed: NavigatorHelper.popAll,
               ),
             );
