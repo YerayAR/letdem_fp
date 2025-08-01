@@ -819,7 +819,7 @@
   "failedToAddPaymentMethod": "Error al agregar método de pago. Por favor, inténtalo de nuevo.",
   "cardNumber": "Número de tarjeta",
   "addNewCard": "Agregar nueva tarjeta",
-  "default": "Predeterminado",
+  "defaultt": "Por defecto",
   "expireDate": "Fecha de vencimiento: {date}",
   "@expireDate": {
     "placeholders": {
