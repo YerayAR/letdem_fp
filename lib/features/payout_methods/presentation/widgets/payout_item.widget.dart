@@ -46,7 +46,7 @@ class OptionItem extends StatelessWidget {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundColor: AppColors.primary50.withOpacity(0.5),
+                        backgroundColor: AppColors.primary50.withValues(alpha: 0.5),
                         radius: 26,
                         child: Center(
                           child: Icon(

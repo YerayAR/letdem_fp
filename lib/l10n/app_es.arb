@@ -252,6 +252,7 @@
   "editDetails": "Editar detalles",
   "lastPlaceParked": "Último lugar estacionado",
   "unknown": "Desconocido",
+  "lastParkedPlace": "Último sitio aparcado",
   "navigateToCar": "Navegar al coche",
   "errorConfirmSpaceReservation": "No se pudo confirmar la reserva del aparcamiento",
   "errorReserveSpace": "No se pudo reservar el aparcamiento",
@@ -273,7 +274,7 @@
   "enterPassword": "Ingresa tu contraseña",
   "passwordsDoNotMatch": "Las contraseñas no coinciden",
   "emailSentTitle": "Te enviamos un correo",
-  "reservations": "Reservas",
+  "reservations": "Reservas solicitadas",
   "emailSentDescription": "Hemos enviado un código OTP a tu correo. Ingrésalo abajo para restablecer tu contraseña.",
   "mailSentTo": "Correo enviado a: ",
   "notYou": "¿No eres tú? ",
@@ -399,8 +400,8 @@
   "resending": "Reenviando",
   "verificationSuccess": "Verificación exitosa",
   "verificationSuccessMessage": "Tu correo ha sido verificado exitosamente. Puedes proceder a la aplicación.",
-  "findShareParking": "Encuentra y comparte aparcamientos de estacionamiento cerca de ti",
-  "parkingDescription": "Accede a una amplia gama de aparcamientos de estacionamiento dentro y fuera de tu ubicación",
+  "findShareParking": "Encuentra y comparte aparcamientos cerca de ti",
+  "parkingDescription": "Accede a una amplia gama de aparcamientos dentro y fuera de tu ubicación",
   "geolocationPermission": "Permiso de geolocalización",
   "enableGeolocationDescription": "Para mejorar tu experiencia, necesitamos acceder a tu ubicación actual. Esto nos permitirá mostrarte los aparcamientos de estacionamiento más cercanos y relevantes.",
   "enableGeolocation": "Habilitar geolocalización",
@@ -597,7 +598,7 @@
   "minWithdrawalToast": "La cantidad mínima que puedes retirar es {amount}.",
   "maxWithdrawalToast": "La cantidad máxima que puedes retirar es {amount}.",
   "exceedsBalanceToast": "No puedes retirar más que tu saldo disponible.",
-  "pendingFundsInfo": "Una parte de tus fondos aún no ha sido liberada por el proveedor de pagos, por lo que la cantidad disponible para retirar solo incluye los fondos ya liberados. Puedes retirar entre {minAmount} y {maxAmount}. Ten en cuenta que los fondos pendientes pueden tardar hasta 10 días en liberarse, según el proveedor.",
+  "pendingFundsInfo": "Puedes retirar entre {minAmount} y {maxAmount}. Los fondos retenidos por el proveedor de pagos estarán disponibles en un plazo máximo de 10 días.",
   "@pendingFundsInfo": {
     "description": "Mensaje informativo sobre fondos pendientes y límites de retiro",
     "placeholders": {
@@ -819,7 +820,7 @@
   "failedToAddPaymentMethod": "Error al agregar método de pago. Por favor, inténtalo de nuevo.",
   "cardNumber": "Número de tarjeta",
   "addNewCard": "Agregar nueva tarjeta",
-  "defaultt": "Predeterminado",
+  "defaultt": "Por defecto",
   "expireDate": "Fecha de vencimiento: {date}",
   "@expireDate": {
     "placeholders": {
@@ -938,7 +939,7 @@
     }
   },
   "amountToReceive": "Monto a recibir",
-  "pendingToBeCleared": "{amount} € pendiente de ser liberado",
+  "pendingToBeCleared": "{amount} € Pendiente de liberar",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {
@@ -948,7 +949,7 @@
   },
   "paymentMethodAddedTitle": "Método de pago añadido",
   "paymentMethodAddedSubtext": "Tu método de pago ha sido agregado correctamente.",
-  "addPaymentMethodTitle": "Agregar un método de pago",
+  "addPaymentMethodTitle": "Agregar método de pago",
   "cardDetails": "Detalles de la tarjeta",
   "enterTheNumber": "Ingresa el número",
   "create": "Crear",
@@ -1020,7 +1021,7 @@
   "accountSetupComplete": "Configuración de cuenta completa",
   "verificationPending": "Verificación pendiente",
   "documentsUploadedSuccessfully": "Documentos subidos exitosamente",
-  "defaultPayment": "Predeterminado",
+  "defaultPayment": "Por defecto",
   "expires": "Expira",
   "deleteCard": "Eliminar tarjeta",
   "setAsDefault": "Establecer como predeterminado",

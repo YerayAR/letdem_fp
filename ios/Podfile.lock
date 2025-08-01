@@ -121,7 +121,7 @@ PODS:
   - GTMSessionFetcher/Core (3.5.0)
   - GTMSessionFetcher/Full (3.5.0):
     - GTMSessionFetcher/Core
-  - here_sdk (4.21.5.0.175151.release):
+  - here_sdk (4.23.2.0.210004.release):
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
@@ -372,13 +372,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
-  audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
+  audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
-  file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
+  file_picker: b159e0c068aef54932bb15dc9fd1571818edaf49
   Firebase: d80354ed7f6df5f9aca55e9eb47cc4b634735eaf
-  firebase_auth: c028e89b64d87f04708ed01f0e7691d997b3fa0d
-  firebase_core: 6cbed78b4f298ed103a9fd034e6dbc846320480f
+  firebase_auth: cecfcb5b0655e1cb66a5c45a88ee77811ca93514
+  firebase_core: 6e223dfa350b2edceb729cea505eaaef59330682
   FirebaseAppCheckInterop: 9226f7217b43e99dfa0bc9f674ad8108cef89feb
   FirebaseAuth: ad59a1a7b161e75f74c39f70179d2482d40e2737
   FirebaseAuthInterop: 2a26ee1bea6d47df8048683cfa071e7da657798f
@@ -386,32 +386,32 @@ SPEC CHECKSUMS:
   FirebaseCoreExtension: 3d3f2017a00d06e09ab4ebe065391b0bb642565e
   FirebaseCoreInternal: df24ce5af28864660ecbd13596fc8dd3a8c34629
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
-  flutter_tts: b88dbc8655d3dc961bc4a796e4e16a4cc1795833
-  geocoding_ios: bcbdaa6bddd7d3129c9bcb8acddc5d8778689768
-  geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
-  google_sign_in_ios: 19297361f2c51d7d8ac0201b866ef1fa5d1f94a8
+  flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
+  flutter_tts: 0f492aab6accf87059b72354fcb4ba934304771d
+  geocoding_ios: d7460f56e80e118d57678efe5c2cdc888739ff18
+  geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
+  google_sign_in_ios: 4111e87aa5e24a4404f00ea13479f35e571969cc
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  here_sdk: 8aced9beb9b27bfe60bdc7f91b4d1fd6fb7f1e59
-  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
-  location: 155caecf9da4f280ab5fe4a55f94ceccfab838f8
-  mapbox_maps_flutter: 1457f41480792ffeaefbf3786008ce2f701dcd20
+  here_sdk: cd476199184d4be45c6287efb21609bb6a4a78fc
+  image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
+  location: d5cf8598915965547c3f36761ae9cc4f4e87d22e
+  mapbox_maps_flutter: facbb604a434657fa1301b1bb2bb45d489123db8
   MapboxCommon: 363dbed6bcdaa9a08674098fc5c661e826049dc2
   MapboxCoreMaps: ba391b7121c52d8ab656b0efa081d928648c8c6f
   MapboxMaps: 5ec35b1ad72822b9b66c69955e6bb0a81129d4b0
-  onesignal_flutter: 6596144e1f08756a2c402047366c867a62b0f6f1
+  onesignal_flutter: c4442bab25faaf3a3ab77cdcd33f4507f10b05b8
   OneSignalXCFramework: 1a3b28dfbff23aabce585796d23c1bef37772774
-  package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
-  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   SDWebImage: f84b0feeb08d2d11e6a9b843cb06d75ebf5b8868
-  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
-  sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
   Stripe: 8a03a78bfa16b197f9fac51e42670ac563b34388
-  stripe_ios: 95bdf6ba58efd184fe1dfed194cd8692299d66ca
+  stripe_ios: 0f0884084e2e8b49df838f8fed2129b42c3516b9
   StripeApplePay: 3c1b43d9b5130f6b714863bf8c9482c24168ab27
   StripeCore: 4955c2af14446db04818ad043d19d8f97b73c5fa
   StripeFinancialConnections: 8cf97b04c2f354879a2a5473126efac38f11f406
@@ -421,8 +421,8 @@ SPEC CHECKSUMS:
   StripeUICore: 17a4f3adb81ae05ab885e1b353022a430176eab1
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
-  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
-  wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
+  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
+  wakelock_plus: 76957ab028e12bfa4e66813c99e46637f367fc7e
 
 PODFILE CHECKSUM: ac0a61da1ab60f0b6ab9621308ffdc9c35e7b1a9
 

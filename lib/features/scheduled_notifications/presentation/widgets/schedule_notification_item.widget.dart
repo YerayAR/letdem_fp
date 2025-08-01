@@ -74,7 +74,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                     Text(
                       context.l10n.spaceReminder,
                       style:
-                          Typo.largeBody.copyWith(fontWeight: FontWeight.bold),
+                          Typo.largeBody.copyWith(fontWeight: FontWeight.w600, fontSize: 16),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -89,7 +89,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                                     Text(
                                       context.l10n.spaceReminder,
                                       style: Typo.heading1.copyWith(
-                                        fontSize: 20,
+                                        fontSize: 17,
                                       ),
                                     ),
                                     const Spacer(),
@@ -97,10 +97,14 @@ class ScheduleNotificationItem extends StatelessWidget {
                                       onTap: () {
                                         NavigatorHelper.pop();
                                       },
-                                      child: Icon(
-                                        CupertinoIcons.clear,
-                                        color: AppColors.neutral300,
-                                        size: 20,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Iconsax.close_circle5,
+                                          color: AppColors.neutral100,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -138,11 +142,9 @@ class ScheduleNotificationItem extends StatelessWidget {
                                   );
                                 },
                               ),
-                              Dimens.space(.5),
                               Divider(
                                 color: AppColors.neutral50,
                               ),
-                              Dimens.space(.5),
                               ListTile(
                                 title: Row(
                                   children: [
@@ -180,7 +182,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                       child: Icon(
                         CupertinoIcons.ellipsis,
                         color: AppColors.neutral300,
-                        size: 17,
+                        size: 20,
                       ),
                     ),
                   ],

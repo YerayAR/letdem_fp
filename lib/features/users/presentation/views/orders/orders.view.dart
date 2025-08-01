@@ -9,7 +9,9 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/core/utils/dates.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/features/commons/presentations/widgets/date_time_display.widget.dart';
 import 'package:letdem/models/orders/order.model.dart';
 
 class OrdersListView extends StatefulWidget {
@@ -37,7 +39,7 @@ class _OrdersListViewState extends State<OrdersListView> {
           StyledAppBar(
             title: context.l10n.orders,
             onTap: () => Navigator.of(context).pop(),
-            icon: Iconsax.close_circle5,
+            icon: Icons.close,
           ),
           Dimens.space(2),
           Expanded(
@@ -96,82 +98,102 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Icon
-          SvgPicture.asset(
-            getSpaceTypeIcon(order.type),
-            width: 40,
-            height: 40,
-          ),
-          const SizedBox(width: 16),
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  order.street,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+          Row(
+            children: [
+              // Icon
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  // color: _getIconBackgroundColor(payment.type),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    getSpaceTypeIcon(order.type),
+                    width: 34,
+                    height: 34,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
+              ),
+              const SizedBox(width: 16),
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      getSpaceTypeText(order.type, context),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                      order.street,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                    Text(
-                      ' • ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Text(
-                      _formatDate(order.created, context),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          getSpaceTypeText(order.type, context),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          // Amount and status
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${double.parse(order.price).toStringAsFixed(2)} €',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
               ),
-              const SizedBox(height: 8),
-              _buildStatusChip(order.status, context),
+
+              const SizedBox(width: 16),
+              // Amount and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${double.parse(order.price).toStringAsFixed(2)} €',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildStatusChip(order.status, context),
+                ],
+              ),
+            ],
+          ),
+          Divider(
+            color: AppColors.neutral200.withValues(alpha: 0.2),
+            thickness: 1,
+            height: 24,
+          ),
+          Row(
+            children: [
+              Dimens.space(1),
+              Icon(
+                Iconsax.clock5,
+                size: 16,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(width: 8),
+              DateTimeDisplay(date: order.created)
             ],
           ),
         ],
@@ -235,47 +257,6 @@ class OrderCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date, BuildContext context) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inMinutes < 5) {
-      return context.l10n.justNow;
-    } else if (difference.inDays == 0) {
-      return context.l10n.today;
-    } else if (difference.inDays == 1) {
-      return context.l10n.yesterday;
-    } else if (difference.inDays < 7) {
-      return context.l10n.daysAgo(difference.inDays);
-    } else if (difference.inDays < 14) {
-      return context.l10n.oneWeekAgo;
-    } else if (difference.inDays < 21) {
-      return context.l10n.twoWeeksAgo;
-    } else if (difference.inDays < 30) {
-      return context.l10n.threeWeeksAgo;
-    } else {
-      return '${date.day} ${_getMonthName(date.month)}. ${date.year}';
-    }
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month - 1];
   }
 }
 

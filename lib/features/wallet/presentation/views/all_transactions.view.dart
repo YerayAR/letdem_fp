@@ -80,7 +80,9 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                                   .subtract(const Duration(days: 365)),
                               onDateSelected: (date) {
                                 setState(() {
-                                  _fromDate = date;
+                                  if (!date.isAfter(_toDate)){
+                                    _fromDate = date;
+                                  }
                                 });
                                 context.read<WalletBloc>().add(
                                         FetchTransactionsEvent(
@@ -99,7 +101,9 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                               initialDate: _toDate,
                               onDateSelected: (date) {
                                 setState(() {
-                                  _toDate = date;
+                                  if (!date.isBefore(_fromDate)){
+                                    _toDate = date;
+                                  }
                                 });
                                 context.read<WalletBloc>().add(
                                         FetchTransactionsEvent(
