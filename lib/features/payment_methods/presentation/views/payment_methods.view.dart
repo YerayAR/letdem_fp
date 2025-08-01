@@ -157,7 +157,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                     child: !isDefault
                         ? null
                         : DecoratedChip(
-                            text: context.l10n.defaultt,
+                            text: context.l10n.defaultPayment,
                             backgroundColor: AppColors.secondary50,
                             color: AppColors.secondary600,
                           ),

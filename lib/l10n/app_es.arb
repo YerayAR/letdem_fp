@@ -597,7 +597,7 @@
   "minWithdrawalToast": "La cantidad mínima que puedes retirar es {amount}.",
   "maxWithdrawalToast": "La cantidad máxima que puedes retirar es {amount}.",
   "exceedsBalanceToast": "No puedes retirar más que tu saldo disponible.",
-  "pendingFundsInfo": "Una parte de tus fondos aún no ha sido liberada por el proveedor de pagos, por lo que la cantidad disponible para retirar solo incluye los fondos ya liberados. Puedes retirar entre {minAmount} y {maxAmount}. Ten en cuenta que los fondos pendientes pueden tardar hasta 10 días en liberarse, según el proveedor.",
+  "pendingFundsInfo": "Puedes retirar entre {minAmount} y {maxAmount}. Ten en cuenta que los fondos que puedan estar retenidos por el proveedor de pagos tardarían hasta 10 días en estar disponibles.",
   "@pendingFundsInfo": {
     "description": "Mensaje informativo sobre fondos pendientes y límites de retiro",
     "placeholders": {
@@ -819,7 +819,7 @@
   "failedToAddPaymentMethod": "Error al agregar método de pago. Por favor, inténtalo de nuevo.",
   "cardNumber": "Número de tarjeta",
   "addNewCard": "Agregar nueva tarjeta",
-  "defaultt": "Predeterminado",
+  "default": "Predeterminado",
   "expireDate": "Fecha de vencimiento: {date}",
   "@expireDate": {
     "placeholders": {
@@ -938,7 +938,7 @@
     }
   },
   "amountToReceive": "Monto a recibir",
-  "pendingToBeCleared": "{amount} € pendiente de ser liberado",
+  "pendingToBeCleared": "{amount} € Pendientes de liberar",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {
@@ -1020,7 +1020,7 @@
   "accountSetupComplete": "Configuración de cuenta completa",
   "verificationPending": "Verificación pendiente",
   "documentsUploadedSuccessfully": "Documentos subidos exitosamente",
-  "defaultPayment": "Predeterminado",
+  "defaultPayment": "Por defecto",
   "expires": "Expira",
   "deleteCard": "Eliminar tarjeta",
   "setAsDefault": "Establecer como predeterminado",

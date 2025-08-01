@@ -536,9 +536,7 @@
   },
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
-
-  "pendingFundsInfo": "Some of your funds have not yet been released by the payment provider, so the amount available to withdraw only includes the released funds. You can withdraw between {minAmount} and {maxAmount}. Please note that pending funds may take up to 10 days to be released, depending on the provider.",
-
+  "pendingFundsInfo": "You can withdraw between {minAmount} and {maxAmount}. Please note that any funds held by the payment provider may take up to 10 days to become available.",
   "@pendingFundsInfo": {
     "description": "Info message explaining pending funds and withdrawal limits",
     "placeholders": {
@@ -908,7 +906,7 @@
   "noPayoutMethodsAvailable": "No payout methods available",
   "success": "Success",
   "withdrawalRequestSuccess": "Withdrawal request has been sent successfully.",
-  "withdrawalToBank": "Withdrawal to Bank {method}",
+  "withdrawalToBank": "Withdrawal to bank {method}",
   "@withdrawalToBank": {
     "placeholders": {
       "method": {
@@ -929,7 +927,7 @@
     }
   },
   "amountToReceive": "Amount to receive",
-  "pendingToBeCleared": "{amount} € Pending to be cleared",
+  "pendingToBeCleared": "{amount} € Awaiting clearance",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {
