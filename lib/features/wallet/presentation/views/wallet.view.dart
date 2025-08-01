@@ -513,7 +513,11 @@ class EmptyTransactionsView extends StatelessWidget {
           children: [
             Text(
               context.l10n.noTransactionsYet,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
