@@ -57,7 +57,7 @@ class RegisteredCarWidget extends StatelessWidget {
                   style: Typo.largeBody.copyWith(
                       // color: Colors.white,
                       fontWeight: FontWeight.w800,
-                      fontSize: 19),
+                      fontSize: 17),
                 ),
                 Dimens.space(1),
 
@@ -103,6 +103,7 @@ class RegisteredCarWidget extends StatelessWidget {
                 ),
 
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: car.lastParkingLocation == null
                       ? []
                       : [
@@ -110,6 +111,15 @@ class RegisteredCarWidget extends StatelessWidget {
                           Divider(
                             color: AppColors.neutral50,
                             height: 1,
+                          ),
+                          Dimens.space(2),
+                          Text(
+                            context.l10n.lastParkedPlace,
+                            style: Typo.smallBody.copyWith(
+                                color: AppColors.neutral500,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14
+                            ),
                           ),
                           Dimens.space(2),
                           Row(
@@ -142,22 +152,19 @@ class RegisteredCarWidget extends StatelessWidget {
                               Dimens.space(2),
                               GestureDetector(
                                 onTap: () {
-                                  if (car.lastParkingLocation == null) {
-                                  } else {
                                     NavigatorHelper.to(NavigationView(
                                       destinationLat:
                                           car.lastParkingLocation!.lat ?? 0,
                                       destinationLng:
                                           car.lastParkingLocation!.lng ?? 0,
                                     ));
-                                  }
                                 },
                                 child: Row(
                                   children: [
                                     Text(
                                       context.l10n.navigateToCar,
                                       style: Typo.mediumBody.copyWith(
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.w600,
                                         color: AppColors.primary500,
                                         fontSize: 12,
                                       ),

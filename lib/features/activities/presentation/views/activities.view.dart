@@ -64,7 +64,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
             NavigatorHelper.to(const ViewAllView());
           },
           child: Text(
-            context.l10n.showAll,
+            context.l10n.seeAll,
             style: Typo.smallBody.copyWith(
               color: AppColors.primary500,
               fontWeight: FontWeight.w500,

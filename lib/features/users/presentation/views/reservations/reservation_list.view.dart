@@ -189,6 +189,7 @@ class ReservationPaymentCard extends StatelessWidget {
           ),
           Row(
             children: [
+              Dimens.space(1),
               Icon(
                 Iconsax.clock5,
                 size: 16,
