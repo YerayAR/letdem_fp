@@ -67,7 +67,7 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
-  static const int _distanceTriggerThreshold = 60;
+  static const int _distanceTriggerThreshold = 120;
 
   DateTime? _navigationStartTime;
   bool _hasShownFatigueAlert = false;
@@ -130,7 +130,8 @@ class _NavigationViewState extends State<NavigationView> {
       longitude: _currentLocation!.longitude,
       onEvent: (MapNearbyPayload payload) {
         debugPrint(
-            '📥 Received WebSocket data: ${payload.spaces.length} spaces, ${payload.events.length} events');
+          '📥 Received WebSocket data: ${payload.spaces.length} spaces, ${payload.events.length} events',
+        );
 
         // Update map with real-time data
         if (mounted) {
@@ -234,8 +235,9 @@ class _NavigationViewState extends State<NavigationView> {
 
     debugPrint('🚗 Setting up speed limit listener...');
 
-    _visualNavigator!.speedLimitListener =
-        HERE.SpeedLimitListener((HERE.SpeedLimit? speedLimit) {
+    _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
+      HERE.SpeedLimit? speedLimit,
+    ) {
       if (speedLimit == null) {
         debugPrint('⚠️ No speed limit information available');
         setState(() {
@@ -245,7 +247,8 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       debugPrint(
-          '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s');
+        '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
+      );
 
       setState(() {
         _currentSpeedLimit = speedLimit;
@@ -253,7 +256,8 @@ class _NavigationViewState extends State<NavigationView> {
         if (_speed > 0 && _currentSpeedLimit != null) {
           final buffer =
               _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
-          _isOverSpeedLimit = _speed >
+          _isOverSpeedLimit =
+              _speed >
               (_currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
 
           if (_isOverSpeedLimit && !_isMuted) {
@@ -291,10 +295,12 @@ class _NavigationViewState extends State<NavigationView> {
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
               decoration: BoxDecoration(
                 // CHANGE: Use red background when overspeeding, orange when normal
-                color: _isOverSpeedLimit
-                    ? Colors.redAccent
-                        .withOpacity(0.2) // Red background when overspeeding
-                    : Colors.orange.shade50, // Normal orange background
+                color:
+                    _isOverSpeedLimit
+                        ? Colors.redAccent.withOpacity(
+                          0.2,
+                        ) // Red background when overspeeding
+                        : Colors.orange.shade50, // Normal orange background
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -304,10 +310,12 @@ class _NavigationViewState extends State<NavigationView> {
                     (_speed * 3.6).round().toString(),
                     style: TextStyle(
                       // CHANGE: Use red text when overspeeding, orange when normal
-                      color: _isOverSpeedLimit
-                          ? Colors.redAccent
-                              .withOpacity(0.8) // Red text when overspeeding
-                          : Colors.orange.shade700, // Normal orange text
+                      color:
+                          _isOverSpeedLimit
+                              ? Colors.redAccent.withOpacity(
+                                0.8,
+                              ) // Red text when overspeeding
+                              : Colors.orange.shade700, // Normal orange text
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
                     ),
@@ -315,10 +323,12 @@ class _NavigationViewState extends State<NavigationView> {
                   Text(
                     context.l10n.kmPerHour,
                     style: TextStyle(
-                      color: _isOverSpeedLimit
-                          ? Colors.redAccent
-                              .withOpacity(0.8) // Red text when overspeeding
-                          : Colors.orange.shade700, // Normal orange text
+                      color:
+                          _isOverSpeedLimit
+                              ? Colors.redAccent.withOpacity(
+                                0.8,
+                              ) // Red text when overspeeding
+                              : Colors.orange.shade700, // Normal orange text
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                     ),
@@ -336,28 +346,32 @@ class _NavigationViewState extends State<NavigationView> {
                 // CHANGE: Make speed limit sign border red when overspeeding
                 border: Border.all(
                   color: _isOverSpeedLimit ? Colors.red : Colors.red,
-                  width: _isOverSpeedLimit
-                      ? 3
-                      : 2, // Thicker border when overspeeding
+                  width:
+                      _isOverSpeedLimit
+                          ? 3
+                          : 2, // Thicker border when overspeeding
                 ),
               ),
               child: Center(
-                child: _currentSpeedLimit != null &&
-                        _currentSpeedLimit!.speedLimitInMetersPerSecond != null
-                    ? Text(
-                        "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
-                        style: TextStyle(
-                          // CHANGE: Make speed limit text red when overspeeding
-                          color: _isOverSpeedLimit ? Colors.red : Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                child:
+                    _currentSpeedLimit != null &&
+                            _currentSpeedLimit!.speedLimitInMetersPerSecond !=
+                                null
+                        ? Text(
+                          "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
+                          style: TextStyle(
+                            // CHANGE: Make speed limit text red when overspeeding
+                            color:
+                                _isOverSpeedLimit ? Colors.red : Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        )
+                        : Icon(
+                          Icons.speed,
+                          color: Colors.grey.shade400,
+                          size: 18,
                         ),
-                      )
-                    : Icon(
-                        Icons.speed,
-                        color: Colors.grey.shade400,
-                        size: 18,
-                      ),
               ),
             ),
           ],
@@ -398,18 +412,18 @@ class _NavigationViewState extends State<NavigationView> {
     if (_currentLocation == null) return;
 
     context.read<MapBloc>().add(
-          GetNearbyPlaces(
-            queryParams: MapQueryParams(
-              currentPoint:
-                  "${_currentLocation?.latitude},${_currentLocation?.longitude}",
-              previousPoint:
-                  "${_currentLocation?.latitude},${_currentLocation?.longitude}",
-              radius: 1000,
-              drivingMode: true,
-              options: ['spaces', 'events', 'alerts'],
-            ),
-          ),
-        );
+      GetNearbyPlaces(
+        queryParams: MapQueryParams(
+          currentPoint:
+              "${_currentLocation?.latitude},${_currentLocation?.longitude}",
+          previousPoint:
+              "${_currentLocation?.latitude},${_currentLocation?.longitude}",
+          radius: 1000,
+          drivingMode: true,
+          options: ['spaces', 'events', 'alerts'],
+        ),
+      ),
+    );
   }
 
   @override
@@ -476,55 +490,71 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
 
     _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.buildingFootprints: MapFeatureModes.buildingFootprintsAll
+      MapFeatures.buildingFootprints: MapFeatureModes.buildingFootprintsAll,
     });
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow});
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow,
+    });
 
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.trafficIncidents: MapFeatureModes.trafficIncidentsAll});
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.trafficIncidents: MapFeatureModes.trafficIncidentsAll,
+    });
 
     // Additional traffic-related features
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll});
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll,
+    });
 
     _hereMapController?.mapScene.enableFeatures({
       MapFeatures.vehicleRestrictions:
-          MapFeatureModes.vehicleRestrictionsActiveAndInactive
+          MapFeatureModes.vehicleRestrictionsActiveAndInactive,
     });
-    _hereMapController?.mapScene
-        .enableFeatures({MapFeatures.contours: MapFeatureModes.contoursAll});
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.congestionZones: MapFeatureModes.congestionZonesAll});
     _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.environmentalZones: MapFeatureModes.environmentalZonesAll
+      MapFeatures.contours: MapFeatureModes.contoursAll,
     });
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.landmarks: MapFeatureModes.landmarksTextured});
-    _hereMapController?.mapScene
-        .enableFeatures({MapFeatures.shadows: MapFeatureModes.shadowsAll});
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll});
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.safetyCameras: MapFeatureModes.defaultMode});
-    _hereMapController?.mapScene
-        .enableFeatures({MapFeatures.shadows: MapFeatureModes.shadowsAll});
-    _hereMapController?.mapScene
-        .enableFeatures({MapFeatures.terrain: MapFeatureModes.defaultMode});
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.trafficFlow: MapFeatureModes.trafficIncidentsAll});
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.lowSpeedZones: MapFeatureModes.lowSpeedZonesAll});
-    _hereMapController?.mapScene.enableFeatures(
-        {MapFeatures.ambientOcclusion: MapFeatureModes.ambientOcclusionAll});
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.congestionZones: MapFeatureModes.congestionZonesAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.environmentalZones: MapFeatureModes.environmentalZonesAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.landmarks: MapFeatureModes.landmarksTextured,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.shadows: MapFeatureModes.shadowsAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.safetyCameras: MapFeatureModes.defaultMode,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.shadows: MapFeatureModes.shadowsAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.terrain: MapFeatureModes.defaultMode,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.trafficFlow: MapFeatureModes.trafficIncidentsAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.lowSpeedZones: MapFeatureModes.lowSpeedZonesAll,
+    });
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.ambientOcclusion: MapFeatureModes.ambientOcclusionAll,
+    });
     _hereMapController?.mapScene.enableFeatures({
       MapFeatures.vehicleRestrictions:
-          MapFeatureModes.vehicleRestrictionsActiveAndInactive
+          MapFeatureModes.vehicleRestrictionsActiveAndInactive,
     });
-    _hereMapController?.mapScene
-        .enableFeatures({MapFeatures.contours: MapFeatureModes.contoursAll});
-    _hereMapController?.gestures.tapListener =
-        TapListener((HERE.Point2D touchPoint) {
+    _hereMapController?.mapScene.enableFeatures({
+      MapFeatures.contours: MapFeatureModes.contoursAll,
+    });
+    _hereMapController?.gestures.tapListener = TapListener((
+      HERE.Point2D touchPoint,
+    ) {
       _pickMapMarker(touchPoint);
     });
     // add map marker for destination
@@ -536,8 +566,12 @@ class _NavigationViewState extends State<NavigationView> {
       MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
     );
     _hereMapController!.mapScene.addMapMarker(marker);
-    _hereMapController?.gestures.panListener = PanListener((GestureState state,
-        HERE.Point2D point1, HERE.Point2D point2, double distanceInPixels) {
+    _hereMapController?.gestures.panListener = PanListener((
+      GestureState state,
+      HERE.Point2D point1,
+      HERE.Point2D point2,
+      double distanceInPixels,
+    ) {
       if (state == GestureState.begin) {
         if (_isCameraLocked && _visualNavigator != null) {
           setState(() {
@@ -575,30 +609,32 @@ class _NavigationViewState extends State<NavigationView> {
 
     setState(() => _isLoading = true);
 
-    _hereMapController!.mapScene.loadSceneForMapScheme(
-      MapScheme.normalDay,
-      (error) {
-        if (error != null) {
-          debugPrint('❌ Map scene not loaded. MapError: ${error.toString()}');
-          setState(() {
-            _errorMessage = context.l10n.failedToLoadMap;
-            _isLoading = false;
-          });
-          return;
-        }
+    _hereMapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay, (
+      error,
+    ) {
+      if (error != null) {
+        debugPrint('❌ Map scene not loaded. MapError: ${error.toString()}');
+        setState(() {
+          _errorMessage = context.l10n.failedToLoadMap;
+          _isLoading = false;
+        });
+        return;
+      }
 
-        debugPrint('✅ Map scene loaded.');
-        MapMeasure mapMeasureZoom = MapMeasure(
-            MapMeasureKind.distanceInMeters, _initialZoomDistanceInMeters);
+      debugPrint('✅ Map scene loaded.');
+      MapMeasure mapMeasureZoom = MapMeasure(
+        MapMeasureKind.distanceInMeters,
+        _initialZoomDistanceInMeters,
+      );
 
-        _hereMapController!.camera.lookAtPointWithMeasure(
-            HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
-            mapMeasureZoom);
+      _hereMapController!.camera.lookAtPointWithMeasure(
+        HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+        mapMeasureZoom,
+      );
 
-        _initLocationEngine();
-        _startNavigation();
-      },
-    );
+      _initLocationEngine();
+      _startNavigation();
+    });
   }
 
   void _cleanupNavigation() {
@@ -634,8 +670,9 @@ class _NavigationViewState extends State<NavigationView> {
         }
 
         // Reset camera behavior safely
-        _hereMapController!.camera
-            .setOrientationAtTarget(HERE.GeoOrientationUpdate(0, 0));
+        _hereMapController!.camera.setOrientationAtTarget(
+          HERE.GeoOrientationUpdate(0, 0),
+        );
         debugPrint('✅ Map scene cleaned up');
       }
 
@@ -712,7 +749,8 @@ class _NavigationViewState extends State<NavigationView> {
       );
 
       debugPrint(
-          '📍 Current location: ${currentLocationGeo.latitude}, ${currentLocationGeo.longitude}');
+        '📍 Current location: ${currentLocationGeo.latitude}, ${currentLocationGeo.longitude}',
+      );
 
       _currentLocation = HERE.GeoCoordinates(
         currentLocationGeo.latitude,
@@ -726,10 +764,7 @@ class _NavigationViewState extends State<NavigationView> {
 
       _initializeWebSocketConnection();
 
-      _calculateRoute(
-        _currentLocation!,
-        HERE.GeoCoordinates(destLat, destLng),
-      );
+      _calculateRoute(_currentLocation!, HERE.GeoCoordinates(destLat, destLng));
     } catch (e) {
       debugPrint('❌ Error getting current location: $e');
       setState(() {
@@ -740,12 +775,13 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _checkDistanceTrigger(double latitude, double longitude) {
-    final distanceBetweenPoints = Geolocator.distanceBetween(
-      _lastLatitude,
-      _lastLongitude,
-      latitude,
-      longitude,
-    ).toInt();
+    final distanceBetweenPoints =
+        Geolocator.distanceBetween(
+          _lastLatitude,
+          _lastLongitude,
+          latitude,
+          longitude,
+        ).toInt();
 
     if (distanceBetweenPoints > 0) {
       _distanceTraveled += distanceBetweenPoints;
@@ -757,7 +793,7 @@ class _NavigationViewState extends State<NavigationView> {
           _distanceTriggerThreshold) {
         _lastTriggerDistance =
             (_distanceTraveled ~/ _distanceTriggerThreshold) *
-                _distanceTriggerThreshold;
+            _distanceTriggerThreshold;
 
         _showDistanceTriggerToast();
       }
@@ -771,9 +807,10 @@ class _NavigationViewState extends State<NavigationView> {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: _locationWebSocketService.isConnected
-              ? Colors.green.withOpacity(0.8)
-              : Colors.red.withOpacity(0.8),
+          color:
+              _locationWebSocketService.isConnected
+                  ? Colors.green.withOpacity(0.8)
+                  : Colors.red.withOpacity(0.8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -788,51 +825,50 @@ class _NavigationViewState extends State<NavigationView> {
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
-    _sendLocationUpdateViaWebSocket(
-      _lastLatitude!,
-      _lastLongitude!,
-    );
+    _sendLocationUpdateViaWebSocket(_lastLatitude!, _lastLongitude!);
     context.read<MapBloc>().add(
-          GetNearbyPlaces(
-              queryParams: MapQueryParams(
-            currentPoint: "$_lastLatitude,$_lastLongitude",
-            previousPoint: "$_lastLatitude,$_lastLongitude",
-            radius: 400,
-            drivingMode: true,
-            options: ['alerts'],
-          )),
-        );
+      GetNearbyPlaces(
+        queryParams: MapQueryParams(
+          currentPoint: "$_lastLatitude,$_lastLongitude",
+          previousPoint: "$_lastLatitude,$_lastLongitude",
+          radius: 400,
+          drivingMode: true,
+          options: ['alerts'],
+        ),
+      ),
+    );
   }
 
-  showSpacePopup({
-    required Space space,
-  }) {
+  showSpacePopup({required Space space}) {
     if (space.isPremium) {
       AppPopup.showBottomSheet(
-          context,
-          SpacePopupSheet(
-            space: space,
-            currentPosition: HERE.GeoCoordinates(
-              _currentLocation!.latitude,
-              _currentLocation!.longitude,
-            ),
-            onRefreshTrigger: () {
-              context.read<MapBloc>().add(GetNearbyPlaces(
-                    queryParams: MapQueryParams(
-                      currentPoint:
-                          "${_currentLocation!.latitude},${_currentLocation!.longitude}",
-                      // "${_currentPosition!.latitude},${_currentPosition!.longitude}",
-                      radius: 8000,
-                      drivingMode: false,
-                      options: ['spaces', 'events'],
-                    ),
-                  ));
-              NavigatorHelper.pop();
-              NavigatorHelper.pop();
+        context,
+        SpacePopupSheet(
+          space: space,
+          currentPosition: HERE.GeoCoordinates(
+            _currentLocation!.latitude,
+            _currentLocation!.longitude,
+          ),
+          onRefreshTrigger: () {
+            context.read<MapBloc>().add(
+              GetNearbyPlaces(
+                queryParams: MapQueryParams(
+                  currentPoint:
+                      "${_currentLocation!.latitude},${_currentLocation!.longitude}",
+                  // "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                  radius: 8000,
+                  drivingMode: false,
+                  options: ['spaces', 'events'],
+                ),
+              ),
+            );
+            NavigatorHelper.pop();
+            NavigatorHelper.pop();
 
-              // _switchToNewDestination(space);
-            },
-          ));
+            // _switchToNewDestination(space);
+          },
+        ),
+      );
       return;
     }
     // if (context.userProfile!.activeReservation != null) {
@@ -877,36 +913,38 @@ class _NavigationViewState extends State<NavigationView> {
                               Dimens.space(1),
                               Text(
                                 getSpaceAvailabilityMessage(
-                                    space.type, context),
-                                style: Typo.largeBody
-                                    .copyWith(fontWeight: FontWeight.w800),
+                                  space.type,
+                                  context,
+                                ),
+                                style: Typo.largeBody.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ],
                           ),
                           Text(
                             space.location.streetName,
                             style: Typo.largeBody.copyWith(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.neutral600),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.neutral600,
+                            ),
                           ),
                           Dimens.space(1),
                           DecoratedChip(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 5),
-                            text: '${parseMeters(Geolocator.distanceBetween(
-                              _currentLocation!.latitude,
-                              _currentLocation!.longitude,
-                              space.location.point.lat,
-                              space.location.point.lng,
-                            ))} away',
+                              horizontal: 8,
+                              vertical: 5,
+                            ),
+                            text:
+                                '${parseMeters(Geolocator.distanceBetween(_currentLocation!.latitude, _currentLocation!.longitude, space.location.point.lat, space.location.point.lng))} away',
                             textStyle: Typo.smallBody.copyWith(
                               fontWeight: FontWeight.w600,
                               color: AppColors.green600,
                             ),
                             icon: Iconsax.clock,
                             color: AppColors.green500,
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -942,7 +980,7 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-// Fix 2: Add new method to switch destinations without full cleanup
+  // Fix 2: Add new method to switch destinations without full cleanup
   void _switchToNewDestination(Space space) {
     debugPrint('🔄 Switching to new destination: ${space.location.streetName}');
 
@@ -953,9 +991,9 @@ class _NavigationViewState extends State<NavigationView> {
 
       // Recalculate route to new destination
       _calculateRoute(
-          _currentLocation!,
-          HERE.GeoCoordinates(
-              space.location.point.lat, space.location.point.lng));
+        _currentLocation!,
+        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
+      );
 
       _showToast(
         context.l10n.navigatingToParking,
@@ -972,8 +1010,9 @@ class _NavigationViewState extends State<NavigationView> {
 
   void _pickMapMarker(HERE.Point2D touchPoint) {
     final rectangle = HERE.Rectangle2D(touchPoint, HERE.Size2D(1, 1));
-    final filter =
-        MapSceneMapPickFilter([MapSceneMapPickFilterContentType.mapItems]);
+    final filter = MapSceneMapPickFilter([
+      MapSceneMapPickFilterContentType.mapItems,
+    ]);
 
     _hereMapController?.pick(filter, rectangle, (result) {
       if (result == null || result.mapItems == null) return;
@@ -1017,12 +1056,16 @@ class _NavigationViewState extends State<NavigationView> {
       try {
         Uint8List imageData = _assetsProvider.getEventIcon(event.type);
 
-        MapImage mapImage =
-            MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png);
+        MapImage mapImage = MapImage.withPixelDataAndImageFormat(
+          imageData,
+          ImageFormat.png,
+        );
 
         final marker = MapMarker(
           HERE.GeoCoordinates(
-              event.location.point.lat, event.location.point.lng),
+            event.location.point.lat,
+            event.location.point.lng,
+          ),
           mapImage,
         );
         marker.fadeDuration = const Duration(seconds: 1);
@@ -1038,7 +1081,9 @@ class _NavigationViewState extends State<NavigationView> {
         final imageData = _assetsProvider.getImageForType(space.type);
         final marker = MapMarker(
           HERE.GeoCoordinates(
-              space.location.point.lat, space.location.point.lng),
+            space.location.point.lat,
+            space.location.point.lng,
+          ),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
         marker.fadeDuration = const Duration(seconds: 1);
@@ -1052,7 +1097,9 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _calculateRoute(
-      HERE.GeoCoordinates start, HERE.GeoCoordinates destination) {
+    HERE.GeoCoordinates start,
+    HERE.GeoCoordinates destination,
+  ) {
     debugPrint('🧭 Calculating route...');
     print('📍 Start: ${start.latitude}, ${start.longitude}');
     print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
@@ -1121,15 +1168,14 @@ class _NavigationViewState extends State<NavigationView> {
   void _setInitialNavigationPosition() {
     if (_currentLocation != null && _visualNavigator != null) {
       // Create a simulated location update to kickstart navigation
-      final initialLocation = HERE.Location.withCoordinates(
-        _currentLocation!,
-      );
+      final initialLocation = HERE.Location.withCoordinates(_currentLocation!);
 
       // Send initial location to visual navigator
       _visualNavigator!.onLocationUpdated(initialLocation);
 
       debugPrint(
-          '📍 Set initial navigation position: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+        '📍 Set initial navigation position: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}',
+      );
     }
   }
 
@@ -1158,8 +1204,9 @@ class _NavigationViewState extends State<NavigationView> {
 
     DateTime lastUpdateTime = DateTime.now();
 
-    _visualNavigator!.routeProgressListener =
-        HERE.RouteProgressListener((HERE.RouteProgress routeProgress) {
+    _visualNavigator!.routeProgressListener = HERE.RouteProgressListener((
+      HERE.RouteProgress routeProgress,
+    ) {
       final now = DateTime.now();
       HERE.SectionProgress lastSectionProgress =
           routeProgress.sectionProgress.last;
@@ -1178,9 +1225,9 @@ class _NavigationViewState extends State<NavigationView> {
         speech.speak(normalManuevers);
       }
 
-      _nextManuoverDistance = routeProgress
-          .maneuverProgress.first.remainingDistanceInMeters
-          .floor();
+      _nextManuoverDistance =
+          routeProgress.maneuverProgress.first.remainingDistanceInMeters
+              .floor();
       final remainingDurationInSeconds =
           lastSectionProgress.remainingDuration.inSeconds;
       _distanceNotifier.value = remainingDistance;
@@ -1226,38 +1273,42 @@ class _NavigationViewState extends State<NavigationView> {
                 // check the users active reservatoon exist
 
                 AppPopup.showBottomSheet(
-                    context,
-                    SpacePopupSheet(
-                      space: _currentSpace!,
-                      currentPosition: HERE.GeoCoordinates(
-                        _currentLocation!.latitude,
-                        _currentLocation!.longitude,
-                      ),
-                      onRefreshTrigger: () {
-                        NavigatorHelper.pop();
-                        _isPopupDisplayed = false;
-                        _hasShownParkingRating = false;
-                      },
-                    ));
+                  context,
+                  SpacePopupSheet(
+                    space: _currentSpace!,
+                    currentPosition: HERE.GeoCoordinates(
+                      _currentLocation!.latitude,
+                      _currentLocation!.longitude,
+                    ),
+                    onRefreshTrigger: () {
+                      NavigatorHelper.pop();
+                      _isPopupDisplayed = false;
+                      _hasShownParkingRating = false;
+                    },
+                  ),
+                );
                 return;
               } else {
                 AppPopup.showBottomSheet(
-                    context,
-                    ParkingRatingWidget(
-                      spaceID: _currentSpace!.id,
-                      onSubmit: () {
-                        NavigatorHelper.pop();
-                        _isPopupDisplayed = false;
-                        _hasShownParkingRating = false;
-                      },
-                    ));
+                  context,
+                  ParkingRatingWidget(
+                    spaceID: _currentSpace!.id,
+                    onSubmit: () {
+                      NavigatorHelper.pop();
+                      _isPopupDisplayed = false;
+                      _hasShownParkingRating = false;
+                    },
+                  ),
+                );
               }
             }
           });
         } else if (!isParkingNavigation) {
           print('🎯 Standard destination reached. Showing toast.');
-          _showToast(context.l10n.arrivedAtDestination,
-              backgroundColor: AppColors.green600);
+          _showToast(
+            context.l10n.arrivedAtDestination,
+            backgroundColor: AppColors.green600,
+          );
 
           putParkingSpacesOnMap();
         }
@@ -1296,8 +1347,9 @@ class _NavigationViewState extends State<NavigationView> {
       }
     });
 
-    _visualNavigator!.eventTextListener =
-        HERE.EventTextListener((HERE.EventText eventText) {
+    _visualNavigator!.eventTextListener = HERE.EventTextListener((
+      HERE.EventText eventText,
+    ) {
       String? streetName = getStreetNameFromManeuver(
         eventText.maneuverNotificationDetails!.maneuver,
       );
@@ -1316,8 +1368,9 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _setupRouteDeviationListener() {
-    _visualNavigator!.routeDeviationListener =
-        HERE.RouteDeviationListener((HERE.RouteDeviation routeDeviation) {
+    _visualNavigator!.routeDeviationListener = HERE.RouteDeviationListener((
+      HERE.RouteDeviation routeDeviation,
+    ) {
       debugPrint('🛰️ Route deviation listener triggered');
 
       if (_isRecalculatingRoute) {
@@ -1328,14 +1381,16 @@ class _NavigationViewState extends State<NavigationView> {
       HERE.Route? route = _visualNavigator?.route;
       if (route == null) {
         debugPrint(
-            '❌ No active route found. Skipping route deviation handling.');
+          '❌ No active route found. Skipping route deviation handling.',
+        );
         return;
       }
 
       HERE.GeoCoordinates currentGeoCoordinates =
           routeDeviation.currentLocation.originalLocation.coordinates;
       debugPrint(
-          '📍 Current location: (${currentGeoCoordinates.latitude}, ${currentGeoCoordinates.longitude})');
+        '📍 Current location: (${currentGeoCoordinates.latitude}, ${currentGeoCoordinates.longitude})',
+      );
 
       double distanceInMeters = Geolocator.distanceBetween(
         _currentLocation!.latitude,
@@ -1357,7 +1412,8 @@ class _NavigationViewState extends State<NavigationView> {
           isFarEnoughFromDestination &&
           isTimeElapsedSinceLastReroute) {
         debugPrint(
-            '⚠️ Significant deviation detected! Off by ${distanceInMeters}m');
+          '⚠️ Significant deviation detected! Off by ${distanceInMeters}m',
+        );
         debugPrint('📡 Initiating reroute sequence...');
 
         _rerouteDebounceTimer?.cancel();
@@ -1387,7 +1443,8 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _recalculateRouteFromCurrentLocation(
-      HERE.GeoCoordinates currentPosition) {
+    HERE.GeoCoordinates currentPosition,
+  ) {
     if (_currentLocation == null) return;
 
     try {
@@ -1396,7 +1453,8 @@ class _NavigationViewState extends State<NavigationView> {
       HERE.Waypoint startWaypoint = HERE.Waypoint(currentPosition);
 
       HERE.Waypoint destinationWaypoint = HERE.Waypoint(
-          HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng));
+        HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
+      );
 
       final carOptions = HERE.CarOptions();
       carOptions.routeOptions.enableTolls = true;
@@ -1447,8 +1505,10 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
-  String getStreetNameFromManeuver(HERE.Maneuver maneuver,
-      {List<Locale> preferredLocales = const []}) {
+  String getStreetNameFromManeuver(
+    HERE.Maneuver maneuver, {
+    List<Locale> preferredLocales = const [],
+  }) {
     String? name = maneuver.nextRoadTexts.names.getDefaultValue();
 
     name ??= maneuver.roadTexts.names.getDefaultValue();
@@ -1472,7 +1532,9 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _setupLocationSource(
-      HERE.LocationListener locationListener, HERE.Route route) {
+    HERE.LocationListener locationListener,
+    HERE.Route route,
+  ) {
     debugPrint('📍 Setting up navigation with visual map...');
     try {
       _visualNavigator!.route = route;
@@ -1508,8 +1570,9 @@ class _NavigationViewState extends State<NavigationView> {
       _visualNavigator!.startRendering(_hereMapController!);
       _setupSpeedLimitListener();
 
-      _hereMapController!.camera
-          .setOrientationAtTarget(HERE.GeoOrientationUpdate(0, 65));
+      _hereMapController!.camera.setOrientationAtTarget(
+        HERE.GeoOrientationUpdate(0, 65),
+      );
 
       debugPrint('✅ Navigation with 3D view started successfully');
     } catch (e) {
@@ -1548,13 +1611,16 @@ class _NavigationViewState extends State<NavigationView> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      height: _isNavigating &&
-              _navigationInstruction.isNotEmpty &&
-              _distanceNotifier.value > 0
-          ? 90
-          : 70,
+      height:
+          _isNavigating &&
+                  _navigationInstruction.isNotEmpty &&
+                  _distanceNotifier.value > 0
+              ? 90
+              : 70,
       padding: const EdgeInsets.symmetric(
-          horizontal: _containerPadding, vertical: _containerPadding + 5),
+        horizontal: _containerPadding,
+        vertical: _containerPadding + 5,
+      ),
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(_borderRadius),
@@ -1566,85 +1632,94 @@ class _NavigationViewState extends State<NavigationView> {
           ),
         ],
       ),
-      child: _isNavigating &&
-              _navigationInstruction.isNotEmpty &&
-              _distanceNotifier.value > 0
-          ? Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.amber,
+      child:
+          _isNavigating &&
+                  _navigationInstruction.isNotEmpty &&
+                  _distanceNotifier.value > 0
+              ? Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.amber,
+                    ),
+                    child: Icon(directionIcon, color: Colors.black, size: 24),
                   ),
-                  child: Icon(directionIcon, color: Colors.black, size: 24),
-                ),
-                const SizedBox(width: 15),
-                ValueListenableBuilder<int>(
-                  valueListenable: _distanceNotifier,
-                  builder: (context, state, _) {
-                    return Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '${_nextManuoverDistance.toFormattedDistance()} ${context.l10n.ahead}',
-                            style: const TextStyle(
+                  const SizedBox(width: 15),
+                  ValueListenableBuilder<int>(
+                    valueListenable: _distanceNotifier,
+                    builder: (context, state, _) {
+                      return Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${_nextManuoverDistance.toFormattedDistance()} ${context.l10n.ahead}',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          ),
-                          Text(
-                            _navigationInstruction,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 15),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                Dimens.space(1),
-                CircleAvatar(
-                  backgroundColor: AppColors.neutral500.withOpacity(0.5),
-                  child: IconButton(
-                    icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up,
-                        color: Colors.white),
-                    onPressed: () {
-                      setState(() {
-                        _isMuted = !_isMuted;
-
-                        if (_visualNavigator != null) {
-                          debugPrint(
-                              '🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}');
-                        }
-                      });
-                      if (_isMuted) {
-                        speech.mute();
-                      } else {
-                        speech.unmute();
-                        _configureTTSLanguage();
-                      }
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              _navigationInstruction,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
-                ),
-              ],
-            )
-          : Center(
-              child: Shimmer.fromColors(
-                baseColor: Colors.white.withOpacity(0.5),
-                highlightColor: Colors.grey[100]!,
-                child: Text(
-                  context.l10n.waitingForNavigation,
-                  style: TextStyle(
-                      color: Colors.white.withOpacity(0.7), fontSize: 16),
+                  Dimens.space(1),
+                  CircleAvatar(
+                    backgroundColor: AppColors.neutral500.withOpacity(0.5),
+                    child: IconButton(
+                      icon: Icon(
+                        _isMuted ? Icons.volume_off : Icons.volume_up,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isMuted = !_isMuted;
+
+                          if (_visualNavigator != null) {
+                            debugPrint(
+                              '🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}',
+                            );
+                          }
+                        });
+                        if (_isMuted) {
+                          speech.mute();
+                        } else {
+                          speech.unmute();
+                          _configureTTSLanguage();
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              )
+              : Center(
+                child: Shimmer.fromColors(
+                  baseColor: Colors.white.withOpacity(0.5),
+                  highlightColor: Colors.grey[100]!,
+                  child: Text(
+                    context.l10n.waitingForNavigation,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ),
-            ),
     );
   }
 
@@ -1767,12 +1842,14 @@ class _NavigationViewState extends State<NavigationView> {
             for (var alert in state.payload.alerts) {
               AlertHelper.showWarning(
                 context: context,
-                title: alert.type.toLowerCase() == "camera"
-                    ? context.l10n.cameraAlertTitle
-                    : context.l10n.radarAlertTitle,
-                subtext: alert.type.toLowerCase() == "camera"
-                    ? context.l10n.cameraAlertMessage
-                    : context.l10n.radarAlertMessage,
+                title:
+                    alert.type.toLowerCase() == "camera"
+                        ? context.l10n.cameraAlertTitle
+                        : context.l10n.radarAlertTitle,
+                subtext:
+                    alert.type.toLowerCase() == "camera"
+                        ? context.l10n.cameraAlertMessage
+                        : context.l10n.radarAlertMessage,
               );
             }
           }
@@ -1797,14 +1874,16 @@ class _NavigationViewState extends State<NavigationView> {
                     child: IconButton(
                       icon: Icon(
                         _isCameraLocked ? Icons.gps_fixed : Icons.gps_not_fixed,
-                        color: _isCameraLocked
-                            ? AppColors.primary500
-                            : Colors.grey,
+                        color:
+                            _isCameraLocked
+                                ? AppColors.primary500
+                                : Colors.grey,
                       ),
                       onPressed: _toggleCameraTracking,
-                      tooltip: _isCameraLocked
-                          ? context.l10n.freeCameraMode
-                          : context.l10n.lockPositionMode,
+                      tooltip:
+                          _isCameraLocked
+                              ? context.l10n.freeCameraMode
+                              : context.l10n.lockPositionMode,
                     ),
                   ),
                 ),
@@ -1856,11 +1935,7 @@ class ArrivalNotificationWidget extends StatelessWidget {
         CircleAvatar(
           radius: 45,
           backgroundColor: AppColors.green50,
-          child: Icon(
-            Iconsax.location5,
-            size: 45,
-            color: AppColors.green600,
-          ),
+          child: Icon(Iconsax.location5, size: 45, color: AppColors.green600),
         ),
         Dimens.space(3),
         Text(

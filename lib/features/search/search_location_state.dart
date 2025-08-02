@@ -20,10 +20,13 @@ final class SearchLocationLoaded extends SearchLocationState {
   final List<HerePlace> recentPlaces;
   final bool isLocationCreating;
 
+  final String? country;
+
   const SearchLocationLoaded({
     required this.locations,
     required this.recentPlaces,
     this.isLocationCreating = false,
+    this.country,
   });
 
   SearchLocationLoaded copyWith({

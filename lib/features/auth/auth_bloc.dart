@@ -11,6 +11,7 @@ import 'package:letdem/features/auth/models/tokens.model.dart';
 import 'package:letdem/features/auth/repositories/auth.repository.dart';
 import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/infrastructure/services/google/google.service.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../infrastructure/services/res/navigator.dart';
@@ -28,7 +29,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendVerificationCodeEvent>(_onResendVerificationCode);
     on<FindForgotPasswordAccountEvent>(_onFindForgotPasswordAccount);
     on<ResendForgotPasswordVerificationCodeEvent>(
-        _onResendForgotPasswordVerificationCode);
+      _onResendForgotPasswordVerificationCode,
+    );
     on<ValidateResetPasswordEvent>(_onValidateResetPassword);
     on<ResetPasswordEvent>(_onResetPassword);
     on<GoogleLoginEvent>(_onGoogleLoginEvent);
@@ -36,12 +38,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onGoogleRegisterEvent(
-      GoogleRegisterEvent event, Emitter<AuthState> emit) async {
+    GoogleRegisterEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(RegisterLoading());
       var at = await GoogleAuthService.signInWithGoogle();
-      final Tokens tokens =
-          await authRepository.googleSignup(TokenDTO(token: at!));
+
+      print("OneSignal User ID: ${OneSignal.User.pushSubscription.id}");
+      print(OneSignal.User.pushSubscription.id);
+
+      final Tokens tokens = await authRepository.googleSignup(
+        TokenDTO(token: at!),
+      );
 
       await tokens.write();
       emit(OTPVerificationSuccess(isGoogleLogin: true));
@@ -49,18 +58,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(RegisterError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(RegisterError(
-          error: NavigatorHelper.context!.l10n.somethingWentWrong));
+      emit(
+        RegisterError(error: NavigatorHelper.context!.l10n.somethingWentWrong),
+      );
     }
   }
 
   Future<void> _onGoogleLoginEvent(
-      GoogleLoginEvent event, Emitter<AuthState> emit) async {
+    GoogleLoginEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(LoginLoading());
+
+      print("OneSignal User ID: ${OneSignal.User.pushSubscription.id}");
+      print(OneSignal.User.pushSubscription.id);
+
       var at = await GoogleAuthService.signInWithGoogle();
-      final Tokens tokens =
-          await authRepository.googleLogin(TokenDTO(token: at!));
+      final Tokens tokens = await authRepository.googleLogin(
+        TokenDTO(token: at!),
+      );
 
       await tokens.write();
       emit(LoginSuccess());
@@ -73,76 +90,101 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onResetPassword(
-      ResetPasswordEvent event, Emitter<AuthState> emit) async {
+    ResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(ResetPasswordLoading());
       await authRepository.resetPassword(
-          ResetPasswordDTO(email: event.email, password: event.password));
+        ResetPasswordDTO(email: event.email, password: event.password),
+      );
 
       emit(ResetPasswordSuccess());
     } on ApiError catch (err) {
       emit(ResetPasswordError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(ResetPasswordError(
-          error: NavigatorHelper.context!.l10n.unableToResetPassword));
+      emit(
+        ResetPasswordError(
+          error: NavigatorHelper.context!.l10n.unableToResetPassword,
+        ),
+      );
     }
   }
 
   Future<void> _onValidateResetPassword(
-      ValidateResetPasswordEvent event, Emitter<AuthState> emit) async {
+    ValidateResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(ValidateResetPasswordLoading());
       await authRepository.validateResetPassword(
-          VerifyEmailDTO(email: event.email, otp: event.code));
+        VerifyEmailDTO(email: event.email, otp: event.code),
+      );
 
       emit(ValidateResetPasswordSuccess());
     } on ApiError catch (err) {
       emit(ValidateResetPasswordError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(ValidateResetPasswordError(
-          error: NavigatorHelper.context!.l10n.unableToResetPassword));
+      emit(
+        ValidateResetPasswordError(
+          error: NavigatorHelper.context!.l10n.unableToResetPassword,
+        ),
+      );
     }
   }
 
   Future<void> _onResendForgotPasswordVerificationCode(
-      ResendForgotPasswordVerificationCodeEvent event,
-      Emitter<AuthState> emit) async {
+    ResendForgotPasswordVerificationCodeEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(ResendVerificationCodeLoading());
-      await authRepository
-          .resendVerificationCodeForgotPassword(EmailDTO(email: event.email));
+      await authRepository.resendVerificationCodeForgotPassword(
+        EmailDTO(email: event.email),
+      );
 
       emit(ResendVerificationCodeSuccess());
     } on ApiError catch (err) {
       emit(FindForgotPasswordAccountError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(FindForgotPasswordAccountError(
-          error: NavigatorHelper.context!.l10n.unableToResendCode));
+      emit(
+        FindForgotPasswordAccountError(
+          error: NavigatorHelper.context!.l10n.unableToResendCode,
+        ),
+      );
     }
   }
 
   Future<void> _onFindForgotPasswordAccount(
-      FindForgotPasswordAccountEvent event, Emitter<AuthState> emit) async {
+    FindForgotPasswordAccountEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(FindForgotPasswordAccountLoading());
-      await authRepository
-          .findForgotPasswordAccount(EmailDTO(email: event.email));
+      await authRepository.findForgotPasswordAccount(
+        EmailDTO(email: event.email),
+      );
 
       emit(FindForgotPasswordAccountSuccess());
     } on ApiError catch (err) {
       emit(FindForgotPasswordAccountError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(FindForgotPasswordAccountError(
-          error: NavigatorHelper.context!.l10n.unableToFindAccount));
+      emit(
+        FindForgotPasswordAccountError(
+          error: NavigatorHelper.context!.l10n.unableToFindAccount,
+        ),
+      );
     }
   }
 
   Future<void> _onResendVerificationCode(
-      ResendVerificationCodeEvent event, Emitter<AuthState> emit) async {
+    ResendVerificationCodeEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(ResendVerificationCodeLoading());
       await authRepository.resendVerificationCode(EmailDTO(email: event.email));
@@ -152,17 +194,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(RegisterError(error: err.message));
     } catch (err, sr) {
       print(sr);
-      emit(RegisterError(
-          error: NavigatorHelper.context!.l10n.unableToResendCode));
+      emit(
+        RegisterError(error: NavigatorHelper.context!.l10n.unableToResendCode),
+      );
     }
   }
 
   Future<void> _onVerifyEmail(
-      VerifyEmailEvent event, Emitter<AuthState> emit) async {
+    VerifyEmailEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(OTPVerificationLoading());
       Tokens tokens = await authRepository.verifyEmailEvent(
-          VerifyEmailDTO(email: event.email, otp: event.code));
+        VerifyEmailDTO(email: event.email, otp: event.code),
+      );
 
       await tokens.write();
 
@@ -172,22 +218,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err, sr) {
       print(sr);
       // emit(const RegisterError(error: 'Unable to Verify Email'));
-      emit(RegisterError(
-          error: NavigatorHelper.context!.l10n.unableToVerifyEmail));
+      emit(
+        RegisterError(error: NavigatorHelper.context!.l10n.unableToVerifyEmail),
+      );
     }
   }
 
   Future<void> _onRegisterUserEvent(
-      RegisterEvent event, Emitter<AuthState> emit) async {
+    RegisterEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(RegisterLoading());
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var lang = prefs.getString("locale");
-      await authRepository.register(RegisterDTO(
-        email: event.email,
-        password: event.password,
-        language: lang ?? "es",
-      ));
+      await authRepository.register(
+        RegisterDTO(
+          email: event.email,
+          password: event.password,
+          language: lang ?? "es",
+        ),
+      );
 
       emit(RegisterSuccess());
     } on ApiError catch (err) {
@@ -196,16 +247,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       print(sr);
       // emit(const RegisterError(error: 'Unable to Register'));
       emit(
-          RegisterError(error: NavigatorHelper.context!.l10n.unableToRegister));
+        RegisterError(error: NavigatorHelper.context!.l10n.unableToRegister),
+      );
     }
   }
 
   Future<void> _onLoginUserEvent(
-      LoginEvent event, Emitter<AuthState> emit) async {
+    LoginEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(LoginLoading());
-      final Tokens tokens = await authRepository
-          .login(LoginDTO(email: event.email, password: event.password));
+      final Tokens tokens = await authRepository.login(
+        LoginDTO(email: event.email, password: event.password),
+      );
 
       await tokens.write();
       emit(LoginSuccess());

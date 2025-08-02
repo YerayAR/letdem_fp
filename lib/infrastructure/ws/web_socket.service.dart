@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -23,8 +24,9 @@ class LocationWebSocketService {
   }) async {
     var token = await SecureStorageHelper().read('access_token');
 
-    final wsUrl =
-        Uri.parse('ws://api-staging.letdem.org/ws/maps/nearby?token=${token}');
+    final wsUrl = Uri.parse(
+      'ws://api-staging.letdem.org/ws/maps/nearby?token=${token}',
+    );
 
     _channel = WebSocketChannel.connect(wsUrl);
     _log('✅ Connected to WebSocket');
@@ -83,18 +85,20 @@ class LocationWebSocketService {
 
   /// Sends a location update over the WebSocket
   void sendLocation(double latitude, double longitude) {
+    if (kDebugMode) {
+      // Toast.show('📍 Sending location update: $latitude, $longitude');
+    }
     if (_channel == null) {
-      _log('⚠️ WebSocket is not connected. Cannot send location.',
-          type: 'warn');
+      _log(
+        '⚠️ WebSocket is not connected. Cannot send location.',
+        type: 'warn',
+      );
       return;
     }
 
     final payload = {
       "event_type": "update.live.location",
-      "data": {
-        "lat": latitude,
-        "lng": longitude,
-      }
+      "data": {"lat": latitude, "lng": longitude},
     };
 
     final jsonString = jsonEncode(payload);

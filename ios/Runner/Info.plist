@@ -45,6 +45,8 @@
 	<string>This app requires access to your microphone to enable voice search for finding nearby parking spots.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to your photo library to allow users to upload parking-related images, such as parking spots and receipts.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This app requires access to the local network to support development tools like hot reload.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
