@@ -168,11 +168,11 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '- ${withdrawal.amount.abs().toStringAsFixed(2)} €',
+                '-${withdrawal.amount.abs().toStringAsFixed(2)}€',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.red500,
+                  color: AppColors.neutral400,
                 ),
               ),
               const SizedBox(height: 4),
