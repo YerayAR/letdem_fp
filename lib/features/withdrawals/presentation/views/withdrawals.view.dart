@@ -8,6 +8,7 @@ import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/features/commons/presentations/widgets/date_time_display.widget.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/models/withdrawals/withdrawal.model.dart';
 
@@ -33,7 +34,7 @@ class _WithdrawListViewState extends State<WithdrawListView> {
           StyledAppBar(
             title: context.l10n.withdrawals,
             onTap: () => Navigator.of(context).pop(),
-            icon: Iconsax.close_circle5,
+            icon: Icons.close,
           ),
           Dimens.space(2),
           BlocConsumer<WithdrawalBloc, WithdrawalState>(
@@ -120,7 +121,7 @@ class WithdrawalCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(19),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -157,14 +158,8 @@ class WithdrawalCard extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatDate(withdrawal.created, context),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
+                const SizedBox(height: 5),
+                DateTimeDisplay(date: withdrawal.created)
               ],
             ),
           ),
@@ -173,11 +168,11 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '-${withdrawal.amount.abs().toStringAsFixed(1)} €',
+                '-${withdrawal.amount.abs().toStringAsFixed(2)}€',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.neutral600,
+                  color: AppColors.neutral400,
                 ),
               ),
               const SizedBox(height: 4),
@@ -233,39 +228,6 @@ class WithdrawalCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date, BuildContext context) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final dateOnly = DateTime(date.year, date.month, date.day);
-
-    if (dateOnly == today) {
-      return context.l10n.justNow;
-    } else if (dateOnly == yesterday) {
-      return '${context.l10n.yesterday} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-    } else {
-      return '${date.day} ${_getMonthName(date.month)}, ${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-    }
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month - 1];
   }
 }
 

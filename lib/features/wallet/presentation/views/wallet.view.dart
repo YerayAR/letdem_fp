@@ -11,6 +11,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/features/commons/presentations/widgets/date_time_display.widget.dart';
 import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
@@ -304,7 +305,7 @@ class TransactionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(context.l10n.transactionHistory,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         BlocBuilder<WalletBloc, WalletState>(
           builder: (context, state) {
             bool hasTransactions = false;
@@ -324,8 +325,8 @@ class TransactionHeader extends StatelessWidget {
                 ),
                 child: Text(
                   context.l10n.seeAll,
-                  style: const TextStyle(
-                      color: Color(0xFF8A3FFC),
+                  style: TextStyle(
+                      color: AppColors.primary500,
                       fontWeight: FontWeight.w500,
                       fontSize: 14),
                 ),
@@ -380,9 +381,13 @@ class TransactionList extends StatelessWidget {
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
-                      itemCount: limit ?? transactions.length,
+                      itemCount: limit != null
+                          ? transactions.length > limit!
+                              ? limit!
+                              : transactions.length
+                          : transactions.length,
                       itemBuilder: (context, index) {
-                        final tx = transactions[index];
+                        final transaction = transactions[index];
                         return Column(
                           children: [
                             Row(
@@ -391,16 +396,16 @@ class TransactionList extends StatelessWidget {
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
-                                    color: isPositiveTransaction(tx.source)
+                                    color: isPositiveTransaction(transaction.source)
                                         ? const Color(0xFFE6F7EE)
                                         : const Color(0xFFFFEEEE),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
-                                    isPositiveTransaction(tx.source)
+                                    isPositiveTransaction(transaction.source)
                                         ? Icons.arrow_downward_rounded
                                         : Icons.arrow_upward_rounded,
-                                    color: tx.source != TransactionType.WITHDRAW
+                                    color: transaction.source != TransactionType.WITHDRAW
                                         ? const Color(0xFF00A86B)
                                         : const Color(0xFFFF4D4F),
                                     size: 22,
@@ -414,27 +419,22 @@ class TransactionList extends StatelessWidget {
                                     children: [
                                       Text(
                                           getTransactionTypeString(
-                                              tx.source, context),
+                                              transaction.source, context),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14)),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        '${DateFormat('dd MMM. yyyy').format(tx.created)} · ${DateFormat('HH:mm').format(tx.created)}',
-                                        style: TextStyle(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 12),
-                                      ),
+                                      DateTimeDisplay(date: transaction.created)
                                     ],
                                   ),
                                 ),
                                 const SizedBox(width: 16),
                                 Text(
-                                  isPositiveTransaction(tx.source)
-                                      ? '+${tx.amount.toStringAsFixed(2)}€'
-                                      : '${(-tx.amount).toStringAsFixed(2)}€',
+                                  isPositiveTransaction(transaction.source)
+                                      ? '+${transaction.amount.toStringAsFixed(2)}€'
+                                      : '${(-transaction.amount).toStringAsFixed(2)}€',
                                   style: TextStyle(
-                                    color: isPositiveTransaction(tx.source)
+                                    color: isPositiveTransaction(transaction.source)
                                         ? const Color(0xFF00A86B)
                                         : const Color(0xFFFF4D4F),
                                     fontWeight: FontWeight.w600,
@@ -513,7 +513,11 @@ class EmptyTransactionsView extends StatelessWidget {
           children: [
             Text(
               context.l10n.noTransactionsYet,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(

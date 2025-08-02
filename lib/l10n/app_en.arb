@@ -174,7 +174,7 @@
   "free": "Free",
   "timeRemaining": "Time remaining",
   "currency": "€",
-  "showAll": "Show All",
+  "showAll": "Show all",
   "noContributions": "No contributions yet",
   "noContributionsDescription": "Your contributions history will appear here, publish to see them",
   "all": "All",
@@ -266,7 +266,7 @@
   "cLabelIndustrial": "Industrial vehicles and buses registered from 2014 onwards.",
   "yourCarDetails": "Your car details",
   "editDetails": "Edit details",
-  "lastPlaceParked": "Last place parked",
+  "lastPlaceParked": "Where is my car?",
   "unknown": "Unknown",
   "navigateToCar": "Navigate to car",
   "errorConfirmSpaceReservation": "Unable to confirm space reservation",
@@ -536,9 +536,7 @@
   },
   "whatIsThisWaitingTime": "What's this?",
   "fetchingLocation": "Fetching location...",
-
-  "pendingFundsInfo": "Some of your funds have not yet been released by the payment provider, so the amount available to withdraw only includes the released funds. You can withdraw between {minAmount} and {maxAmount}. Please note that pending funds may take up to 10 days to be released, depending on the provider.",
-
+  "pendingFundsInfo": "You can withdraw between {minAmount} and {maxAmount}. Funds held by the payment provider will be available within a maximum of 10 days.",
   "@pendingFundsInfo": {
     "description": "Info message explaining pending funds and withdrawal limits",
     "placeholders": {
@@ -602,6 +600,7 @@
   "speedLimitWarning": "You are driving at speed limit, slow down",
   "kmPerHour": "Km/h",
   "speedLimit": "Speed limit",
+  "codeConfirmation": "Code",
   "recalculatingRoute": "Recalculating route...",
   "youHaveArrived": "You have arrived at your destination!",
   "navigatingToParking": "Navigating to parking space",
@@ -908,7 +907,7 @@
   "noPayoutMethodsAvailable": "No payout methods available",
   "success": "Success",
   "withdrawalRequestSuccess": "Withdrawal request has been sent successfully.",
-  "withdrawalToBank": "Withdrawal to Bank {method}",
+  "withdrawalToBank": "Withdrawal to bank {method}",
   "@withdrawalToBank": {
     "placeholders": {
       "method": {
@@ -929,7 +928,7 @@
     }
   },
   "amountToReceive": "Amount to receive",
-  "pendingToBeCleared": "{amount} € Pending to be cleared",
+  "pendingToBeCleared": "{amount} € Awaiting clearance",
   "@pendingToBeCleared": {
     "placeholders": {
       "amount": {

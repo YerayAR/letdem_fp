@@ -39,8 +39,6 @@ class _ActivitiesViewState extends State<ActivitiesView> {
   @override
   void initState() {
     super.initState();
-    context.loadUser();
-    // context.read<ActivitiesBloc>().add(GetActivitiesEvent());
   }
 
   Widget _buildFooter(ActivitiesState state, bool isAllRouted) {
@@ -57,6 +55,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
         context.l10n.contributions,
         style: Typo.mediumBody.copyWith(
           fontWeight: FontWeight.w600,
+          fontSize: 18,
         ),
       ),
       if (state is ActivitiesLoaded && state.activities.isNotEmpty)
@@ -65,11 +64,11 @@ class _ActivitiesViewState extends State<ActivitiesView> {
             NavigatorHelper.to(const ViewAllView());
           },
           child: Text(
-            context.l10n.showAll,
+            context.l10n.seeAll,
             style: Typo.smallBody.copyWith(
               color: AppColors.primary500,
-              fontWeight: FontWeight.w600,
-              decoration: TextDecoration.underline,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
             ),
           ),
         ),
@@ -160,6 +159,7 @@ class NotificationAppBar extends StatelessWidget {
                     '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
                     style: Typo.smallBody.copyWith(
                       color: Colors.white,
+                      fontSize: 9,
                       fontWeight: FontWeight.w700,
                     ),
                   )),

@@ -5,6 +5,9 @@ sealed class UserEvent extends Equatable {
 }
 
 class FetchUserInfoEvent extends UserEvent {
+  final bool isSilent;
+
+  const FetchUserInfoEvent({this.isSilent = false});
   @override
   // TODO: implement props
   List<Object?> get props => [];

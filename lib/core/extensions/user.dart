@@ -8,7 +8,7 @@ extension UserBlocExtension on BuildContext {
 
   // load user
   void loadUser() {
-    userBloc.add(FetchUserInfoEvent());
+    userBloc.add(const FetchUserInfoEvent(isSilent: true));
   }
 
   LetDemUser? get userProfile {

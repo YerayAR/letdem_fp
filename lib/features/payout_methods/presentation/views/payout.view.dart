@@ -179,7 +179,7 @@ class _PayoutMethodsScreenState extends State<PayoutMethodsScreen> {
                       ],
                     ),
                   ),
-                  Dimens.space(2),
+                  Dimens.space(3),
                 ],
               ),
             ));
