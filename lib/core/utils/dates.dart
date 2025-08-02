@@ -22,13 +22,10 @@ String getMonthName(int month) {
 }
 
 String formatDate(DateTime date, BuildContext context) {
-  final now = DateTime.now();
-
   return DateFormat(
       context.isSpanish
           ? "dd 'de' MMM. yyyy"
           : "dd MMM. yyyy",
       context.isSpanish ? 'es' : 'en'
-  )
-      .format(now.toLocal());
+  ).format(date.toLocal());
 }
