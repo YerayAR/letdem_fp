@@ -114,7 +114,7 @@ class RegisteredCarWidget extends StatelessWidget {
                           ),
                           Dimens.space(2),
                           Text(
-                            context.l10n.lastParkedPlace,
+                            context.l10n.lastPlaceParked,
                             style: Typo.smallBody.copyWith(
                                 color: AppColors.neutral500,
                                 fontWeight: FontWeight.w700,

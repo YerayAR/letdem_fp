@@ -154,7 +154,7 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
                           maxLines: 2,
                           style: Typo.mediumBody.copyWith(
                             fontWeight: FontWeight.w600,
-                            fontSize: 12,
+                            fontSize: 13,
                             color: AppColors.neutral500,
                           ),
                         ),
@@ -167,7 +167,7 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w500,
                     color: AppColors.primary500,
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
               ],
@@ -232,11 +232,20 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
       children: [
         Expanded(
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (!isReserved)
                 _buildIconText(
                     Iconsax.clock5, _formatDuration(_remaining, context)),
-              isReserved ? const SizedBox() : Dimens.space(3),
+              isReserved & !widget.payload.isOwner
+                  ? Text(
+                      "${context.l10n.codeConfirmation}: ${widget.payload.confirmationCode}",
+                      style: Typo.mediumBody.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      )
+                  )
+                  : Dimens.space(3),
               _buildIconText(
                 Iconsax.money5,
                 payload.price == null
