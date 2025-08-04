@@ -104,11 +104,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       }
 
       var maxPrice = context.userProfile!.constantsSettings.spacePrice.maximum;
-      var minPrice =
-          context.userProfile!.constantsSettings?.spacePrice?.minimum ?? 0;
-
-      print("Max Price: $maxPrice");
-      print("Min Price: $minPrice");
+      var minPrice = context.userProfile!.constantsSettings.spacePrice.minimum;
 
       if (int.tryParse(price) == null ||
           int.tryParse(price)! < minPrice ||
@@ -121,14 +117,11 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
         return;
       }
 
-      print("Phone Number: $phoneNumber");
-      print("Country Code: $countryCode");
-
       bool isValid = CountryUtils.validatePhoneNumber(
           phoneNumber, countryCode.replaceAll('-', ''));
 
       if (!isValid) {
-        Toast.showError("The phone number is not valid");
+        Toast.showError(context.l10n.invalidPhoneNumber);
         return;
       }
       if (widget.isPaid &&

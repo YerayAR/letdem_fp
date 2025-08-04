@@ -60,7 +60,7 @@ class _AllTransactionsViewState extends State<AllTransactionsView> {
                   )));
             },
             title: context.l10n.transactionTitle,
-            icon: Iconsax.close_circle5,
+            icon: Icons.close,
           ),
           Expanded(
             child: BlocBuilder<WalletBloc, WalletState>(
