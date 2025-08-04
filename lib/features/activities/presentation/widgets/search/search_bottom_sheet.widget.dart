@@ -138,7 +138,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
         IconButton(
           icon: Icon(
             CupertinoIcons.clear_circled_solid,
-            color: AppColors.neutral400,
+            color: AppColors.neutral100,
           ),
           onPressed: () => Navigator.pop(context),
         ),

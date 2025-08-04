@@ -108,6 +108,7 @@ class _ProfileAppBar extends StatelessWidget {
                     '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
                     style: Typo.smallBody.copyWith(
                       color: Colors.white,
+                      fontSize: 9,
                       fontWeight: FontWeight.w700,
                     ),
                   )),
