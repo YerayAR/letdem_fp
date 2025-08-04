@@ -163,6 +163,50 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
+  void _forceInitialLocationUpdate() async {
+    if (_visualNavigator == null || _currentLocation == null) return;
+
+    try {
+      // Create a location object with current position
+      final initialLocation = HERE.Location.withCoordinates(_currentLocation!);
+
+      // Force the visual navigator to process this location
+      _visualNavigator!.onLocationUpdated(initialLocation);
+
+      // Also update the location engine if it exists
+      if (_locationEngine != null) {
+        // Get a fresh location reading
+        final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 10),
+        );
+
+        final freshLocation = HERE.Location.withCoordinates(
+          HERE.GeoCoordinates(position.latitude, position.longitude),
+        );
+
+        _visualNavigator!.onLocationUpdated(freshLocation);
+      }
+
+      // move camera to current location
+      _hereMapController?.camera.lookAtPointWithMeasure(
+        _currentLocation!,
+        MapMeasure(MapMeasureKind.distanceInMeters, 500),
+      );
+
+      debugPrint('✅ Forced initial location update sent to navigator');
+
+      // Set loading to false after forcing the update
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error forcing initial location update: $e');
+    }
+  }
+
   // Method to send location updates via WebSocket
   void _sendLocationUpdateViaWebSocket(double latitude, double longitude) {
     if (_locationWebSocketService.isConnected) {
@@ -1573,6 +1617,10 @@ class _NavigationViewState extends State<NavigationView> {
       _hereMapController!.camera.setOrientationAtTarget(
         HERE.GeoOrientationUpdate(0, 65),
       );
+      // Force initial location update after a short delay
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        _forceInitialLocationUpdate();
+      });
 
       debugPrint('✅ Navigation with 3D view started successfully');
     } catch (e) {

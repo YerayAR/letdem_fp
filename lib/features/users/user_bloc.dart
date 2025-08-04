@@ -38,22 +38,24 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onLoadReserveInfo(
-      FetchReservationHistoryEvent event, Emitter<UserState> emit) async {
+    FetchReservationHistoryEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       if (state is UserLoaded) {
         UserLoaded userLoaded = state as UserLoaded;
-        emit(userLoaded.copyWith(
-          isUpdateLoading: true,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: true));
 
         var orders = await userRepository.getReservationHistory();
 
         print(orders);
 
-        emit(userLoaded.copyWith(
-          isOrdersLoading: false,
-          reservationHistory: orders,
-        ));
+        emit(
+          userLoaded.copyWith(
+            isOrdersLoading: false,
+            reservationHistory: orders,
+          ),
+        );
       }
     } catch (err, st) {
       print(err);
@@ -64,40 +66,39 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onUpdateNotificationCount(
-      UpdateUserNotificationsEvent event, Emitter<UserState> emit) async {
+    UpdateUserNotificationsEvent event,
+    Emitter<UserState> emit,
+  ) async {
     if (state is UserLoaded) {
       UserLoaded userLoaded = state as UserLoaded;
 
       try {
-        emit(userLoaded.copyWith(
-          unreadNotificationsCount: event.unreadNotificationsCount,
-        ));
+        emit(
+          userLoaded.copyWith(
+            unreadNotificationsCount: event.unreadNotificationsCount,
+          ),
+        );
       } catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError("Unable to update notifications");
       }
     }
   }
 
   Future<void> _onLoadOrdererInfo(
-      LoadOrdersEvent event, Emitter<UserState> emit) async {
+    LoadOrdersEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       if (state is UserLoaded) {
         UserLoaded userLoaded = state as UserLoaded;
-        emit(userLoaded.copyWith(
-          isOrdersLoading: true,
-        ));
+        emit(userLoaded.copyWith(isOrdersLoading: true));
 
         var orders = await userRepository.getOrders();
 
         print(orders);
 
-        emit(userLoaded.copyWith(
-          isOrdersLoading: false,
-          orders: orders,
-        ));
+        emit(userLoaded.copyWith(isOrdersLoading: false, orders: orders));
       }
     } catch (err, st) {
       print(err);
@@ -108,7 +109,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onUpdateEarningAccount(
-      UpdateEarningAccountEvent event, Emitter<UserState> emit) async {
+    UpdateEarningAccountEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       if (state is UserLoaded) {
         UserLoaded userLoaded = state as UserLoaded;
@@ -116,12 +119,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         final updatedUser = userLoaded.user.copyWith(
           earningAccount: event.account,
         );
-        emit(UserLoaded(
-          unreadNotificationsCount: userLoaded.unreadNotificationsCount,
-          user: updatedUser,
-          points: userLoaded.points,
-          isLocationPermissionGranted: userLoaded.isLocationPermissionGranted,
-        ));
+        emit(
+          UserLoaded(
+            unreadNotificationsCount: userLoaded.unreadNotificationsCount,
+            user: updatedUser,
+            points: userLoaded.points,
+            isLocationPermissionGranted: userLoaded.isLocationPermissionGranted,
+          ),
+        );
       }
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
@@ -131,107 +136,91 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onChangeLanguage(
-      ChangeLanguageEvent event, Emitter<UserState> emit) async {
+    ChangeLanguageEvent event,
+    Emitter<UserState> emit,
+  ) async {
     if (state is UserLoaded) {
       UserLoaded userLoaded = state as UserLoaded;
 
       try {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: true,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: true));
         await userRepository.changeLanguage(event.locale);
 
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         emit(const UserInfoChanged());
       } on ApiError catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError(err.message);
       } catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError("Unable to change language");
       }
     }
   }
 
   Future<void> _onUpdateNotificationPreferences(
-      UpdateNotificationPreferencesEvent event, Emitter<UserState> emit) async {
+    UpdateNotificationPreferencesEvent event,
+    Emitter<UserState> emit,
+  ) async {
     if (state is UserLoaded) {
       UserLoaded userLoaded = state as UserLoaded;
 
       try {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: true,
-        ));
-        await userRepository.updateNotificationPreferences(PreferencesDTO(
-          preferences: [],
-          notificationsPreferences: [
-            {
-              'push': event.pushNotifications,
-            },
-            {
-              'email': event.emailNotifications,
-            },
-          ],
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: true));
+        await userRepository.updateNotificationPreferences(
+          PreferencesDTO(
+            preferences: [],
+            notificationsPreferences: [
+              {'push': event.pushNotifications},
+              {'email': event.emailNotifications},
+            ],
+          ),
+        );
 
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         emit(const UserInfoChanged());
       } on ApiError catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError(err.message);
       } catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError("Unable to update notification preferences");
       }
     }
   }
 
   Future<void> _onUpdatePreferences(
-      UpdatePreferencesEvent event, Emitter<UserState> emit) async {
+    UpdatePreferencesEvent event,
+    Emitter<UserState> emit,
+  ) async {
     if (state is UserLoaded) {
       UserLoaded userLoaded = state as UserLoaded;
 
       try {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: true,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: true));
         await userRepository.updatePreferencesEndpoint(
           PreferencesDTO(
-              preferences: event.preferences, notificationsPreferences: []),
+            preferences: event.preferences,
+            notificationsPreferences: [],
+          ),
         );
 
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         emit(const UserInfoChanged());
       } on ApiError catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError(err.message);
       } catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError("Unable to update preferences");
       }
     }
   }
 
   Future<void> _onDeleteAccount(
-      DeleteAccountEvent event, Emitter<UserState> emit) async {
+    DeleteAccountEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       emit(UserLoading());
       await userRepository.deleteAccount();
@@ -245,45 +234,39 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onChangePassword(
-      ChangePasswordEvent event, Emitter<UserState> emit) async {
+    ChangePasswordEvent event,
+    Emitter<UserState> emit,
+  ) async {
     if (state is UserLoaded) {
       UserLoaded userLoaded = state as UserLoaded;
 
       try {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: true,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: true));
         await userRepository.changePassword(
           event.oldPassword,
           event.newPassword,
         );
 
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         emit(const UserInfoChanged());
       } on ApiError catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError(err.message);
       } catch (err) {
-        emit(userLoaded.copyWith(
-          isUpdateLoading: false,
-        ));
+        emit(userLoaded.copyWith(isUpdateLoading: false));
         Toast.showError("Unable to change password");
       }
     }
   }
 
   Future<void> _onIncreaseUserPoint(
-      IncreaseUserPointEvent event, Emitter<UserState> emit) async {
+    IncreaseUserPointEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       if (state is UserLoaded) {
         UserLoaded userLoaded = state as UserLoaded;
-        emit(userLoaded.copyWith(
-          points: userLoaded.points + event.points,
-        ));
+        emit(userLoaded.copyWith(points: userLoaded.points + event.points));
       }
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
@@ -293,28 +276,33 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onEditBasicInfo(
-      EditBasicInfoEvent event, Emitter<UserState> emit) async {
+    EditBasicInfoEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       emit(UserLoading());
 
       await userRepository.updateUser(
-        EditBasicInfoDTO(
-          firstName: event.firstName,
-          lastName: event.lastName,
-        ),
+        EditBasicInfoDTO(firstName: event.firstName, lastName: event.lastName),
       );
 
-      bool isLocationPermissionGranted = await NavigatorHelper
-          .navigatorKey.currentState!.context.hasLocationPermission;
+      bool isLocationPermissionGranted =
+          await NavigatorHelper
+              .navigatorKey
+              .currentState!
+              .context
+              .hasLocationPermission;
 
       var user = await userRepository.getUser();
 
-      emit(UserLoaded(
-        unreadNotificationsCount: user.notificationsCount,
-        user: user,
-        points: user.totalPoints,
-        isLocationPermissionGranted: isLocationPermissionGranted,
-      ));
+      emit(
+        UserLoaded(
+          unreadNotificationsCount: user.notificationsCount,
+          user: user,
+          points: user.totalPoints,
+          isLocationPermissionGranted: isLocationPermissionGranted,
+        ),
+      );
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
     } catch (err) {
@@ -323,7 +311,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onUserLoggedOut(
-      UserLoggedOutEvent event, Emitter<UserState> emit) async {
+    UserLoggedOutEvent event,
+    Emitter<UserState> emit,
+  ) async {
     await DatabaseHelper().clearAll();
     await Tokens.delete();
     DatabaseHelper().deleteAllPlaces();
@@ -331,7 +321,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onFetchUserInfo(
-      FetchUserInfoEvent event, Emitter<UserState> emit) async {
+    FetchUserInfoEvent event,
+    Emitter<UserState> emit,
+  ) async {
     try {
       // Only skip loading state if silent AND currently loaded
       bool shouldSkipLoading = event.isSilent && state is UserLoaded;
@@ -349,18 +341,24 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       LetDemUser user = await userRepository.getUser();
 
       await OneSignal.Notifications.requestPermission(true);
-      await OneSignal.login(user.id);
+      await OneSignal.login(user.email);
 
-      bool isLocationPermissionGranted = await NavigatorHelper
-          .navigatorKey.currentState!.context.hasLocationPermission;
+      bool isLocationPermissionGranted =
+          await NavigatorHelper
+              .navigatorKey
+              .currentState!
+              .context
+              .hasLocationPermission;
 
       // Always emit the loaded state (whether silent or not)
-      emit(UserLoaded(
-        points: user.totalPoints,
-        unreadNotificationsCount: user.notificationsCount,
-        user: user,
-        isLocationPermissionGranted: isLocationPermissionGranted,
-      ));
+      emit(
+        UserLoaded(
+          points: user.totalPoints,
+          unreadNotificationsCount: user.notificationsCount,
+          user: user,
+          isLocationPermissionGranted: isLocationPermissionGranted,
+        ),
+      );
     } on ApiError catch (err) {
       emit(UserError(error: err.message, apiError: err));
     } catch (err, strack) {

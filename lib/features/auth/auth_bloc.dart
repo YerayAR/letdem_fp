@@ -43,6 +43,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(RegisterLoading());
+      await OneSignal.Notifications.requestPermission(true);
+
       var at = await GoogleAuthService.signInWithGoogle();
 
       print("OneSignal User ID: ${OneSignal.User.pushSubscription.id}");
@@ -70,6 +72,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(LoginLoading());
+      await OneSignal.Notifications.requestPermission(true);
 
       print("OneSignal User ID: ${OneSignal.User.pushSubscription.id}");
       print(OneSignal.User.pushSubscription.id);
@@ -230,6 +233,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(RegisterLoading());
+      await OneSignal.Notifications.requestPermission(true);
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var lang = prefs.getString("locale");
       await authRepository.register(
