@@ -30,7 +30,7 @@ import 'package:letdem/features/activities/presentation/modals/space.popup.dart'
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
@@ -95,6 +95,7 @@ class _NavigationViewState extends State<NavigationView> {
   bool _hasShownArrivalNotification = false;
   bool _hasShownParkingRating = false;
   HERE.SpeedLimit? _currentSpeedLimit;
+  bool _isSpeedLimitAlertShown = false;
   bool _isOverSpeedLimit = false;
   bool _isPopupDisplayed = false;
   bool _isUserPanning = false;
@@ -254,14 +255,14 @@ class _NavigationViewState extends State<NavigationView> {
         _currentSpeedLimit = speedLimit;
 
         if (_speed > 0 && _currentSpeedLimit != null) {
-          final buffer =
-              _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
           _isOverSpeedLimit =
-              _speed >
-              (_currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
+              _speed > _currentSpeedLimit!.speedLimitInMetersPerSecond!;
 
-          if (_isOverSpeedLimit && !_isMuted) {
+          if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
             _showSpeedLimitAlert();
+            _isSpeedLimitAlertShown = true;
+          } else if (!_isOverSpeedLimit){
+            _isSpeedLimitAlertShown = false;
           }
         }
       });
@@ -282,7 +283,7 @@ class _NavigationViewState extends State<NavigationView> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -294,12 +295,11 @@ class _NavigationViewState extends State<NavigationView> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
               decoration: BoxDecoration(
-                // CHANGE: Use red background when overspeeding, orange when normal
                 color:
                     _isOverSpeedLimit
-                        ? Colors.redAccent.withOpacity(
-                          0.2,
-                        ) // Red background when overspeeding
+                        ? Colors.redAccent.withValues(
+                          alpha: 0.2,
+                        ) // Red background when over speeding
                         : Colors.orange.shade50, // Normal orange background
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -309,12 +309,12 @@ class _NavigationViewState extends State<NavigationView> {
                   Text(
                     (_speed * 3.6).round().toString(),
                     style: TextStyle(
-                      // CHANGE: Use red text when overspeeding, orange when normal
+                      // CHANGE: Use red text when over speeding, orange when normal
                       color:
                           _isOverSpeedLimit
-                              ? Colors.redAccent.withOpacity(
-                                0.8,
-                              ) // Red text when overspeeding
+                              ? Colors.redAccent.withValues(
+                                alpha: 0.8,
+                              ) // Red text when over speeding
                               : Colors.orange.shade700, // Normal orange text
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
@@ -325,9 +325,9 @@ class _NavigationViewState extends State<NavigationView> {
                     style: TextStyle(
                       color:
                           _isOverSpeedLimit
-                              ? Colors.redAccent.withOpacity(
-                                0.8,
-                              ) // Red text when overspeeding
+                              ? Colors.redAccent.withValues(
+                                alpha: 0.8,
+                              ) // Red text when over speeding
                               : Colors.orange.shade700, // Normal orange text
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
@@ -345,11 +345,11 @@ class _NavigationViewState extends State<NavigationView> {
                 shape: BoxShape.circle,
                 // CHANGE: Make speed limit sign border red when overspeeding
                 border: Border.all(
-                  color: _isOverSpeedLimit ? Colors.red : Colors.red,
+                  color: Colors.red,
                   width:
                       _isOverSpeedLimit
                           ? 3
-                          : 2, // Thicker border when overspeeding
+                          : 2, // Thicker border when over speeding
                 ),
               ),
               child: Center(
@@ -360,7 +360,7 @@ class _NavigationViewState extends State<NavigationView> {
                         ? Text(
                           "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
                           style: TextStyle(
-                            // CHANGE: Make speed limit text red when overspeeding
+                            // CHANGE: Make speed limit text red when over speeding
                             color:
                                 _isOverSpeedLimit ? Colors.red : Colors.black,
                             fontWeight: FontWeight.bold,
@@ -744,8 +744,10 @@ class _NavigationViewState extends State<NavigationView> {
 
     try {
       var currentLocationGeo = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 15),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
 
       debugPrint(
@@ -809,8 +811,8 @@ class _NavigationViewState extends State<NavigationView> {
         decoration: BoxDecoration(
           color:
               _locationWebSocketService.isConnected
-                  ? Colors.green.withOpacity(0.8)
-                  : Colors.red.withOpacity(0.8),
+                  ? Colors.green.withValues(alpha: 0.8)
+                  : Colors.red.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -1680,7 +1682,7 @@ class _NavigationViewState extends State<NavigationView> {
                   ),
                   Dimens.space(1),
                   CircleAvatar(
-                    backgroundColor: AppColors.neutral500.withOpacity(0.5),
+                    backgroundColor: AppColors.neutral500.withValues(alpha: 0.5),
                     child: IconButton(
                       icon: Icon(
                         _isMuted ? Icons.volume_off : Icons.volume_up,
@@ -1709,12 +1711,12 @@ class _NavigationViewState extends State<NavigationView> {
               )
               : Center(
                 child: Shimmer.fromColors(
-                  baseColor: Colors.white.withOpacity(0.5),
+                  baseColor: Colors.white.withValues(alpha: 0.5),
                   highlightColor: Colors.grey[100]!,
                   child: Text(
                     context.l10n.waitingForNavigation,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                   ),
@@ -1746,7 +1748,7 @@ class _NavigationViewState extends State<NavigationView> {
               borderRadius: BorderRadius.circular(2000),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -1856,8 +1858,16 @@ class _NavigationViewState extends State<NavigationView> {
         }
       },
       builder: (context, state) {
-        return WillPopScope(
-          onWillPop: _handleBackPress,
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (!didPop) {
+              final shouldExit = await _handleBackPress();
+              if (shouldExit) {
+                Navigator.of(context).pop(result);
+              }
+            }
+          },
           child: Scaffold(
             body: Stack(
               children: [

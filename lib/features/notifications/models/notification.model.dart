@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/core/utils/parsers.dart';
 
 class NotificationResult {
   final String id;

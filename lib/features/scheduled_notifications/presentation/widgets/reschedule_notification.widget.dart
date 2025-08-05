@@ -7,10 +7,11 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/core/utils/dates.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
+
 
 class RescheduleNotificationCard extends StatefulWidget {
   final ScheduledNotification notification;

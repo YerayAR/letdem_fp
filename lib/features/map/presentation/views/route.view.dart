@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
-import 'package:here_sdk/animation.dart' as an;
+import 'package:here_sdk/animation.dart' as map_animation;
 import 'package:here_sdk/core.dart';
 import 'package:here_sdk/mapview.dart';
 import 'package:here_sdk/navigation.dart' as navigation;
@@ -12,11 +12,16 @@ import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
 import 'package:letdem/common/popups/date_time_picker.widget.dart';
 import 'package:letdem/common/popups/popup.dart';
+import 'package:letdem/common/popups/success_dialog.dart';
+import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/core/utils/dates.dart';
+import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
@@ -27,13 +32,10 @@ import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
+import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
 
-import '../../../../common/popups/success_dialog.dart';
-import '../../../../common/widgets/button.dart';
-import '../../../../common/widgets/chip.dart';
-import '../../../../infrastructure/services/location/location.service.dart';
-import '../../../../infrastructure/toast/toast/toast.dart';
 
 class NavigationMapScreen extends StatefulWidget {
   final double? latitude;
@@ -65,7 +67,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   final List<MapMarker> _mapMarkers = [];
   final List<MapPolyline> _mapPolylines = [];
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
-  late RouteInfo _routeInfo;
+  RouteInfo? _routeInfo;
   late geolocator.Position _currentLocation;
   routing.Route? _currentRoute;
   HereMapController? _hereMapController;
@@ -118,7 +120,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
         if (spaceInfo != null) {
           _latitudeDelta = spaceInfo['lat'] as double;
           _longitudeDelta = spaceInfo['lng'] as double;
-        } else {}
+        }
       }
 
       if (spaceID != null) {
@@ -177,15 +179,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
       final currentPosition = await geolocator.Geolocator.getCurrentPosition();
       _currentLocation = currentPosition;
 
-      _routeInfo = await MapboxService.getRoutes(
-        currentPointLatitude: currentPosition.latitude,
-        currentPointLongitude: currentPosition.longitude,
-        destinationLatitude: widget.latitude ?? _latitude!,
-        destinationLongitude: widget.longitude ?? _longitude!,
-        destination:
-            widget.destinationStreetName ?? _destinationStreetName ?? '',
-      );
-
       setState(() => _isLoading = false);
     } catch (e) {
       print("Error loading map data: $e");
@@ -195,7 +188,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 
   void _onMapCreated(HereMapController controller) {
     _hereMapController = controller;
-
     _hereMapController!.mapScene.loadSceneForMapScheme(
       MapScheme.normalDay,
       (error) {
@@ -234,6 +226,24 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     }
   }
 
+  RouteInfo retrieveRouteInfoFromHereMap(){
+    // Extract basic info
+    final durationSeconds = _currentRoute!.duration.inSeconds;
+    final trafficDelaySeconds = _currentRoute!.trafficDelay.inSeconds;
+
+    double distanceMeters = _currentRoute!.lengthInMeters / 1;
+    TrafficLevel trafficCongestion = parseTrafficCongestion(trafficDelaySeconds, durationSeconds);
+    int durationMinutes = (durationSeconds / 60).round();
+    DateTime arrivingAt = DateTime.now().add(Duration(minutes: durationMinutes));
+    return RouteInfo(
+        tafficLevel: trafficCongestion,
+        distance: distanceMeters,
+        duration: durationMinutes,
+        arrivingAt: arrivingAt
+    );
+  }
+
+
   void _calculateRoute(List<routing.Waypoint> waypoints) {
     if (_routingEngine == null) return;
 
@@ -263,10 +273,15 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
           _assetsProvider.currentLocationMarker,
         );
 
-        ;
+        RouteInfo routeInfo = retrieveRouteInfoFromHereMap();
+        if (_routeInfo == null){
+          setState(() {
+            _routeInfo = routeInfo;
+          });
+        }
+
       } else {
-        print(
-            "Route calculation failed: ${error?.toString() ?? 'Unknown error'}");
+        print("Route calculation failed: ${error?.toString() ?? 'Unknown error'}");
         if (error == routing.RoutingError.noRouteFound) {
           print("No route found between given points.");
         }
@@ -318,8 +333,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
       final animation =
           MapCameraAnimationFactory.createAnimationFromUpdateWithEasing(
         update,
-        const Duration(milliseconds: 3000),
-        an.Easing(an.EasingFunction.inCubic),
+        const Duration(seconds: 2), map_animation.Easing(map_animation.EasingFunction.inCubic),
       );
 
       _hereMapController!.camera.startAnimation(animation);
@@ -394,7 +408,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
                   bottom: 0,
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width,
-                    child: _isLoading
+                    child: _isLoading || _routingEngine == null || _routeInfo == null
                         ? Container(
                             decoration: const BoxDecoration(
                               color: Colors.white,
@@ -406,7 +420,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
                         : NavigateNotificationCard(
                             spaceInfo: widget.spaceDetails ?? _spaceDetails,
                             hideToggle: widget.hideToggle,
-                            routeInfo: _routeInfo,
+                            routeInfo: _routeInfo!,
                             notification: ScheduledNotification(
                               id: "1",
                               startsAt: DateTime.now(),
@@ -433,7 +447,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 
 class NavigateNotificationCard extends StatefulWidget {
   final ScheduledNotification notification;
-  final RouteInfo routeInfo;
+  final RouteInfo? routeInfo;
   final bool hideToggle;
   final Space? spaceInfo;
 
@@ -488,7 +502,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 spreadRadius: 1,
                 blurRadius: 10,
                 offset: const Offset(0, 2),
@@ -501,11 +515,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     );
   }
 
-  Widget _buildContent(BuildContext context, RouteInfo routeInfo,
+  Widget _buildContent(BuildContext context, RouteInfo? routeInfo,
       LocationData location, ScheduleNotificationsState state) {
-    print(
-        "Route Info: ${routeInfo.distance < context.userProfile!.constantsSettings.metersToShowTooCloseModal}");
-    if (routeInfo.distance <
+    if (routeInfo!.distance <
         context.userProfile!.constantsSettings.metersToShowTooCloseModal) {
       return _buildTooCloseMessage();
     }
@@ -522,11 +534,11 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       children: [
         _buildRouteDetails(routeInfo),
         const SizedBox(height: 22),
-        _buildLocationInfo(location, (widget.spaceInfo)),
+        _buildLocationInfo(location, widget.spaceInfo),
         const SizedBox(height: 16),
         _buildArrivalInfo(routeInfo),
         const SizedBox(height: 16),
-        Divider(color: Colors.grey.withOpacity(0.2)),
+        Divider(color: Colors.grey.withValues(alpha: 0.2)),
         const SizedBox(height: 16),
         _buildNotificationOptions(),
         const SizedBox(height: 24),
@@ -572,11 +584,11 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     );
   }
 
-  Widget _buildRouteDetails(RouteInfo routeInfo) {
+  Widget _buildRouteDetails(RouteInfo? routeInfo) {
     return Row(
       children: [
         Text(
-          "${parseHours(context, routeInfo.duration)} (${parseMeters(routeInfo.distance)})",
+          "${parseHours(context, routeInfo!.duration)} (${parseMeters(routeInfo!.distance)})",
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const Spacer(),
@@ -628,14 +640,14 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     );
   }
 
-  Widget _buildArrivalInfo(RouteInfo routeInfo) {
+  Widget _buildArrivalInfo(RouteInfo? routeInfo) {
     return Row(
       children: [
         const Icon(IconlyLight.time_circle, color: Colors.grey),
         const SizedBox(width: 8),
         Text(
           context.l10n.toArriveBy(
-              DateFormat('HH:mm').format(routeInfo.arrivingAt.toLocal())),
+              DateFormat('HH:mm').format(routeInfo!.arrivingAt.toLocal())),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ],
@@ -814,63 +826,4 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       ),
     );
   }
-}
-
-String parseMeters(
-  double distance, [
-  bool longFormat = false,
-]) {
-  var context = NavigatorHelper.navigatorKey.currentState!.context;
-  // distance is in km
-  return distance < 1
-      ? "${(1).toStringAsFixed(0)} ${context.l10n.meters}"
-      : distance < 1000
-          ? "${distance.toStringAsFixed(0)} ${context.l10n.meters}"
-          : "${(distance / 1000).toStringAsFixed(1)} km";
-  // if (distance < 1000) {
-  //   return "${distance.toStringAsFixed(0)} meters";
-  // } else {
-  //   return "${(distance / 1000).toStringAsFixed(1)} m";
-  // }
-}
-
-String parseHours(BuildContext context, int min) {
-  if (min < 60) {
-    if (min == 0) {
-      return "1 min";
-    }
-    return "$min ${context.l10n.minutesShort}";
-  } else {
-    // if zero then return 1 minute
-
-    return "${(min / 60).toStringAsFixed(0)} ${context.l10n.hoursShort}";
-  }
-}
-
-bool validateDateTime(BuildContext context, DateTime? start, DateTime? end) {
-  DateTime now = DateTime.now();
-
-  if (start == null || end == null) {
-    Toast.showError(context.l10n.timesRequired);
-    return false;
-  }
-
-  if (start.isAfter(end) || start.isAtSameMomentAs(end)) {
-    Toast.showError(context.l10n.startBeforeEnd);
-    return false;
-  }
-
-  if (start.isBefore(now) || end.isBefore(now)) {
-    Toast.showError(context.l10n.timeGreaterThanCurrent);
-    return false;
-  }
-
-  // Ensure difference is not greater than 5 days (including milliseconds rounding)
-  if (end.difference(start).inMilliseconds >
-      const Duration(days: 5).inMilliseconds) {
-    Toast.showError(context.l10n.maxScheduleDays);
-    return false;
-  }
-
-  return true;
 }

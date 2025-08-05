@@ -553,7 +553,7 @@
   "couldNotRecalculateRoute": "No se pudo recalcular la ruta",
   "tooCloseToLocation": "Demasiado cerca de la ubicación",
   "close": "Cerrar",
-  "trafficLevel": "Nivel de tráfico",
+  "trafficLevel": "Tráfico",
   "toArriveBy": "Para llegar a las {time}",
   "@toArriveBy": {
     "placeholders": {
