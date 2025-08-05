@@ -239,20 +239,17 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
       HERE.SpeedLimit? speedLimit,
     ) {
-      if (speedLimit == null) {
-        debugPrint('⚠️ No speed limit information available');
-        setState(() {
-          _currentSpeedLimit = null;
-        });
-        return;
-      }
-
-      debugPrint(
-        '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
-      );
 
       setState(() {
-        _currentSpeedLimit = speedLimit;
+        if (speedLimit == null){
+          debugPrint('⚠️ No speed limit information available');
+          _currentSpeedLimit = null;
+        } else {
+          debugPrint(
+            '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
+          );
+          _currentSpeedLimit = speedLimit;
+        }
       });
     });
 
