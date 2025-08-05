@@ -253,18 +253,6 @@ class _NavigationViewState extends State<NavigationView> {
 
       setState(() {
         _currentSpeedLimit = speedLimit;
-
-        if (_speed > 0 && _currentSpeedLimit != null) {
-          _isOverSpeedLimit =
-              _speed > _currentSpeedLimit!.speedLimitInMetersPerSecond!;
-
-          if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
-            _showSpeedLimitAlert();
-            _isSpeedLimitAlertShown = true;
-          } else if (!_isOverSpeedLimit){
-            _isSpeedLimitAlertShown = false;
-          }
-        }
       });
     });
 
@@ -1549,6 +1537,19 @@ class _NavigationViewState extends State<NavigationView> {
 
           setState(() {
             _speed = speed ?? 0;
+
+            if (_speed > 0 && _currentSpeedLimit != null) {
+              _isOverSpeedLimit =
+                  _speed > _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+
+              if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
+                _showSpeedLimitAlert();
+                _isSpeedLimitAlertShown = true;
+              } else if (!_isOverSpeedLimit){
+                _isSpeedLimitAlertShown = false;
+              }
+            }
+
           });
 
           if (_lastLatitude == 0 && _lastLongitude == 0) {
@@ -1561,7 +1562,6 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.longitude,
           );
           // Send location update via WebSocket instead of HTTP request
-
           locationListener.onLocationUpdated(location);
         }),
       );
