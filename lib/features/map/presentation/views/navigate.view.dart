@@ -1536,8 +1536,10 @@ class _NavigationViewState extends State<NavigationView> {
             _speed = speed ?? 0;
 
             if (_speed > 0 && _currentSpeedLimit != null) {
+              final buffer =
+                  _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
               _isOverSpeedLimit =
-                  _speed > _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+                  _speed > _currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
 
               if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
                 _showSpeedLimitAlert();
