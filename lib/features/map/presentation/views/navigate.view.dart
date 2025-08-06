@@ -62,7 +62,7 @@ class NavigationView extends StatefulWidget {
 }
 
 class _NavigationViewState extends State<NavigationView> {
-  static const double _initialZoomDistanceInMeters = 8000;
+  static const double _initialZoomDistanceInMeters = 350;
   static const double _mapPadding = 20;
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
@@ -78,7 +78,7 @@ class _NavigationViewState extends State<NavigationView> {
   HERE.LocationEngine? _locationEngine;
 
   HERE.GeoCoordinates? _currentLocation;
-  double _speed = 0;
+  double _currentSpeed = 0;
   bool _isNavigating = false;
   bool _isLoading = false;
   String _navigationInstruction = "";
@@ -94,13 +94,14 @@ class _NavigationViewState extends State<NavigationView> {
 
   bool _hasShownArrivalNotification = false;
   bool _hasShownParkingRating = false;
-  HERE.SpeedLimit? _currentSpeedLimit;
+  HERE.SpeedLimit? _roadSpeedLimit;
   bool _isSpeedLimitAlertShown = false;
   bool _isOverSpeedLimit = false;
   bool _isPopupDisplayed = false;
   bool _isUserPanning = false;
   bool _isCameraLocked = true;
   bool _isRecalculatingRoute = false;
+  MapMarker? _destinationMarker;
 
   late double _actualDestinationLat;
   late double _actualDestinationLng;
@@ -243,12 +244,12 @@ class _NavigationViewState extends State<NavigationView> {
       setState(() {
         if (speedLimit == null){
           debugPrint('⚠️ No speed limit information available');
-          _currentSpeedLimit = null;
+          _roadSpeedLimit = null;
         } else {
           debugPrint(
             '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
           );
-          _currentSpeedLimit = speedLimit;
+          _roadSpeedLimit = speedLimit;
         }
       });
     });
@@ -292,7 +293,7 @@ class _NavigationViewState extends State<NavigationView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    (_speed * 3.6).round().toString(),
+                    (_currentSpeed * 3.6).round().toString(),
                     style: TextStyle(
                       // CHANGE: Use red text when over speeding, orange when normal
                       color:
@@ -328,7 +329,7 @@ class _NavigationViewState extends State<NavigationView> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                // CHANGE: Make speed limit sign border red when overspeeding
+                // CHANGE: Make speed limit sign border red when over speeding
                 border: Border.all(
                   color: Colors.red,
                   width:
@@ -339,11 +340,11 @@ class _NavigationViewState extends State<NavigationView> {
               ),
               child: Center(
                 child:
-                    _currentSpeedLimit != null &&
-                            _currentSpeedLimit!.speedLimitInMetersPerSecond !=
+                    _roadSpeedLimit != null &&
+                            _roadSpeedLimit!.speedLimitInMetersPerSecond !=
                                 null
                         ? Text(
-                          "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
+                          "${(_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
                           style: TextStyle(
                             // CHANGE: Make speed limit text red when over speeding
                             color:
@@ -365,17 +366,11 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  bool isSpeedLimitCooldownActive = false;
-
   void _showSpeedLimitAlert() {
-    if (isSpeedLimitCooldownActive) return;
-
-    isSpeedLimitCooldownActive = true;
-
-    if (_currentSpeedLimit == null || context.isSpeedAlertEnabled) return;
+    if (_roadSpeedLimit == null || !context.isSpeedAlertEnabled) return;
 
     final speedLimitKmh =
-        (_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
+        (_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
 
     AlertHelper.showWarning(
       context: context,
@@ -384,7 +379,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
 
     Timer.periodic(const Duration(seconds: 3), (timer) {
-      isSpeedLimitCooldownActive = false;
       timer.cancel();
     });
 
@@ -543,14 +537,6 @@ class _NavigationViewState extends State<NavigationView> {
       _pickMapMarker(touchPoint);
     });
     // add map marker for destination
-
-    var icon = _assetsProvider.destinationMarkerLarge;
-
-    final marker = MapMarker(
-      HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
-      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
-    );
-    _hereMapController!.mapScene.addMapMarker(marker);
     _hereMapController?.gestures.panListener = PanListener((
       GestureState state,
       HERE.Point2D point1,
@@ -607,15 +593,6 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       debugPrint('✅ Map scene loaded.');
-      MapMeasure mapMeasureZoom = MapMeasure(
-        MapMeasureKind.distanceInMeters,
-        _initialZoomDistanceInMeters,
-      );
-
-      _hereMapController!.camera.lookAtPointWithMeasure(
-        HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
-        mapMeasureZoom,
-      );
 
       _initLocationEngine();
       _startNavigation();
@@ -667,7 +644,7 @@ class _NavigationViewState extends State<NavigationView> {
           _isNavigating = false;
           _isLoading = false;
           _navigationInstruction = "";
-          _currentSpeedLimit = null;
+          _roadSpeedLimit = null;
           _isOverSpeedLimit = false;
           _hasShownArrivalNotification = false;
           _hasShownParkingRating = false;
@@ -675,7 +652,7 @@ class _NavigationViewState extends State<NavigationView> {
           _isRecalculatingRoute = false;
           _isCameraLocked = true;
           _isUserPanning = false;
-          _speed = 0;
+          _currentSpeed = 0;
           _totalRouteTime = 0;
           _nextManuoverDistance = 0;
           normalManuevers = "";
@@ -742,6 +719,16 @@ class _NavigationViewState extends State<NavigationView> {
       _currentLocation = HERE.GeoCoordinates(
         currentLocationGeo.latitude,
         currentLocationGeo.longitude,
+      );
+
+      MapMeasure mapMeasureZoom = MapMeasure(
+        MapMeasureKind.distanceInMeters,
+        _initialZoomDistanceInMeters,
+      );
+
+      _hereMapController!.camera.lookAtPointWithMeasure(
+        HERE.GeoCoordinates(_currentLocation!.latitude, _currentLocation!.longitude),
+        mapMeasureZoom,
       );
 
       _lastLatitude = currentLocationGeo.latitude;
@@ -1055,7 +1042,7 @@ class _NavigationViewState extends State<NavigationView> {
           ),
           mapImage,
         );
-        marker.fadeDuration = const Duration(seconds: 1);
+        marker.fadeDuration = const Duration(milliseconds: 300);
 
         _hereMapController?.mapScene.addMapMarker(marker);
         _eventMarkers[marker] = event;
@@ -1073,7 +1060,7 @@ class _NavigationViewState extends State<NavigationView> {
           ),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
         );
-        marker.fadeDuration = const Duration(seconds: 1);
+        marker.fadeDuration = const Duration(milliseconds: 300);
 
         _hereMapController?.mapScene.addMapMarker(marker);
         _spaceMarkers[marker] = space;
@@ -1083,10 +1070,28 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
+  void _addDestinationMarker(HERE.Route calculatedRoute){
+    // Remove old marker if exists
+    if (_destinationMarker != null) {
+      _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
+      _destinationMarker = null;
+    }
+
+    // Add marker exactly at the end of the road
+    var icon = _assetsProvider.destinationMarkerLarge;
+    _destinationMarker = MapMarker(
+      HERE.GeoCoordinates(
+          calculatedRoute.geometry.vertices.last.latitude,
+          calculatedRoute.geometry.vertices.last.longitude),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(_destinationMarker!);
+  }
+
   void _calculateRoute(
-    HERE.GeoCoordinates start,
-    HERE.GeoCoordinates destination,
-  ) {
+      HERE.GeoCoordinates start,
+      HERE.GeoCoordinates destination,
+      ) {
     debugPrint('🧭 Calculating route...');
     print('📍 Start: ${start.latitude}, ${start.longitude}');
     print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
@@ -1115,13 +1120,14 @@ class _NavigationViewState extends State<NavigationView> {
 
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
-      carOptions,
-      (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+      carOptions, (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
         if (routingError == null && routeList != null && routeList.isNotEmpty) {
           HERE.Route calculatedRoute = routeList.first;
 
           _totalRouteTime = calculatedRoute.duration.inSeconds;
           _distanceNotifier.value = calculatedRoute.lengthInMeters;
+
+          _addDestinationMarker(calculatedRoute);
 
           setState(() {
             _isNavigating = true;
@@ -1464,6 +1470,8 @@ class _NavigationViewState extends State<NavigationView> {
             if (_visualNavigator != null && mounted) {
               _visualNavigator!.route = calculatedRoute;
 
+              _addDestinationMarker(calculatedRoute);
+
               setState(() {
                 _isNavigating = true;
                 _isRecalculatingRoute = false;
@@ -1533,13 +1541,12 @@ class _NavigationViewState extends State<NavigationView> {
           double? speed = location.speedInMetersPerSecond;
 
           setState(() {
-            _speed = speed ?? 0;
-
-            if (_speed > 0 && _currentSpeedLimit != null) {
+            _currentSpeed = speed ?? 0;
+            if (_currentSpeed > 0 && _roadSpeedLimit != null) {
               final buffer =
-                  _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+                  _roadSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
               _isOverSpeedLimit =
-                  _speed > _currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
+                  _currentSpeed > _roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
 
               if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
                 _showSpeedLimitAlert();

@@ -247,11 +247,9 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   void _calculateRoute(List<routing.Waypoint> waypoints) {
     if (_routingEngine == null) return;
 
-    final carOptions = routing.CarOptions()
-      ..routeOptions.enableTolls = true
-      ..routeOptions.enableRouteHandle = true
-      ..routeOptions.trafficOptimizationMode =
-          routing.TrafficOptimizationMode.timeDependent;
+    final carOptions = routing.CarOptions();
+    carOptions.routeOptions.enableTolls = true;
+    carOptions.routeOptions.optimizationMode = routing.OptimizationMode.fastest;
 
     _routingEngine!.calculateCarRoute(waypoints, carOptions,
         (routing.RoutingError? error, List<routing.Route>? routes) {
