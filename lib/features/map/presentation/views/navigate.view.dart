@@ -62,7 +62,7 @@ class NavigationView extends StatefulWidget {
 }
 
 class _NavigationViewState extends State<NavigationView> {
-  static const double _initialZoomDistanceInMeters = 350;
+  static const double _initialZoomDistanceInMeters = 500;
   static const double _mapPadding = 20;
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
@@ -721,16 +721,6 @@ class _NavigationViewState extends State<NavigationView> {
         currentLocationGeo.longitude,
       );
 
-      MapMeasure mapMeasureZoom = MapMeasure(
-        MapMeasureKind.distanceInMeters,
-        _initialZoomDistanceInMeters,
-      );
-
-      _hereMapController!.camera.lookAtPointWithMeasure(
-        HERE.GeoCoordinates(_currentLocation!.latitude, _currentLocation!.longitude),
-        mapMeasureZoom,
-      );
-
       _lastLatitude = currentLocationGeo.latitude;
       _lastLongitude = currentLocationGeo.longitude;
       _distanceTraveled = 0;
@@ -1088,6 +1078,18 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController!.mapScene.addMapMarker(_destinationMarker!);
   }
 
+  void _setMapCameraFocus() {
+    MapMeasure mapMeasureZoom = MapMeasure(
+      MapMeasureKind.distanceInMeters,
+      _initialZoomDistanceInMeters,
+    );
+
+    _hereMapController!.camera.lookAtPointWithMeasure(
+      HERE.GeoCoordinates(_currentLocation!.latitude, _currentLocation!.longitude),
+      mapMeasureZoom,
+    );
+  }
+
   void _calculateRoute(
       HERE.GeoCoordinates start,
       HERE.GeoCoordinates destination,
@@ -1128,6 +1130,7 @@ class _NavigationViewState extends State<NavigationView> {
           _distanceNotifier.value = calculatedRoute.lengthInMeters;
 
           _addDestinationMarker(calculatedRoute);
+          _setMapCameraFocus();
 
           setState(() {
             _isNavigating = true;
@@ -1471,6 +1474,7 @@ class _NavigationViewState extends State<NavigationView> {
               _visualNavigator!.route = calculatedRoute;
 
               _addDestinationMarker(calculatedRoute);
+              _setMapCameraFocus();
 
               setState(() {
                 _isNavigating = true;
