@@ -640,7 +640,7 @@
 
   "tooCloseToLocation": "Too close to location",
   "close": "Close",
-  "trafficLevel": "Traffic Level",
+  "trafficLevel": "Traffic",
   "toArriveBy": "To arrive by {time}",
   "@toArriveBy": {
     "placeholders": {

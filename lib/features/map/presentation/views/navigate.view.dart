@@ -30,7 +30,7 @@ import 'package:letdem/features/activities/presentation/modals/space.popup.dart'
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
@@ -62,7 +62,7 @@ class NavigationView extends StatefulWidget {
 }
 
 class _NavigationViewState extends State<NavigationView> {
-  static const double _initialZoomDistanceInMeters = 8000;
+  static const double _initialZoomDistanceInMeters = 500;
   static const double _mapPadding = 20;
   static const double _buttonRadius = 26;
   static const double _containerPadding = 15;
@@ -78,7 +78,7 @@ class _NavigationViewState extends State<NavigationView> {
   HERE.LocationEngine? _locationEngine;
 
   HERE.GeoCoordinates? _currentLocation;
-  double _speed = 0;
+  double _currentSpeed = 0;
   bool _isNavigating = false;
   bool _isLoading = false;
   String _navigationInstruction = "";
@@ -94,12 +94,14 @@ class _NavigationViewState extends State<NavigationView> {
 
   bool _hasShownArrivalNotification = false;
   bool _hasShownParkingRating = false;
-  HERE.SpeedLimit? _currentSpeedLimit;
+  HERE.SpeedLimit? _roadSpeedLimit;
+  bool _isSpeedLimitAlertShown = false;
   bool _isOverSpeedLimit = false;
   bool _isPopupDisplayed = false;
   bool _isUserPanning = false;
   bool _isCameraLocked = true;
   bool _isRecalculatingRoute = false;
+  MapMarker? _destinationMarker;
 
   late double _actualDestinationLat;
   late double _actualDestinationLng;
@@ -281,31 +283,16 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
       HERE.SpeedLimit? speedLimit,
     ) {
-      if (speedLimit == null) {
-        debugPrint('⚠️ No speed limit information available');
-        setState(() {
-          _currentSpeedLimit = null;
-        });
-        return;
-      }
-
-      debugPrint(
-        '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
-      );
 
       setState(() {
-        _currentSpeedLimit = speedLimit;
-
-        if (_speed > 0 && _currentSpeedLimit != null) {
-          final buffer =
-              _currentSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
-          _isOverSpeedLimit =
-              _speed >
-              (_currentSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
-
-          if (_isOverSpeedLimit && !_isMuted) {
-            _showSpeedLimitAlert();
-          }
+        if (speedLimit == null){
+          debugPrint('⚠️ No speed limit information available');
+          _roadSpeedLimit = null;
+        } else {
+          debugPrint(
+            '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
+          );
+          _roadSpeedLimit = speedLimit;
         }
       });
     });
@@ -325,7 +312,7 @@ class _NavigationViewState extends State<NavigationView> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -337,7 +324,6 @@ class _NavigationViewState extends State<NavigationView> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
               decoration: BoxDecoration(
-                // CHANGE: Use red background when overspeeding, orange when normal
                 color:
                     _isOverSpeedLimit
                         ? Colors.redAccent.withOpacity(
@@ -350,14 +336,14 @@ class _NavigationViewState extends State<NavigationView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    (_speed * 3.6).round().toString(),
+                    (_currentSpeed * 3.6).round().toString(),
                     style: TextStyle(
-                      // CHANGE: Use red text when overspeeding, orange when normal
+                      // CHANGE: Use red text when over speeding, orange when normal
                       color:
                           _isOverSpeedLimit
-                              ? Colors.redAccent.withOpacity(
-                                0.8,
-                              ) // Red text when overspeeding
+                              ? Colors.redAccent.withValues(
+                                alpha: 0.8,
+                              ) // Red text when over speeding
                               : Colors.orange.shade700, // Normal orange text
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
@@ -368,9 +354,9 @@ class _NavigationViewState extends State<NavigationView> {
                     style: TextStyle(
                       color:
                           _isOverSpeedLimit
-                              ? Colors.redAccent.withOpacity(
-                                0.8,
-                              ) // Red text when overspeeding
+                              ? Colors.redAccent.withValues(
+                                alpha: 0.8,
+                              ) // Red text when over speeding
                               : Colors.orange.shade700, // Normal orange text
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
@@ -386,24 +372,24 @@ class _NavigationViewState extends State<NavigationView> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                // CHANGE: Make speed limit sign border red when overspeeding
+                // CHANGE: Make speed limit sign border red when over speeding
                 border: Border.all(
-                  color: _isOverSpeedLimit ? Colors.red : Colors.red,
+                  color: Colors.red,
                   width:
                       _isOverSpeedLimit
                           ? 3
-                          : 2, // Thicker border when overspeeding
+                          : 2, // Thicker border when over speeding
                 ),
               ),
               child: Center(
                 child:
-                    _currentSpeedLimit != null &&
-                            _currentSpeedLimit!.speedLimitInMetersPerSecond !=
+                    _roadSpeedLimit != null &&
+                            _roadSpeedLimit!.speedLimitInMetersPerSecond !=
                                 null
                         ? Text(
-                          "${(_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
+                          "${(_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
                           style: TextStyle(
-                            // CHANGE: Make speed limit text red when overspeeding
+                            // CHANGE: Make speed limit text red when over speeding
                             color:
                                 _isOverSpeedLimit ? Colors.red : Colors.black,
                             fontWeight: FontWeight.bold,
@@ -423,17 +409,11 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  bool isSpeedLimitCooldownActive = false;
-
   void _showSpeedLimitAlert() {
-    if (isSpeedLimitCooldownActive) return;
-
-    isSpeedLimitCooldownActive = true;
-
-    if (_currentSpeedLimit == null || context.isSpeedAlertEnabled) return;
+    if (_roadSpeedLimit == null || !context.isSpeedAlertEnabled) return;
 
     final speedLimitKmh =
-        (_currentSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
+        (_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
 
     AlertHelper.showWarning(
       context: context,
@@ -442,7 +422,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
 
     Timer.periodic(const Duration(seconds: 3), (timer) {
-      isSpeedLimitCooldownActive = false;
       timer.cancel();
     });
 
@@ -601,14 +580,6 @@ class _NavigationViewState extends State<NavigationView> {
       _pickMapMarker(touchPoint);
     });
     // add map marker for destination
-
-    var icon = _assetsProvider.destinationMarkerLarge;
-
-    final marker = MapMarker(
-      HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
-      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
-    );
-    _hereMapController!.mapScene.addMapMarker(marker);
     _hereMapController?.gestures.panListener = PanListener((
       GestureState state,
       HERE.Point2D point1,
@@ -665,15 +636,6 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       debugPrint('✅ Map scene loaded.');
-      MapMeasure mapMeasureZoom = MapMeasure(
-        MapMeasureKind.distanceInMeters,
-        _initialZoomDistanceInMeters,
-      );
-
-      _hereMapController!.camera.lookAtPointWithMeasure(
-        HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
-        mapMeasureZoom,
-      );
 
       _initLocationEngine();
       _startNavigation();
@@ -725,7 +687,7 @@ class _NavigationViewState extends State<NavigationView> {
           _isNavigating = false;
           _isLoading = false;
           _navigationInstruction = "";
-          _currentSpeedLimit = null;
+          _roadSpeedLimit = null;
           _isOverSpeedLimit = false;
           _hasShownArrivalNotification = false;
           _hasShownParkingRating = false;
@@ -733,7 +695,7 @@ class _NavigationViewState extends State<NavigationView> {
           _isRecalculatingRoute = false;
           _isCameraLocked = true;
           _isUserPanning = false;
-          _speed = 0;
+          _currentSpeed = 0;
           _totalRouteTime = 0;
           _nextManuoverDistance = 0;
           normalManuevers = "";
@@ -787,8 +749,10 @@ class _NavigationViewState extends State<NavigationView> {
 
     try {
       var currentLocationGeo = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 15),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
 
       debugPrint(
@@ -852,8 +816,8 @@ class _NavigationViewState extends State<NavigationView> {
         decoration: BoxDecoration(
           color:
               _locationWebSocketService.isConnected
-                  ? Colors.green.withOpacity(0.8)
-                  : Colors.red.withOpacity(0.8),
+                  ? Colors.green.withValues(alpha: 0.8)
+                  : Colors.red.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -1251,10 +1215,40 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
+  void _addDestinationMarker(HERE.Route calculatedRoute){
+    // Remove old marker if exists
+    if (_destinationMarker != null) {
+      _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
+      _destinationMarker = null;
+    }
+
+    // Add marker exactly at the end of the road
+    var icon = _assetsProvider.destinationMarkerLarge;
+    _destinationMarker = MapMarker(
+      HERE.GeoCoordinates(
+          calculatedRoute.geometry.vertices.last.latitude,
+          calculatedRoute.geometry.vertices.last.longitude),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(_destinationMarker!);
+  }
+
+  void _setMapCameraFocus() {
+    MapMeasure mapMeasureZoom = MapMeasure(
+      MapMeasureKind.distanceInMeters,
+      _initialZoomDistanceInMeters,
+    );
+
+    _hereMapController!.camera.lookAtPointWithMeasure(
+      HERE.GeoCoordinates(_currentLocation!.latitude, _currentLocation!.longitude),
+      mapMeasureZoom,
+    );
+  }
+
   void _calculateRoute(
-    HERE.GeoCoordinates start,
-    HERE.GeoCoordinates destination,
-  ) {
+      HERE.GeoCoordinates start,
+      HERE.GeoCoordinates destination,
+      ) {
     debugPrint('🧭 Calculating route...');
     print('📍 Start: ${start.latitude}, ${start.longitude}');
     print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
@@ -1283,13 +1277,15 @@ class _NavigationViewState extends State<NavigationView> {
 
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
-      carOptions,
-      (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+      carOptions, (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
         if (routingError == null && routeList != null && routeList.isNotEmpty) {
           HERE.Route calculatedRoute = routeList.first;
 
           _totalRouteTime = calculatedRoute.duration.inSeconds;
           _distanceNotifier.value = calculatedRoute.lengthInMeters;
+
+          _addDestinationMarker(calculatedRoute);
+          _setMapCameraFocus();
 
           setState(() {
             _isNavigating = true;
@@ -1632,6 +1628,9 @@ class _NavigationViewState extends State<NavigationView> {
             if (_visualNavigator != null && mounted) {
               _visualNavigator!.route = calculatedRoute;
 
+              _addDestinationMarker(calculatedRoute);
+              _setMapCameraFocus();
+
               setState(() {
                 _isNavigating = true;
                 _isRecalculatingRoute = false;
@@ -1701,7 +1700,21 @@ class _NavigationViewState extends State<NavigationView> {
           double? speed = location.speedInMetersPerSecond;
 
           setState(() {
-            _speed = speed ?? 0;
+            _currentSpeed = speed ?? 0;
+            if (_currentSpeed > 0 && _roadSpeedLimit != null) {
+              final buffer =
+                  _roadSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+              _isOverSpeedLimit =
+                  _currentSpeed > _roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
+
+              if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
+                _showSpeedLimitAlert();
+                _isSpeedLimitAlertShown = true;
+              } else if (!_isOverSpeedLimit){
+                _isSpeedLimitAlertShown = false;
+              }
+            }
+
           });
 
           if (_lastLatitude == 0 && _lastLongitude == 0) {
@@ -1714,7 +1727,6 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.longitude,
           );
           // Send location update via WebSocket instead of HTTP request
-
           locationListener.onLocationUpdated(location);
         }),
       );
@@ -1839,7 +1851,7 @@ class _NavigationViewState extends State<NavigationView> {
                   ),
                   Dimens.space(1),
                   CircleAvatar(
-                    backgroundColor: AppColors.neutral500.withOpacity(0.5),
+                    backgroundColor: AppColors.neutral500.withValues(alpha: 0.5),
                     child: IconButton(
                       icon: Icon(
                         _isMuted ? Icons.volume_off : Icons.volume_up,
@@ -1868,12 +1880,12 @@ class _NavigationViewState extends State<NavigationView> {
               )
               : Center(
                 child: Shimmer.fromColors(
-                  baseColor: Colors.white.withOpacity(0.5),
+                  baseColor: Colors.white.withValues(alpha: 0.5),
                   highlightColor: Colors.grey[100]!,
                   child: Text(
                     context.l10n.waitingForNavigation,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                   ),
@@ -1905,7 +1917,7 @@ class _NavigationViewState extends State<NavigationView> {
               borderRadius: BorderRadius.circular(2000),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -2015,8 +2027,16 @@ class _NavigationViewState extends State<NavigationView> {
         }
       },
       builder: (context, state) {
-        return WillPopScope(
-          onWillPop: _handleBackPress,
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (!didPop) {
+              final shouldExit = await _handleBackPress();
+              if (shouldExit) {
+                Navigator.of(context).pop(result);
+              }
+            }
+          },
           child: Scaffold(
             body: Stack(
               children: [

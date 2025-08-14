@@ -16,8 +16,8 @@ import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:otp_text_field/otp_text_field.dart';
@@ -43,7 +43,11 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {
           if (state is ActivitiesPublished) {
-            context.read<UserBloc>().add(const FetchUserInfoEvent());
+            if (state.isCancelled) {
+              NavigatorHelper.pop();
+              return;
+            }
+
             // Handle successful space reservation confirmation
             AppPopup.showDialogSheet(
               context,
@@ -75,17 +79,39 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                     Dimens.space(6),
                     _buildConfirmOrderButton(context),
                     Dimens.space(2),
-                    PrimaryButton(
-                      isLoading: state is ActivitiesLoading,
-                      text: context.l10n.cancel,
-                      color: AppColors.red500,
-                      textColor: Colors.white,
-                      onTap: () {
-                        context.read<ActivitiesBloc>().add(
-                          CancelReservationEvent(spaceID: widget.payload.id),
-                        );
-                        NavigatorHelper.pop();
-                      },
+                    SizedBox(
+                      child:
+                          widget.payload.status == "PENDING"
+                              ? null
+                              : PrimaryButton(
+                                isLoading: state is ActivitiesLoading,
+                                text: context.l10n.cancel,
+                                color: AppColors.red500,
+                                textColor: Colors.white,
+                                onTap: () {
+                                  AppPopup.showDialogSheet(
+                                    context,
+                                    ConfirmationDialog(
+                                      title:
+                                          context
+                                              .l10n
+                                              .cancelReservationConfirmationTitle,
+                                      subtext:
+                                          context
+                                              .l10n
+                                              .cancelReservationConfirmationText,
+                                      onProceed: () {
+                                        NavigatorHelper.pop();
+                                        context.read<ActivitiesBloc>().add(
+                                          CancelReservationEvent(
+                                            spaceID: widget.payload.id,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
                     ),
                     Dimens.space(2),
                   ],

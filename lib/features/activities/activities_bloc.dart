@@ -36,7 +36,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     try {
       emit(ActivitiesLoading());
       await activityRepository.cancelReservation(event.spaceID);
-      emit(const ActivitiesPublished(totalPointsEarned: 0));
+      emit(const ActivitiesPublished(totalPointsEarned: 0, isCancelled: true));
     } on ApiError catch (err) {
       Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
