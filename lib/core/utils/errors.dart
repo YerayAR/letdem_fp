@@ -26,6 +26,8 @@ class ErrorMessageHelper {
     'INACTIVE_ACCOUNT': 'Your account is inactive.',
     'EMAIL_ALREADY_EXISTS': 'This email is already registered.',
     'INVALID_SOCIAL_TOKEN': 'Invalid social login token.',
+    'CANCEL_RESERVATION_ERROR':
+        'An error occurred while canceling the reservation.',
     'card_declined':
         'Your card was declined. Please check your payment details.',
     'INVALID_OTP': 'Invalid OTP code.',
@@ -91,6 +93,7 @@ class ErrorMessageHelper {
     // Accounts
     'INVALID_CREDENTIALS': 'Credenciales inválidas. Intenta nuevamente.',
     'ACCOUNT_ALREADY_ACTIVATED': 'La cuenta ya está activada.',
+    'CANCEL_RESERVATION_ERROR': 'Ocurrió un error al cancelar la reserva.',
     'card_declined':
         'Tu tarjeta fue rechazada. Verifica los detalles de tu pago.',
     'ACTIVE_RESERVATION_ALREADY_EXIST': 'Ya existe una reserva activa.',

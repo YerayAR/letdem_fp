@@ -18,18 +18,23 @@ import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
 import 'package:letdem/features/withdrawals/dto/withdraw.dto.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
+import '../../../features/users/repository/user.repository.dart';
+
 enum Environment { STG, PROD, DEV }
 
 class EndPoints {
   static String baseURL = "https://api-staging.letdem.org/v1";
 
   static bool showApiLogs = true;
+  // /v1/users/me/update-device-id
+  static Endpoint<DeviceIdDTO> updateDeviceIdEndpoint = Endpoint(
+    url: "/users/me/update-device-id",
+    method: HTTPMethod.PUT,
+  );
 
   // v1/spaces/1d75c325fab445edb60a9eebef996b0f
-  static Endpoint getSpaceDetails(String id) => Endpoint(
-        url: "/spaces/$id",
-        method: HTTPMethod.GET,
-      );
+  static Endpoint getSpaceDetails(String id) =>
+      Endpoint(url: "/spaces/$id", method: HTTPMethod.GET);
 
   static Endpoint<EditBasicInfoDTO> updateUserProfileEndpoint = Endpoint(
     url: "/users/me",
@@ -39,10 +44,10 @@ class EndPoints {
   // resendVerificationCodeForgotPasswordEndpoint
   static Endpoint<EmailDTO> resendVerificationCodeForgotPasswordEndpoint =
       Endpoint(
-    url: "/auth/password-reset/resend-otp",
-    method: HTTPMethod.POST,
-    isProtected: false,
-  );
+        url: "/auth/password-reset/resend-otp",
+        method: HTTPMethod.POST,
+        isProtected: false,
+      );
 
   // getReservationHistoryEndpoint
   static Endpoint getReservationHistoryEndpoint = Endpoint(
@@ -51,20 +56,16 @@ class EndPoints {
   );
 
   // delete space
-  static Endpoint deleteSpace(String id) => Endpoint(
-        url: "/spaces/$id",
-        method: HTTPMethod.DELETE,
-      );
+  static Endpoint deleteSpace(String id) =>
+      Endpoint(url: "/spaces/$id", method: HTTPMethod.DELETE);
 
   static Endpoint getOrdersEndpoint = Endpoint(
     url: "/credits/orders?page_size=100&page=1",
     method: HTTPMethod.GET,
   );
 
-  static Endpoint<ReserveSpaceDTO> reserveSpace(String id) => Endpoint(
-        url: "/spaces/$id/reserve",
-        method: HTTPMethod.POST,
-      );
+  static Endpoint<ReserveSpaceDTO> reserveSpace(String id) =>
+      Endpoint(url: "/spaces/$id/reserve", method: HTTPMethod.POST);
 
   static Endpoint getWithdrawals = Endpoint(
     url: "/credits/withdrawals",
@@ -95,18 +96,10 @@ class EndPoints {
   );
 
   static Endpoint<ConfirmationCodeDTO> confirmReservation(String id) =>
-      Endpoint(
-        url: "/reservations/$id/confirm",
-        method: HTTPMethod.POST,
-      );
+      Endpoint(url: "/reservations/$id/confirm", method: HTTPMethod.POST);
 
-  static Endpoint deletePayoutMethod(
-    String id,
-  ) =>
-      Endpoint(
-        url: "/credits/payout-methods/$id",
-        method: HTTPMethod.DELETE,
-      );
+  static Endpoint deletePayoutMethod(String id) =>
+      Endpoint(url: "/credits/payout-methods/$id", method: HTTPMethod.DELETE);
 
   static Endpoint<RegisterDTO> registerEndpoint = Endpoint(
     url: "/auth/signup",
@@ -173,9 +166,9 @@ class EndPoints {
   );
 
   static Endpoint takeSpace(String id) => Endpoint<TakeSpaceDTO>(
-        url: "/spaces/$id/feedback",
-        method: HTTPMethod.POST,
-      );
+    url: "/spaces/$id/feedback",
+    method: HTTPMethod.POST,
+  );
 
   static Endpoint<PostLetDemoLocationDTO> addHomeLocation = Endpoint(
     url: "/users/me/addresses/home",
@@ -190,6 +183,12 @@ class EndPoints {
   static Endpoint deleteHomeLocation = Endpoint(
     url: "/users/me/addresses/home",
     method: HTTPMethod.DELETE,
+  );
+
+  static Endpoint cancelReservation(String id) => Endpoint(
+    url: "/reservations/$id/cancel",
+    method: HTTPMethod.POST,
+    dtoNullable: true,
   );
   static Endpoint getContributions = Endpoint(
     url: "/users/me/contributions?page_size=5&page=1",
@@ -258,9 +257,9 @@ class EndPoints {
 
   static Endpoint<CreateScheduledNotificationDTO> createScheduleNotification =
       Endpoint(
-    url: "/users/me/scheduled-notifications",
-    method: HTTPMethod.POST,
-  );
+        url: "/users/me/scheduled-notifications",
+        method: HTTPMethod.POST,
+      );
 
   static Endpoint deleteScheduleNotification(String id) {
     return Endpoint(
@@ -270,7 +269,8 @@ class EndPoints {
   }
 
   static Endpoint<CreateScheduledNotificationDTO> updateScheduleNotification(
-      String id) {
+    String id,
+  ) {
     return Endpoint(
       url: "/users/me/scheduled-notifications/$id",
       method: HTTPMethod.PUT,
@@ -350,11 +350,6 @@ class EndPoints {
     url: '/credits/transactions',
     method: HTTPMethod.GET,
   );
-  static Endpoint<EventFeedBackDTO> eventFeedBack(
-    String id,
-  ) =>
-      Endpoint(
-        url: "/events/$id/feedback",
-        method: HTTPMethod.POST,
-      );
+  static Endpoint<EventFeedBackDTO> eventFeedBack(String id) =>
+      Endpoint(url: "/events/$id/feedback", method: HTTPMethod.POST);
 }

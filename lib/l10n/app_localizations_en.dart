@@ -45,6 +45,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectAccount => 'Connect account';
 
   @override
+  String get cancelReservationConfirmationTitle => 'Cancel reservation?';
+
+  @override
+  String get cancelReservationConfirmationText => 'Are you sure you want to cancel this reservation? This action can’t be undone.';
+
+  @override
   String get basicInformation => 'Basic information';
 
   @override

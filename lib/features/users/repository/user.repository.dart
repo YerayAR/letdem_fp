@@ -5,14 +5,35 @@ import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 import 'package:letdem/models/orders/order.model.dart';
+
+class DeviceIdDTO extends DTO {
+  final String deviceId;
+
+  DeviceIdDTO({required this.deviceId});
+
+  Map<String, dynamic> toMap() {
+    return {'device_id': deviceId};
+  }
+}
 
 class UserRepository extends IUserRepository {
   @override
   Future<void> createUser() {
     // TODO: implement createUser
     throw UnimplementedError();
+  }
+
+  Future updateUserDeviceId(String deviceId) async {
+    try {
+      return ApiService.sendRequest(
+        endpoint: EndPoints.updateDeviceIdEndpoint.copyWithDTO(
+          DeviceIdDTO(deviceId: deviceId),
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -52,19 +73,14 @@ class UserRepository extends IUserRepository {
   Future changePassword(String oldPassword, String newPassword) async {
     return ApiService.sendRequest(
       endpoint: EndPoints.changePassword.copyWithDTO(
-        ChangePasswordDTO(
-          oldPassword: oldPassword,
-          newPassword: newPassword,
-        ),
+        ChangePasswordDTO(oldPassword: oldPassword, newPassword: newPassword),
       ),
     );
   }
 
   @override
   deleteAccount() async {
-    return ApiService.sendRequest(
-      endpoint: EndPoints.deleteAccountEndpoint,
-    );
+    return ApiService.sendRequest(endpoint: EndPoints.deleteAccountEndpoint);
   }
 
   @override
@@ -83,9 +99,7 @@ class UserRepository extends IUserRepository {
 
   @override
   Future changeLanguage(Locale locale) async {
-    return ApiService.sendRequest(
-      endpoint: EndPoints.updateLanguageEndpoint,
-    );
+    return ApiService.sendRequest(endpoint: EndPoints.updateLanguageEndpoint);
   }
 
   @override
@@ -96,7 +110,8 @@ class UserRepository extends IUserRepository {
 
     return response.data['results']
         .map<UserReservationPayments>(
-            (e) => UserReservationPayments.fromJson(e))
+          (e) => UserReservationPayments.fromJson(e),
+        )
         .toList();
   }
 }

@@ -240,7 +240,6 @@ class _NavigationViewState extends State<NavigationView> {
   final Map<MapMarker, Space> _spaceMarkers = {};
   final Map<MapMarker, Event> _eventMarkers = {};
 
-  bool _isShownRegularDestinationAlert = false;
   final speech = SpeechService();
 
   @override
@@ -343,7 +342,7 @@ class _NavigationViewState extends State<NavigationView> {
                     _isOverSpeedLimit
                         ? Colors.redAccent.withOpacity(
                           0.2,
-                        ) // Red background when overspeeding
+                        ) // Red background when overspending
                         : Colors.orange.shade50, // Normal orange background
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1093,50 +1092,162 @@ class _NavigationViewState extends State<NavigationView> {
     });
   }
 
+  final Map<String, MapMarker> _spaceMarkersById = {}; // Track by space ID
+  final Map<String, MapMarker> _eventMarkersById = {}; // Track by event ID
+
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
-    _hereMapController?.mapScene.removeMapMarkers(_spaceMarkers.keys.toList());
-    _spaceMarkers.clear();
-    for (var event in events) {
-      try {
-        Uint8List imageData = _assetsProvider.getEventIcon(event.type);
+    // Process spaces
+    _updateSpaceMarkers(spaces);
 
-        MapImage mapImage = MapImage.withPixelDataAndImageFormat(
-          imageData,
-          ImageFormat.png,
+    // Process events
+    _updateEventMarkers(events);
+  }
+
+  double _calculateDistance(
+    HERE.GeoCoordinates coord1,
+    HERE.GeoCoordinates coord2,
+  ) {
+    return Geolocator.distanceBetween(
+      coord1.latitude,
+      coord1.longitude,
+      coord2.latitude,
+      coord2.longitude,
+    );
+  }
+
+  void _updateSpaceMarkers(List<Space> spaces) {
+    // Create a set of current space IDs from the new data
+    final currentSpaceIds = spaces.map((space) => space.id).toSet();
+
+    // Remove markers for spaces that are no longer present
+    final spacesToRemove = <String>[];
+    _spaceMarkersById.forEach((spaceId, marker) {
+      if (!currentSpaceIds.contains(spaceId)) {
+        spacesToRemove.add(spaceId);
+        _hereMapController?.mapScene.removeMapMarker(marker);
+        _spaceMarkers.remove(marker);
+      }
+    });
+
+    // Remove from tracking maps
+    for (final spaceId in spacesToRemove) {
+      _spaceMarkersById.remove(spaceId);
+    }
+
+    // Add or update markers for current spaces
+    for (final space in spaces) {
+      final existingMarker = _spaceMarkersById[space.id];
+
+      if (existingMarker != null) {
+        // Check if position has changed
+        final currentCoordinates = existingMarker.coordinates;
+        final newCoordinates = HERE.GeoCoordinates(
+          space.location.point.lat,
+          space.location.point.lng,
         );
 
-        final marker = MapMarker(
-          HERE.GeoCoordinates(
-            event.location.point.lat,
-            event.location.point.lng,
-          ),
-          mapImage,
-        );
-        marker.fadeDuration = const Duration(seconds: 1);
-
-        _hereMapController?.mapScene.addMapMarker(marker);
-        _eventMarkers[marker] = event;
-      } catch (e) {
-        print("Error adding space marker: $e");
+        // Only update if position changed significantly (e.g., more than 1 meter)
+        final distance = _calculateDistance(currentCoordinates, newCoordinates);
+        if (distance > 1.0) {
+          // Remove old marker and create new one
+          _hereMapController?.mapScene.removeMapMarker(existingMarker);
+          _spaceMarkers.remove(existingMarker);
+          _createSpaceMarker(space);
+        }
+      } else {
+        _createSpaceMarker(space);
       }
     }
-    for (var space in spaces) {
-      try {
-        final imageData = _assetsProvider.getImageForType(space.type);
-        final marker = MapMarker(
-          HERE.GeoCoordinates(
-            space.location.point.lat,
-            space.location.point.lng,
-          ),
-          MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
-        );
-        marker.fadeDuration = const Duration(seconds: 1);
+  }
 
-        _hereMapController?.mapScene.addMapMarker(marker);
-        _spaceMarkers[marker] = space;
-      } catch (e) {
-        debugPrint("Space marker error: $e");
+  void _updateEventMarkers(List<Event> events) {
+    // Create a set of current event IDs from the new data
+    final currentEventIds = events.map((event) => event.id).toSet();
+
+    // Remove markers for events that are no longer present
+    final eventsToRemove = <String>[];
+    _eventMarkersById.forEach((eventId, marker) {
+      if (!currentEventIds.contains(eventId)) {
+        eventsToRemove.add(eventId);
+        _hereMapController?.mapScene.removeMapMarker(marker);
+        _eventMarkers.remove(marker);
       }
+    });
+
+    // Remove from tracking maps
+    for (final eventId in eventsToRemove) {
+      _eventMarkersById.remove(eventId);
+    }
+
+    // Add or update markers for current events
+    for (final event in events) {
+      final existingMarker = _eventMarkersById[event.id];
+
+      if (existingMarker != null) {
+        // Check if position has changed
+        final currentCoordinates = existingMarker.coordinates;
+        final newCoordinates = HERE.GeoCoordinates(
+          event.location.point.lat,
+          event.location.point.lng,
+        );
+
+        // Only update if position changed significantly
+        final distance = _calculateDistance(currentCoordinates, newCoordinates);
+        if (distance > 1.0) {
+          // Remove old marker and create new one
+          _hereMapController?.mapScene.removeMapMarker(existingMarker);
+          _eventMarkers.remove(existingMarker);
+          _createEventMarker(event);
+        }
+        // If position hasn't changed significantly, keep existing marker
+      } else {
+        // Create new marker for new event
+        _createEventMarker(event);
+      }
+    }
+  }
+
+  void _createSpaceMarker(Space space) {
+    try {
+      final imageData = _assetsProvider.getImageForType(space.type);
+      final marker = MapMarker(
+        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
+        MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
+      );
+      marker.fadeDuration = const Duration(
+        milliseconds: 300,
+      ); // Smoother animation
+
+      _hereMapController?.mapScene.addMapMarker(marker);
+      _spaceMarkers[marker] = space;
+      _spaceMarkersById[space.id] = marker;
+    } catch (e) {
+      debugPrint("Error adding space marker: $e");
+    }
+  }
+
+  void _createEventMarker(Event event) {
+    try {
+      Uint8List imageData = _assetsProvider.getEventIcon(event.type);
+
+      MapImage mapImage = MapImage.withPixelDataAndImageFormat(
+        imageData,
+        ImageFormat.png,
+      );
+
+      final marker = MapMarker(
+        HERE.GeoCoordinates(event.location.point.lat, event.location.point.lng),
+        mapImage,
+      );
+      marker.fadeDuration = const Duration(
+        milliseconds: 300,
+      ); // Smoother animation
+
+      _hereMapController?.mapScene.addMapMarker(marker);
+      _eventMarkers[marker] = event;
+      _eventMarkersById[event.id] = marker;
+    } catch (e) {
+      debugPrint("Error adding event marker: $e");
     }
   }
 

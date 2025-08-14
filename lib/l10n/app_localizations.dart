@@ -167,6 +167,18 @@ abstract class AppLocalizations {
   /// **'Connect account'**
   String get connectAccount;
 
+  /// Title for the confirmation dialog when the user chooses to cancel a reservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel reservation?'**
+  String get cancelReservationConfirmationTitle;
+
+  /// Body text explaining the consequence of cancelling a reservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this reservation? This action can’t be undone.'**
+  String get cancelReservationConfirmationText;
+
   /// No description provided for @basicInformation.
   ///
   /// In en, this message translates to:
