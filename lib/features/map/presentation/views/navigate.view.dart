@@ -25,12 +25,12 @@ import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/time.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/map_bloc.dart';
-import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
@@ -283,9 +283,8 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
       HERE.SpeedLimit? speedLimit,
     ) {
-
       setState(() {
-        if (speedLimit == null){
+        if (speedLimit == null) {
           debugPrint('⚠️ No speed limit information available');
           _roadSpeedLimit = null;
         } else {
@@ -384,8 +383,7 @@ class _NavigationViewState extends State<NavigationView> {
               child: Center(
                 child:
                     _roadSpeedLimit != null &&
-                            _roadSpeedLimit!.speedLimitInMetersPerSecond !=
-                                null
+                            _roadSpeedLimit!.speedLimitInMetersPerSecond != null
                         ? Text(
                           "${(_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
                           style: TextStyle(
@@ -1215,7 +1213,7 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
-  void _addDestinationMarker(HERE.Route calculatedRoute){
+  void _addDestinationMarker(HERE.Route calculatedRoute) {
     // Remove old marker if exists
     if (_destinationMarker != null) {
       _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
@@ -1226,8 +1224,9 @@ class _NavigationViewState extends State<NavigationView> {
     var icon = _assetsProvider.destinationMarkerLarge;
     _destinationMarker = MapMarker(
       HERE.GeoCoordinates(
-          calculatedRoute.geometry.vertices.last.latitude,
-          calculatedRoute.geometry.vertices.last.longitude),
+        calculatedRoute.geometry.vertices.last.latitude,
+        calculatedRoute.geometry.vertices.last.longitude,
+      ),
       MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
     );
     _hereMapController!.mapScene.addMapMarker(_destinationMarker!);
@@ -1240,15 +1239,18 @@ class _NavigationViewState extends State<NavigationView> {
     );
 
     _hereMapController!.camera.lookAtPointWithMeasure(
-      HERE.GeoCoordinates(_currentLocation!.latitude, _currentLocation!.longitude),
+      HERE.GeoCoordinates(
+        _currentLocation!.latitude,
+        _currentLocation!.longitude,
+      ),
       mapMeasureZoom,
     );
   }
 
   void _calculateRoute(
-      HERE.GeoCoordinates start,
-      HERE.GeoCoordinates destination,
-      ) {
+    HERE.GeoCoordinates start,
+    HERE.GeoCoordinates destination,
+  ) {
     debugPrint('🧭 Calculating route...');
     print('📍 Start: ${start.latitude}, ${start.longitude}');
     print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
@@ -1277,7 +1279,8 @@ class _NavigationViewState extends State<NavigationView> {
 
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
-      carOptions, (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+      carOptions,
+      (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
         if (routingError == null && routeList != null && routeList.isNotEmpty) {
           HERE.Route calculatedRoute = routeList.first;
 
@@ -1705,16 +1708,16 @@ class _NavigationViewState extends State<NavigationView> {
               final buffer =
                   _roadSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
               _isOverSpeedLimit =
-                  _currentSpeed > _roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
+                  _currentSpeed >
+                  _roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
 
               if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
                 _showSpeedLimitAlert();
                 _isSpeedLimitAlertShown = true;
-              } else if (!_isOverSpeedLimit){
+              } else if (!_isOverSpeedLimit) {
                 _isSpeedLimitAlertShown = false;
               }
             }
-
           });
 
           if (_lastLatitude == 0 && _lastLongitude == 0) {
@@ -1851,7 +1854,9 @@ class _NavigationViewState extends State<NavigationView> {
                   ),
                   Dimens.space(1),
                   CircleAvatar(
-                    backgroundColor: AppColors.neutral500.withValues(alpha: 0.5),
+                    backgroundColor: AppColors.neutral500.withValues(
+                      alpha: 0.5,
+                    ),
                     child: IconButton(
                       icon: Icon(
                         _isMuted ? Icons.volume_off : Icons.volume_up,
