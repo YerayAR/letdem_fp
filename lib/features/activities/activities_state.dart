@@ -2,10 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:letdem/features/activities/models/activity.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 
-enum ReserveSpaceErrorStatus {
-  generic,
-  requiredAction,
-}
+enum ReserveSpaceErrorStatus { generic, requiredAction }
 
 sealed class ActivitiesState extends Equatable {
   const ActivitiesState();
@@ -32,10 +29,14 @@ final class ActivitiesLoaded extends ActivitiesState {
 
 final class ActivitiesPublished extends ActivitiesState {
   final int totalPointsEarned;
+  final bool isCancelled;
 
-  const ActivitiesPublished({required this.totalPointsEarned});
+  const ActivitiesPublished({
+    required this.totalPointsEarned,
+    this.isCancelled = false,
+  });
   @override
-  List<Object?> get props => [totalPointsEarned];
+  List<Object?> get props => [totalPointsEarned, isCancelled];
 }
 
 final class ActivitiesError extends ActivitiesState {
@@ -54,10 +55,11 @@ class ReserveSpaceError extends ActivitiesState {
   final String? clientSecret;
   final ReserveSpaceErrorStatus status;
 
-  const ReserveSpaceError(
-      {required this.error,
-      this.status = ReserveSpaceErrorStatus.generic,
-      required this.clientSecret});
+  const ReserveSpaceError({
+    required this.error,
+    this.status = ReserveSpaceErrorStatus.generic,
+    required this.clientSecret,
+  });
 
   @override
   List<Object?> get props => [error, status];

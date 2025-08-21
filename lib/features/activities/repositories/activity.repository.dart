@@ -19,6 +19,13 @@ class ActivityRepository extends IActivityRepository {
     throw UnimplementedError();
   }
 
+  Future cancelReservation(String spaceID) async {
+    ApiResponse res = await ApiService.sendRequest(
+      endpoint: EndPoints.cancelReservation(spaceID),
+    );
+    return res;
+  }
+
   @override
   Future<void> deleteActivity(String id) {
     // TODO: implement deleteActivity
@@ -71,38 +78,40 @@ class ActivityRepository extends IActivityRepository {
   @override
   Future eventFeedback({required String eventID, required bool isThere}) {
     return ApiService.sendRequest(
-      endpoint: EndPoints.eventFeedBack(eventID).copyWithDTO(
-        EventFeedBackDTO(isThere: isThere),
-      ),
+      endpoint: EndPoints.eventFeedBack(
+        eventID,
+      ).copyWithDTO(EventFeedBackDTO(isThere: isThere)),
     );
   }
 
   @override
-  Future<ReservedSpacePayload> reserveSpace(
-      {required String spaceID, required String paymentMethodID}) async {
+  Future<ReservedSpacePayload> reserveSpace({
+    required String spaceID,
+    required String paymentMethodID,
+  }) async {
     var res = await ApiService.sendRequest(
-      endpoint: EndPoints.reserveSpace(spaceID).copyWithDTO(
-        ReserveSpaceDTO(paymentMethodID: paymentMethodID),
-      ),
+      endpoint: EndPoints.reserveSpace(
+        spaceID,
+      ).copyWithDTO(ReserveSpaceDTO(paymentMethodID: paymentMethodID)),
     );
 
     return ReservedSpacePayload.fromJson(res.data);
   }
 
   @override
-  Future confirmSpaceReservation(
-      {required ConfirmationCodeDTO confirmationCode,
-      required String spaceID}) async {
+  Future confirmSpaceReservation({
+    required ConfirmationCodeDTO confirmationCode,
+    required String spaceID,
+  }) async {
     return ApiService.sendRequest(
-      endpoint:
-          EndPoints.confirmReservation(spaceID).copyWithDTO(confirmationCode),
+      endpoint: EndPoints.confirmReservation(
+        spaceID,
+      ).copyWithDTO(confirmationCode),
     );
   }
 
   @override
   Future deleteSpace(String spaceID) {
-    return ApiService.sendRequest(
-      endpoint: EndPoints.deleteSpace(spaceID),
-    );
+    return ApiService.sendRequest(endpoint: EndPoints.deleteSpace(spaceID));
   }
 }

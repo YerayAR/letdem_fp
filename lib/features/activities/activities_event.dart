@@ -19,10 +19,7 @@ final class TakeSpaceEvent extends ActivitiesEvent {
   final String spaceID;
   final TakeSpaceType type;
 
-  const TakeSpaceEvent({
-    required this.spaceID,
-    required this.type,
-  });
+  const TakeSpaceEvent({required this.spaceID, required this.type});
 
   // TODO: implement props
   @override
@@ -35,11 +32,12 @@ final class PublishRoadEventEvent extends ActivitiesEvent {
   final double longitude;
   final String type;
 
-  const PublishRoadEventEvent(
-      {required this.locationName,
-      required this.type,
-      required this.latitude,
-      required this.longitude});
+  const PublishRoadEventEvent({
+    required this.locationName,
+    required this.type,
+    required this.latitude,
+    required this.longitude,
+  });
 
   @override
   // TODO: implement props
@@ -60,8 +58,10 @@ final class ReserveSpaceEvent extends ActivitiesEvent {
   final String spaceID;
   final String paymentMethodID;
 
-  const ReserveSpaceEvent(
-      {required this.spaceID, required this.paymentMethodID});
+  const ReserveSpaceEvent({
+    required this.spaceID,
+    required this.paymentMethodID,
+  });
 
   @override
   // TODO: implement props
@@ -72,6 +72,16 @@ class DeleteSpaceEvent extends ActivitiesEvent {
   final String spaceID;
 
   const DeleteSpaceEvent({required this.spaceID});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [spaceID];
+}
+
+final class CancelReservationEvent extends ActivitiesEvent {
+  final String spaceID;
+
+  const CancelReservationEvent({required this.spaceID});
 
   @override
   // TODO: implement props
@@ -103,15 +113,15 @@ final class PublishSpaceEvent extends ActivitiesEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [
-        image,
-        locationName,
-        latitude,
-        longitude,
-        type,
-        price,
-        waitTime,
-        phoneNumber
-      ];
+    image,
+    locationName,
+    latitude,
+    longitude,
+    type,
+    price,
+    waitTime,
+    phoneNumber,
+  ];
 }
 
 final class GetActivitiesEvent extends ActivitiesEvent {

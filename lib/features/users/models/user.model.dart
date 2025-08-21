@@ -86,10 +86,7 @@ class SpacePrice {
   SpacePrice({required this.minimum, required this.maximum});
 
   factory SpacePrice.fromJson(Map<String, dynamic> json) {
-    return SpacePrice(
-      minimum: json['minimum'],
-      maximum: json['maximum'],
-    );
+    return SpacePrice(minimum: json['minimum'], maximum: json['maximum']);
   }
 }
 
@@ -100,10 +97,7 @@ class SpaceTimeToWait {
   SpaceTimeToWait({required this.minimum, required this.maximum});
 
   factory SpaceTimeToWait.fromJson(Map<String, dynamic> json) {
-    return SpaceTimeToWait(
-      minimum: json['minimum'],
-      maximum: json['maximum'],
-    );
+    return SpaceTimeToWait(minimum: json['minimum'], maximum: json['maximum']);
   }
 }
 
@@ -111,6 +105,8 @@ class LetDemUser extends Equatable {
   final String id;
   final String email;
   final String firstName;
+
+  final String? deviceId;
 
   final ReservedSpacePayload? activeReservation;
 
@@ -133,6 +129,7 @@ class LetDemUser extends Equatable {
     required this.notificationPreferences,
     required this.firstName,
     required this.lastName,
+    this.deviceId,
     this.earningAccount,
     this.defaultPaymentMethod,
     required this.constantsSettings,
@@ -143,12 +140,11 @@ class LetDemUser extends Equatable {
     required this.contributions,
   });
 
-  LetDemUser copyWith({
-    EarningAccount? earningAccount,
-  }) {
+  LetDemUser copyWith({EarningAccount? earningAccount}) {
     return LetDemUser(
       id: id,
       email: email,
+      deviceId: deviceId,
       preferences: preferences,
       notificationPreferences: notificationPreferences,
       firstName: firstName,
@@ -167,23 +163,28 @@ class LetDemUser extends Equatable {
   factory LetDemUser.fromJSON(Map<String, dynamic> json) {
     return LetDemUser(
       id: json['id'],
-      notificationPreferences:
-          NotificationPreferences.fromJSON(json['notifications_preferences']),
+      deviceId: json['device_id'],
+      notificationPreferences: NotificationPreferences.fromJSON(
+        json['notifications_preferences'],
+      ),
       email: json['email'] ?? '',
       constantsSettings: ConstantsSettings.fromJson(json['constants_settings']),
       firstName: json['first_name'] ?? '',
-      earningAccount: json['earning_account'] != null
-          ? EarningAccount.fromJson(json['earning_account'])
-          : null,
-      defaultPaymentMethod: json['default_payment_method'] != null
-          ? PaymentMethodModel.fromJson(json['default_payment_method'])
-          : null,
-      activeReservation: json['active_reservation'] != null
-          ? ReservedSpacePayload.fromJson(json['active_reservation'])
-          : null,
+      earningAccount:
+          json['earning_account'] != null
+              ? EarningAccount.fromJson(json['earning_account'])
+              : null,
+      defaultPaymentMethod:
+          json['default_payment_method'] != null
+              ? PaymentMethodModel.fromJson(json['default_payment_method'])
+              : null,
+      activeReservation:
+          json['active_reservation'] != null
+              ? ReservedSpacePayload.fromJson(json['active_reservation'])
+              : null,
       preferences: UserPreferences(
-        isProhibitedZoneAlert: json['alerts_preferences']
-            ['prohibited_zone_alert'],
+        isProhibitedZoneAlert:
+            json['alerts_preferences']['prohibited_zone_alert'],
         isSpeedLimitAlert: json['alerts_preferences']['speed_limit_alert'],
         isFatigueAlert: json['alerts_preferences']['fatigue_alert'],
         isPoliceAlert: json['alerts_preferences']['police_alert'],
@@ -196,9 +197,10 @@ class LetDemUser extends Equatable {
       lastName: json['last_name'] ?? '',
       isSocial: json['is_social'] ?? false,
       totalPoints: json['total_points'] ?? 0,
-      contributions: (json['contributions'] as List)
-          .map((e) => Activity.fromJson(e))
-          .toList(),
+      contributions:
+          (json['contributions'] as List)
+              .map((e) => Activity.fromJson(e))
+              .toList(),
       notificationsCount: json['notifications_count'] ?? 0,
     );
   }
@@ -216,16 +218,16 @@ class LetDemUser extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        email,
-        firstName,
-        lastName,
-        isSocial,
-        totalPoints,
-        notificationsCount,
-        contributions,
-        earningAccount,
-        preferences,
-        notificationPreferences,
-      ];
+    id,
+    email,
+    firstName,
+    lastName,
+    isSocial,
+    totalPoints,
+    notificationsCount,
+    contributions,
+    earningAccount,
+    preferences,
+    notificationPreferences,
+  ];
 }

@@ -25,9 +25,10 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/payment/payment.model.dart';
+import 'package:letdem/core/utils/parsers.dart';
 
-import '../../../../common/widgets/chip.dart';
-import '../../../auth/models/nearby_payload.model.dart';
+import 'package:letdem/common/widgets/chip.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 
 class SpacePopupSheet extends StatefulWidget {
   final Space space;

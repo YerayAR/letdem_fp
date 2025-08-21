@@ -340,8 +340,16 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       LetDemUser user = await userRepository.getUser();
 
+      if (user.deviceId == null || user.deviceId!.isEmpty) {
+        await OneSignal.Notifications.requestPermission(true);
+        var id = OneSignal.User.pushSubscription.id;
+        if (id != null && id.isNotEmpty) {
+          userRepository.updateUserDeviceId(id);
+        }
+      }
+
       await OneSignal.Notifications.requestPermission(true);
-      await OneSignal.login(user.id);
+      await OneSignal.login(user.email);
 
       bool isLocationPermissionGranted =
           await NavigatorHelper

@@ -12,6 +12,14 @@
   "paymentMethods": "Payment methods",
   "earnings": "Earnings",
   "connectAccount": "Connect account",
+  "cancelReservationConfirmationTitle": "Cancel reservation?",
+  "@cancelReservationConfirmationTitle": {
+    "description": "Title for the confirmation dialog when the user chooses to cancel a reservation."
+  },
+  "cancelReservationConfirmationText": "Are you sure you want to cancel this reservation? This action can’t be undone.",
+  "@cancelReservationConfirmationText": {
+    "description": "Body text explaining the consequence of cancelling a reservation."
+  },
   "basicInformation": "Basic information",
   "preferences": "Preferences",
   "security": "Security",
@@ -632,7 +640,7 @@
 
   "tooCloseToLocation": "Too close to location",
   "close": "Close",
-  "trafficLevel": "Traffic Level",
+  "trafficLevel": "Traffic",
   "toArriveBy": "To arrive by {time}",
   "@toArriveBy": {
     "placeholders": {

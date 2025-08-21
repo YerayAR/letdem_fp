@@ -7,9 +7,12 @@ import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 
 class BaseApiService {
   static Future<Map<String, String>> getHeaders(
-      bool mustAuthenticated, String? tokenKey) async {
+    bool mustAuthenticated,
+    String? tokenKey,
+  ) async {
     Locale currentLocale = Localizations.localeOf(
-        NavigatorHelper.navigatorKey.currentState!.context);
+      NavigatorHelper.navigatorKey.currentState!.context,
+    );
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Accept-Language': currentLocale.toString(), // e.g., "en_US"
@@ -17,11 +20,14 @@ class BaseApiService {
 
     if (mustAuthenticated) {
       try {
-        String? token =
-            await SecureStorageHelper().read(tokenKey ?? 'access_token');
+        String? token = await SecureStorageHelper().read(
+          tokenKey ?? 'access_token',
+        );
         if (token == null || token.isEmpty) {
           throw ApiError(
-              message: 'Token not found', status: ErrorStatus.unauthorized);
+            message: 'Token not found',
+            status: ErrorStatus.unauthorized,
+          );
         }
         print(token);
 

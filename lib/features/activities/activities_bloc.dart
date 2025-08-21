@@ -17,21 +17,39 @@ part 'activities_event.dart';
 
 class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   ActivityRepository activityRepository;
-  ActivitiesBloc({
-    required this.activityRepository,
-  }) : super(ActivitiesInitial()) {
+  ActivitiesBloc({required this.activityRepository})
+    : super(ActivitiesInitial()) {
     on<PublishSpaceEvent>(_onPublishSpace);
     on<GetActivitiesEvent>(_onGetActivities);
     on<PublishRoadEventEvent>(_onPublishRoadEvent);
     on<TakeSpaceEvent>(_onTakeSpace);
     on<EventFeedBackEvent>(_onEventFeedBack);
+    on<CancelReservationEvent>(_onDeleteReservationEvent);
     on<DeleteSpaceEvent>(_onDeleteSpaceEvent);
     on<ReserveSpaceEvent>(_onReserveSpace);
     on<ConfirmSpaceReserveEvent>(_onConfirmSpaceReserveEvent);
   }
+  Future<void> _onDeleteReservationEvent(
+    CancelReservationEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
+    try {
+      emit(ActivitiesLoading());
+      await activityRepository.cancelReservation(event.spaceID);
+      emit(const ActivitiesPublished(totalPointsEarned: 0, isCancelled: true));
+    } on ApiError catch (err) {
+      Toast.showError(err.message);
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      Toast.showError("Unable to cancel reservation");
+      emit(const ActivitiesError(error: "Unable to cancel reservation"));
+    }
+  }
 
   Future<void> _onDeleteSpaceEvent(
-      DeleteSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    DeleteSpaceEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       emit(ActivitiesLoading());
       await activityRepository.deleteSpace(event.spaceID);
@@ -46,7 +64,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   }
 
   Future<void> _onConfirmSpaceReserveEvent(
-      ConfirmSpaceReserveEvent event, Emitter<ActivitiesState> emit) async {
+    ConfirmSpaceReserveEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       emit(ActivitiesLoading());
       await activityRepository.confirmSpaceReservation(
@@ -64,7 +84,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   }
 
   Future<void> _onReserveSpace(
-      ReserveSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    ReserveSpaceEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       print("Reserving space with ID: ${event.spaceID}");
       emit(ActivitiesLoading());
@@ -75,20 +97,30 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       emit(SpaceReserved(spaceID: payload));
     } on ApiError catch (err) {
       print("Error reserving space: ${err.message}");
-      emit(ReserveSpaceError(
+      emit(
+        ReserveSpaceError(
           error: err.message,
           clientSecret: err.data!['client_secret'],
-          status: err.data!['error_code'] == 'PAYMENT_REQUIRES_ACTION'
-              ? ReserveSpaceErrorStatus.requiredAction
-              : ReserveSpaceErrorStatus.generic));
+          status:
+              err.data!['error_code'] == 'PAYMENT_REQUIRES_ACTION'
+                  ? ReserveSpaceErrorStatus.requiredAction
+                  : ReserveSpaceErrorStatus.generic,
+        ),
+      );
     } catch (err, st) {
-      emit(const ReserveSpaceError(
-          error: "Unable to reserve paid space", clientSecret: null));
+      emit(
+        const ReserveSpaceError(
+          error: "Unable to reserve paid space",
+          clientSecret: null,
+        ),
+      );
     }
   }
 
   Future<void> _onEventFeedBack(
-      EventFeedBackEvent event, Emitter<ActivitiesState> emit) async {
+    EventFeedBackEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       emit(ActivitiesLoading());
       await activityRepository.eventFeedback(
@@ -104,7 +136,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   }
 
   Future<void> _onTakeSpace(
-      TakeSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    TakeSpaceEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       emit(ActivitiesLoading());
       await activityRepository.takeSpace(event.spaceID, event.type);
@@ -120,7 +154,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   }
 
   Future<void> _onPublishRoadEvent(
-      PublishRoadEventEvent event, Emitter<ActivitiesState> emit) async {
+    PublishRoadEventEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       emit(ActivitiesLoading());
 
@@ -133,9 +169,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
           longitude: c.longitude,
         ),
       );
-      emit(const ActivitiesPublished(
-        totalPointsEarned: 10,
-      ));
+      emit(const ActivitiesPublished(totalPointsEarned: 10));
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {
@@ -144,7 +178,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   }
 
   Future<void> _onGetActivities(
-      GetActivitiesEvent event, Emitter<ActivitiesState> emit) async {
+    GetActivitiesEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       if (state is! ActivitiesLoaded) {
         emit(ActivitiesLoading());
@@ -159,7 +195,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   }
 
   Future<void> _onPublishSpace(
-      PublishSpaceEvent event, Emitter<ActivitiesState> emit) async {
+    PublishSpaceEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
     try {
       emit(ActivitiesLoading());
 
