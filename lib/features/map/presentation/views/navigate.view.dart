@@ -283,15 +283,30 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
       HERE.SpeedLimit? speedLimit,
     ) {
-      setState(() {
-        if (speedLimit == null) {
-          debugPrint('⚠️ No speed limit information available');
+      if (speedLimit == null) {
+        debugPrint('⚠️ No speed limit information available');
+        setState(() {
           _roadSpeedLimit = null;
-        } else {
-          debugPrint(
-            '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
-          );
-          _roadSpeedLimit = speedLimit;
+        });
+        return;
+      }
+
+      debugPrint(
+        '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
+      );
+
+      setState(() {
+        _roadSpeedLimit = speedLimit;
+
+        if (_currentSpeed > 0 && _roadSpeedLimit != null) {
+          final buffer = _roadSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+          _isOverSpeedLimit =
+              _currentSpeed >
+              (_roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
+
+          if (_isOverSpeedLimit && !_isMuted) {
+            _showSpeedLimitAlert();
+          }
         }
       });
     });
@@ -387,7 +402,7 @@ class _NavigationViewState extends State<NavigationView> {
                         ? Text(
                           "${(_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
                           style: TextStyle(
-                            // CHANGE: Make speed limit text red when over speeding
+                            // CHANGE: Make speed limit text red when overspeeding
                             color:
                                 _isOverSpeedLimit ? Colors.red : Colors.black,
                             fontWeight: FontWeight.bold,
@@ -424,7 +439,10 @@ class _NavigationViewState extends State<NavigationView> {
     });
 
     if (!_isMuted) {
-      speech.speak(context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()));
+      speech.speak(
+        context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()),
+        context,
+      );
     }
   }
 
@@ -578,6 +596,14 @@ class _NavigationViewState extends State<NavigationView> {
       _pickMapMarker(touchPoint);
     });
     // add map marker for destination
+
+    var icon = _assetsProvider.destinationMarkerLarge;
+
+    final marker = MapMarker(
+      HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(marker);
     _hereMapController?.gestures.panListener = PanListener((
       GestureState state,
       HERE.Point2D point1,
@@ -634,6 +660,15 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       debugPrint('✅ Map scene loaded.');
+      MapMeasure mapMeasureZoom = MapMeasure(
+        MapMeasureKind.distanceInMeters,
+        _initialZoomDistanceInMeters,
+      );
+
+      _hereMapController!.camera.lookAtPointWithMeasure(
+        HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+        mapMeasureZoom,
+      );
 
       _initLocationEngine();
       _startNavigation();
@@ -1058,134 +1093,58 @@ class _NavigationViewState extends State<NavigationView> {
   final Map<String, MapMarker> _eventMarkersById = {}; // Track by event ID
 
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
-    // Process spaces
-    _updateSpaceMarkers(spaces);
+    // Clear both space and event markers
+    _hereMapController?.mapScene.removeMapMarkers(_spaceMarkers.keys.toList());
+    _hereMapController?.mapScene.removeMapMarkers(_eventMarkers.keys.toList());
+    _spaceMarkers.clear();
+    _eventMarkers.clear();
 
-    // Process events
-    _updateEventMarkers(events);
-  }
+    // Add event markers
+    for (var event in events) {
+      try {
+        Uint8List imageData = _assetsProvider.getEventIcon(event.type);
 
-  double _calculateDistance(
-    HERE.GeoCoordinates coord1,
-    HERE.GeoCoordinates coord2,
-  ) {
-    return Geolocator.distanceBetween(
-      coord1.latitude,
-      coord1.longitude,
-      coord2.latitude,
-      coord2.longitude,
-    );
-  }
-
-  void _updateSpaceMarkers(List<Space> spaces) {
-    // Create a set of current space IDs from the new data
-    final currentSpaceIds = spaces.map((space) => space.id).toSet();
-
-    // Remove markers for spaces that are no longer present
-    final spacesToRemove = <String>[];
-    _spaceMarkersById.forEach((spaceId, marker) {
-      if (!currentSpaceIds.contains(spaceId)) {
-        spacesToRemove.add(spaceId);
-        _hereMapController?.mapScene.removeMapMarker(marker);
-        _spaceMarkers.remove(marker);
-      }
-    });
-
-    // Remove from tracking maps
-    for (final spaceId in spacesToRemove) {
-      _spaceMarkersById.remove(spaceId);
-    }
-
-    // Add or update markers for current spaces
-    for (final space in spaces) {
-      final existingMarker = _spaceMarkersById[space.id];
-
-      if (existingMarker != null) {
-        // Check if position has changed
-        final currentCoordinates = existingMarker.coordinates;
-        final newCoordinates = HERE.GeoCoordinates(
-          space.location.point.lat,
-          space.location.point.lng,
+        MapImage mapImage = MapImage.withPixelDataAndImageFormat(
+          imageData,
+          ImageFormat.png,
         );
 
-        // Only update if position changed significantly (e.g., more than 1 meter)
-        final distance = _calculateDistance(currentCoordinates, newCoordinates);
-        if (distance > 1.0) {
-          // Remove old marker and create new one
-          _hereMapController?.mapScene.removeMapMarker(existingMarker);
-          _spaceMarkers.remove(existingMarker);
-          _createSpaceMarker(space);
-        }
-      } else {
-        _createSpaceMarker(space);
-      }
-    }
-  }
-
-  void _updateEventMarkers(List<Event> events) {
-    // Create a set of current event IDs from the new data
-    final currentEventIds = events.map((event) => event.id).toSet();
-
-    // Remove markers for events that are no longer present
-    final eventsToRemove = <String>[];
-    _eventMarkersById.forEach((eventId, marker) {
-      if (!currentEventIds.contains(eventId)) {
-        eventsToRemove.add(eventId);
-        _hereMapController?.mapScene.removeMapMarker(marker);
-        _eventMarkers.remove(marker);
-      }
-    });
-
-    // Remove from tracking maps
-    for (final eventId in eventsToRemove) {
-      _eventMarkersById.remove(eventId);
-    }
-
-    // Add or update markers for current events
-    for (final event in events) {
-      final existingMarker = _eventMarkersById[event.id];
-
-      if (existingMarker != null) {
-        // Check if position has changed
-        final currentCoordinates = existingMarker.coordinates;
-        final newCoordinates = HERE.GeoCoordinates(
-          event.location.point.lat,
-          event.location.point.lng,
+        final marker = MapMarker(
+          HERE.GeoCoordinates(
+            event.location.point.lat,
+            event.location.point.lng,
+          ),
+          mapImage,
         );
+        marker.fadeDuration = const Duration(seconds: 1);
 
-        // Only update if position changed significantly
-        final distance = _calculateDistance(currentCoordinates, newCoordinates);
-        if (distance > 1.0) {
-          // Remove old marker and create new one
-          _hereMapController?.mapScene.removeMapMarker(existingMarker);
-          _eventMarkers.remove(existingMarker);
-          _createEventMarker(event);
-        }
-        // If position hasn't changed significantly, keep existing marker
-      } else {
-        // Create new marker for new event
-        _createEventMarker(event);
+        _hereMapController?.mapScene.addMapMarker(marker);
+        _eventMarkers[marker] = event;
+      } catch (e) {
+        debugPrint("Error adding event marker: $e"); // Fixed error message
       }
     }
-  }
 
-  void _createSpaceMarker(Space space) {
-    try {
-      final imageData = _assetsProvider.getImageForType(space.type);
-      final marker = MapMarker(
-        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
-        MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
-      );
-      marker.fadeDuration = const Duration(
-        milliseconds: 300,
-      ); // Smoother animation
+    // Add space markers
+    for (var space in spaces) {
+      try {
+        final imageData = _assetsProvider.getImageForType(space.type);
+        final marker = MapMarker(
+          HERE.GeoCoordinates(
+            space.location.point.lat,
+            space.location.point.lng,
+          ),
+          MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
+        );
+        marker.fadeDuration = const Duration(seconds: 1);
 
-      _hereMapController?.mapScene.addMapMarker(marker);
-      _spaceMarkers[marker] = space;
-      _spaceMarkersById[space.id] = marker;
-    } catch (e) {
-      debugPrint("Error adding space marker: $e");
-    }
+        _hereMapController?.mapScene.addMapMarker(marker);
+        _spaceMarkers[marker] = space;
+        _spaceMarkersById[space.id] = marker;
+      } catch (e) {
+        debugPrint("Error adding space marker: $e");
+      }
+    } // <-- Added the missing closing brace
   }
 
   void _createEventMarker(Event event) {
@@ -1376,7 +1335,7 @@ class _NavigationViewState extends State<NavigationView> {
 
       if (!_isMuted && normalManuevers != _lastSpokenInstruction) {
         _lastSpokenInstruction = normalManuevers;
-        speech.speak(normalManuevers);
+        speech.speak(normalManuevers, context);
       }
 
       _nextManuoverDistance =
@@ -1494,7 +1453,7 @@ class _NavigationViewState extends State<NavigationView> {
             );
 
             if (!_isMuted) {
-              speech.speak(context.l10n.fatigueAlertVoice);
+              speech.speak(context.l10n.fatigueAlertVoice, context);
             }
           }
         }
@@ -1854,9 +1813,7 @@ class _NavigationViewState extends State<NavigationView> {
                   ),
                   Dimens.space(1),
                   CircleAvatar(
-                    backgroundColor: AppColors.neutral500.withValues(
-                      alpha: 0.5,
-                    ),
+                    backgroundColor: AppColors.neutral500.withOpacity(0.5),
                     child: IconButton(
                       icon: Icon(
                         _isMuted ? Icons.volume_off : Icons.volume_up,
@@ -1885,12 +1842,12 @@ class _NavigationViewState extends State<NavigationView> {
               )
               : Center(
                 child: Shimmer.fromColors(
-                  baseColor: Colors.white.withValues(alpha: 0.5),
+                  baseColor: Colors.white.withOpacity(0.5),
                   highlightColor: Colors.grey[100]!,
                   child: Text(
                     context.l10n.waitingForNavigation,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withOpacity(0.7),
                       fontSize: 16,
                     ),
                   ),
