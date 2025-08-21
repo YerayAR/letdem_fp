@@ -14,7 +14,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
+import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';

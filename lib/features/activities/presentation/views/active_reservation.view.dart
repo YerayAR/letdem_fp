@@ -250,7 +250,7 @@ class _ActiveReservationViewState extends State<ActiveReservationView> {
                 Iconsax.money5,
                 payload.price == null
                     ? context.l10n.free
-                    : "${payload.price}${context.l10n.currency}",
+                    : "${payload.price.toStringAsFixed(2)}${context.l10n.currency}",
               ),
             ],
           ),

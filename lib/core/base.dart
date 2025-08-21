@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,8 +9,10 @@ import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
 import 'package:letdem/features/users/presentation/views/profile.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 import '../features/map/presentation/views/home.view.dart';
+import '../infrastructure/ws/web_socket.service.dart';
 
 class BaseView extends StatefulWidget {
   const BaseView({super.key});
@@ -20,11 +23,53 @@ class BaseView extends StatefulWidget {
 
 class _BaseViewState extends State<BaseView> {
   int _selectedIndex = 0;
+  late UserWebSocketService _userWebSocketService;
+
   final List<Widget> _pages = [
     const HomeView(),
     const ActivitiesView(),
-    const ProfileView()
+    const ProfileView(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserWebSocket();
+  }
+
+  void _initializeUserWebSocket() {
+    _userWebSocketService = UserWebSocketService();
+    _userWebSocketService.connect(
+      onEvent: (event) {
+        if (kDebugMode) {
+          Toast.show('UserWebSocket Event: $event');
+        }
+        // Handle user data update event
+        _handleUserDataUpdate(event);
+      },
+      onError: (error) {
+        if (kDebugMode) {
+          Toast.showError('UserWebSocket Error: $error');
+        }
+      },
+      onDone: () {
+        if (kDebugMode) {
+          Toast.show('UserWebSocket connection closed');
+        }
+        debugPrint('UserWebSocket connection closed');
+      },
+    );
+  }
+
+  void _handleUserDataUpdate(Map<String, dynamic> event) {
+    if (mounted) {
+      context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+
+      if (_selectedIndex == 1) {
+        context.read<ActivitiesBloc>().add(GetActivitiesEvent());
+      }
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -36,11 +81,17 @@ class _BaseViewState extends State<BaseView> {
       case 1:
         context.read<ActivitiesBloc>().add(GetActivitiesEvent());
         context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
-
+        break;
       case 2:
         break;
       default:
     }
+  }
+
+  @override
+  void dispose() {
+    _userWebSocketService.disconnect();
+    super.dispose();
   }
 
   @override
@@ -53,11 +104,7 @@ class _BaseViewState extends State<BaseView> {
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: _pages,
-        ),
-        // body: _pages[_selectedIndex],
+        body: IndexedStack(index: _selectedIndex, children: _pages),
         bottomNavigationBar: Theme(
           data: ThemeData(
             splashColor: Colors.transparent,
@@ -71,19 +118,24 @@ class _BaseViewState extends State<BaseView> {
             items: [
               BottomNavigationBarItem(
                 icon: Icon(
-                    _selectedIndex == 0 ? IconlyBold.home : IconlyLight.home),
+                  _selectedIndex == 0 ? IconlyBold.home : IconlyLight.home,
+                ),
                 label: context.l10n.home,
               ),
               BottomNavigationBarItem(
-                icon: Icon(_selectedIndex == 1
-                    ? IconlyBold.activity
-                    : IconlyLight.activity),
+                icon: Icon(
+                  _selectedIndex == 1
+                      ? IconlyBold.activity
+                      : IconlyLight.activity,
+                ),
                 label: context.l10n.activities,
               ),
               BottomNavigationBarItem(
-                icon: Icon(_selectedIndex == 2
-                    ? IconlyBold.profile
-                    : IconlyLight.profile),
+                icon: Icon(
+                  _selectedIndex == 2
+                      ? IconlyBold.profile
+                      : IconlyLight.profile,
+                ),
                 label: context.l10n.profile,
               ),
             ],

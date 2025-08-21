@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,6 +20,7 @@ import '../../../../../common/widgets/button.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
 import '../../../../../infrastructure/toast/toast/toast.dart';
 import '../../../../auth/models/nearby_payload.model.dart';
+import '../../../activities_bloc.dart';
 
 class ReservedSpaceDetailView extends StatelessWidget {
   final ReservedSpacePayload details;
@@ -36,18 +40,58 @@ class ReservedSpaceDetailView extends StatelessWidget {
         children: [
           _buildAppBar(context),
           Expanded(
-            child: ListView(
-              children: [
-                _buildImage(context),
-                const SizedBox(height: 24),
-                _buildConfirmationCard(context),
-                const SizedBox(height: 24),
-                _buildPropertiesRow(context),
-                const SizedBox(height: 24),
-                _buildNavigateButton(context),
-                const SizedBox(height: 16),
-                _buildCallButton(context),
-              ],
+            child: BlocConsumer<ActivitiesBloc, ActivitiesState>(
+              listener: (context, state) {
+                if (state is ActivitiesError) {
+                  Toast.showError(state.error);
+                } else if (state is ActivitiesLoaded) {
+                  // Handle success state, e.g., show a success message or navigate
+                  NavigatorHelper.pop();
+                }
+                // TODO: implement listener
+              },
+              builder: (context, state) {
+                return ListView(
+                  children: [
+                    _buildImage(context),
+                    const SizedBox(height: 24),
+                    _buildConfirmationCard(context),
+                    const SizedBox(height: 24),
+                    _buildPropertiesRow(context),
+                    const SizedBox(height: 24),
+                    _buildNavigateButton(context),
+                    const SizedBox(height: 16),
+                    _buildCallButton(context),
+                    const SizedBox(height: 24),
+                    PrimaryButton(
+                      isLoading:
+                          context.watch<ActivitiesBloc>().state
+                              is ActivitiesLoading,
+                      text: context.l10n.cancel,
+                      color: AppColors.red500,
+                      textColor: Colors.white,
+                      onTap: () {
+                        AppPopup.showDialogSheet(
+                          context,
+                          ConfirmationDialog(
+                            onProceed: () {
+                              NavigatorHelper.pop();
+
+                              context.read<ActivitiesBloc>().add(
+                                CancelReservationEvent(spaceID: details.id),
+                              );
+                            },
+                            title:
+                                context.l10n.cancelReservationConfirmationTitle,
+                            subtext:
+                                context.l10n.cancelReservationConfirmationText,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -69,9 +113,7 @@ class ReservedSpaceDetailView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // Top Image
   // ---------------------------------------------------------------------------
-  Widget _buildImage(
-    BuildContext context,
-  ) {
+  Widget _buildImage(BuildContext context) {
     return Column(
       children: [
         ClipRRect(
@@ -214,10 +256,12 @@ class ReservedSpaceDetailView extends StatelessWidget {
   Widget _buildNavigateButton(BuildContext context) {
     return PrimaryButton(
       onTap: () {
-        NavigatorHelper.to(NavigationView(
-          destinationLat: details.space.location.point.lat,
-          destinationLng: details.space.location.point.lng,
-        ));
+        NavigatorHelper.to(
+          NavigationView(
+            destinationLat: details.space.location.point.lat,
+            destinationLng: details.space.location.point.lng,
+          ),
+        );
       },
       text: context.l10n.navigateToSpace,
     );
@@ -225,19 +269,20 @@ class ReservedSpaceDetailView extends StatelessWidget {
 
   Widget _buildCallButton(BuildContext context) {
     return PrimaryButton(
-        onTap: () async {
-          Uri url = Uri.parse('tel:${details.phone}');
-          if (!await launchUrl(url)) {
-            Toast.showError(context.l10n.couldNotLaunchDialer);
-          } else {
-            print("Dialer launched successfully");
-          }
-        },
-        borderWidth: 1,
-        background: Colors.white,
-        textColor: AppColors.neutral500,
-        icon: IconlyBold.call,
-        text: context.l10n.callSpaceOwner);
+      onTap: () async {
+        Uri url = Uri.parse('tel:${details.phone}');
+        if (!await launchUrl(url)) {
+          Toast.showError(context.l10n.couldNotLaunchDialer);
+        } else {
+          print("Dialer launched successfully");
+        }
+      },
+      borderWidth: 1,
+      background: Colors.white,
+      textColor: AppColors.neutral500,
+      icon: IconlyBold.call,
+      text: context.l10n.callSpaceOwner,
+    );
   }
 
   // ---------------------------------------------------------------------------

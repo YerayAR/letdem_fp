@@ -6,7 +6,6 @@ import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:here_sdk/core.dart';
@@ -52,6 +51,7 @@ import 'package:toastification/toastification.dart';
 
 import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
+import 'l10n/app_localizations.dart';
 
 Future _initializeHERESDK() async {
   try {
@@ -65,10 +65,13 @@ Future _initializeHERESDK() async {
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
 
-    AuthenticationMode authenticationMode =
-        AuthenticationMode.withKeySecret(accessKeyId, accessKeySecret);
-    SDKOptions sdkOptions =
-        SDKOptions.withAuthenticationMode(authenticationMode);
+    AuthenticationMode authenticationMode = AuthenticationMode.withKeySecret(
+      accessKeyId,
+      accessKeySecret,
+    );
+    SDKOptions sdkOptions = SDKOptions.withAuthenticationMode(
+      authenticationMode,
+    );
 
     try {
       await SDKNativeEngine.makeSharedInstance(sdkOptions);
@@ -90,7 +93,8 @@ void main() async {
   OneSignal.initialize(AppCredentials.oneSignalAppId);
 
   // Configure language for OneSignal notifications
-  final String defaultLocale = Platform.localeName; // Returns locale string in the form 'en_US'
+  final String defaultLocale =
+      Platform.localeName; // Returns locale string in the form 'en_US'
   //getting the language preference and assign in into the app, if none default is japanese
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   final String? languageCode = sharedPreferences.getString('locale');
@@ -99,20 +103,17 @@ void main() async {
   final String appLanguage = languageCode ?? defaultLocale.split('_')[0];
   OneSignal.User.setLanguage(appLanguage);
 
-
   OneSignal.Notifications.addClickListener((event) {
     final data = event.notification.additionalData;
-    final handler = NotificationHandler(NavigatorHelper.navigatorKey.currentContext!);
+    final handler = NotificationHandler(
+      NavigatorHelper.navigatorKey.currentContext!,
+    );
     handler.handleNotification(data);
   });
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(
     MultiProvider(
@@ -120,11 +121,12 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) {
             const fallbackLocale = Locale('es');
-            final resolvedLocale = (languageCode != null)
-                ? Locale(languageCode)
-                : (L10n.all.contains(Locale(defaultLocale))
-                    ? Locale(defaultLocale)
-                    : fallbackLocale);
+            final resolvedLocale =
+                (languageCode != null)
+                    ? Locale(languageCode)
+                    : (L10n.all.contains(Locale(defaultLocale))
+                        ? Locale(defaultLocale)
+                        : fallbackLocale);
 
             return LocaleProvider(defaultLocale: resolvedLocale);
           },
@@ -132,18 +134,14 @@ void main() async {
       ],
       child: MultiRepositoryProvider(
         providers: [
-          RepositoryProvider<AuthRepository>(
-            create: (_) => AuthRepository(),
-          ),
+          RepositoryProvider<AuthRepository>(create: (_) => AuthRepository()),
           RepositoryProvider<PaymentMethodRepository>(
             create: (_) => PaymentMethodRepository(),
           ),
           RepositoryProvider<TransactionRepository>(
             create: (_) => TransactionRepository(),
           ),
-          RepositoryProvider<UserRepository>(
-            create: (_) => UserRepository(),
-          ),
+          RepositoryProvider<UserRepository>(create: (_) => UserRepository()),
           RepositoryProvider<PayoutMethodRepository>(
             create: (_) => PayoutMethodRepository(),
           ),
@@ -156,96 +154,99 @@ void main() async {
           RepositoryProvider<WithdrawalRepository>(
             create: (_) => WithdrawalRepository(),
           ),
-          RepositoryProvider(
-            create: (_) => SearchLocationRepository(),
-          ),
-          RepositoryProvider(
-            create: (_) => CarRepository(),
-          ),
-          RepositoryProvider(
-            create: (_) => MapRepository(),
-          ),
-          RepositoryProvider(
-            create: (_) => ScheduleNotificationsRepository(),
-          ),
-          RepositoryProvider(
-            create: (_) => NotificationRepository(),
-          ),
+          RepositoryProvider(create: (_) => SearchLocationRepository()),
+          RepositoryProvider(create: (_) => CarRepository()),
+          RepositoryProvider(create: (_) => MapRepository()),
+          RepositoryProvider(create: (_) => ScheduleNotificationsRepository()),
+          RepositoryProvider(create: (_) => NotificationRepository()),
         ],
         child: MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (context) => PayoutMethodBloc(
-                  payoutMethodRepository:
-                      context.read<PayoutMethodRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => WithdrawalBloc(
-                  withdrawalRepository: context.read<WithdrawalRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => EarningsBloc(
-                  repository: context.read<EarningsRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => PaymentMethodBloc(
-                  repository: context.read<PaymentMethodRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => WalletBloc(
-                  transactionRepository: context.read<TransactionRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => MapBloc(
-                  mapRepository: context.read<MapRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => ScheduleNotificationsBloc(
-                  scheduleNotificationsRepository:
-                      context.read<ScheduleNotificationsRepository>(),
-                ),
-              ),
-              BlocProvider<NotificationsBloc>(
-                create: (context) => NotificationsBloc(
-                  notificationRepository:
-                      context.read<NotificationRepository>(),
-                ),
-              ),
-              BlocProvider<AuthBloc>(
-                create: (context) => AuthBloc(
-                  authRepository: context.read<AuthRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => SearchLocationBloc(
-                  searchLocationRepository:
-                      context.read<SearchLocationRepository>(),
-                ),
-              ),
-              BlocProvider<UserBloc>(
-                create: (context) => UserBloc(
-                  userRepository: context.read<UserRepository>(),
-                ),
-              ),
-              BlocProvider<ActivitiesBloc>(
-                create: (context) => ActivitiesBloc(
-                  activityRepository: context.read<ActivityRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => CarBloc(
-                  carRepository: context.read<CarRepository>(),
-                ),
-              ),
-            ],
-            child: const AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle.dark, child: LetDemApp())),
+          providers: [
+            BlocProvider(
+              create:
+                  (context) => PayoutMethodBloc(
+                    payoutMethodRepository:
+                        context.read<PayoutMethodRepository>(),
+                  ),
+            ),
+            BlocProvider(
+              create:
+                  (context) => WithdrawalBloc(
+                    withdrawalRepository: context.read<WithdrawalRepository>(),
+                  ),
+            ),
+            BlocProvider(
+              create:
+                  (context) => EarningsBloc(
+                    repository: context.read<EarningsRepository>(),
+                  ),
+            ),
+            BlocProvider(
+              create:
+                  (context) => PaymentMethodBloc(
+                    repository: context.read<PaymentMethodRepository>(),
+                  ),
+            ),
+            BlocProvider(
+              create:
+                  (context) => WalletBloc(
+                    transactionRepository:
+                        context.read<TransactionRepository>(),
+                  ),
+            ),
+            BlocProvider(
+              create:
+                  (context) =>
+                      MapBloc(mapRepository: context.read<MapRepository>()),
+            ),
+            BlocProvider(
+              create:
+                  (context) => ScheduleNotificationsBloc(
+                    scheduleNotificationsRepository:
+                        context.read<ScheduleNotificationsRepository>(),
+                  ),
+            ),
+            BlocProvider<NotificationsBloc>(
+              create:
+                  (context) => NotificationsBloc(
+                    notificationRepository:
+                        context.read<NotificationRepository>(),
+                  ),
+            ),
+            BlocProvider<AuthBloc>(
+              create:
+                  (context) =>
+                      AuthBloc(authRepository: context.read<AuthRepository>()),
+            ),
+            BlocProvider(
+              create:
+                  (context) => SearchLocationBloc(
+                    searchLocationRepository:
+                        context.read<SearchLocationRepository>(),
+                  ),
+            ),
+            BlocProvider<UserBloc>(
+              create:
+                  (context) =>
+                      UserBloc(userRepository: context.read<UserRepository>()),
+            ),
+            BlocProvider<ActivitiesBloc>(
+              create:
+                  (context) => ActivitiesBloc(
+                    activityRepository: context.read<ActivityRepository>(),
+                  ),
+            ),
+            BlocProvider(
+              create:
+                  (context) =>
+                      CarBloc(carRepository: context.read<CarRepository>()),
+            ),
+          ],
+          child: const AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.dark,
+            child: LetDemApp(),
+          ),
+        ),
       ),
     ),
   );
@@ -258,46 +259,47 @@ class LetDemApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: MaterialApp(
-          darkTheme: ThemeData.light(), // Optional, will be ignored
-          themeMode: ThemeMode.light, // Forces light theme always
-          locale: context.watch<LocaleProvider>().defaultLocale,
-          localizationsDelegates: const [
-            AppLocalizations.delegate, // Add this line
+        darkTheme: ThemeData.light(), // Optional, will be ignored
+        themeMode: ThemeMode.light, // Forces light theme always
+        locale: context.watch<LocaleProvider>().defaultLocale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate, // Add this line
 
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'), // English
-            Locale('es'), // Spanish
-          ],
-          builder: FlashyFlushbarProvider.init(),
-          theme: ThemeData(
-            appBarTheme: AppBarTheme(
-              backgroundColor: AppColors.scaffoldColor,
-              titleTextStyle: TextStyle(
-                color: AppColors.neutral600,
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-              ),
-              elevation: 0,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('es'), // Spanish
+        ],
+        builder: FlashyFlushbarProvider.init(),
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            backgroundColor: AppColors.scaffoldColor,
+            titleTextStyle: TextStyle(
+              color: AppColors.neutral600,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
             ),
-            scaffoldBackgroundColor: AppColors.scaffoldColor,
-            fontFamily: 'DMSans',
+            elevation: 0,
           ),
-          navigatorKey: NavigatorHelper.navigatorKey,
-          debugShowCheckedModeBanner: false,
-          debugShowMaterialGrid: false,
-          home: const AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: Brightness.dark,
-              systemNavigationBarColor: Colors.black54,
-              systemNavigationBarIconBrightness: Brightness.dark,
-            ),
-            child: SplashView(),
-          )),
+          scaffoldBackgroundColor: AppColors.scaffoldColor,
+          fontFamily: 'DMSans',
+        ),
+        navigatorKey: NavigatorHelper.navigatorKey,
+        debugShowCheckedModeBanner: false,
+        debugShowMaterialGrid: false,
+        home: const AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            systemNavigationBarColor: Colors.black54,
+            systemNavigationBarIconBrightness: Brightness.dark,
+          ),
+          child: SplashView(),
+        ),
+      ),
     );
   }
 }

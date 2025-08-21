@@ -68,13 +68,17 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
         setState(() => _isSearching = true);
         try {
           // Usar el método de geocoding que garantiza ordenamiento por distancia
-          var results =
-              await HereSearchApiService().getLocationResults(query, context);
+          var results = await HereSearchApiService().getLocationResults(
+            query,
+            context,
+          );
 
           // Si no hay resultados del geocoding, usar el método de autosuggestion
           if (results.isEmpty) {
-            results =
-                await HereSearchApiService().getLocationResults(query, context);
+            results = await HereSearchApiService().getLocationResults(
+              query,
+              context,
+            );
           }
 
           setState(() {
@@ -93,15 +97,20 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     });
   }
 
-  void _navigateToRoute(String streetName, String? googlePlaceID,
-      [CoordinatesData? coordinates]) {
-    NavigatorHelper.to(NavigationMapScreen(
-      destinationStreetName: streetName,
-      hideToggle: false,
-      googlePlaceID: googlePlaceID,
-      latitude: coordinates?.latitude ?? null,
-      longitude: coordinates?.longitude ?? null,
-    ));
+  void _navigateToRoute(
+    String streetName,
+    String? googlePlaceID, [
+    CoordinatesData? coordinates,
+  ]) {
+    NavigatorHelper.to(
+      NavigationMapScreen(
+        destinationStreetName: streetName,
+        hideToggle: false,
+        googlePlaceID: googlePlaceID,
+        latitude: coordinates?.latitude ?? null,
+        longitude: coordinates?.longitude ?? null,
+      ),
+    );
   }
 
   void _onLetDemLocationSelected(LetDemLocation location) {
@@ -122,11 +131,15 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(context.l10n.whereAreYouGoing,
-            style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700)),
+        Text(
+          context.l10n.whereAreYouGoing,
+          style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+        ),
         IconButton(
-          icon: Icon(CupertinoIcons.clear_circled_solid,
-              color: AppColors.neutral400),
+          icon: Icon(
+            CupertinoIcons.clear_circled_solid,
+            color: AppColors.neutral100,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ],
@@ -150,15 +163,18 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       return const SizedBox();
     }
     return Column(
-      children: _searchResults
-          .map((place) => SavedAddressComponent(
-                place: place,
-                onPlaceSelected: _onHerePlaceSelected,
-                onApiPlaceSelected: _onLetDemLocationSelected,
-                onHerePlaceDeleted: (_) {},
-                onLetDemLocationDeleted: (_) {},
-              ))
-          .toList(),
+      children:
+          _searchResults
+              .map(
+                (place) => SavedAddressComponent(
+                  place: place,
+                  onPlaceSelected: _onHerePlaceSelected,
+                  onApiPlaceSelected: _onLetDemLocationSelected,
+                  onHerePlaceDeleted: (_) {},
+                  onLetDemLocationDeleted: (_) {},
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -178,25 +194,29 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
           onPlaceSelected: (place) {
             NavigatorHelper.pop();
 
-            context.read<SearchLocationBloc>().add(CreateLocationEvent(
+            context.read<SearchLocationBloc>().add(
+              CreateLocationEvent(
                 isUpdating: filtered.isNotEmpty,
                 locationType: locationType,
                 name: place.description!,
-                placeID: place.placeId));
+                placeID: place.placeId,
+              ),
+            );
           },
           onApiPlaceSelected: _onLetDemLocationSelected,
           onLetDemLocationDeleted: (_) {
-            context
-                .read<SearchLocationBloc>()
-                .add(DeleteLocationEvent(locationType: locationType));
+            context.read<SearchLocationBloc>().add(
+              DeleteLocationEvent(locationType: locationType),
+            );
           },
           onHerePlaceDeleted: (_) {},
           onEditLocationTriggered: () async {
             final HerePlace? place = await AppPopup.showBottomSheet(
               NavigatorHelper.navigatorKey.currentState!.context,
               AddLocationBottomSheet(
-                title: context.l10n
-                    .setLocation(toBeginningOfSentenceCase(locationType.name)!),
+                title: context.l10n.setLocation(
+                  toBeginningOfSentenceCase(locationType.name)!,
+                ),
                 onLocationSelected: (HerePlace loc) {
                   NavigatorHelper.pop(loc);
                 },
@@ -204,12 +224,14 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
             );
 
             if (place != null) {
-              context.read<SearchLocationBloc>().add(CreateLocationEvent(
-                    isUpdating: filtered.isNotEmpty,
-                    locationType: locationType,
-                    name: place.description ?? "",
-                    placeID: place.placeId,
-                  ));
+              context.read<SearchLocationBloc>().add(
+                CreateLocationEvent(
+                  isUpdating: filtered.isNotEmpty,
+                  locationType: locationType,
+                  name: place.description ?? "",
+                  placeID: place.placeId,
+                ),
+              );
             }
           },
         ),
@@ -224,13 +246,16 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       children: [
         Row(
           children: [
-            Text(context.l10n.recent,
-                style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w500)),
+            Text(
+              context.l10n.recent,
+              style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w500),
+            ),
             const Spacer(),
             GestureDetector(
-              onTap: () => context
-                  .read<SearchLocationBloc>()
-                  .add(const ClearRecentLocationEvent()),
+              onTap:
+                  () => context.read<SearchLocationBloc>().add(
+                    const ClearRecentLocationEvent(),
+                  ),
               child: Text(
                 context.l10n.clearAll,
                 style: Typo.mediumBody.copyWith(
@@ -244,19 +269,22 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
         ),
         Dimens.space(2),
         Column(
-          children: recentPlaces
-              .map((place) => SavedAddressComponent(
-                    place: place,
-                    locationType: LetDemLocationType.other,
-                    onPlaceSelected: _onHerePlaceSelected,
-                    onHerePlaceDeleted: (place) {
-                      context
-                          .read<SearchLocationBloc>()
-                          .add(DeleteRecentLocationEvent(place: place));
-                    },
-                    onLetDemLocationDeleted: (_) {},
-                  ))
-              .toList(),
+          children:
+              recentPlaces
+                  .map(
+                    (place) => SavedAddressComponent(
+                      place: place,
+                      locationType: LetDemLocationType.other,
+                      onPlaceSelected: _onHerePlaceSelected,
+                      onHerePlaceDeleted: (place) {
+                        context.read<SearchLocationBloc>().add(
+                          DeleteRecentLocationEvent(place: place),
+                        );
+                      },
+                      onLetDemLocationDeleted: (_) {},
+                    ),
+                  )
+                  .toList(),
         ),
       ],
     );
@@ -270,13 +298,19 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(context.l10n.favourites,
-            style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w500)),
+        Text(
+          context.l10n.favourites,
+          style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w500),
+        ),
         Dimens.space(2),
         _buildLocationTypeComponent(
-            locationType: LetDemLocationType.home, locations: state.locations),
+          locationType: LetDemLocationType.home,
+          locations: state.locations,
+        ),
         _buildLocationTypeComponent(
-            locationType: LetDemLocationType.work, locations: state.locations),
+          locationType: LetDemLocationType.work,
+          locations: state.locations,
+        ),
         Dimens.space(2),
         _buildRecentLocationsSection(state.recentPlaces),
       ],
@@ -314,7 +348,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
                 }
                 if (state is SearchLocationLoaded) {
                   return Expanded(
-                      child: ListView(children: [_buildContent(state)]));
+                    child: ListView(children: [_buildContent(state)]),
+                  );
                 }
                 return const SizedBox();
               },

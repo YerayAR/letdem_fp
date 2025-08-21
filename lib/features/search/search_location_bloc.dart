@@ -1,5 +1,6 @@
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/search/repository/search_location.repository.dart';
@@ -14,7 +15,7 @@ class SearchLocationBloc
     extends Bloc<SearchLocationEvent, SearchLocationState> {
   final SearchLocationRepository searchLocationRepository;
   SearchLocationBloc({required this.searchLocationRepository})
-      : super(SearchLocationInitial()) {
+    : super(SearchLocationInitial()) {
     on<GetLocationListEvent>(_getLocationList);
     on<CreateLocationEvent>(_createLocation);
     on<DeleteLocationEvent>(_deleteLocation);
@@ -32,10 +33,9 @@ class SearchLocationBloc
 
       try {
         await DatabaseHelper().clearAll();
-        emit(currentState.copyWith(
-          recentPlaces: [],
-          isLocationCreating: false,
-        ));
+        emit(
+          currentState.copyWith(recentPlaces: [], isLocationCreating: false),
+        );
       } catch (e) {
         emit(SearchLocationError(message: e.toString()));
       }
@@ -52,12 +52,15 @@ class SearchLocationBloc
 
       try {
         await DatabaseHelper().deletePlace(event.place.placeId ?? '');
-        emit(currentState.copyWith(
-          recentPlaces: currentState.recentPlaces
-              .where((element) => element != event.place)
-              .toList(),
-          isLocationCreating: false,
-        ));
+        emit(
+          currentState.copyWith(
+            recentPlaces:
+                currentState.recentPlaces
+                    .where((element) => element != event.place)
+                    .toList(),
+            isLocationCreating: false,
+          ),
+        );
       } catch (e) {
         emit(SearchLocationError(message: e.toString()));
       }
@@ -74,12 +77,15 @@ class SearchLocationBloc
 
       try {
         await searchLocationRepository.deleteLocation(event.locationType);
-        emit(currentState.copyWith(
-          locations: currentState.locations
-              .where((element) => element.type != event.locationType)
-              .toList(),
-          isLocationCreating: false,
-        ));
+        emit(
+          currentState.copyWith(
+            locations:
+                currentState.locations
+                    .where((element) => element.type != event.locationType)
+                    .toList(),
+            isLocationCreating: false,
+          ),
+        );
       } catch (e) {
         emit(SearchLocationError(message: e.toString()));
       }
@@ -98,8 +104,9 @@ class SearchLocationBloc
       late double latitude;
       late double longitude;
       // get lat and lng from recent places if available
-      var value =
-          await HereSearchApiService().getPlaceDetailsLatLng(event.placeID);
+      var value = await HereSearchApiService().getPlaceDetailsLatLng(
+        event.placeID,
+      );
 
       if (value != null) {
         latitude = value['lat'] as double;
@@ -118,16 +125,20 @@ class SearchLocationBloc
             type: event.locationType,
           ),
         );
-        emit(currentState.copyWith(
-          locations: event.isUpdating
-              ? [
-                  ...currentState.locations
-                      .where((element) => element.type != event.locationType),
-                  location
-                ]
-              : [...currentState.locations, location],
-          isLocationCreating: false,
-        ));
+        emit(
+          currentState.copyWith(
+            locations:
+                event.isUpdating
+                    ? [
+                      ...currentState.locations.where(
+                        (element) => element.type != event.locationType,
+                      ),
+                      location,
+                    ]
+                    : [...currentState.locations, location],
+            isLocationCreating: false,
+          ),
+        );
       } catch (e) {
         emit(SearchLocationError(message: e.toString()));
       }
@@ -140,13 +151,32 @@ class SearchLocationBloc
   ) async {
     emit(SearchLocationLoading());
     try {
+      var country = await getCountryCodeFromLocation();
       final locations = await searchLocationRepository.getLocationList();
       final recentPlaces = await DatabaseHelper().getPlaces();
-      emit(SearchLocationLoaded(
-          locations: locations, recentPlaces: recentPlaces));
+      emit(
+        SearchLocationLoaded(
+          locations: locations,
+          recentPlaces: recentPlaces,
+          country: country,
+        ),
+      );
     } catch (e, st) {
       print(st);
       emit(SearchLocationError(message: e.toString()));
     }
+  }
+}
+
+//extension to get country code from context
+
+extension LocationExtension on BuildContext {
+  String? get countryCode {
+    var state = read<SearchLocationBloc>().state;
+
+    if (state is SearchLocationLoaded) {
+      return (state as SearchLocationLoaded).country;
+    }
+    return null;
   }
 }

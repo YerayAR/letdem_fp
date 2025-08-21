@@ -5,9 +5,11 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 class HereSearchApiService {
@@ -21,7 +23,7 @@ class HereSearchApiService {
   static const String _contentType = "application/json";
 
   // Replace with your Google Places API key
-  static const String googleApiKey = "AIzaSyC7GS-4uZ8LUCoTfItD740nr48KpuL6P9g";
+  static const String googleApiKey = "AIzaSyC3N860jGD8vcRTtBS0Qg9woj4lbBVhNcY";
   Future<Map<String, dynamic>?> getPlaceDetailsLatLng(String placeId) async {
     // get current country
 
@@ -44,13 +46,15 @@ class HereSearchApiService {
         } else {
           if (kDebugMode) {
             print(
-                "❌ [GOOGLE PLACE DETAILS] API error: ${jsonBody['status']}, message: ${jsonBody['error_message'] ?? 'N/A'}");
+              "❌ [GOOGLE PLACE DETAILS] API error: ${jsonBody['status']}, message: ${jsonBody['error_message'] ?? 'N/A'}",
+            );
           }
         }
       } else {
         if (kDebugMode) {
           print(
-              "❌ [GOOGLE PLACE DETAILS] Request failed with status: ${response.statusCode}");
+            "❌ [GOOGLE PLACE DETAILS] Request failed with status: ${response.statusCode}",
+          );
         }
       }
     } catch (e, st) {
@@ -64,13 +68,18 @@ class HereSearchApiService {
 
   /// Calculate distance between two lat/lng points in meters using Haversine formula
   double calculateDistanceMeters(
-      double startLat, double startLng, double endLat, double endLng) {
+    double startLat,
+    double startLng,
+    double endLat,
+    double endLng,
+  ) {
     const earthRadius = 6371000; // meters
 
     final dLat = _degreesToRadians(endLat - startLat);
     final dLng = _degreesToRadians(endLng - startLng);
 
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_degreesToRadians(startLat)) *
             math.cos(_degreesToRadians(endLat)) *
             math.sin(dLng / 2) *
@@ -99,13 +108,13 @@ class HereSearchApiService {
   /// This method now calls **Google Places Autocomplete API**
   /// but returns List<HerePlace> (same as Prediction model)
   Future<List<HerePlace>> getLocationResults(
-      String query, BuildContext context) async {
+    String query,
+    BuildContext context,
+  ) async {
     if (kDebugMode) {
       print("🔍 [GOOGLE API] Starting location search for query: '$query'");
     }
 
-    var countryCode =
-        WidgetsBinding.instance.platformDispatcher.locale.countryCode;
     var currentLocation = await Geolocator.getCurrentPosition();
 
     // Build Google Places Autocomplete URL
@@ -116,7 +125,7 @@ class HereSearchApiService {
         '&language=${NavigatorHelper.navigatorKey.currentContext!.isSpanish ? 'sp' : 'en'}'
         '&location=${currentLocation.latitude},${currentLocation.longitude}'
         '&radius=50000' // 50 km radius
-        '&components=country:$countryCode';
+        '&components=country:${context.countryCode}';
 
     try {
       if (kDebugMode) {
@@ -124,9 +133,10 @@ class HereSearchApiService {
         print("📤 [GOOGLE API] Making HTTP GET request...");
       }
 
-      final response = await http.get(Uri.parse(url), headers: {
-        "Content-Type": _contentType,
-      });
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {"Content-Type": _contentType},
+      );
 
       if (kDebugMode) {
         print("📥 [GOOGLE API] Response status: ${response.statusCode}");
@@ -140,15 +150,17 @@ class HereSearchApiService {
 
         final List<dynamic> predictionsJson = jsonBody["predictions"] ?? [];
 
-        final List<HerePlace> places = predictionsJson
-            .map((e) => HerePlace.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final List<HerePlace> places =
+            predictionsJson
+                .map((e) => HerePlace.fromJson(e as Map<String, dynamic>))
+                .toList();
 
         return places;
       } else {
         if (kDebugMode) {
           print(
-              "❌ [GOOGLE API] Request failed with status: ${response.statusCode}");
+            "❌ [GOOGLE API] Request failed with status: ${response.statusCode}",
+          );
           print("❌ [GOOGLE API] Response body: ${response.body}");
         }
         return [];
@@ -192,19 +204,22 @@ class HerePlace {
     return HerePlace(
       description: json['description'],
       id: json['id'],
-      matchedSubstrings: json['matched_substrings'] != null
-          ? (json['matched_substrings'] as List)
-              .map((v) => MatchedSubstrings.fromJson(v))
-              .toList()
-          : null,
+      matchedSubstrings:
+          json['matched_substrings'] != null
+              ? (json['matched_substrings'] as List)
+                  .map((v) => MatchedSubstrings.fromJson(v))
+                  .toList()
+              : null,
       placeId: json['place_id'],
       reference: json['reference'],
-      structuredFormatting: json['structured_formatting'] != null
-          ? StructuredFormatting.fromJson(json['structured_formatting'])
-          : null,
-      terms: json['terms'] != null
-          ? (json['terms'] as List).map((v) => Terms.fromJson(v)).toList()
-          : null,
+      structuredFormatting:
+          json['structured_formatting'] != null
+              ? StructuredFormatting.fromJson(json['structured_formatting'])
+              : null,
+      terms:
+          json['terms'] != null
+              ? (json['terms'] as List).map((v) => Terms.fromJson(v)).toList()
+              : null,
       types: json['types'] != null ? List<String>.from(json['types']) : null,
       // lat: json['lat'],
       // lng: json['lng'],
@@ -234,17 +249,11 @@ class MatchedSubstrings {
   MatchedSubstrings({this.length, this.offset});
 
   factory MatchedSubstrings.fromJson(Map<String, dynamic> json) {
-    return MatchedSubstrings(
-      length: json['length'],
-      offset: json['offset'],
-    );
+    return MatchedSubstrings(length: json['length'], offset: json['offset']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'length': length,
-      'offset': offset,
-    };
+    return {'length': length, 'offset': offset};
   }
 }
 
@@ -262,10 +271,7 @@ class StructuredFormatting {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'main_text': mainText,
-      'secondary_text': secondaryText,
-    };
+    return {'main_text': mainText, 'secondary_text': secondaryText};
   }
 }
 
@@ -276,16 +282,42 @@ class Terms {
   Terms({this.offset, this.value});
 
   factory Terms.fromJson(Map<String, dynamic> json) {
-    return Terms(
-      offset: json['offset'],
-      value: json['value'],
-    );
+    return Terms(offset: json['offset'], value: json['value']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'offset': offset,
-      'value': value,
-    };
+    return {'offset': offset, 'value': value};
+  }
+}
+
+Future<String?> getCountryCodeFromLocation() async {
+  try {
+    // Check location service
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return null;
+
+    // Check permissions
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return null;
+    }
+    if (permission == LocationPermission.deniedForever) return null;
+
+    // Get current location
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.low,
+    );
+
+    // Reverse geocode
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+
+    return placemarks.isNotEmpty ? placemarks.first.isoCountryCode : null;
+  } catch (e) {
+    print('Error getting country code: $e');
+    return null;
   }
 }

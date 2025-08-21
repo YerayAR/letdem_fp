@@ -20,6 +20,11 @@ class ScheduleNotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateFormat dateFormat = DateFormat(
+        context.isSpanish ? 'dd MMM HH:mm' : 'dd MMM HH:mm',
+        context.isSpanish ? 'es_ES' : 'en_US'
+    );
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -215,7 +220,7 @@ class ScheduleNotificationItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${DateFormat(context.isSpanish ? 'd MMM HH:mm' : 'd MMM HH:mm', context.isSpanish ? 'es_ES' : 'en_US').format(notification.startsAt)} - ${DateFormat(context.isSpanish ? 'd MMM HH:mm' : 'd MMM HH:mm').format(notification.endsAt)}',
+                      '${dateFormat.format(notification.startsAt)} - ${dateFormat.format(notification.endsAt)}',
                       style: Typo.mediumBody.copyWith(
                         color: AppColors.neutral500,
                       ),

@@ -16,8 +16,8 @@ import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
+import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
-import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:otp_text_field/otp_text_field.dart';
@@ -43,7 +43,11 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {
           if (state is ActivitiesPublished) {
-            context.read<UserBloc>().add(const FetchUserInfoEvent());
+            if (state.isCancelled) {
+              NavigatorHelper.pop();
+              return;
+            }
+
             // Handle successful space reservation confirmation
             AppPopup.showDialogSheet(
               context,
@@ -74,6 +78,42 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                     _buildStatusStepper(),
                     Dimens.space(6),
                     _buildConfirmOrderButton(context),
+                    Dimens.space(2),
+                    SizedBox(
+                      child:
+                          widget.payload.status == "PENDING"
+                              ? null
+                              : PrimaryButton(
+                                isLoading: state is ActivitiesLoading,
+                                text: context.l10n.cancel,
+                                color: AppColors.red500,
+                                textColor: Colors.white,
+                                onTap: () {
+                                  AppPopup.showDialogSheet(
+                                    context,
+                                    ConfirmationDialog(
+                                      title:
+                                          context
+                                              .l10n
+                                              .cancelReservationConfirmationTitle,
+                                      subtext:
+                                          context
+                                              .l10n
+                                              .cancelReservationConfirmationText,
+                                      onProceed: () {
+                                        NavigatorHelper.pop();
+                                        context.read<ActivitiesBloc>().add(
+                                          CancelReservationEvent(
+                                            spaceID: widget.payload.id,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                    ),
+                    Dimens.space(2),
                   ],
                 ),
               ),
@@ -108,27 +148,30 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
               !widget.payload.isOwner || widget.payload.status == "PENDING"
                   ? []
                   : [
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary50,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          context.l10n.reservationPendingNote(
-                            DateFormat('HH:mm')
-                                .format(widget.payload.canceledAt.toLocal()),
-                          ),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.secondary600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 16,
                       ),
-                    ],
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary50,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        context.l10n.reservationPendingNote(
+                          DateFormat(
+                            'HH:mm',
+                          ).format(widget.payload.canceledAt.toLocal()),
+                        ),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.secondary600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
         ),
       ],
     );
@@ -216,11 +259,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   }
 
   Widget _stepperDivider() {
-    return Container(
-      width: 55,
-      height: 2,
-      color: AppColors.neutral100,
-    );
+    return Container(width: 55, height: 2, color: AppColors.neutral100);
   }
 
   Widget _statusStep(bool isReserved) {
@@ -299,8 +338,10 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   Widget _buildSheetTitle() {
     return Column(
       children: [
-        Text(context.l10n.confirmationCode,
-            style: Typo.heading4.copyWith(color: AppColors.neutral600)),
+        Text(
+          context.l10n.confirmationCode,
+          style: Typo.heading4.copyWith(color: AppColors.neutral600),
+        ),
         Text(
           context.l10n.enterConfirmationCode,
           textAlign: TextAlign.center,
@@ -373,13 +414,13 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                 }
 
                 context.read<ActivitiesBloc>().add(
-                      ConfirmSpaceReserveEvent(
-                        confirmationCode: ConfirmationCodeDTO(
-                          code: otp,
-                          spaceID: widget.payload.id,
-                        ),
-                      ),
-                    );
+                  ConfirmSpaceReserveEvent(
+                    confirmationCode: ConfirmationCodeDTO(
+                      code: otp,
+                      spaceID: widget.payload.id,
+                    ),
+                  ),
+                );
               },
             ),
             Dimens.space(2),

@@ -36,15 +36,18 @@ class ApiService extends BaseApiService {
         List<Map<String, dynamic>> queryParams =
             endpoint.queryParameter!.map((e) => e.toMap()).toList();
 
-        uri = Uri.parse(uri)
-            .replace(queryParameters: _flattenMapList(queryParams))
-            .toString();
+        uri =
+            Uri.parse(
+              uri,
+            ).replace(queryParameters: _flattenMapList(queryParams)).toString();
       }
 
       // Add headers
       Options options = Options(
         headers: await BaseApiService.getHeaders(
-            endpoint.isProtected, endpoint.tokenKey),
+          endpoint.isProtected,
+          endpoint.tokenKey,
+        ),
       );
 
       // Create form data
@@ -81,25 +84,26 @@ class ApiService extends BaseApiService {
       }
 
       debugPrint("Sending ${endpoint.getHTTPMethod()} request to $uri");
-      Response response = endpoint.method.name.toLowerCase() == "put"
-          ? await _dio.put(
-              uri,
-              data: formData,
-              options: options,
-              onSendProgress: (int sent, int total) {
-                double progress = (sent / total) * 100;
-                onProgress(progress);
-              },
-            )
-          : await _dio.post(
-              uri,
-              data: formData,
-              options: options,
-              onSendProgress: (int sent, int total) {
-                double progress = (sent / total) * 100;
-                onProgress(progress);
-              },
-            );
+      Response response =
+          endpoint.method.name.toLowerCase() == "put"
+              ? await _dio.put(
+                uri,
+                data: formData,
+                options: options,
+                onSendProgress: (int sent, int total) {
+                  double progress = (sent / total) * 100;
+                  onProgress(progress);
+                },
+              )
+              : await _dio.post(
+                uri,
+                data: formData,
+                options: options,
+                onSendProgress: (int sent, int total) {
+                  double progress = (sent / total) * 100;
+                  onProgress(progress);
+                },
+              );
 
       debugPrint("Status code: ${response.statusCode}");
       debugPrint("Body: ${response.data}");
@@ -120,8 +124,9 @@ class ApiService extends BaseApiService {
           response.data.containsKey('error_code')) {
         String status = response.data['error_code'];
         throw ApiError(
-            message: ErrorMessageHelper.getMessage(status),
-            data: response.data);
+          message: ErrorMessageHelper.getMessage(status),
+          data: response.data,
+        );
       }
       String err =
           response.data['message'] ?? response.data['error'] ?? 'Unknown error';
@@ -142,9 +147,7 @@ class ApiService extends BaseApiService {
   }
 
   // Send an HTTP request and handle the response
-  static Future<ApiResponse> sendRequest({
-    required Endpoint endpoint,
-  }) async {
+  static Future<ApiResponse> sendRequest({required Endpoint endpoint}) async {
     try {
       var url = "${EndPoints.baseURL}${endpoint.url}";
 
@@ -154,16 +157,19 @@ class ApiService extends BaseApiService {
         List<Map<String, dynamic>> queryParams =
             endpoint.queryParameter!.map((e) => e.toMap()).toList();
 
-        url = Uri.parse(url)
-            .replace(queryParameters: _flattenMapList(queryParams))
-            .toString();
+        url =
+            Uri.parse(
+              url,
+            ).replace(queryParameters: _flattenMapList(queryParams)).toString();
       }
 
       Options options = Options(
         headers: await BaseApiService.getHeaders(
-            endpoint.isProtected, endpoint.tokenKey),
+          endpoint.isProtected,
+          endpoint.tokenKey,
+        ),
       );
-      if (EndPoints.showApiLogs) {
+      if (true) {
         log("""
 ════════════════════════════════════════════════════════════════════════════════════════════════
       API REQUEST           🐶
@@ -187,7 +193,7 @@ class ApiService extends BaseApiService {
         );
       }
 
-      if (EndPoints.showApiLogs) {
+      if (true) {
         log("""
 ════════════════════════════════════════════════════════════════════════════════════════════════
       API RESPONSE    🐶
@@ -217,17 +223,19 @@ ${response.data}
         return ApiResponse(
           success: true,
           status: RequestStatus.success,
-          data: response.data == null
-              ? {}
-              : response.data is String
+          data:
+              response.data == null
+                  ? {}
+                  : response.data is String
                   ? {}
                   : (response.data is List)
-                      ? {'data': response.data}
-                      : response.data,
+                  ? {'data': response.data}
+                  : response.data,
         );
       }
 
-      String err = response.data['message'] ??
+      String err =
+          response.data['message'] ??
           response.data['error'] ??
           fromCode(response.statusCode ?? 0);
 
@@ -245,14 +253,18 @@ ${response.data}
       _handleDioError(e, e.response?.data);
     } on TimeoutException {
       throw ApiError(
-          message: 'The request is timed out', status: ErrorStatus.timeout);
+        message: 'The request is timed out',
+        status: ErrorStatus.timeout,
+      );
     } catch (e) {
       debugPrint('An error occurred: $e');
       if (e.runtimeType == ApiError) {
         rethrow;
       }
       throw ApiError(
-          message: "Something went wrong", status: ErrorStatus.unauthorized);
+        message: "Something went wrong",
+        status: ErrorStatus.unauthorized,
+      );
     }
     throw ApiError(message: "Unexpected error occurred, no response received");
   }
@@ -268,9 +280,10 @@ ${response.data}
         e.type == DioExceptionType.sendTimeout) {
       Toast.showError("No internet connection");
       throw ApiError(
-          message: "No internet connection",
-          status: ErrorStatus.noInternet,
-          data: data);
+        message: "No internet connection",
+        status: ErrorStatus.noInternet,
+        data: data,
+      );
     }
     if (EndPoints.showApiLogs) {
       log("""
@@ -291,17 +304,21 @@ ${response.data}
         e.response!.data.containsKey('error_code')) {
       String status = e.response!.data['error_code'];
       throw ApiError(
-          message: ErrorMessageHelper.getMessage(status), data: data);
+        message: ErrorMessageHelper.getMessage(status),
+        data: data,
+      );
     }
 
-    var message = e.response == null
-        ? "Unknown error"
-        : e.response!.data?['message'] ?? "Unknown error";
+    var message =
+        e.response == null
+            ? "Unknown error"
+            : e.response!.data?['message'] ?? "Unknown error";
 
     throw ApiError(
-        message: message,
-        status: fromCode(e.response?.statusCode ?? 0),
-        data: data);
+      message: message,
+      status: fromCode(e.response?.statusCode ?? 0),
+      data: data,
+    );
   }
 }
 

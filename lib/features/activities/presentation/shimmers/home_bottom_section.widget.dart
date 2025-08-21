@@ -81,7 +81,6 @@ class HomeMapBottomSection extends StatelessWidget {
                   child: PrimaryButton(
                     onTap: () async {
                       PublishSpaceHandler.showSpaceOptions(context, () {
-                        ;
                         onRefreshTriggered();
                       });
                     },
