@@ -41,8 +41,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      Toast.showError("Unable to cancel reservation");
-      emit(const ActivitiesError(error: "Unable to cancel reservation"));
+      print("Unable to cancel reservation");
     }
   }
 
@@ -58,8 +57,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      Toast.showError("Unable to delete space");
-      emit(const ActivitiesError(error: "Unable to delete space"));
+      print("Unable to delete space");
     }
   }
 
@@ -78,8 +76,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      Toast.showError("Unable to confirm space reservation");
-      emit(const ActivitiesError(error: "Unable to confirm space reservation"));
+      print("Unable to confirm space reservation");
     }
   }
 
@@ -108,12 +105,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
         ),
       );
     } catch (err, st) {
-      emit(
-        const ReserveSpaceError(
-          error: "Unable to reserve paid space",
-          clientSecret: null,
-        ),
-      );
+      print("Unable to reserve paid space");
     }
   }
 
@@ -131,7 +123,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      emit(const ActivitiesError(error: "Unable to send feedback"));
+      print("Unable to send feedback");
     }
   }
 
@@ -147,9 +139,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       emit(ActivitiesError(error: err.message));
       (Toast.showError(err.message));
     } catch (err) {
-      emit(const ActivitiesError(error: "Unable to take space"));
-
-      Toast.showError("Unable to take space");
+      print("Error reserving space");
     }
   }
 
@@ -173,7 +163,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      emit(const ActivitiesError(error: "Unable to publish road event"));
+      print("Error publish alert");
     }
   }
 
@@ -190,7 +180,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      emit(const ActivitiesError(error: "Unable to load activities"));
+      print("Unable to load activities");
     }
   }
 
@@ -219,7 +209,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      emit(const ActivitiesError(error: "Unable to publish space"));
+      print("Unable to publish space");
     }
   }
 }

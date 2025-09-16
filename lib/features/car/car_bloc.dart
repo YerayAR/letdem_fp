@@ -55,8 +55,7 @@ class CarBloc extends Bloc<CarEvent, CarState> {
       final car = await carRepository.getCar();
       emit(CarLoaded(car));
     } catch (e, st) {
-      print(st);
-      print(e);
+      print("$st - $e");
       emit(CarError(e.toString()));
     }
   }
