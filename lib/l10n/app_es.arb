@@ -1128,5 +1128,6 @@
       }
     }
   },
-  "waitingForNavigation": "Esperando a que inicie la navegación..."
+  "waitingForNavigation": "Esperando a que inicie la navegación...",
+  "locationNotAvailable": "Ubicación no disponible"
 }

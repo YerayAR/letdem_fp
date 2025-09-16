@@ -161,16 +161,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
   }
 
   void _publishSpace() {
-    // If it's a paid space and we're on the first page, go to the second page
-    if (widget.isPaid && _pageController.page == 0) {
-      _moveToNextPage();
-      return;
-    }
-
-    // Validate form data first (fast operation)
-    if (!_validatePaidSpaceForm()) {
-      return;
-    }
+    if (isPublishing) return;
 
     // Check if location data is available
     if (locationData == null) {
@@ -178,10 +169,33 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       return;
     }
 
-    // Set local loading state immediately for instant feedback
-    setState(() {
-      isPublishing = true;
-    });
+    // If it's a paid space and we're on the first page, go to the second page
+    if (widget.isPaid) {
+      if (_pageController.page == 0) {
+        _moveToNextPage();
+        return;
+      }
+
+      // Set local loading state immediately for instant feedback
+      setState(() {
+        isPublishing = true;
+      });
+
+      // Validate form data first (fast operation)
+      if (!_validatePaidSpaceForm()) {
+        setState(() {
+          isPublishing = false;
+        });
+        return;
+      }
+    }
+
+    if (!isPublishing){
+      // Set local loading state immediately for instant feedback
+      setState(() {
+        isPublishing = true;
+      });
+    }
 
     // Proceed with publishing
     context.read<ActivitiesBloc>().add(
@@ -275,8 +289,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                 color:
                                     _selectedPage == 1
                                         ? AppColors.secondary500
-                                        : AppColors.secondary500.withOpacity(
-                                          0.3,
+                                        : AppColors.secondary500.withValues(
+                                          alpha: 0.3,
                                         ),
                               ),
                             ),
@@ -325,18 +339,18 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                       children:
                           PublishSpaceType.values
                               .where(
-                                (e) =>
-                                    e != PublishSpaceType.paidFree &&
-                                    e != PublishSpaceType.paidBlue &&
-                                    e != PublishSpaceType.paidDisabled &&
-                                    e != PublishSpaceType.paidGreenZone,
+                                (spaceType) =>
+                                    spaceType != PublishSpaceType.paidFree &&
+                                    spaceType != PublishSpaceType.paidBlue &&
+                                    spaceType != PublishSpaceType.paidDisabled &&
+                                    spaceType != PublishSpaceType.paidGreenZone,
                               )
                               .map(
-                                (e) => Flexible(
+                                (spaceType) => Flexible(
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        selectedType = e;
+                                        selectedType = spaceType;
                                       });
                                     },
                                     child: AspectRatio(
@@ -351,7 +365,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                             15,
                                           ),
                                           border:
-                                              selectedType == e
+                                              selectedType == spaceType
                                                   ? Border.all(
                                                     color: AppColors.primary200,
                                                     width: 2,
@@ -367,13 +381,13 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               SvgPicture.asset(
-                                                getSpaceTypeIcon(e),
+                                                getSpaceTypeIcon(spaceType),
                                                 width: 30,
                                                 height: 30,
                                               ),
                                               Dimens.space(1),
                                               Text(
-                                                getSpaceTypeText(e, context),
+                                                getSpaceTypeText(spaceType, context),
                                                 style: Typo.smallBody.copyWith(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
@@ -558,7 +572,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
               child: Padding(
                 padding: EdgeInsets.all(Dimens.defaultMargin),
                 child: PrimaryButton(
-                  isLoading: state is ActivitiesLoading || isPublishing,
+                  isLoading: isPublishing,
                   onTap: _publishSpace,
                   isDisabled: _isPublishDisabled,
                   text:

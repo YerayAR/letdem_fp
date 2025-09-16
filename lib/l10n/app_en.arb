@@ -1114,5 +1114,6 @@
       }
     }
   },
-  "waitingForNavigation": "Waiting for navigation to start..."
+  "waitingForNavigation": "Waiting for navigation to start...",
+  "locationNotAvailable": "Location data not available"
 }
