@@ -12,7 +12,6 @@ class LoginDTO extends DTO {
 
   @override
   Map<String, dynamic> toMap() {
-    print("OneSignal User: ${OneSignal.User.pushSubscription.id}");
     return {
       'email': email,
       'password': password,
