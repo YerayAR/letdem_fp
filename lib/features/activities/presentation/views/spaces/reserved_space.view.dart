@@ -44,9 +44,6 @@ class ReservedSpaceDetailView extends StatelessWidget {
               listener: (context, state) {
                 if (state is ActivitiesError) {
                   Toast.showError(state.error);
-                } else if (state is ActivitiesLoaded) {
-                  // Handle success state, e.g., show a success message or navigate
-                  NavigatorHelper.pop();
                 }
                 // TODO: implement listener
               },

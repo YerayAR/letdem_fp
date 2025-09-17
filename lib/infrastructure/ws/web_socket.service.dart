@@ -140,9 +140,10 @@ class UserWebSocketService {
     void Function(dynamic error)? onError,
   }) async {
     var token = await SecureStorageHelper().read('access_token');
+    if(token == null) return;
 
     final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/users/refresh?token=${token}',
+      'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
     );
 
     _channel = WebSocketChannel.connect(wsUrl);
