@@ -8,18 +8,6 @@ import 'transaction.interface.dart';
 
 class TransactionRepository implements ITransactionRepository {
   @override
-  Future<void> addTransaction(Transaction transaction) {
-    // TODO: implement addTransaction
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteTransaction(String transactionId) {
-    // TODO: implement deleteTransaction
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<Transaction>> fetchTransactions(TransactionParams data) async {
     EndPoints.getTransactions.setParams([
       QParam(
@@ -42,6 +30,26 @@ class TransactionRepository implements ITransactionRepository {
     ]);
     ApiResponse response =
         await ApiService.sendRequest(endpoint: EndPoints.getTransactions);
+
+    return (response.data['results'] as List)
+        .map((e) => Transaction.fromJson(e))
+        .toList();
+  }
+
+  @override
+  Future<List<Transaction>> fetchLastTransactions(TransactionParams data) async {
+    EndPoints.getTransactions.setParams([
+      QParam(
+        key: 'page_size',
+        value: '5',
+      ),
+      QParam(
+        key: 'page',
+        value: '1',
+      ),
+    ]);
+    ApiResponse response =
+    await ApiService.sendRequest(endpoint: EndPoints.getTransactions);
 
     return (response.data['results'] as List)
         .map((e) => Transaction.fromJson(e))
