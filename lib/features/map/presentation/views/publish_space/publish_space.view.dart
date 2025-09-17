@@ -165,7 +165,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
 
     // Check if location data is available
     if (locationData == null) {
-      Toast.showError('Location data not available');
+      Toast.showError(context.l10n.locationNotAvailable);
       return;
     }
 

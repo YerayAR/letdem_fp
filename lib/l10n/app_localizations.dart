@@ -2684,7 +2684,7 @@ abstract class AppLocalizations {
   /// No description provided for @trafficLevel.
   ///
   /// In en, this message translates to:
-  /// **'Traffic Level'**
+  /// **'Traffic'**
   String get trafficLevel;
 
   /// No description provided for @toArriveBy.
@@ -4558,6 +4558,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waiting for navigation to start...'**
   String get waitingForNavigation;
+
+  /// No description provided for @locationNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Location data not available'**
+  String get locationNotAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1346,7 +1346,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get close => 'Cerrar';
 
   @override
-  String get trafficLevel => 'Nivel de tráfico';
+  String get trafficLevel => 'Tráfico';
 
   @override
   String toArriveBy(String time) {
@@ -2323,4 +2323,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get waitingForNavigation => 'Esperando a que inicie la navegación...';
+
+  @override
+  String get locationNotAvailable => 'Ubicación no disponible';
 }
