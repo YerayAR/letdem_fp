@@ -108,9 +108,7 @@ class _AmountInputCardState extends State<AmountInputCard> {
           //   onChanged: _validateAmount,
           // ),
           Dimens.space(1),
-          context.userProfile!.earningAccount!.pendingBalance <= 0
-          ? const SizedBox()
-          : Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(

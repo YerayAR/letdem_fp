@@ -24,19 +24,19 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     on<PublishRoadEventEvent>(_onPublishRoadEvent);
     on<TakeSpaceEvent>(_onTakeSpace);
     on<EventFeedBackEvent>(_onEventFeedBack);
-    on<CancelReservationEvent>(_onDeleteReservationEvent);
+    on<CancelReservationEvent>(_onCancelReservationEvent);
     on<DeleteSpaceEvent>(_onDeleteSpaceEvent);
     on<ReserveSpaceEvent>(_onReserveSpace);
     on<ConfirmSpaceReserveEvent>(_onConfirmSpaceReserveEvent);
   }
-  Future<void> _onDeleteReservationEvent(
+  Future<void> _onCancelReservationEvent(
     CancelReservationEvent event,
     Emitter<ActivitiesState> emit,
   ) async {
     try {
       emit(ActivitiesLoading());
-      await activityRepository.cancelReservation(event.spaceID);
-      emit(const ActivitiesPublished(totalPointsEarned: 0, isCancelled: true));
+      await activityRepository.cancelReservation(event.reservationId);
+      emit(const ReservationSpaceCancelled());
     } on ApiError catch (err) {
       Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
