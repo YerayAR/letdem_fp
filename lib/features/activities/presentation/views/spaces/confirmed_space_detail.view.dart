@@ -37,17 +37,27 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   String otp = "";
   final OtpFieldController otpController = OtpFieldController();
 
+  void _onBack(){
+    NavigatorHelper.pop();
+    NavigatorHelper.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {
-          if (state is ActivitiesPublished) {
-            if (state.isCancelled) {
-              NavigatorHelper.pop();
-              return;
-            }
-
+          if (state is ReservationSpaceCancelled){
+            // Handle cancelled reservation
+            AppPopup.showDialogSheet(
+              context,
+              SuccessDialog(
+                title: context.l10n.reservationCancelledOwnerTitle,
+                subtext: context.l10n.reservationCancelledOwnerDescription,
+                onProceed: _onBack,
+              ),
+            );
+          } else if (state is ActivitiesPublished) {
             // Handle successful space reservation confirmation
             AppPopup.showDialogSheet(
               context,
@@ -58,10 +68,10 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
               ),
             );
           }
-
           // TODO: implement listener
         },
         builder: (context, state) {
+          bool isStateLoading = state is ActivitiesLoading;
           return StyledBody(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -84,7 +94,8 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                           widget.payload.status == "PENDING"
                               ? null
                               : PrimaryButton(
-                                isLoading: state is ActivitiesLoading,
+                                isLoading: isStateLoading,
+                                isDisabled: isStateLoading,
                                 text: context.l10n.cancel,
                                 color: AppColors.red500,
                                 textColor: Colors.white,
@@ -92,19 +103,13 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                                   AppPopup.showDialogSheet(
                                     context,
                                     ConfirmationDialog(
-                                      title:
-                                          context
-                                              .l10n
-                                              .cancelReservationConfirmationTitle,
-                                      subtext:
-                                          context
-                                              .l10n
-                                              .cancelReservationConfirmationText,
+                                      title: context.l10n.cancelReservationConfirmationTitle,
+                                      subtext: context.l10n.cancelReservationConfirmationText,
                                       onProceed: () {
                                         NavigatorHelper.pop();
                                         context.read<ActivitiesBloc>().add(
                                           CancelReservationEvent(
-                                            spaceID: widget.payload.id,
+                                            reservationId: widget.payload.id,
                                           ),
                                         );
                                       },
@@ -406,6 +411,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
           children: [
             PrimaryButton(
               isLoading: isLoading,
+              isDisabled: isLoading,
               text: context.l10n.confirmOrder,
               onTap: () {
                 if (otp.length < 6) {

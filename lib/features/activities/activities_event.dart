@@ -79,13 +79,13 @@ class DeleteSpaceEvent extends ActivitiesEvent {
 }
 
 final class CancelReservationEvent extends ActivitiesEvent {
-  final String spaceID;
+  final String reservationId;
 
-  const CancelReservationEvent({required this.spaceID});
+  const CancelReservationEvent({required this.reservationId});
 
   @override
   // TODO: implement props
-  List<Object?> get props => [spaceID];
+  List<Object?> get props => [reservationId];
 }
 
 final class PublishSpaceEvent extends ActivitiesEvent {

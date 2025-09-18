@@ -3857,6 +3857,30 @@ abstract class AppLocalizations {
   /// **'Your reservation has been confirmed successfully, we will update your balance shortly.'**
   String get reservationConfirmedDescription;
 
+  /// No description provided for @reservationCancelledOwnerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation cancelled'**
+  String get reservationCancelledOwnerTitle;
+
+  /// No description provided for @reservationCancelledOwnerDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Now we will proceed to refund the total amount of reservation to the requester.'**
+  String get reservationCancelledOwnerDescription;
+
+  /// No description provided for @reservationCancelledRequesterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation cancelled'**
+  String get reservationCancelledRequesterTitle;
+
+  /// No description provided for @reservationCancelledRequesterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Now we will refund the total amount of reservation to your bank account.'**
+  String get reservationCancelledRequesterDescription;
+
   /// No description provided for @networkError.
   ///
   /// In en, this message translates to:

@@ -1970,6 +1970,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservationConfirmedDescription => 'Your reservation has been confirmed successfully, we will update your balance shortly.';
 
   @override
+  String get reservationCancelledOwnerTitle => 'Reservation cancelled';
+
+  @override
+  String get reservationCancelledOwnerDescription => 'Now we will proceed to refund the total amount of reservation to the requester.';
+
+  @override
+  String get reservationCancelledRequesterTitle => 'Reservation cancelled';
+
+  @override
+  String get reservationCancelledRequesterDescription => 'Now we will refund the total amount of reservation to your bank account.';
+
+  @override
   String get networkError => 'Network error';
 
   @override
