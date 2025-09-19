@@ -12,7 +12,36 @@
           "package_name": "com.letdem.letdemapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1030587373633-7k81esmt1qjn2a1ht8n9mpplckavqe6e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.letdem.letdemapp",
+            "certificate_hash": "1b88a95f6ac505af723e5c4f5e2895f5f54569ff"
+          }
+        },
+        {
+          "client_id": "1030587373633-dq3hhics00lg5lkdp1o5tbc1kvojietl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.letdem.letdemapp",
+            "certificate_hash": "0ace04ed8edda24a7002237859fa92eef40e1df0"
+          }
+        },
+        {
+          "client_id": "1030587373633-ghnsku6l8c38ddaej2loh60n023kl4ih.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.letdem.letdemapp",
+            "certificate_hash": "d7a5867781d8678fc425a380643735ddd73dc43d"
+          }
+        },
+        {
+          "client_id": "1030587373633-amkpbk3ed1as95f7dboskiqfsjfqm6t5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBYZClEaZy1KGNlkOXwwHobYc5AXxVv9Cs"
@@ -20,7 +49,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1030587373633-amkpbk3ed1as95f7dboskiqfsjfqm6t5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1030587373633-6ar51chuu5snk5051e99kn8uf14re6vr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.letdem"
+              }
+            }
+          ]
         }
       }
     }

@@ -121,7 +121,7 @@ PODS:
   - GTMSessionFetcher/Core (3.5.0)
   - GTMSessionFetcher/Full (3.5.0):
     - GTMSessionFetcher/Core
-  - here_sdk (4.23.3.0.213462.release):
+  - here_sdk (4.23.2.0.210004.release):
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
@@ -395,7 +395,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  here_sdk: 65e77b7869df85c4347cd06621c88c42bf5ee4e0
+  here_sdk: e42bf9b8bb394c85df6b4b31f0d2817d0f18c387
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   location: 155caecf9da4f280ab5fe4a55f94ceccfab838f8
   mapbox_maps_flutter: 1457f41480792ffeaefbf3786008ce2f701dcd20

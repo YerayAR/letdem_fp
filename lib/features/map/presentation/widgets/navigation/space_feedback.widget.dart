@@ -14,9 +14,15 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 class ParkingRatingWidget extends StatefulWidget {
   final VoidCallback onSubmit;
 
+  final bool isOwner;
+
   final String spaceID;
-  const ParkingRatingWidget(
-      {super.key, required this.onSubmit, required this.spaceID});
+  const ParkingRatingWidget({
+    super.key,
+    required this.onSubmit,
+    required this.spaceID,
+    required this.isOwner,
+  });
 
   @override
   _ParkingRatingWidgetState createState() => _ParkingRatingWidgetState();
@@ -29,48 +35,48 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
 
   void _inizializeOptions() {
     _options = [
-    {
-      'id': 'take',
-      'label': context.l10n.illTakeIt,
-      'icon': Icons.thumb_up,
-      'color': Colors.green.shade100,
-      "enum": TakeSpaceType.TAKE_IT,
-      'iconColor': Colors.green
-    },
-    {
-      'id': 'inuse',
-      'label': context.l10n.itsInUse,
-      'icon': Icons.directions_car,
-      "enum": TakeSpaceType.IN_USE,
-      'color': AppColors.primary500.withOpacity(0.1),
-      'iconColor': AppColors.primary500
-    },
-    {
-      'id': 'notuseful',
-      'label': context.l10n.notUseful,
-      "enum": TakeSpaceType.NOT_USEFUL,
-      'icon': Icons.thumb_down,
-      'color': Colors.amber.shade100,
-      'iconColor': Colors.amber.shade700
-    },
-    {
-      'id': 'prohibited',
-      'label': context.l10n.prohibited,
-      "enum": TakeSpaceType.PROHIBITED,
-      'icon': Icons.not_interested,
-      'color': Colors.red.shade100,
-      'iconColor': Colors.red
-    },
-  ];
+      {
+        'id': 'take',
+        'label': context.l10n.illTakeIt,
+        'icon': Icons.thumb_up,
+        'color': Colors.green.shade100,
+        "enum": TakeSpaceType.TAKE_IT,
+        'iconColor': Colors.green,
+      },
+      {
+        'id': 'inuse',
+        'label': context.l10n.itsInUse,
+        'icon': Icons.directions_car,
+        "enum": TakeSpaceType.IN_USE,
+        'color': AppColors.primary500.withOpacity(0.1),
+        'iconColor': AppColors.primary500,
+      },
+      {
+        'id': 'notuseful',
+        'label': context.l10n.notUseful,
+        "enum": TakeSpaceType.NOT_USEFUL,
+        'icon': Icons.thumb_down,
+        'color': Colors.amber.shade100,
+        'iconColor': Colors.amber.shade700,
+      },
+      {
+        'id': 'prohibited',
+        'label': context.l10n.prohibited,
+        "enum": TakeSpaceType.PROHIBITED,
+        'icon': Icons.not_interested,
+        'color': Colors.red.shade100,
+        'iconColor': Colors.red,
+      },
+    ];
   }
 
   void _handleSubmit() {
     context.read<ActivitiesBloc>().add(
-          TakeSpaceEvent(
-            type: _selectedOption as TakeSpaceType,
-            spaceID: widget.spaceID,
-          ),
-        );
+      TakeSpaceEvent(
+        type: _selectedOption as TakeSpaceType,
+        spaceID: widget.spaceID,
+      ),
+    );
     return;
 
     if (_selectedOption != null) {
@@ -162,65 +168,86 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        context.l10n.rateThisParkingSpace,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black87,
-                        ),
-                        textAlign: TextAlign.center,
+                      Column(
+                        children:
+                            widget.isOwner
+                                ? []
+                                : [
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    context.l10n.rateThisParkingSpace,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black87,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                       ),
                     ],
                   ),
                 ),
-                Dimens.space(3),
+                Dimens.space(widget.isOwner ? 0 : 3),
 
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Rating options
-                      ..._options.map((option) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedOption = option['enum'];
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: _selectedOption == option['enum']
-                                  ? (option['color'] as Color).withOpacity(0.4)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: _selectedOption == option['enum']
-                                    ? option['iconColor']
-                                    : Colors.grey.withOpacity(0.4),
-                              ),
-                            ),
-                            child: Column(
+                SizedBox(
+                  child:
+                      widget.isOwner
+                          ? null
+                          : SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                CircleAvatar(
-                                  backgroundColor:
-                                      (option['iconColor'] as Color)
-                                          .withOpacity(0.1),
-                                  child: Icon(option['icon'],
-                                      color: option['iconColor']),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(option['label']),
+                                // Rating options
+                                ..._options.map((option) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedOption = option['enum'];
+                                      });
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                      ),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            _selectedOption == option['enum']
+                                                ? (option['color'] as Color)
+                                                    .withOpacity(0.4)
+                                                : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color:
+                                              _selectedOption == option['enum']
+                                                  ? option['iconColor']
+                                                  : Colors.grey.withOpacity(
+                                                    0.4,
+                                                  ),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor:
+                                                (option['iconColor'] as Color)
+                                                    .withOpacity(0.1),
+                                            child: Icon(
+                                              option['icon'],
+                                              color: option['iconColor'],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(option['label']),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
                               ],
                             ),
                           ),
-                        );
-                      }),
-                    ],
-                  ),
                 ),
 
                 Dimens.space(4),
@@ -229,7 +256,12 @@ class _ParkingRatingWidgetState extends State<ParkingRatingWidget> {
                 PrimaryButton(
                   text: context.l10n.done,
                   isLoading: state is ActivitiesLoading,
-                  onTap: _submitted ? null : _handleSubmit,
+                  onTap:
+                      widget.isOwner
+                          ? () => NavigatorHelper.pop()
+                          : _submitted
+                          ? null
+                          : _handleSubmit,
                 ),
               ],
             ),
