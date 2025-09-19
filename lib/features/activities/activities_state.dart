@@ -74,6 +74,13 @@ final class SpaceReserved extends ActivitiesState {
   List<Object?> get props => [spaceID];
 }
 
+final class ReservationSpaceCancelled extends ActivitiesState {
+  const ReservationSpaceCancelled();
+
+  @override
+  List<Object?> get props => [];
+}
+
 enum ReservedSpaceStatus {
   pending,
   reserved,

@@ -2684,7 +2684,7 @@ abstract class AppLocalizations {
   /// No description provided for @trafficLevel.
   ///
   /// In en, this message translates to:
-  /// **'Traffic Level'**
+  /// **'Traffic'**
   String get trafficLevel;
 
   /// No description provided for @toArriveBy.
@@ -3857,6 +3857,30 @@ abstract class AppLocalizations {
   /// **'Your reservation has been confirmed successfully, we will update your balance shortly.'**
   String get reservationConfirmedDescription;
 
+  /// No description provided for @reservationCancelledOwnerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation cancelled'**
+  String get reservationCancelledOwnerTitle;
+
+  /// No description provided for @reservationCancelledOwnerDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Now we will proceed to refund the total amount of reservation to the requester.'**
+  String get reservationCancelledOwnerDescription;
+
+  /// No description provided for @reservationCancelledRequesterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation cancelled'**
+  String get reservationCancelledRequesterTitle;
+
+  /// No description provided for @reservationCancelledRequesterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Now we will refund the total amount of reservation to your bank account.'**
+  String get reservationCancelledRequesterDescription;
+
   /// No description provided for @networkError.
   ///
   /// In en, this message translates to:
@@ -4558,6 +4582,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waiting for navigation to start...'**
   String get waitingForNavigation;
+
+  /// No description provided for @locationNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Location data not available'**
+  String get locationNotAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

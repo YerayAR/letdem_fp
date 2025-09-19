@@ -19,7 +19,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     emit(WalletLoading());
     try {
       final transactions =
-          await transactionRepository.fetchTransactions(event.filters);
+          await transactionRepository.fetchLastTransactions(event.filters);
       emit(WalletSuccess(transactions));
     } catch (e, stack) {
       print(stack);

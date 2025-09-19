@@ -14,6 +14,7 @@ import 'package:letdem/features/activities/presentation/modals/space.popup.dart'
 import 'package:letdem/features/map/presentation/views/navigate.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../common/popups/success_dialog.dart';
 import '../../../../../common/widgets/appbar.dart';
 import '../../../../../common/widgets/body.dart';
 import '../../../../../common/widgets/button.dart';
@@ -32,69 +33,79 @@ class ReservedSpaceDetailView extends StatelessWidget {
     required this.space,
   });
 
+  void _onBack(){
+    NavigatorHelper.pop();
+    NavigatorHelper.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StyledBody(
-        isBottomPadding: false,
-        children: [
-          _buildAppBar(context),
-          Expanded(
-            child: BlocConsumer<ActivitiesBloc, ActivitiesState>(
-              listener: (context, state) {
-                if (state is ActivitiesError) {
-                  Toast.showError(state.error);
-                } else if (state is ActivitiesLoaded) {
-                  // Handle success state, e.g., show a success message or navigate
-                  NavigatorHelper.pop();
-                }
-                // TODO: implement listener
-              },
-              builder: (context, state) {
-                return ListView(
-                  children: [
-                    _buildImage(context),
-                    const SizedBox(height: 24),
-                    _buildConfirmationCard(context),
-                    const SizedBox(height: 24),
-                    _buildPropertiesRow(context),
-                    const SizedBox(height: 24),
-                    _buildNavigateButton(context),
-                    const SizedBox(height: 16),
-                    _buildCallButton(context),
-                    const SizedBox(height: 24),
-                    PrimaryButton(
-                      isLoading:
-                          context.watch<ActivitiesBloc>().state
-                              is ActivitiesLoading,
-                      text: context.l10n.cancel,
-                      color: AppColors.red500,
-                      textColor: Colors.white,
-                      onTap: () {
-                        AppPopup.showDialogSheet(
-                          context,
-                          ConfirmationDialog(
-                            onProceed: () {
-                              NavigatorHelper.pop();
+      body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
+          listener: (context, state) {
+            if (state is ReservationSpaceCancelled){
+              // Handle cancelled reservation
+              AppPopup.showDialogSheet(
+                context,
+                SuccessDialog(
+                  title: context.l10n.reservationCancelledRequesterTitle,
+                  subtext: context.l10n.reservationCancelledRequesterDescription,
+                  onProceed: _onBack,
+                ),
+              );
+            }
+            // TODO: implement listener
+          },
+          builder: (context, state) {
+            bool isStateLoading = context.watch<ActivitiesBloc>().state is ActivitiesLoading;
+            return StyledBody(
+              isBottomPadding: false,
+              children: [
+                _buildAppBar(context),
+                Expanded(
+                  child: ListView(
+                        children: [
+                          _buildImage(context),
+                          const SizedBox(height: 24),
+                          _buildConfirmationCard(context),
+                          const SizedBox(height: 24),
+                          _buildPropertiesRow(context),
+                          const SizedBox(height: 24),
+                          _buildNavigateButton(context),
+                          const SizedBox(height: 16),
+                          _buildCallButton(context),
+                          const SizedBox(height: 24),
+                          PrimaryButton(
+                            isLoading: isStateLoading,
+                            isDisabled: isStateLoading,
+                            text: context.l10n.cancel,
+                            color: AppColors.red500,
+                            textColor: Colors.white,
+                            onTap: () {
+                              AppPopup.showDialogSheet(
+                                context,
+                                ConfirmationDialog(
+                                  onProceed: () {
+                                    NavigatorHelper.pop();
 
-                              context.read<ActivitiesBloc>().add(
-                                CancelReservationEvent(spaceID: details.id),
+                                    context.read<ActivitiesBloc>().add(
+                                      CancelReservationEvent(reservationId: details.id),
+                                    );
+                                  },
+                                  title:
+                                  context.l10n.cancelReservationConfirmationTitle,
+                                  subtext:
+                                  context.l10n.cancelReservationConfirmationText,
+                                ),
                               );
                             },
-                            title:
-                                context.l10n.cancelReservationConfirmationTitle,
-                            subtext:
-                                context.l10n.cancelReservationConfirmationText,
                           ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+                        ],
+                      )
+                ),
+              ],
+            );
+          },
       ),
     );
   }

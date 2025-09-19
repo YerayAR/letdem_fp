@@ -1346,7 +1346,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get close => 'Cerrar';
 
   @override
-  String get trafficLevel => 'Nivel de tráfico';
+  String get trafficLevel => 'Tráfico';
 
   @override
   String toArriveBy(String time) {
@@ -1970,6 +1970,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reservationConfirmedDescription => 'Tu reserva ha sido confirmada correctamente, actualizaremos tu saldo en breve.';
 
   @override
+  String get reservationCancelledOwnerTitle => 'Reserva cancelada';
+
+  @override
+  String get reservationCancelledOwnerDescription => 'Ahora procedemos a la devolución del importe completo de la reserva al solicitante.';
+
+  @override
+  String get reservationCancelledRequesterTitle => 'Reserva cancelada';
+
+  @override
+  String get reservationCancelledRequesterDescription => 'Ahora procedemos a la devolución del importe completo de la reserva a tu cuenta bancaria.';
+
+  @override
   String get networkError => 'Error de red';
 
   @override
@@ -2323,4 +2335,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get waitingForNavigation => 'Esperando a que inicie la navegación...';
+
+  @override
+  String get locationNotAvailable => 'Ubicación no disponible';
 }

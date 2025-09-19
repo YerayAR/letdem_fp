@@ -12,9 +12,9 @@ import 'package:letdem/features/activities/presentation/views/activities.view.da
 import 'package:letdem/features/users/presentation/views/profile.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-
-import '../features/map/presentation/views/home.view.dart';
-import '../infrastructure/ws/web_socket.service.dart';
+import 'package:letdem/features/car/car_bloc.dart';
+import 'package:letdem/features/map/presentation/views/home.view.dart';
+import 'package:letdem/infrastructure/ws/web_socket.service.dart';
 
 class BaseView extends StatefulWidget {
   const BaseView({super.key});
@@ -61,10 +61,8 @@ class _BaseViewState extends State<BaseView> {
   void _handleUserDataUpdate(Map<String, dynamic> event) {
     if (mounted) {
       context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
-
-      if (_selectedIndex == 1) {
-        context.read<ActivitiesBloc>().add(GetActivitiesEvent());
-      }
+      context.read<CarBloc>().add(const GetCarEvent());
+      context.read<ActivitiesBloc>().add(GetActivitiesEvent());
     }
   }
 
@@ -76,6 +74,7 @@ class _BaseViewState extends State<BaseView> {
       case 0:
         break;
       case 1:
+        context.read<CarBloc>().add(const GetCarEvent());
         context.read<ActivitiesBloc>().add(GetActivitiesEvent());
         context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
         break;

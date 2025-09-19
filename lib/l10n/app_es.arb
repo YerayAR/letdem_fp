@@ -985,6 +985,10 @@
   "errorOccurred": "Ocurrió un error",
   "reservationConfirmedTitle": "Reserva confirmada",
   "reservationConfirmedDescription": "Tu reserva ha sido confirmada correctamente, actualizaremos tu saldo en breve.",
+  "reservationCancelledOwnerTitle": "Reserva cancelada",
+  "reservationCancelledOwnerDescription": "Ahora procedemos a la devolución del importe completo de la reserva al solicitante.",
+  "reservationCancelledRequesterTitle": "Reserva cancelada",
+  "reservationCancelledRequesterDescription": "Ahora procedemos a la devolución del importe completo de la reserva a tu cuenta bancaria.",
   "pleaseTryAgain": "Por favor inténtalo de nuevo",
   "networkError": "Error de red",
   "published": "Publicado",
@@ -1128,5 +1132,6 @@
       }
     }
   },
-  "waitingForNavigation": "Esperando a que inicie la navegación..."
+  "waitingForNavigation": "Esperando a que inicie la navegación...",
+  "locationNotAvailable": "Ubicación no disponible"
 }

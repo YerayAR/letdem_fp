@@ -148,12 +148,21 @@ class UserWebSocketService {
     void Function()? onDone,
     void Function(dynamic error)? onError,
   }) async {
+
+    var token = await SecureStorageHelper().read('access_token');
+    if(token == null) return;
+
+    final wsUrl = Uri.parse(
+      'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
+    );
+
     try {
       // Cancel any existing reconnection attempts
       _reconnectTimer?.cancel();
 
       // Close existing connection if any
       await disconnect();
+
 
       var token = await SecureStorageHelper().read('access_token');
       if (token == null || token.isEmpty) {
