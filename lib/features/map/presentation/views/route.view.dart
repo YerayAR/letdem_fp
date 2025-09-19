@@ -29,13 +29,12 @@ import 'package:letdem/features/scheduled_notifications/schedule_notifications_b
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
+import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
-import 'package:letdem/infrastructure/services/location/location.service.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
-
 
 class NavigationMapScreen extends StatefulWidget {
   final double? latitude;
@@ -46,12 +45,15 @@ class NavigationMapScreen extends StatefulWidget {
   final String? spaceID;
   final Space? spaceDetails;
 
+  final Function(Space space)? onPremiumSpaceViewed;
+
   final String? googlePlaceID;
 
   const NavigationMapScreen({
     super.key,
     required this.latitude,
     this.spaceID,
+    this.onPremiumSpaceViewed,
     required this.longitude,
     required this.hideToggle,
     required this.googlePlaceID,
@@ -102,9 +104,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 
   bool isError = false;
 
-  void getInfoFromSpaceID(
-    String? spaceID,
-  ) async {
+  void getInfoFromSpaceID(String? spaceID) async {
     try {
       print("Fetching space details for ID: $spaceID");
       setState(() {
@@ -115,8 +115,9 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
       late double _longitudeDelta;
 
       if (widget.googlePlaceID != null) {
-        var spaceInfo = await HereSearchApiService()
-            .getPlaceDetailsLatLng(widget.googlePlaceID ?? '');
+        var spaceInfo = await HereSearchApiService().getPlaceDetailsLatLng(
+          widget.googlePlaceID ?? '',
+        );
         if (spaceInfo != null) {
           _latitudeDelta = spaceInfo['lat'] as double;
           _longitudeDelta = spaceInfo['lng'] as double;
@@ -125,11 +126,19 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 
       if (spaceID != null) {
         var response = await ApiService.sendRequest(
-            endpoint: EndPoints.getSpaceDetails(widget.spaceID!));
+          endpoint: EndPoints.getSpaceDetails(widget.spaceID!),
+        );
 
         var spaceDetails = Space.fromJson(response.data);
         _latitudeDelta = spaceDetails.location.point.lat;
         _longitudeDelta = spaceDetails.location.point.lng;
+
+        print(double.parse(spaceDetails.price ?? "0") > 0);
+        if (double.parse(spaceDetails.price ?? "0") > 0) {
+          widget.onPremiumSpaceViewed?.call(spaceDetails);
+          NavigatorHelper.pop();
+          return;
+        }
 
         setState(() {
           _spaceDetails = spaceDetails;
@@ -148,7 +157,9 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
         Toast.showError("Could not retrieve location data for the space.");
         throw Exception("Latitude or Longitude is null");
       }
-    } catch (e) {
+    } catch (e, st) {
+      print(st);
+
       setState(() {
         isError = true;
         _isLoading = false;
@@ -188,31 +199,34 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 
   void _onMapCreated(HereMapController controller) {
     _hereMapController = controller;
-    _hereMapController!.mapScene.loadSceneForMapScheme(
-      MapScheme.normalDay,
-      (error) {
-        if (error != null) {
-          print('Map scene loading failed: $error');
-          return;
-        }
+    _hereMapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay, (
+      error,
+    ) {
+      if (error != null) {
+        print('Map scene loading failed: $error');
+        return;
+      }
 
-        _hereMapController!.camera.lookAtPointWithMeasure(
-          GeoCoordinates(_currentLocation.latitude, _currentLocation.longitude),
-          MapMeasure(MapMeasureKind.distanceInMeters, 1000),
-        );
+      _hereMapController!.camera.lookAtPointWithMeasure(
+        GeoCoordinates(_currentLocation.latitude, _currentLocation.longitude),
+        MapMeasure(MapMeasureKind.distanceInMeters, 1000),
+      );
 
-        _buildRoute();
-      },
-    );
+      _buildRoute();
+    });
   }
 
   Future<void> _buildRoute() async {
     _clearMapResources();
 
-    final start =
-        GeoCoordinates(_currentLocation.latitude, _currentLocation.longitude);
+    final start = GeoCoordinates(
+      _currentLocation.latitude,
+      _currentLocation.longitude,
+    );
     final end = GeoCoordinates(
-        widget.latitude ?? _latitude!, widget.longitude ?? _longitude!);
+      widget.latitude ?? _latitude!,
+      widget.longitude ?? _longitude!,
+    );
 
     _waypoints = [
       routing.Waypoint.withDefaults(start),
@@ -226,23 +240,27 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     }
   }
 
-  RouteInfo retrieveRouteInfoFromHereMap(){
+  RouteInfo retrieveRouteInfoFromHereMap() {
     // Extract basic info
     final durationSeconds = _currentRoute!.duration.inSeconds;
     final trafficDelaySeconds = _currentRoute!.trafficDelay.inSeconds;
 
     double distanceMeters = _currentRoute!.lengthInMeters / 1;
-    TrafficLevel trafficCongestion = parseTrafficCongestion(trafficDelaySeconds, durationSeconds);
+    TrafficLevel trafficCongestion = parseTrafficCongestion(
+      trafficDelaySeconds,
+      durationSeconds,
+    );
     int durationMinutes = (durationSeconds / 60).round();
-    DateTime arrivingAt = DateTime.now().add(Duration(minutes: durationMinutes));
+    DateTime arrivingAt = DateTime.now().add(
+      Duration(minutes: durationMinutes),
+    );
     return RouteInfo(
-        tafficLevel: trafficCongestion,
-        distance: distanceMeters,
-        duration: durationMinutes,
-        arrivingAt: arrivingAt
+      tafficLevel: trafficCongestion,
+      distance: distanceMeters,
+      duration: durationMinutes,
+      arrivingAt: arrivingAt,
     );
   }
-
 
   void _calculateRoute(List<routing.Waypoint> waypoints) {
     if (_routingEngine == null) return;
@@ -251,8 +269,10 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     carOptions.routeOptions.enableTolls = true;
     carOptions.routeOptions.optimizationMode = routing.OptimizationMode.fastest;
 
-    _routingEngine!.calculateCarRoute(waypoints, carOptions,
-        (routing.RoutingError? error, List<routing.Route>? routes) {
+    _routingEngine!.calculateCarRoute(waypoints, carOptions, (
+      routing.RoutingError? error,
+      List<routing.Route>? routes,
+    ) {
       if (error == null && routes != null && routes.isNotEmpty) {
         _currentRoute = routes.first;
         _renderRoute(_currentRoute!);
@@ -272,14 +292,15 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
         );
 
         RouteInfo routeInfo = retrieveRouteInfoFromHereMap();
-        if (_routeInfo == null){
+        if (_routeInfo == null) {
           setState(() {
             _routeInfo = routeInfo;
           });
         }
-
       } else {
-        print("Route calculation failed: ${error?.toString() ?? 'Unknown error'}");
+        print(
+          "Route calculation failed: ${error?.toString() ?? 'Unknown error'}",
+        );
         if (error == routing.RoutingError.noRouteFound) {
           print("No route found between given points.");
         }
@@ -300,7 +321,9 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
         route.geometry,
         MapPolylineSolidRepresentation(
           MapMeasureDependentRenderSize.withSingleSize(
-              RenderSizeUnit.pixels, 20),
+            RenderSizeUnit.pixels,
+            20,
+          ),
           AppColors.primary300,
           LineCap.round,
         ),
@@ -319,20 +342,23 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     try {
       final update =
           MapCameraUpdateFactory.lookAtAreaWithGeoOrientationAndViewRectangle(
-        route.boundingBox,
-        GeoOrientationUpdate(0, 0),
-        Rectangle2D(
-          Point2D(50, 50),
-          Size2D(_hereMapController!.viewportSize.width - 100,
-              _hereMapController!.viewportSize.height - 100),
-        ),
-      );
+            route.boundingBox,
+            GeoOrientationUpdate(0, 0),
+            Rectangle2D(
+              Point2D(50, 50),
+              Size2D(
+                _hereMapController!.viewportSize.width - 100,
+                _hereMapController!.viewportSize.height - 100,
+              ),
+            ),
+          );
 
       final animation =
           MapCameraAnimationFactory.createAnimationFromUpdateWithEasing(
-        update,
-        const Duration(seconds: 2), map_animation.Easing(map_animation.EasingFunction.inCubic),
-      );
+            update,
+            const Duration(seconds: 2),
+            map_animation.Easing(map_animation.EasingFunction.inCubic),
+          );
 
       _hereMapController!.camera.startAnimation(animation);
     } catch (e) {
@@ -382,63 +408,71 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
           Dimens.space(2),
         ],
       ),
-      body: isError
-          ? SizedBox(
-              child: Center(
-                child: Text(
-                  "Could not retrieve location data for the space.",
-                  style: Typo.largeBody.copyWith(color: Colors.red),
-                ),
-              ),
-            )
-          : Stack(
-              children: [
-                Positioned.fill(
-                  child: _isLoading
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : HereMap(
-                          key: UniqueKey(),
-                          onMapCreated: _onMapCreated,
-                        ),
-                ),
-                Positioned(
-                  left: 0,
-                  bottom: 0,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: _isLoading || _routingEngine == null || _routeInfo == null
-                        ? Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(16)),
-                            ),
-                            child: const HomePageShimmer(),
-                          )
-                        : NavigateNotificationCard(
-                            spaceInfo: widget.spaceDetails ?? _spaceDetails,
-                            hideToggle: widget.hideToggle,
-                            routeInfo: _routeInfo!,
-                            notification: ScheduledNotification(
-                              id: "1",
-                              startsAt: DateTime.now(),
-                              endsAt: DateTime.now(),
-                              isExpired: false,
-                              location: LocationData(
-                                streetName: widget.destinationStreetName ??
-                                    _destinationStreetName ??
-                                    '',
-                                point: CoordinatesData(
-                                  latitude: widget.latitude ?? _latitude!,
-                                  longitude: widget.longitude ?? _longitude!,
-                                ),
-                              ),
-                            ),
-                          ),
+      body:
+          isError
+              ? SizedBox(
+                child: Center(
+                  child: Text(
+                    "Could not retrieve location data for the space.",
+                    style: Typo.largeBody.copyWith(color: Colors.red),
                   ),
                 ),
-              ],
-            ),
+              )
+              : Stack(
+                children: [
+                  Positioned.fill(
+                    child:
+                        _isLoading
+                            ? const Center(child: CupertinoActivityIndicator())
+                            : HereMap(
+                              key: UniqueKey(),
+                              onMapCreated: _onMapCreated,
+                            ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    bottom: 0,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child:
+                          _isLoading ||
+                                  _routingEngine == null ||
+                                  _routeInfo == null
+                              ? Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
+                                ),
+                                child: const HomePageShimmer(),
+                              )
+                              : NavigateNotificationCard(
+                                spaceInfo: widget.spaceDetails ?? _spaceDetails,
+                                hideToggle: widget.hideToggle,
+                                routeInfo: _routeInfo!,
+                                notification: ScheduledNotification(
+                                  id: "1",
+                                  startsAt: DateTime.now(),
+                                  endsAt: DateTime.now(),
+                                  isExpired: false,
+                                  location: LocationData(
+                                    streetName:
+                                        widget.destinationStreetName ??
+                                        _destinationStreetName ??
+                                        '',
+                                    point: CoordinatesData(
+                                      latitude: widget.latitude ?? _latitude!,
+                                      longitude:
+                                          widget.longitude ?? _longitude!,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                    ),
+                  ),
+                ],
+              ),
     );
   }
 }
@@ -513,8 +547,12 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
     );
   }
 
-  Widget _buildContent(BuildContext context, RouteInfo? routeInfo,
-      LocationData location, ScheduleNotificationsState state) {
+  Widget _buildContent(
+    BuildContext context,
+    RouteInfo? routeInfo,
+    LocationData location,
+    ScheduleNotificationsState state,
+  ) {
     if (routeInfo!.distance <
         context.userProfile!.constantsSettings.metersToShowTooCloseModal) {
       return _buildTooCloseMessage();
@@ -555,8 +593,11 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           CircleAvatar(
             radius: 43,
             backgroundColor: AppColors.green50,
-            child:
-                Icon(IconlyBold.location, color: AppColors.green600, size: 36),
+            child: Icon(
+              IconlyBold.location,
+              color: AppColors.green600,
+              size: 36,
+            ),
           ),
           Dimens.space(2),
           Text(
@@ -566,8 +607,9 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
           ),
           const SizedBox(height: 8),
           Text(
-            context.l10n.closeToLocationDescription(context
-                .userProfile!.constantsSettings.metersToShowTooCloseModal),
+            context.l10n.closeToLocationDescription(
+              context.userProfile!.constantsSettings.metersToShowTooCloseModal,
+            ),
             style: Typo.mediumBody,
             textAlign: TextAlign.center,
           ),
@@ -602,16 +644,18 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: routeInfo.tafficLevel == TrafficLevel.low
-                    ? AppColors.green500
-                    : routeInfo.tafficLevel == TrafficLevel.moderate
+                color:
+                    routeInfo.tafficLevel == TrafficLevel.low
+                        ? AppColors.green500
+                        : routeInfo.tafficLevel == TrafficLevel.moderate
                         ? AppColors.neutral500
                         : AppColors.red500,
               ),
               // low, moderate, heavy
-              color: routeInfo.tafficLevel == TrafficLevel.low
-                  ? AppColors.green500
-                  : routeInfo.tafficLevel == TrafficLevel.moderate
+              color:
+                  routeInfo.tafficLevel == TrafficLevel.low
+                      ? AppColors.green500
+                      : routeInfo.tafficLevel == TrafficLevel.moderate
                       ? AppColors.neutral500
                       : AppColors.red500,
             ),
@@ -645,7 +689,8 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
         const SizedBox(width: 8),
         Text(
           context.l10n.toArriveBy(
-              DateFormat('HH:mm').format(routeInfo!.arrivingAt.toLocal())),
+            DateFormat('HH:mm').format(routeInfo!.arrivingAt.toLocal()),
+          ),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ],
@@ -666,14 +711,16 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
             Expanded(
               child: Text(
                 context.l10n.notifyAvailableSpace,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             ToggleSwitch(
               value: notifyAvailableSpace,
-              onChanged: (value) =>
-                  setState(() => notifyAvailableSpace = value),
+              onChanged:
+                  (value) => setState(() => notifyAvailableSpace = value),
             ),
           ],
         ),
@@ -708,11 +755,10 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
             Dimens.space(5),
             Flexible(child: Divider(color: Colors.grey.withOpacity(0.2))),
             Dimens.space(1),
-            Text(context.l10n.toDate,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.black54,
-                )),
+            Text(
+              context.l10n.toDate,
+              style: const TextStyle(fontSize: 13, color: Colors.black54),
+            ),
             Dimens.space(1),
             Flexible(child: Divider(color: Colors.grey.withOpacity(0.2))),
             Dimens.space(5),
@@ -743,12 +789,15 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       children: [
         Row(
           children: [
-            Text(context.l10n.notificationRadius,
-                style: const TextStyle(fontSize: 14)),
+            Text(
+              context.l10n.notificationRadius,
+              style: const TextStyle(fontSize: 14),
+            ),
             const Spacer(),
-            Text(radius.toStringAsFixed(0),
-                style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            Text(
+              radius.toStringAsFixed(0),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -781,19 +830,31 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
 
     return PrimaryButton(
       isLoading: isLoading,
-      onTap: () => shouldSchedule
-          ? _handleScheduleNotification()
-          : _navigateToDestination(),
+      onTap:
+          () =>
+              shouldSchedule
+                  ? _handleScheduleNotification()
+                  : _navigateToDestination(),
       icon: !shouldSchedule ? IconlyBold.location : null,
       text: shouldSchedule ? context.l10n.save : context.l10n.startRoute,
     );
   }
 
   void _handleScheduleNotification() {
-    final start = DateTime(_fromDate.year, _fromDate.month, _fromDate.day,
-        _fromTime.hour, _fromTime.minute);
+    final start = DateTime(
+      _fromDate.year,
+      _fromDate.month,
+      _fromDate.day,
+      _fromTime.hour,
+      _fromTime.minute,
+    );
     final end = DateTime(
-        _toDate.year, _toDate.month, _toDate.day, _toTime.hour, _toTime.minute);
+      _toDate.year,
+      _toDate.month,
+      _toDate.day,
+      _toTime.hour,
+      _toTime.minute,
+    );
 
     if (!validateDateTime(context, start, end)) return;
     if (radius < 100) {
@@ -801,26 +862,27 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       return;
     }
 
-    context
-        .read<ScheduleNotificationsBloc>()
-        .add(CreateScheduledNotificationEvent(
-          startsAt: start,
-          endsAt: end,
-          radius: radius,
-          location: widget.notification.location,
-        ));
+    context.read<ScheduleNotificationsBloc>().add(
+      CreateScheduledNotificationEvent(
+        startsAt: start,
+        endsAt: end,
+        radius: radius,
+        location: widget.notification.location,
+      ),
+    );
   }
 
   void _navigateToDestination() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NavigationView(
-          parkingSpaceID: widget.spaceInfo?.id,
-          isNavigatingToParking: widget.spaceInfo != null,
-          destinationLat: widget.notification.location.point.latitude,
-          destinationLng: widget.notification.location.point.longitude,
-        ),
+        builder:
+            (context) => NavigationView(
+              parkingSpaceID: widget.spaceInfo?.id,
+              isNavigatingToParking: widget.spaceInfo != null,
+              destinationLat: widget.notification.location.point.latitude,
+              destinationLng: widget.notification.location.point.longitude,
+            ),
       ),
     );
   }

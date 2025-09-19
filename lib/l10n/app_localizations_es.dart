@@ -48,7 +48,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cancelReservationConfirmationTitle => '¿Cancelar la reserva?';
 
   @override
-  String get cancelReservationConfirmationText => '¿Seguro que quieres cancelar esta reserva? Esta acción no se puede deshacer.';
+  String get cancelReservationConfirmationText =>
+      '¿Seguro que quieres cancelar esta reserva? Esta acción no se puede deshacer.';
 
   @override
   String get basicInformation => 'Información básica';
@@ -140,16 +141,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pleaseEnter => 'Por favor ingrese';
 
   @override
-  String get passwordMinLength => 'La contraseña debe tener al menos 8 caracteres';
+  String get passwordMinLength =>
+      'La contraseña debe tener al menos 8 caracteres';
 
   @override
-  String get passwordRequireNumber => 'La contraseña debe contener al menos un número';
+  String get passwordRequireNumber =>
+      'La contraseña debe contener al menos un número';
 
   @override
-  String get passwordRequireSpecial => 'La contraseña debe contener al menos un carácter especial';
+  String get passwordRequireSpecial =>
+      'La contraseña debe contener al menos un carácter especial';
 
   @override
-  String get passwordRequireUppercase => 'La contraseña debe contener al menos una letra mayúscula';
+  String get passwordRequireUppercase =>
+      'La contraseña debe contener al menos una letra mayúscula';
 
   @override
   String get pleaseEnterValidEmail => 'Por favor ingrese un email válido';
@@ -304,7 +309,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get eventPublishedTitle => 'Alerta publicada\nexitosamente';
 
   @override
-  String get eventPublishedSubtext => 'Tu alerta ha sido publicada exitosamente, las personas ahora pueden ver esta alerta en el mapa.';
+  String get eventPublishedSubtext =>
+      'Tu alerta ha sido publicada exitosamente, las personas ahora pueden ver esta alerta en el mapa.';
 
   @override
   String get away => 'de distancia';
@@ -321,13 +327,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paymentSuccessful => 'Pago exitoso';
 
   @override
-  String get spaceReservedSuccess => 'Has reservado exitosamente un aparcamiento de pago. Puedes ver los detalles haciendo clic abajo.';
+  String get spaceReservedSuccess =>
+      'Has reservado exitosamente un aparcamiento de pago. Puedes ver los detalles haciendo clic abajo.';
 
   @override
   String get arrivalTitle => '¡Has llegado!';
 
   @override
-  String get arrivalSubtitle => 'Las plazas de aparcamiento cercanas ahora están visibles en el mapa. Pulsa una para iniciar la navegación.';
+  String get arrivalSubtitle =>
+      'Las plazas de aparcamiento cercanas ahora están visibles en el mapa. Pulsa una para iniciar la navegación.';
 
   @override
   String get getSpaceDetails => 'Ver detalles del aparcamiento';
@@ -348,10 +356,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importantNotice => 'Aviso importante';
 
   @override
-  String get createCarProfileFirst => 'Necesitas crear un perfil de coche para publicar un aparcamiento de pago. Por favor, crea un perfil de coche primero.';
+  String get createCarProfileFirst =>
+      'Necesitas crear un perfil de coche para publicar un aparcamiento de pago. Por favor, crea un perfil de coche primero.';
 
   @override
-  String get createEarningAccountFirst => 'Necesitas crear una cuenta de ganancias para publicar un aparcamiento de pago. Por favor, crea una cuenta de ganancias primero.';
+  String get createEarningAccountFirst =>
+      'Necesitas crear una cuenta de ganancias para publicar un aparcamiento de pago. Por favor, crea una cuenta de ganancias primero.';
 
   @override
   String get continueText => 'Continuar';
@@ -360,7 +370,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get locationPermissionRequired => 'Permiso de ubicación\nrequerido';
 
   @override
-  String get locationPermissionDescription => 'Necesitamos acceder a tus servicios de ubicación para realizar cualquier acción en la aplicación';
+  String get locationPermissionDescription =>
+      'Necesitamos acceder a tus servicios de ubicación para realizar cualquier acción en la aplicación';
 
   @override
   String get openSystemSettings => 'Abrir configuración del sistema';
@@ -375,19 +386,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get spaceReserved => 'Aparcamiento reservado';
 
   @override
-  String get spaceReservedSuccessfully => 'Tu aparcamiento ha sido reservado exitosamente.';
+  String get spaceReservedSuccessfully =>
+      'Tu aparcamiento ha sido reservado exitosamente.';
 
   @override
   String get confirmationCode => 'Código de confirmación';
 
   @override
-  String get enterConfirmationCode => 'El solicitante del aparcamiento te dará un número de confirmación de 6 dígitos, ingrésalo aquí.';
+  String get enterConfirmationCode =>
+      'El solicitante del aparcamiento te dará un número de confirmación de 6 dígitos, ingrésalo aquí.';
 
   @override
-  String get confirmationCodeWarning => 'Por favor, asegúrate de que el código de confirmación funcione antes de entregar el aparcamiento';
+  String get confirmationCodeWarning =>
+      'Por favor, asegúrate de que el código de confirmación funcione antes de entregar el aparcamiento';
 
   @override
-  String get pleaseEnterConfirmationCode => 'Por favor ingresa el código de confirmación';
+  String get pleaseEnterConfirmationCode =>
+      'Por favor ingresa el código de confirmación';
 
   @override
   String get reserved => 'Reservado';
@@ -399,13 +414,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteSpaceTitle => 'Eliminar aparcamiento';
 
   @override
-  String get deleteSpaceSubtext => '¿Estás seguro de que deseas eliminar este aparcamiento? Esta acción no se puede deshacer.';
+  String get deleteSpaceSubtext =>
+      '¿Estás seguro de que deseas eliminar este aparcamiento? Esta acción no se puede deshacer.';
 
   @override
   String get spaceDeleted => 'Aparcamiento eliminado';
 
   @override
-  String get spaceDeletedSubtext => 'El aparcamiento ha sido eliminado con éxito.';
+  String get spaceDeletedSubtext =>
+      'El aparcamiento ha sido eliminado con éxito.';
 
   @override
   String get reservedSpace => 'Aparcamiento reservado';
@@ -414,7 +431,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get confirmationCodeTitle => 'Código de confirmación';
 
   @override
-  String get shareCodeOwner => 'Comparte este código con el propietario del aparcamiento';
+  String get shareCodeOwner =>
+      'Comparte este código con el propietario del aparcamiento';
 
   @override
   String get ownerPlateNumber => 'Matrícula del propietario: ';
@@ -444,7 +462,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noContributions => 'No hay contribuciones todavía';
 
   @override
-  String get noContributionsDescription => 'Tu historial de contribuciones aparecerá aquí.';
+  String get noContributionsDescription =>
+      'Tu historial de contribuciones aparecerá aquí.';
 
   @override
   String get all => 'Todos';
@@ -456,7 +475,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get events => 'Alertas';
 
   @override
-  String get verifyYourAccountFirst => 'Tu cuenta de ganancias aún no está verificada. Por favor verifica tu cuenta enviando tu DNI e información bancaria.';
+  String get verifyYourAccountFirst =>
+      'Tu cuenta de ganancias aún no está verificada. Por favor verifica tu cuenta enviando tu DNI e información bancaria.';
 
   @override
   String failedToLoadActivities(String error) {
@@ -464,7 +484,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get selectFilterActivities => 'Selecciona un filtro para ver actividades';
+  String get selectFilterActivities =>
+      'Selecciona un filtro para ver actividades';
 
   @override
   String get searchLocation => 'Buscar ubicación';
@@ -478,7 +499,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get spaceOwnerCannotReserve => 'El propietario del aparcamiento no puede reservar su propio aparcamiento';
+  String get spaceOwnerCannotReserve =>
+      'El propietario del aparcamiento no puede reservar su propio aparcamiento';
 
   @override
   String get location => 'Ubicación';
@@ -541,7 +563,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noCarRegistered => 'Sin coche registrado';
 
   @override
-  String get registerCarDetails => 'Registra tu coche con los detalles\npara seguridad y accesibilidad';
+  String get registerCarDetails =>
+      'Registra tu coche con los detalles\npara seguridad y accesibilidad';
 
   @override
   String get tapToRegisterCar => 'Toca para registrar coche';
@@ -598,40 +621,49 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noLabel => 'Sin etiqueta';
 
   @override
-  String get ecoLabelPluginHybrids => 'Híbridos enchufables con autonomía eléctrica inferior a 40 km.';
+  String get ecoLabelPluginHybrids =>
+      'Híbridos enchufables con autonomía eléctrica inferior a 40 km.';
 
   @override
   String get ecoLabelNonPluginHybrids => 'Híbridos no enchufables (HEV).';
 
   @override
-  String get ecoLabelGasPowered => 'Vehículos propulsados por gas (GLP, GNC o GNL).';
+  String get ecoLabelGasPowered =>
+      'Vehículos propulsados por gas (GLP, GNC o GNL).';
 
   @override
   String get zeroLabelElectric => 'Vehículos 100% eléctricos (BEV).';
 
   @override
-  String get zeroLabelPluginHybrids => 'Híbridos enchufables (PHEV) con autonomía eléctrica superior a 40 km.';
+  String get zeroLabelPluginHybrids =>
+      'Híbridos enchufables (PHEV) con autonomía eléctrica superior a 40 km.';
 
   @override
   String get zeroLabelHydrogen => 'Vehículos propulsados por hidrógeno.';
 
   @override
-  String get bLabelPetrol => 'Coches y furgonetas de gasolina matriculados desde enero de 2001.';
+  String get bLabelPetrol =>
+      'Coches y furgonetas de gasolina matriculados desde enero de 2001.';
 
   @override
-  String get bLabelDiesel => 'Coches y furgonetas diésel matriculados desde enero de 2006.';
+  String get bLabelDiesel =>
+      'Coches y furgonetas diésel matriculados desde enero de 2006.';
 
   @override
-  String get bLabelIndustrial => 'Vehículos industriales y autobuses matriculados desde 2005.';
+  String get bLabelIndustrial =>
+      'Vehículos industriales y autobuses matriculados desde 2005.';
 
   @override
-  String get cLabelPetrol => 'Coches y furgonetas de gasolina matriculados desde enero de 2006.';
+  String get cLabelPetrol =>
+      'Coches y furgonetas de gasolina matriculados desde enero de 2006.';
 
   @override
-  String get cLabelDiesel => 'Coches y furgonetas diésel matriculados desde septiembre de 2015.';
+  String get cLabelDiesel =>
+      'Coches y furgonetas diésel matriculados desde septiembre de 2015.';
 
   @override
-  String get cLabelIndustrial => 'Vehículos industriales y autobuses matriculados desde 2014.';
+  String get cLabelIndustrial =>
+      'Vehículos industriales y autobuses matriculados desde 2014.';
 
   @override
   String get yourCarDetails => 'Detalles de tu coche';
@@ -649,7 +681,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navigateToCar => 'Navegar al coche';
 
   @override
-  String get errorConfirmSpaceReservation => 'No se pudo confirmar la reserva del aparcamiento';
+  String get errorConfirmSpaceReservation =>
+      'No se pudo confirmar la reserva del aparcamiento';
 
   @override
   String get errorReserveSpace => 'No se pudo reservar el aparcamiento';
@@ -676,7 +709,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get getHelp => 'Obtener ayuda';
 
   @override
-  String get enterEmailToReset => 'Ingresa tu dirección de correo electrónico para continuar';
+  String get enterEmailToReset =>
+      'Ingresa tu dirección de correo electrónico para continuar';
 
   @override
   String get emailAddress => 'Correo electrónico';
@@ -691,7 +725,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get setNewPassword => 'Establecer nueva contraseña';
 
   @override
-  String get createStrongPassword => 'Crea una contraseña segura para tu cuenta';
+  String get createStrongPassword =>
+      'Crea una contraseña segura para tu cuenta';
 
   @override
   String get newPassword => 'Nueva contraseña';
@@ -703,16 +738,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enterPassword => 'Ingresa tu contraseña';
 
   @override
-  String get howToPublishPaidSpaceTitle => '¿Cómo puedo publicar un aparcamiento de pago?';
+  String get howToPublishPaidSpaceTitle =>
+      '¿Cómo puedo publicar un aparcamiento de pago?';
 
   @override
-  String get howToPublishPaidSpaceDescription => 'Para publicar un aparcamiento de pago, debes cumplir con los siguientes requisitos:';
+  String get howToPublishPaidSpaceDescription =>
+      'Para publicar un aparcamiento de pago, debes cumplir con los siguientes requisitos:';
 
   @override
-  String get publishPaidSpaceRequirement1 => 'Registrar los datos de tu vehículo en la aplicación, ya que serán necesarios al momento de la reserva.';
+  String get publishPaidSpaceRequirement1 =>
+      'Registrar los datos de tu vehículo en la aplicación, ya que serán necesarios al momento de la reserva.';
 
   @override
-  String get publishPaidSpaceRequirement2 => 'Crear una cuenta de beneficios desde tu perfil. Para ello, deberás ingresar tu información fiscal, la cual es obligatoria para recibir pagos en la aplicación conforme a la normativa europea de prevención de lavado de dinero.';
+  String get publishPaidSpaceRequirement2 =>
+      'Crear una cuenta de beneficios desde tu perfil. Para ello, deberás ingresar tu información fiscal, la cual es obligatoria para recibir pagos en la aplicación conforme a la normativa europea de prevención de lavado de dinero.';
 
   @override
   String reservationPendingNote(String expiresAt) {
@@ -720,13 +759,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get howToEarnMoneyTitle => '¿Cómo obtengo ganancias por mi aparcamiento de pago?';
+  String get howToEarnMoneyTitle =>
+      '¿Cómo obtengo ganancias por mi aparcamiento de pago?';
 
   @override
-  String get howToEarnMoneyDescription => 'Para generar ganancias con tu aparcamiento, este debe ser reservado por otro usuario. Una vez realizada la reserva, deberás confirmar la operación ingresando el código de confirmación que se le proporciona al usuario que reservó. Tras recibir el código, podrás confirmar la reserva.';
+  String get howToEarnMoneyDescription =>
+      'Para generar ganancias con tu aparcamiento, este debe ser reservado por otro usuario. Una vez realizada la reserva, deberás confirmar la operación ingresando el código de confirmación que se le proporciona al usuario que reservó. Tras recibir el código, podrás confirmar la reserva.';
 
   @override
-  String get earningsTransferDescription => 'Cuando la reserva es confirmada, recibirás el importe correspondiente menos las comisiones aplicadas por LetDem por la operación.';
+  String get earningsTransferDescription =>
+      'Cuando la reserva es confirmada, recibirás el importe correspondiente menos las comisiones aplicadas por LetDem por la operación.';
 
   @override
   String minutesLeft(Object minutes) {
@@ -739,13 +781,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get earningsLocationDescription => 'El monto total de tus beneficios se reflejará en la sección ganancias de tu perfil.';
+  String get earningsLocationDescription =>
+      'El monto total de tus beneficios se reflejará en la sección ganancias de tu perfil.';
 
   @override
-  String get howToWithdrawFundsTitle => '¿Cómo retiro mis fondos a una cuenta personal?';
+  String get howToWithdrawFundsTitle =>
+      '¿Cómo retiro mis fondos a una cuenta personal?';
 
   @override
-  String get howToWithdrawFundsDescription => 'Para retirar tus fondos, estos deben ser liberados previamente por el proveedor de pagos. Este proceso suele tardar aproximadamente 10 días. Una vez liberados, los fondos estarán disponibles en la app y podrás retirarlos utilizando una de las cuentas bancarias que hayas asociado previamente.';
+  String get howToWithdrawFundsDescription =>
+      'Para retirar tus fondos, estos deben ser liberados previamente por el proveedor de pagos. Este proceso suele tardar aproximadamente 10 días. Una vez liberados, los fondos estarán disponibles en la app y podrás retirarlos utilizando una de las cuentas bancarias que hayas asociado previamente.';
 
   @override
   String get earningsSection => 'Ganancias';
@@ -778,13 +823,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get passwordsDoNotMatch => 'Las contraseñas no coinciden';
 
   @override
-  String get passwordRequirements => 'Asegúrate de usar al menos 8 caracteres, con un número, una letra mayúscula y uno de los siguientes caracteres especiales: \$, ., &, @';
+  String get passwordRequirements =>
+      'Asegúrate de usar al menos 8 caracteres, con un número, una letra mayúscula y uno de los siguientes caracteres especiales: \$, ., &, @';
 
   @override
   String get emailSentTitle => 'Te enviamos un correo';
 
   @override
-  String get emailSentDescription => 'Hemos enviado un código OTP a tu correo. Ingrésalo abajo para restablecer tu contraseña.';
+  String get emailSentDescription =>
+      'Hemos enviado un código OTP a tu correo. Ingrésalo abajo para restablecer tu contraseña.';
 
   @override
   String get mailSentTo => 'Correo enviado a: ';
@@ -810,7 +857,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get howToCreateScheduledNotificationsTitle => '¿Cómo crear notificaciones programadas?';
+  String get howToCreateScheduledNotificationsTitle =>
+      '¿Cómo crear notificaciones programadas?';
 
   @override
   String get howToEarnPointsTitle => '¿Cómo ganar Puntos LetDem?';
@@ -819,61 +867,73 @@ class AppLocalizationsEs extends AppLocalizations {
   String get publishAlertTitle => 'Publicar una alerta';
 
   @override
-  String get publishAlertDescription => 'Si otro usuario confirma la existencia de la alerta.';
+  String get publishAlertDescription =>
+      'Si otro usuario confirma la existencia de la alerta.';
 
   @override
   String get point => 'punto';
 
   @override
-  String get howToEarnPointsDescription => 'Gana Puntos LetDem contribuyendo a la comunidad con estas acciones:';
+  String get howToEarnPointsDescription =>
+      'Gana Puntos LetDem contribuyendo a la comunidad con estas acciones:';
 
   @override
   String get reservePaidSpaceTitle => 'Reservar un Aparcamiento de Pago';
 
   @override
-  String get reservePaidSpaceDescription => 'Para el usuario que reserva y paga un aparcamiento publicado por otro usuario y una vez que la reserva es confirmada.';
+  String get reservePaidSpaceDescription =>
+      'Para el usuario que reserva y paga un aparcamiento publicado por otro usuario y una vez que la reserva es confirmada.';
 
   @override
   String get publishFreeSpaceTitle => 'Publicar un Aparcamiento Gratuito';
 
   @override
-  String get publishFreeSpaceDescription => 'Si otro usuario lo utiliza y selecciona “Me lo quedo” como valoración al llegar al lugar.';
+  String get publishFreeSpaceDescription =>
+      'Si otro usuario lo utiliza y selecciona “Me lo quedo” como valoración al llegar al lugar.';
 
   @override
   String get additionalNotes => 'Notas Adicionales';
 
   @override
-  String get pointsNote1 => 'El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.';
+  String get pointsNote1 =>
+      'El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.';
 
   @override
-  String get pointsNote2 => 'En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.';
+  String get pointsNote2 =>
+      'En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.';
 
   @override
-  String get howToCreateScheduledNotificationsDescription => 'Para programar una notificación de aparcamiento, sigue estos pasos:';
+  String get howToCreateScheduledNotificationsDescription =>
+      'Para programar una notificación de aparcamiento, sigue estos pasos:';
 
   @override
   String get searchDestinationTitle => 'Buscar Destino';
 
   @override
-  String get searchDestinationDescription => 'Busca tu destino utilizando la barra de búsqueda en la pantalla principal.';
+  String get searchDestinationDescription =>
+      'Busca tu destino utilizando la barra de búsqueda en la pantalla principal.';
 
   @override
   String get selectAddressTitle => 'Seleccionar Dirección';
 
   @override
-  String get selectAddressDescription => 'Selecciona la dirección deseada y pulsa el botón \"Avisarme por aparcamientos disponibles\".';
+  String get selectAddressDescription =>
+      'Selecciona la dirección deseada y pulsa el botón \"Avisarme por aparcamientos disponibles\".';
 
   @override
   String get configureAlertTitle => 'Configurar alerta';
 
   @override
-  String get configureAlertDescription => 'Selecciona la franja horaria y la distancia desde tu ubicación para recibir notificaciones.';
+  String get configureAlertDescription =>
+      'Selecciona la franja horaria y la distancia desde tu ubicación para recibir notificaciones.';
 
   @override
-  String get scheduledNotificationsManagement => 'Gestiona tus notificaciones desde la sección \'Notificaciones programadas\'.';
+  String get scheduledNotificationsManagement =>
+      'Gestiona tus notificaciones desde la sección \'Notificaciones programadas\'.';
 
   @override
-  String get scheduledNotificationsAlert => 'Recibirás una notificación cada vez que se publique un aparcamiento dentro del área configurada.';
+  String get scheduledNotificationsAlert =>
+      'Recibirás una notificación cada vez que se publique un aparcamiento dentro del área configurada.';
 
   @override
   String get createNewAccount => 'CREAR NUEVA CUENTA';
@@ -927,7 +987,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get continuee => 'Continuar';
 
   @override
-  String get unableToResendVerification => 'No se pudo reenviar el código de verificación';
+  String get unableToResendVerification =>
+      'No se pudo reenviar el código de verificación';
 
   @override
   String get somethingWentWrong => 'Algo salió mal';
@@ -941,7 +1002,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get retry => 'Reintentar';
 
   @override
-  String get sessionExpired => 'La sesión ha expirado. Por favor, inicia sesión nuevamente.';
+  String get sessionExpired =>
+      'La sesión ha expirado. Por favor, inicia sesión nuevamente.';
 
   @override
   String get verifyAccount => 'Verificar cuenta';
@@ -950,7 +1012,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get weWillSendOTP => 'Te enviamos un correo';
 
   @override
-  String get verificationInstructions => 'Por favor revisa el correo proporcionado para obtener un código OTP y verificar tu correo. Ingrésalo abajo';
+  String get verificationInstructions =>
+      'Por favor revisa el correo proporcionado para obtener un código OTP y verificar tu correo. Ingrésalo abajo';
 
   @override
   String get resending => 'Reenviando';
@@ -959,19 +1022,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get verificationSuccess => 'Verificación exitosa';
 
   @override
-  String get verificationSuccessMessage => 'Tu correo ha sido verificado exitosamente. Puedes proceder a la aplicación.';
+  String get verificationSuccessMessage =>
+      'Tu correo ha sido verificado exitosamente. Puedes proceder a la aplicación.';
 
   @override
-  String get findShareParking => 'Encuentra y comparte aparcamientos cerca de ti';
+  String get findShareParking =>
+      'Encuentra y comparte aparcamientos cerca de ti';
 
   @override
-  String get parkingDescription => 'Accede a una amplia gama de aparcamientos dentro y fuera de tu ubicación';
+  String get parkingDescription =>
+      'Accede a una amplia gama de aparcamientos dentro y fuera de tu ubicación';
 
   @override
   String get geolocationPermission => 'Permiso de geolocalización';
 
   @override
-  String get enableGeolocationDescription => 'Para mejorar tu experiencia, necesitamos acceder a tu ubicación actual. Esto nos permitirá mostrarte los aparcamientos de estacionamiento más cercanos y relevantes.';
+  String get enableGeolocationDescription =>
+      'Para mejorar tu experiencia, necesitamos acceder a tu ubicación actual. Esto nos permitirá mostrarte los aparcamientos de estacionamiento más cercanos y relevantes.';
 
   @override
   String get enableGeolocation => 'Habilitar geolocalización';
@@ -1022,7 +1089,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addressInformationTitle => 'Tu información de dirección';
 
   @override
-  String get addressInformationDescription => 'Ingresa tu dirección completa y ubicación de residencia';
+  String get addressInformationDescription =>
+      'Ingresa tu dirección completa y ubicación de residencia';
 
   @override
   String get enterAddress => 'Ingresa tu dirección';
@@ -1046,7 +1114,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get bankInformationTitle => 'Información bancaria';
 
   @override
-  String get bankInformationDescription => 'Ingresa tu IBAN para completar este paso';
+  String get bankInformationDescription =>
+      'Ingresa tu IBAN para completar este paso';
 
   @override
   String get enterIBAN => 'Ingresa tu IBAN';
@@ -1058,7 +1127,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get iban => 'IBAN';
 
   @override
-  String get bankAccountNote => 'Ten en cuenta que esta cuenta bancaria es necesaria para recibir pagos de nuestro proveedor de pagos.';
+  String get bankAccountNote =>
+      'Ten en cuenta que esta cuenta bancaria es necesaria para recibir pagos de nuestro proveedor de pagos.';
 
   @override
   String get detailsSubmitted => 'Detalles enviados';
@@ -1067,13 +1137,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gotItThanks => 'Entendido';
 
   @override
-  String get accountDetailsSuccess => 'Los detalles de conexión de su cuenta se enviaron correctamente, pronto podrá recibir dinero por aparcamientos de pago.';
+  String get accountDetailsSuccess =>
+      'Los detalles de conexión de su cuenta se enviaron correctamente, pronto podrá recibir dinero por aparcamientos de pago.';
 
   @override
   String get selectCountry => 'Seleccionar país';
 
   @override
-  String get selectCountryDescription => 'Selecciona tu país de residencia para continuar';
+  String get selectCountryDescription =>
+      'Selecciona tu país de residencia para continuar';
 
   @override
   String get spain => 'España';
@@ -1121,25 +1193,29 @@ class AppLocalizationsEs extends AppLocalizations {
   String get selectIdType => 'Seleccionar tipo de identificación';
 
   @override
-  String get selectIdDescription => 'Selecciona tu tipo de identificación y sube el frente y reverso de tu documento';
+  String get selectIdDescription =>
+      'Selecciona tu tipo de identificación y sube el frente y reverso de tu documento';
 
   @override
   String get nationalIdCard => 'DNI';
 
   @override
-  String get nationalIdDescription => 'Tu documento nacional de identidad emitido por el gobierno';
+  String get nationalIdDescription =>
+      'Tu documento nacional de identidad emitido por el gobierno';
 
   @override
   String get residentPermit => 'Permiso de residencia';
 
   @override
-  String get residentPermitDescription => 'Tu permiso de residencia emitido por el gobierno';
+  String get residentPermitDescription =>
+      'Tu permiso de residencia emitido por el gobierno';
 
   @override
   String get personalInfoTitle => 'Tu información personal';
 
   @override
-  String get personalInfoDescription => 'Ingresa tus datos personales como aparecen en tu DNI';
+  String get personalInfoDescription =>
+      'Ingresa tus datos personales como aparecen en tu DNI';
 
   @override
   String get phoneNumber => 'Número de teléfono';
@@ -1180,7 +1256,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get activeReservationExists => 'Hay una reserva activa en tu cuenta. Debe completarse o cancelarse antes de que puedas publicar un nuevo aparcamiento de pago.';
+  String get activeReservationExists =>
+      'Hay una reserva activa en tu cuenta. Debe completarse o cancelarse antes de que puedas publicar un nuevo aparcamiento de pago.';
 
   @override
   String get whatIsThisWaitingTime => '¿En qué consiste?';
@@ -1214,7 +1291,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get exceedsBalanceToast => 'No puedes retirar más que tu saldo disponible.';
+  String get exceedsBalanceToast =>
+      'No puedes retirar más que tu saldo disponible.';
 
   @override
   String timeToWaitMustBeBetween(String min, String max) {
@@ -1238,13 +1316,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get spacePublishedSuccesfully => 'Aparcamiento publicado exitosamente';
 
   @override
-  String get spacePublishedDescription => 'Tu aparcamiento ha sido publicado exitosamente, las personas ahora pueden tener acceso para usar el aparcamiento.';
+  String get spacePublishedDescription =>
+      'Tu aparcamiento ha sido publicado exitosamente, las personas ahora pueden tener acceso para usar el aparcamiento.';
 
   @override
   String get speedLimitAlert => 'Alerta de límite de velocidad';
 
   @override
-  String get speedLimitWarning => 'Estás conduciendo al límite de velocidad, reduce la velocidad';
+  String get speedLimitWarning =>
+      'Estás conduciendo al límite de velocidad, reduce la velocidad';
 
   @override
   String get kmPerHour => 'Km/h';
@@ -1262,13 +1342,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get youHaveArrived => '¡Has llegado a tu destino!';
 
   @override
-  String get navigatingToParking => 'Navegando al aparcamiento de estacionamiento';
+  String get navigatingToParking =>
+      'Navegando al aparcamiento de estacionamiento';
 
   @override
   String get preparingNavigation => 'Preparando tu navegación...';
 
   @override
-  String get navigationError => 'No se pudo calcular la ruta. Por favor, inténtalo de nuevo.';
+  String get navigationError =>
+      'No se pudo calcular la ruta. Por favor, inténtalo de nuevo.';
 
   @override
   String get tryAgain => 'Intentar de nuevo';
@@ -1277,10 +1359,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fatigueAlertTitle => 'Alerta de fatiga';
 
   @override
-  String get fatigueAlertMessage => 'Has estado conduciendo durante 3 horas. Por favor considera tomar un descanso.';
+  String get fatigueAlertMessage =>
+      'Has estado conduciendo durante 3 horas. Por favor considera tomar un descanso.';
 
   @override
-  String get fatigueAlertVoice => 'Has estado conduciendo durante tres horas. Por favor toma un descanso.';
+  String get fatigueAlertVoice =>
+      'Has estado conduciendo durante tres horas. Por favor toma un descanso.';
 
   @override
   String get addEvent => 'Agregar alerta';
@@ -1295,19 +1379,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get locationPermissionDenied => 'Permiso de ubicación denegado';
 
   @override
-  String get locationPermissionDeniedPermanently => 'Permisos de ubicación denegados permanentemente, por favor habilítalos en configuración';
+  String get locationPermissionDeniedPermanently =>
+      'Permisos de ubicación denegados permanentemente, por favor habilítalos en configuración';
 
   @override
   String get failedToLoadMap => 'Error al cargar el mapa';
 
   @override
-  String get failedToInitializeLocation => 'Error al inicializar los servicios de ubicación';
+  String get failedToInitializeLocation =>
+      'Error al inicializar los servicios de ubicación';
 
   @override
   String get failedToInitNavigation => 'Error al inicializar la navegación';
 
   @override
-  String get failedToStartNavigation => 'Error al iniciar la visualización de navegación';
+  String get failedToStartNavigation =>
+      'Error al iniciar la visualización de navegación';
 
   @override
   String get freeCameraMode => 'Cámara libre';
@@ -1322,7 +1409,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get radarAlertTitle => 'Alerta de radar';
 
   @override
-  String get cameraAlertMessage => 'Estás en una zona de vigilancia con cámaras CCTV';
+  String get cameraAlertMessage =>
+      'Estás en una zona de vigilancia con cámaras CCTV';
 
   @override
   String get radarAlertMessage => 'Te estás acercando a una zona con radar';
@@ -1354,7 +1442,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get notifyAvailableSpace => 'Notificarme de aparcamientos disponibles en esta área';
+  String get notifyAvailableSpace =>
+      'Notificarme de aparcamientos disponibles en esta área';
 
   @override
   String get dateAndTime => 'Fecha y Hora';
@@ -1383,7 +1472,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notificationScheduled => 'Notificación programada';
 
   @override
-  String get notificationScheduledDescription => 'Se te notificará cuando haya un aparcamiento disponible en esta área';
+  String get notificationScheduledDescription =>
+      'Se te notificará cuando haya un aparcamiento disponible en esta área';
 
   @override
   String get minutesShort => 'min';
@@ -1401,10 +1491,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get timesRequired => 'Las horas de inicio y fin son requeridas';
 
   @override
-  String get startBeforeEnd => 'La hora de inicio debe ser anterior a la hora de fin';
+  String get startBeforeEnd =>
+      'La hora de inicio debe ser anterior a la hora de fin';
 
   @override
-  String get timeGreaterThanCurrent => 'Las horas de inicio y fin deben ser posteriores a la hora actual';
+  String get timeGreaterThanCurrent =>
+      'Las horas de inicio y fin deben ser posteriores a la hora actual';
 
   @override
   String get maxScheduleDays => 'Solo puedes programar hasta 5 días';
@@ -1450,25 +1542,32 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get locationPermissionPermanentlyDenied => 'Permisos de ubicación denegados permanentemente, habilítelos en la configuración';
+  String get locationPermissionPermanentlyDenied =>
+      'Permisos de ubicación denegados permanentemente, habilítelos en la configuración';
 
   @override
-  String get failedToInitializeLocationServices => 'Error al inicializar los servicios de ubicación';
+  String get failedToInitializeLocationServices =>
+      'Error al inicializar los servicios de ubicación';
 
   @override
-  String get failedToGetCurrentLocation => 'Error al obtener la ubicación actual';
+  String get failedToGetCurrentLocation =>
+      'Error al obtener la ubicación actual';
 
   @override
-  String get failedToStartNavigationSimulation => 'Error al iniciar la simulación de navegación';
+  String get failedToStartNavigationSimulation =>
+      'Error al iniciar la simulación de navegación';
 
   @override
-  String get failedToInitializeRouting => 'Error al inicializar el enrutamiento';
+  String get failedToInitializeRouting =>
+      'Error al inicializar el enrutamiento';
 
   @override
-  String get couldNotCalculateRoute => 'No se pudo calcular la ruta. Por favor, inténtelo de nuevo.';
+  String get couldNotCalculateRoute =>
+      'No se pudo calcular la ruta. Por favor, inténtelo de nuevo.';
 
   @override
-  String get failedToInitializeNavigation => 'Error al inicializar la navegación';
+  String get failedToInitializeNavigation =>
+      'Error al inicializar la navegación';
 
   @override
   String metersAhead(int distance) {
@@ -1523,7 +1622,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unableToRegister => 'No se pudo registrar';
 
   @override
-  String get unableToVerifyEmail => 'No se pudo verificar el correo electrónico';
+  String get unableToVerifyEmail =>
+      'No se pudo verificar el correo electrónico';
 
   @override
   String get unableToResetPassword => 'No se pudo restablecer la contraseña';
@@ -1532,7 +1632,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unableToValidateReset => 'No se pudo validar la contraseña';
 
   @override
-  String get unableToFindAccount => 'No se pudo encontrar la cuenta de recuperación';
+  String get unableToFindAccount =>
+      'No se pudo encontrar la cuenta de recuperación';
 
   @override
   String get unableToResendCode => 'No se pudo reenviar el código';
@@ -1571,7 +1672,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hasBeenOccupied => ' ha sido ocupado';
 
   @override
-  String get aNewSpaceHasBeenPublished => 'Se ha publicado un nuevo aparcamiento dentro de ';
+  String get aNewSpaceHasBeenPublished =>
+      'Se ha publicado un nuevo aparcamiento dentro de ';
 
   @override
   String get around => ' alrededor de ';
@@ -1586,13 +1688,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noNotificationsYet => 'Aún no hay notificaciones';
 
   @override
-  String get notificationsWillAppear => 'Las notificaciones de la aplicación aparecerán aquí\ncuando haya una nueva actividad';
+  String get notificationsWillAppear =>
+      'Las notificaciones de la aplicación aparecerán aquí\ncuando haya una nueva actividad';
 
   @override
-  String get noScheduledNotificationsYet => 'Aún no hay notificaciones programadas';
+  String get noScheduledNotificationsYet =>
+      'Aún no hay notificaciones programadas';
 
   @override
-  String get scheduledNotificationsWillAppear => 'Las notificaciones programadas aparecerán\naquí cuando configures este recordatorio';
+  String get scheduledNotificationsWillAppear =>
+      'Las notificaciones programadas aparecerán\naquí cuando configures este recordatorio';
 
   @override
   String get justNow => 'Ahora mismo';
@@ -1604,19 +1709,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noPaymentMethodsAdded => 'No se han añadido métodos de pago';
 
   @override
-  String get noPaymentMethodsDescription => 'Aún no has añadido ningún método de pago.\nAñade uno para realizar pagos fácilmente.';
+  String get noPaymentMethodsDescription =>
+      'Aún no has añadido ningún método de pago.\nAñade uno para realizar pagos fácilmente.';
 
   @override
   String get paymentMethodAdded => 'Método de pago añadido';
 
   @override
-  String get paymentMethodAddedDescription => 'Tu método de pago ha sido agregado correctamente.';
+  String get paymentMethodAddedDescription =>
+      'Tu método de pago ha sido agregado correctamente.';
 
   @override
-  String get pleaseCompleteCardDetails => 'Por favor completa los detalles de la tarjeta';
+  String get pleaseCompleteCardDetails =>
+      'Por favor completa los detalles de la tarjeta';
 
   @override
-  String get failedToAddPaymentMethod => 'Error al agregar método de pago. Por favor, inténtalo de nuevo.';
+  String get failedToAddPaymentMethod =>
+      'Error al agregar método de pago. Por favor, inténtalo de nuevo.';
 
   @override
   String get cardNumber => 'Número de tarjeta';
@@ -1656,13 +1765,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noPayoutMethodsYet => 'Aún no hay métodos de pago';
 
   @override
-  String get payoutMethodsDescription => 'Tus métodos de pago añadidos aparecerán\naquí una vez que los configures en tu perfil';
+  String get payoutMethodsDescription =>
+      'Tus métodos de pago añadidos aparecerán\naquí una vez que los configures en tu perfil';
 
   @override
   String get payoutMethodAdded => 'Método de pago añadido';
 
   @override
-  String get payoutMethodAddedDescription => 'Tu método de pago ha sido agregado correctamente.';
+  String get payoutMethodAddedDescription =>
+      'Tu método de pago ha sido agregado correctamente.';
 
   @override
   String get addPayoutMethod => 'Añadir cuenta bancaria';
@@ -1674,10 +1785,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get accountNumberExample => 'ES00 0000 0000 0000 0000 0000';
 
   @override
-  String get makeDefaultPaymentMethod => 'Establecer como método de pago predeterminado';
+  String get makeDefaultPaymentMethod =>
+      'Establecer como método de pago predeterminado';
 
   @override
-  String get pleaseEnterAccountNumber => 'Por favor ingresa el número de cuenta';
+  String get pleaseEnterAccountNumber =>
+      'Por favor ingresa el número de cuenta';
 
   @override
   String get payoutMethods => 'Cuentas bancarias';
@@ -1692,7 +1805,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reschedule => 'Reprogramar';
 
   @override
-  String get notificationRescheduledSuccessfully => 'Notificación reprogramada correctamente';
+  String get notificationRescheduledSuccessfully =>
+      'Notificación reprogramada correctamente';
 
   @override
   String get spaceReminder => 'Recordatorio de aparcamiento';
@@ -1704,7 +1818,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteReminder => 'Eliminar recordatorio';
 
   @override
-  String get youHaveReminderForSpace => 'Tienes un recordatorio para un aparcamiento en ';
+  String get youHaveReminderForSpace =>
+      'Tienes un recordatorio para un aparcamiento en ';
 
   @override
   String get expired => 'Expirado';
@@ -1716,16 +1831,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get activeMayus => 'Activo';
 
   @override
-  String get antiMoneyLaunderingMessage => 'La Directiva Antiblanqueo de Capitales (UE) 2015/849 nos obliga a verificar tu identidad para que puedas recibir pagos por tus ventas en línea. Solo tendrás que verificarte una vez.';
+  String get antiMoneyLaunderingMessage =>
+      'La Directiva Antiblanqueo de Capitales (UE) 2015/849 nos obliga a verificar tu identidad para que puedas recibir pagos por tus ventas en línea. Solo tendrás que verificarte una vez.';
 
   @override
-  String get couldNotOpenTermsAndConditions => 'No se pudo abrir el enlace de Términos y Condiciones';
+  String get couldNotOpenTermsAndConditions =>
+      'No se pudo abrir el enlace de Términos y Condiciones';
 
   @override
   String get byAgreementStripe => 'Al continuar, acepto el ';
 
   @override
-  String get stripeConnectedAccountAgreement => 'Acuerdo de cuenta conectada de Stripe';
+  String get stripeConnectedAccountAgreement =>
+      'Acuerdo de cuenta conectada de Stripe';
 
   @override
   String get and => ' y ';
@@ -1734,10 +1852,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get stripeTermsOfService => 'Términos de Servicio de Stripe';
 
   @override
-  String get accountInformationChanged => 'Información de cuenta cambiada correctamente';
+  String get accountInformationChanged =>
+      'Información de cuenta cambiada correctamente';
 
   @override
-  String get accountInformationChangedDescription => 'La información de tu cuenta ha sido cambiada correctamente,';
+  String get accountInformationChangedDescription =>
+      'La información de tu cuenta ha sido cambiada correctamente,';
 
   @override
   String get orders => 'Reservas';
@@ -1772,7 +1892,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noOrdersYet => 'Aún no hay reservas';
 
   @override
-  String get noOrdersDescription => 'Aún no has realizado ningún pedido.\n¡Comienza a explorar y haz tu primer pedido!';
+  String get noOrdersDescription =>
+      'Aún no has realizado ningún pedido.\n¡Comienza a explorar y haz tu primer pedido!';
 
   @override
   String get alerts => 'Alertas';
@@ -1844,7 +1965,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noTransactionsYet => 'No hay transacciones todavía';
 
   @override
-  String get transactionsHistoryMessage => 'Tu historial de transacciones aparecerá aquí cuando tengas alguna para mostrar.';
+  String get transactionsHistoryMessage =>
+      'Tu historial de transacciones aparecerá aquí cuando tengas alguna para mostrar.';
 
   @override
   String get loadingTransactions => 'Cargando transacciones';
@@ -1856,7 +1978,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get success => 'Éxito';
 
   @override
-  String get withdrawalRequestSuccess => 'La solicitud de retiro ha sido enviada correctamente.';
+  String get withdrawalRequestSuccess =>
+      'La solicitud de retiro ha sido enviada correctamente.';
 
   @override
   String withdrawalToBank(String method) {
@@ -1873,7 +1996,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noWithdrawalsYet => 'Aún no hay retiradas';
 
   @override
-  String get withdrawalHistoryMessage => 'Tu historial de retiradas aparecerá aquí\ncuando realices un retiro';
+  String get withdrawalHistoryMessage =>
+      'Tu historial de retiradas aparecerá aquí\ncuando realices un retiro';
 
   @override
   String amountCannotExceed(String balance) {
@@ -1892,7 +2016,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paymentMethodAddedTitle => 'Método de pago añadido';
 
   @override
-  String get paymentMethodAddedSubtext => 'Tu método de pago ha sido agregado correctamente.';
+  String get paymentMethodAddedSubtext =>
+      'Tu método de pago ha sido agregado correctamente.';
 
   @override
   String get addPaymentMethodTitle => 'Agregar método de pago';
@@ -1910,22 +2035,26 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pleaseEnterYourName => 'Por favor ingresa tu nombre';
 
   @override
-  String get paymentSuccessfulReservation => 'Tu pago se ha realizado con éxito. El aparcamiento ya está reservado.';
+  String get paymentSuccessfulReservation =>
+      'Tu pago se ha realizado con éxito. El aparcamiento ya está reservado.';
 
   @override
-  String get paymentFailedRequiresAction => 'El pago falló o requiere acción adicional';
+  String get paymentFailedRequiresAction =>
+      'El pago falló o requiere acción adicional';
 
   @override
   String get connectionPending => 'Conexión pendiente';
 
   @override
-  String get connectionPendingMessage => 'La conexión de tu cuenta aún está pendiente, serás notificado cuando la conexión esté completa';
+  String get connectionPendingMessage =>
+      'La conexión de tu cuenta aún está pendiente, serás notificado cuando la conexión esté completa';
 
   @override
   String get somethingWentWrongGeneric => 'Algo salió mal';
 
   @override
-  String get contactSupportMessage => 'Parece que hay un problema con tu cuenta. Por favor contacta soporte para asistencia.';
+  String get contactSupportMessage =>
+      'Parece que hay un problema con tu cuenta. Por favor contacta soporte para asistencia.';
 
   @override
   String get insufficientBalance => 'No tienes suficiente saldo para retirar';
@@ -1967,19 +2096,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reservationConfirmedTitle => 'Reserva confirmada';
 
   @override
-  String get reservationConfirmedDescription => 'Tu reserva ha sido confirmada correctamente, actualizaremos tu saldo en breve.';
+  String get reservationConfirmedDescription =>
+      'Tu reserva ha sido confirmada correctamente, actualizaremos tu saldo en breve.';
 
   @override
   String get reservationCancelledOwnerTitle => 'Reserva cancelada';
 
   @override
-  String get reservationCancelledOwnerDescription => 'Ahora procedemos a la devolución del importe completo de la reserva al solicitante.';
+  String get reservationCancelledOwnerDescription =>
+      'Ahora procedemos a la devolución del importe completo de la reserva al solicitante.';
 
   @override
   String get reservationCancelledRequesterTitle => 'Reserva cancelada';
 
   @override
-  String get reservationCancelledRequesterDescription => 'Ahora procedemos a la devolución del importe completo de la reserva a tu cuenta bancaria.';
+  String get reservationCancelledRequesterDescription =>
+      'Ahora procedemos a la devolución del importe completo de la reserva a tu cuenta bancaria.';
 
   @override
   String get networkError => 'Error de red';
@@ -2026,7 +2158,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invalidCredentials => 'Credenciales inválidas';
 
   @override
-  String get checkInternetConnection => 'Por favor verifica tu conexión a internet';
+  String get checkInternetConnection =>
+      'Por favor verifica tu conexión a internet';
 
   @override
   String get loginFailed => 'Error al iniciar sesión';
@@ -2059,7 +2192,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invalidPlateNumber => 'Matrícula inválida';
 
   @override
-  String get selectValidCarType => 'Por favor selecciona un tipo de coche válido';
+  String get selectValidCarType =>
+      'Por favor selecciona un tipo de coche válido';
 
   @override
   String get accountSetupComplete => 'Configuración de cuenta completa';
@@ -2077,7 +2211,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get expires => 'Expira';
 
   @override
-  String get logoutConfirmation => '¿Estás seguro de que quieres cerrar sesión?';
+  String get logoutConfirmation =>
+      '¿Estás seguro de que quieres cerrar sesión?';
 
   @override
   String get deleteCard => 'Eliminar tarjeta';
@@ -2104,7 +2239,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unableToGetLocation => 'No se pudo obtener ubicación';
 
   @override
-  String get locationServicesUnavailable => 'Servicios de ubicación no disponibles';
+  String get locationServicesUnavailable =>
+      'Servicios de ubicación no disponibles';
 
   @override
   String get noInternetConnection => 'Sin conexión a internet';
@@ -2194,10 +2330,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteAccount => 'Eliminar cuenta';
 
   @override
-  String get deleteAccountConfirmation => '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.';
+  String get deleteAccountConfirmation =>
+      '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.';
 
   @override
-  String get pleaseEnterYourPhoneNumber => 'Por favor ingrese su número de teléfono';
+  String get pleaseEnterYourPhoneNumber =>
+      'Por favor ingrese su número de teléfono';
 
   @override
   String get monthJan => 'Ene';
@@ -2239,22 +2377,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get faqTitle => 'FAQ';
 
   @override
-  String get faqPublishPaidSpaceQuestion => '¿Cómo puedo publicar un aparcamiento de pago?';
+  String get faqPublishPaidSpaceQuestion =>
+      '¿Cómo puedo publicar un aparcamiento de pago?';
 
   @override
-  String get faqPublishPaidSpaceAnswer => 'Para publicar un aparcamiento de pago, debes cumplir con los siguientes requisitos:\n\n• Registrar los datos de tu vehículo en la aplicación, ya que serán necesarios al momento de la reserva.\n• Crear una cuenta de beneficios desde tu perfil. Para ello, deberás ingresar tu información fiscal, la cual es obligatoria para recibir pagos en la aplicación conforme a la normativa europea de prevención de lavado de dinero.';
+  String get faqPublishPaidSpaceAnswer =>
+      'Para publicar un aparcamiento de pago, debes cumplir con los siguientes requisitos:\n\n• Registrar los datos de tu vehículo en la aplicación, ya que serán necesarios al momento de la reserva.\n• Crear una cuenta de beneficios desde tu perfil. Para ello, deberás ingresar tu información fiscal, la cual es obligatoria para recibir pagos en la aplicación conforme a la normativa europea de prevención de lavado de dinero.';
 
   @override
-  String get faqEarnMoneyQuestion => '¿Cómo obtengo ganancias por mi aparcamiento de pago?';
+  String get faqEarnMoneyQuestion =>
+      '¿Cómo obtengo ganancias por mi aparcamiento de pago?';
 
   @override
-  String get faqEarnMoneyAnswer => 'Para generar ganancias con tu aparcamiento, este debe ser reservado por otro usuario. Una vez realizada la reserva, deberás confirmar la operación ingresando el código de confirmación que se le proporciona al usuario que reservó. Tras recibir el código, podrás confirmar la reserva.\n\nCuando la reserva es confirmada, recibirás el importe correspondiente menos las comisiones aplicadas por LetDem por la operación.\n\nEl monto total de tus ganancias se reflejará en la sección \"Ganancias\" de tu perfil.';
+  String get faqEarnMoneyAnswer =>
+      'Para generar ganancias con tu aparcamiento, este debe ser reservado por otro usuario. Una vez realizada la reserva, deberás confirmar la operación ingresando el código de confirmación que se le proporciona al usuario que reservó. Tras recibir el código, podrás confirmar la reserva.\n\nCuando la reserva es confirmada, recibirás el importe correspondiente menos las comisiones aplicadas por LetDem por la operación.\n\nEl monto total de tus ganancias se reflejará en la sección \"Ganancias\" de tu perfil.';
 
   @override
-  String get faqWithdrawFundsQuestion => '¿Cómo retiro mis fondos a una cuenta personal?';
+  String get faqWithdrawFundsQuestion =>
+      '¿Cómo retiro mis fondos a una cuenta personal?';
 
   @override
-  String get faqWithdrawFundsAnswer => 'Para retirar tus fondos, estos deben ser liberados previamente por el proveedor de pagos. Este proceso suele tardar aproximadamente 10 días. Una vez liberados, los fondos estarán disponibles en la app y podrás retirarlos utilizando una de las cuentas bancarias que hayas asociado previamente.';
+  String get faqWithdrawFundsAnswer =>
+      'Para retirar tus fondos, estos deben ser liberados previamente por el proveedor de pagos. Este proceso suele tardar aproximadamente 10 días. Una vez liberados, los fondos estarán disponibles en la app y podrás retirarlos utilizando una de las cuentas bancarias que hayas asociado previamente.';
 
   @override
   String get helpLetDemPointsTitle => '¿Cómo ganar Puntos LetDem?';
@@ -2263,55 +2407,71 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpLetDemPointsReserveTitle => 'Reservar un aparcamiento de pago';
 
   @override
-  String get helpLetDemPointsReserveDescription => 'para el usuario que reserva y paga un aparcamiento publicado por otro usuario y una vez que la reserva es confirmada mediante el código de confirmación.';
+  String get helpLetDemPointsReserveDescription =>
+      'para el usuario que reserva y paga un aparcamiento publicado por otro usuario y una vez que la reserva es confirmada mediante el código de confirmación.';
 
   @override
-  String get helpLetDemPointsPublishTitle => 'Publicar un aparcamiento gratuito';
+  String get helpLetDemPointsPublishTitle =>
+      'Publicar un aparcamiento gratuito';
 
   @override
-  String get helpLetDemPointsPublishDescription => 'Si otro usuario lo utiliza y selecciona \"Me lo quedo\" como valoración al llegar al lugar.';
+  String get helpLetDemPointsPublishDescription =>
+      'Si otro usuario lo utiliza y selecciona \"Me lo quedo\" como valoración al llegar al lugar.';
 
   @override
-  String get helpLetDemPointsAlertTitle => 'Publicar una alerta (Policía, Vía cortada, Accidente)';
+  String get helpLetDemPointsAlertTitle =>
+      'Publicar una alerta (Policía, Vía cortada, Accidente)';
 
   @override
-  String get helpLetDemPointsAlertDescription => 'Si otro usuario confirma la existencia de la alerta.';
+  String get helpLetDemPointsAlertDescription =>
+      'Si otro usuario confirma la existencia de la alerta.';
 
   @override
   String get helpLetDemPointsAdditionalNotesTitle => 'Notas adicionales';
 
   @override
-  String get helpLetDemPointsAdditionalNote1 => '• El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.';
+  String get helpLetDemPointsAdditionalNote1 =>
+      '• El usuario que cede un aparcamiento de pago no gana puntos, pero sí gana dinero.';
 
   @override
-  String get helpLetDemPointsAdditionalNote2 => '• En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.';
+  String get helpLetDemPointsAdditionalNote2 =>
+      '• En todas las acciones, los puntos se otorgan únicamente si la contribución es útil y confirmada por otro usuario.';
 
   @override
-  String get helpScheduledNotificationsTitle => '¿Cómo crear notificaciones programadas de aparcamientos?';
+  String get helpScheduledNotificationsTitle =>
+      '¿Cómo crear notificaciones programadas de aparcamientos?';
 
   @override
-  String get helpScheduledNotificationsIntro => 'Para programar una notificación de aparcamiento:';
+  String get helpScheduledNotificationsIntro =>
+      'Para programar una notificación de aparcamiento:';
 
   @override
-  String get helpScheduledNotificationsStep1 => 'Busca tu destino utilizando la barra de búsqueda en la pantalla principal.';
+  String get helpScheduledNotificationsStep1 =>
+      'Busca tu destino utilizando la barra de búsqueda en la pantalla principal.';
 
   @override
-  String get helpScheduledNotificationsStep2 => 'Selecciona la dirección deseada y pulsa el botón \"Avisarme por aparcamientos disponibles\".';
+  String get helpScheduledNotificationsStep2 =>
+      'Selecciona la dirección deseada y pulsa el botón \"Avisarme por aparcamientos disponibles\".';
 
   @override
-  String get helpScheduledNotificationsStep3 => 'Configura la alerta seleccionando:';
+  String get helpScheduledNotificationsStep3 =>
+      'Configura la alerta seleccionando:';
 
   @override
-  String get helpScheduledNotificationsStep3Detail1 => '• La franja horaria en la que deseas recibir notificaciones.';
+  String get helpScheduledNotificationsStep3Detail1 =>
+      '• La franja horaria en la que deseas recibir notificaciones.';
 
   @override
-  String get helpScheduledNotificationsStep3Detail2 => '• La distancia en metros desde la ubicación seleccionada que se debe considerar como área de notificación.';
+  String get helpScheduledNotificationsStep3Detail2 =>
+      '• La distancia en metros desde la ubicación seleccionada que se debe considerar como área de notificación.';
 
   @override
-  String get helpScheduledNotificationsInfo1 => 'Una vez creada la alerta, podrás gestionarla desde tu perfil, en la sección \"Notificaciones programadas\", donde verás todas tus alertas activas o expiradas.';
+  String get helpScheduledNotificationsInfo1 =>
+      'Una vez creada la alerta, podrás gestionarla desde tu perfil, en la sección \"Notificaciones programadas\", donde verás todas tus alertas activas o expiradas.';
 
   @override
-  String get helpScheduledNotificationsInfo2 => 'Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar.';
+  String get helpScheduledNotificationsInfo2 =>
+      'Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar.';
 
   @override
   String get unhandledError => 'Error no controlado';
@@ -2323,10 +2483,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get changePaymentMethod => 'Cambiar método de pago';
 
   @override
-  String get paymentFailedDescription => 'La reserva falló porque tu pago no se procesó correctamente';
+  String get paymentFailedDescription =>
+      'La reserva falló porque tu pago no se procesó correctamente';
 
   @override
-  String get errorReserveSpaceDescription => 'Por favor, inténtalo de nuevo más tarde. Si el problema persiste, contacta con soporte.';
+  String get errorReserveSpaceDescription =>
+      'Por favor, inténtalo de nuevo más tarde. Si el problema persiste, contacta con soporte.';
 
   @override
   String speedLimitVoiceAlert(String speedLimit) {

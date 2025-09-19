@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -9,15 +11,18 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/popups/success_dialog.dart';
 import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/widgets/chip.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/enums/PublishSpaceType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
+import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
@@ -25,10 +30,6 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/payment/payment.model.dart';
-import 'package:letdem/core/utils/parsers.dart';
-
-import 'package:letdem/common/widgets/chip.dart';
-import 'package:letdem/features/auth/models/nearby_payload.model.dart';
 
 class SpacePopupSheet extends StatefulWidget {
   final Space space;
@@ -72,9 +73,13 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 style: Typo.largeBody.copyWith(fontWeight: FontWeight.w800),
               ),
               GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Icon(Iconsax.close_circle5,
-                      size: 25, color: AppColors.neutral300)),
+                onTap: () => Navigator.of(context).pop(),
+                child: Icon(
+                  Iconsax.close_circle5,
+                  size: 25,
+                  color: AppColors.neutral300,
+                ),
+              ),
             ],
           ),
           Dimens.space(4),
@@ -82,8 +87,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
           Dimens.space(3),
           _buildPaymentCard(context, _selectedPaymentMethod),
           SizedBox(
-              child: (widget.space.isOwner)
-                  ? BlocConsumer<ActivitiesBloc, ActivitiesState>(
+            child:
+                (widget.space.isOwner)
+                    ? BlocConsumer<ActivitiesBloc, ActivitiesState>(
                       listener: (context, state) {
                         if (state is ActivitiesPublished) {
                           widget.onRefreshTrigger();
@@ -115,9 +121,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                                 subtext: context.l10n.deleteSpaceSubtext,
                                 onProceed: () {
                                   context.read<ActivitiesBloc>().add(
-                                        DeleteSpaceEvent(
-                                            spaceID: widget.space.id),
-                                      );
+                                    DeleteSpaceEvent(spaceID: widget.space.id),
+                                  );
                                   NavigatorHelper.pop();
                                 },
                               ),
@@ -126,7 +131,8 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                         );
                       },
                     )
-                  : _buildReserveButton(context, widget.space)),
+                    : _buildReserveButton(context, widget.space),
+          ),
         ],
       ),
     );
@@ -164,8 +170,11 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   Widget _buildTypeRow(BuildContext context) {
     return Row(
       children: [
-        SvgPicture.asset(getSpaceTypeIcon(widget.space.type),
-            width: 20, height: 20),
+        SvgPicture.asset(
+          getSpaceTypeIcon(widget.space.type),
+          width: 20,
+          height: 20,
+        ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -220,7 +229,10 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     return DecoratedChip(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       text: getTimeLeftMessage(
-          DateTime.now(), widget.space.expirationDate!, context),
+        DateTime.now(),
+        widget.space.expirationDate!,
+        context,
+      ),
       textStyle: Typo.smallBody.copyWith(
         fontWeight: FontWeight.w600,
         color: AppColors.primary500,
@@ -237,18 +249,25 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
     return GestureDetector(
       onTap: () {
         if (context.userProfile!.defaultPaymentMethod == null) {
-          NavigatorHelper.to(AddPaymentMethod(
-              onPaymentMethodAdded: (e) => setState(() {
+          NavigatorHelper.to(
+            AddPaymentMethod(
+              onPaymentMethodAdded:
+                  (e) => setState(() {
                     _selectedPaymentMethod = e;
-                  })));
+                  }),
+            ),
+          );
         } else {
           NavigatorHelper.to(
-              PaymentMethodsScreen(onPaymentMethodSelected: (event) {
-            NavigatorHelper.pop();
-            setState(() {
-              _selectedPaymentMethod = event;
-            });
-          }));
+            PaymentMethodsScreen(
+              onPaymentMethodSelected: (event) {
+                NavigatorHelper.pop();
+                setState(() {
+                  _selectedPaymentMethod = event;
+                });
+              },
+            ),
+          );
         }
       },
       child: Container(
@@ -259,47 +278,65 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.neutral50),
         ),
-        child: method != null
-            ? Row(
-                children: [
-                  Image.asset(getCardIcon(_selectedPaymentMethod!.brand),
-                      width: 40, height: 40),
-                  Dimens.space(1),
-                  Text(
-                    context.l10n.cardEndingWith(
-                        getBrandName(method.brand), method.last4),
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () =>
-                        NavigatorHelper.to(const PaymentMethodsScreen()),
-                    child: Icon(Icons.keyboard_arrow_right_sharp,
-                        size: 25, color: AppColors.neutral100),
-                  ),
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.l10n.addPaymentMethod,
-                    style: Typo.mediumBody.copyWith(
-                      color: AppColors.primary500,
-                      decoration: TextDecoration.underline,
+        child:
+            method != null
+                ? Row(
+                  children: [
+                    Image.asset(
+                      getCardIcon(_selectedPaymentMethod!.brand),
+                      width: 40,
+                      height: 40,
                     ),
-                  ),
-                  Icon(IconlyBold.arrow_right_2,
-                      size: 18, color: AppColors.neutral100),
-                ],
-              ),
+                    Dimens.space(1),
+                    Text(
+                      context.l10n.cardEndingWith(
+                        getBrandName(method.brand),
+                        method.last4,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap:
+                          () =>
+                              NavigatorHelper.to(const PaymentMethodsScreen()),
+                      child: Icon(
+                        Icons.keyboard_arrow_right_sharp,
+                        size: 25,
+                        color: AppColors.neutral100,
+                      ),
+                    ),
+                  ],
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      context.l10n.addPaymentMethod,
+                      style: Typo.mediumBody.copyWith(
+                        color: AppColors.primary500,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    Icon(
+                      IconlyBold.arrow_right_2,
+                      size: 18,
+                      color: AppColors.neutral100,
+                    ),
+                  ],
+                ),
       ),
     );
   }
 
   Future<void> handle3DSPayment(
-      String clientSecret, VoidCallback onSuccess, VoidCallback onError) async {
+    String clientSecret,
+    VoidCallback onSuccess,
+    VoidCallback onError,
+  ) async {
     try {
       // Triggers the 3DS flow if required
       final paymentIntent = await Stripe.instance.confirmPayment(
@@ -331,18 +368,19 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
             handle3DSPayment(
               state.clientSecret!,
               () {
-                context.read<UserBloc>().add(FetchUserInfoEvent());
                 NavigatorHelper.pop();
-                AppPopup.showDialogSheet(
-                  context,
-                  SuccessDialog(
-                    title: context.l10n.spaceReserved,
-                    subtext: context.l10n.paymentSuccessfulReservation,
-                    onProceed: () {
-                      NavigatorHelper.pop();
-                      widget.onRefreshTrigger();
-                    },
-                  ),
+                context.showThreeDSProcessDialog(
+                  onSuccess: (p) {
+                    NavigatorHelper.to(
+                      ReservedSpaceDetailView(space: widget.space, details: p),
+                    );
+                    // Navigate to reservation details
+                  },
+                  onFailed: () {
+                    NavigatorHelper.pop();
+
+                    // Show error message or handle failure
+                  },
                 );
                 widget.onRefreshTrigger();
               },
@@ -353,15 +391,18 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                     isError: true,
                     onSecondaryCTA: () {
                       NavigatorHelper.pop();
-                      NavigatorHelper.to(PaymentMethodsScreen(
-                        onPaymentMethodSelected: (e) => setState(() {
-                          NavigatorHelper.pop();
+                      NavigatorHelper.to(
+                        PaymentMethodsScreen(
+                          onPaymentMethodSelected:
+                              (e) => setState(() {
+                                NavigatorHelper.pop();
 
-                          setState(() {
-                            _selectedPaymentMethod = e;
-                          });
-                        }),
-                      ));
+                                setState(() {
+                                  _selectedPaymentMethod = e;
+                                });
+                              }),
+                        ),
+                      );
                     },
                     title: context.l10n.paymentFailed,
                     secondaryCTAText: context.l10n.changePaymentMethod,
@@ -382,11 +423,11 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                 onSecondaryCTA: () {
                   NavigatorHelper.pop();
                   context.read<ActivitiesBloc>().add(
-                        ReserveSpaceEvent(
-                            spaceID: widget.space.id,
-                            paymentMethodID:
-                                _selectedPaymentMethod!.paymentMethodId),
-                      );
+                    ReserveSpaceEvent(
+                      spaceID: widget.space.id,
+                      paymentMethodID: _selectedPaymentMethod!.paymentMethodId,
+                    ),
+                  );
                 },
                 title: context.l10n.errorReserveSpace,
                 subtext:
@@ -402,10 +443,12 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
           widget.onRefreshTrigger();
           context.read<UserBloc>().add(FetchUserInfoEvent());
           NavigatorHelper.pop();
-          NavigatorHelper.to(ReservedSpaceDetailView(
-            space: widget.space,
-            details: state.spaceID,
-          ));
+          NavigatorHelper.to(
+            ReservedSpaceDetailView(
+              space: widget.space,
+              details: state.spaceID,
+            ),
+          );
         } else if (state is ActivitiesError) {
           Toast.showError(state.error);
         }
@@ -414,21 +457,21 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         return PrimaryButton(
           icon: widget.space.isPremium ? null : Iconsax.location5,
           isLoading: state is ActivitiesLoading,
-          text: space.isPremium
-              ? context.l10n.reserveSpace
-              : context.l10n.navigateToSpace,
+          text:
+              space.isPremium
+                  ? context.l10n.reserveSpace
+                  : context.l10n.navigateToSpace,
           onTap: () {
             if (widget.space.isPremium) {
               if (context.userProfile!.defaultPaymentMethod == null) {
                 NavigatorHelper.to(const AddPaymentMethod());
               } else {
                 context.read<ActivitiesBloc>().add(
-                      ReserveSpaceEvent(
-                        spaceID: widget.space.id,
-                        paymentMethodID:
-                            _selectedPaymentMethod!.paymentMethodId,
-                      ),
-                    );
+                  ReserveSpaceEvent(
+                    spaceID: widget.space.id,
+                    paymentMethodID: _selectedPaymentMethod!.paymentMethodId,
+                  ),
+                );
               }
             } else {
               NavigatorHelper.to(
@@ -449,12 +492,14 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
   }
 
   String _distanceToSpace(BuildContext context) {
-    var d = parseMeters(geolocator.Geolocator.distanceBetween(
-      widget.currentPosition.latitude,
-      widget.currentPosition.longitude,
-      widget.space.location.point.lat,
-      widget.space.location.point.lng,
-    ));
+    var d = parseMeters(
+      geolocator.Geolocator.distanceBetween(
+        widget.currentPosition.latitude,
+        widget.currentPosition.longitude,
+        widget.space.location.point.lat,
+        widget.space.location.point.lng,
+      ),
+    );
 
     return d;
   }
@@ -490,11 +535,7 @@ class ConfirmationDialog extends StatelessWidget {
               child: CircleAvatar(
                 radius: 45,
                 backgroundColor: AppColors.red50,
-                child: Icon(
-                  Icons.error,
-                  size: 45,
-                  color: AppColors.red500,
-                ),
+                child: Icon(Icons.error, size: 45, color: AppColors.red500),
               ),
             ),
           Text(
@@ -522,13 +563,177 @@ class ConfirmationDialog extends StatelessWidget {
               child: Text(
                 secondaryCTAText!,
                 style: Typo.mediumBody.copyWith(
-                    color: AppColors.neutral500,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
+                  color: AppColors.neutral500,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class ThreeDSProcessDialog extends StatefulWidget {
+  final Function(ReservedSpacePayload p)? onSuccess;
+  final VoidCallback? onFailed;
+  final Duration timeout;
+  final Duration pollingInterval;
+
+  const ThreeDSProcessDialog({
+    super.key,
+    this.onSuccess,
+    this.onFailed,
+    this.timeout = const Duration(minutes: 1),
+    this.pollingInterval = const Duration(seconds: 2),
+  });
+
+  @override
+  State<ThreeDSProcessDialog> createState() => _ThreeDSProcessDialogState();
+}
+
+class _ThreeDSProcessDialogState extends State<ThreeDSProcessDialog> {
+  Timer? _pollingTimer;
+  Timer? _timeoutTimer;
+  bool _isProcessing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _startPolling();
+    _startTimeout();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _timeoutTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(widget.pollingInterval, (timer) {
+      if (mounted && _isProcessing) {
+        context.read<UserBloc>().add(FetchUserInfoEvent(isSilent: true));
+      }
+    });
+  }
+
+  void _startTimeout() {
+    _timeoutTimer = Timer(widget.timeout, () {
+      if (mounted && _isProcessing) {
+        _handleFailure();
+      }
+    });
+  }
+
+  void _handleSuccess(ReservedSpacePayload p) {
+    if (!_isProcessing) return;
+
+    setState(() {
+      _isProcessing = false;
+    });
+
+    _pollingTimer?.cancel();
+    _timeoutTimer?.cancel();
+
+    // Close dialog
+    Navigator.of(context).pop();
+
+    // Call success callback
+    widget.onSuccess?.call(p);
+  }
+
+  void _handleFailure() {
+    if (!_isProcessing) return;
+
+    setState(() {
+      _isProcessing = false;
+    });
+
+    _pollingTimer?.cancel();
+    _timeoutTimer?.cancel();
+
+    // Close dialog
+    Navigator.of(context).pop();
+
+    // Call failed callback
+    widget.onFailed?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<UserBloc, UserState>(
+      listener: (context, state) {
+        if (state is UserLoaded &&
+            state.user.activeReservation != null &&
+            _isProcessing) {
+          _handleSuccess(state.user.activeReservation!);
+        }
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Spinner
+              const SizedBox(
+                width: 48,
+                height: 48,
+                child: CircularProgressIndicator(strokeWidth: 3),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Title
+              const Text(
+                'Reservation in progress',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 12),
+
+              // Description
+              const Text(
+                'Please wait while we process your reservation...',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Extension method to show the dialog
+extension ThreeDSProcessDialogExtension on BuildContext {
+  Future<void> showThreeDSProcessDialog({
+    Function(ReservedSpacePayload p)? onSuccess,
+    VoidCallback? onFailed,
+    Duration timeout = const Duration(minutes: 1),
+    Duration pollingInterval = const Duration(seconds: 2),
+  }) {
+    return AppPopup.showBottomSheet(
+      this,
+      ThreeDSProcessDialog(
+        onSuccess: onSuccess,
+        onFailed: onFailed,
+        timeout: timeout,
+        pollingInterval: pollingInterval,
       ),
     );
   }

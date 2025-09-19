@@ -48,7 +48,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancelReservationConfirmationTitle => 'Cancel reservation?';
 
   @override
-  String get cancelReservationConfirmationText => 'Are you sure you want to cancel this reservation? This action can’t be undone.';
+  String get cancelReservationConfirmationText =>
+      'Are you sure you want to cancel this reservation? This action can’t be undone.';
 
   @override
   String get basicInformation => 'Basic information';
@@ -143,13 +144,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordMinLength => 'Password must be at least 8 characters';
 
   @override
-  String get passwordRequireNumber => 'Password must contain at least one number';
+  String get passwordRequireNumber =>
+      'Password must contain at least one number';
 
   @override
-  String get passwordRequireSpecial => 'Password must contain at least one special character';
+  String get passwordRequireSpecial =>
+      'Password must contain at least one special character';
 
   @override
-  String get passwordRequireUppercase => 'Password must contain at least one uppercase letter';
+  String get passwordRequireUppercase =>
+      'Password must contain at least one uppercase letter';
 
   @override
   String get pleaseEnterValidEmail => 'Please enter valid email';
@@ -304,7 +308,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventPublishedTitle => 'Alert published\nsuccessfully';
 
   @override
-  String get eventPublishedSubtext => 'Your alert have been published successfully, people can now see this alert on map.';
+  String get eventPublishedSubtext =>
+      'Your alert have been published successfully, people can now see this alert on map.';
 
   @override
   String get away => 'away';
@@ -321,13 +326,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentSuccessful => 'Payment successful';
 
   @override
-  String get spaceReservedSuccess => 'You have successfully reserved a paid space. You can get the details by clicking below.';
+  String get spaceReservedSuccess =>
+      'You have successfully reserved a paid space. You can get the details by clicking below.';
 
   @override
   String get arrivalTitle => 'You’ve arrived!';
 
   @override
-  String get arrivalSubtitle => 'Nearby parking spots are now visible on the map. Tap a spot to start navigation.';
+  String get arrivalSubtitle =>
+      'Nearby parking spots are now visible on the map. Tap a spot to start navigation.';
 
   @override
   String get getSpaceDetails => 'Get details of space';
@@ -348,10 +355,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importantNotice => 'Important notice';
 
   @override
-  String get createCarProfileFirst => 'You need to create a car profile to publish a paid space. Please create a car profile first.';
+  String get createCarProfileFirst =>
+      'You need to create a car profile to publish a paid space. Please create a car profile first.';
 
   @override
-  String get createEarningAccountFirst => 'You need to create an earning account to publish a paid space. Please create an earning account first.';
+  String get createEarningAccountFirst =>
+      'You need to create an earning account to publish a paid space. Please create an earning account first.';
 
   @override
   String get continueText => 'Continue';
@@ -360,7 +369,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationPermissionRequired => 'Location permission\nrequired';
 
   @override
-  String get locationPermissionDescription => 'We need to get access to your location services to perform any action in the app';
+  String get locationPermissionDescription =>
+      'We need to get access to your location services to perform any action in the app';
 
   @override
   String get openSystemSettings => 'Open system settings';
@@ -375,19 +385,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceReserved => 'Space reserved';
 
   @override
-  String get spaceReservedSuccessfully => 'Your space has been reserved successfully.';
+  String get spaceReservedSuccessfully =>
+      'Your space has been reserved successfully.';
 
   @override
   String get confirmationCode => 'Confirmation code';
 
   @override
-  String get enterConfirmationCode => 'The requester of the space will give you a 6-digit confirmation number, enter it here.';
+  String get enterConfirmationCode =>
+      'The requester of the space will give you a 6-digit confirmation number, enter it here.';
 
   @override
-  String get confirmationCodeWarning => 'Kindly ensure that the confirmation code works before you give out the space';
+  String get confirmationCodeWarning =>
+      'Kindly ensure that the confirmation code works before you give out the space';
 
   @override
-  String get pleaseEnterConfirmationCode => 'Please enter the confirmation code';
+  String get pleaseEnterConfirmationCode =>
+      'Please enter the confirmation code';
 
   @override
   String get reserved => 'Reserved';
@@ -399,7 +413,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteSpaceTitle => 'Delete space';
 
   @override
-  String get deleteSpaceSubtext => 'Are you sure you want to delete this space? This action cannot be undone.';
+  String get deleteSpaceSubtext =>
+      'Are you sure you want to delete this space? This action cannot be undone.';
 
   @override
   String get spaceDeleted => 'Space deleted';
@@ -444,7 +459,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noContributions => 'No contributions yet';
 
   @override
-  String get noContributionsDescription => 'Your contributions history will appear here, publish to see them';
+  String get noContributionsDescription =>
+      'Your contributions history will appear here, publish to see them';
 
   @override
   String get all => 'All';
@@ -456,7 +472,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events => 'Alerts';
 
   @override
-  String get verifyYourAccountFirst => 'Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.';
+  String get verifyYourAccountFirst =>
+      'Your earnings account is not verified yet. Please verify your account by submitting your ID card and bank information.';
 
   @override
   String failedToLoadActivities(String error) {
@@ -478,7 +495,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get spaceOwnerCannotReserve => 'Space owner cannot reserve their own space';
+  String get spaceOwnerCannotReserve =>
+      'Space owner cannot reserve their own space';
 
   @override
   String get location => 'Location';
@@ -541,7 +559,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noCarRegistered => 'No car registered';
 
   @override
-  String get registerCarDetails => 'Register your car with the car details\nfor safety and accessibility';
+  String get registerCarDetails =>
+      'Register your car with the car details\nfor safety and accessibility';
 
   @override
   String get tapToRegisterCar => 'Tap to register car';
@@ -598,7 +617,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noLabel => 'No Label';
 
   @override
-  String get ecoLabelPluginHybrids => 'Plug-in hybrids with an electric range of less than 40 km.';
+  String get ecoLabelPluginHybrids =>
+      'Plug-in hybrids with an electric range of less than 40 km.';
 
   @override
   String get ecoLabelNonPluginHybrids => 'Non-plug-in hybrids (HEV).';
@@ -610,28 +630,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zeroLabelElectric => '100% electric vehicles (BEV).';
 
   @override
-  String get zeroLabelPluginHybrids => 'Plug-in hybrids (PHEV) with an electric range of more than 40 km.';
+  String get zeroLabelPluginHybrids =>
+      'Plug-in hybrids (PHEV) with an electric range of more than 40 km.';
 
   @override
   String get zeroLabelHydrogen => 'Hydrogen-powered vehicles.';
 
   @override
-  String get bLabelPetrol => 'Petrol cars and vans registered from January 2001 onwards.';
+  String get bLabelPetrol =>
+      'Petrol cars and vans registered from January 2001 onwards.';
 
   @override
-  String get bLabelDiesel => 'Diesel cars and vans registered from January 2006 onwards.';
+  String get bLabelDiesel =>
+      'Diesel cars and vans registered from January 2006 onwards.';
 
   @override
-  String get bLabelIndustrial => 'Industrial vehicles and buses registered from 2005 onwards.';
+  String get bLabelIndustrial =>
+      'Industrial vehicles and buses registered from 2005 onwards.';
 
   @override
-  String get cLabelPetrol => 'Petrol cars and vans registered from January 2006 onwards.';
+  String get cLabelPetrol =>
+      'Petrol cars and vans registered from January 2006 onwards.';
 
   @override
-  String get cLabelDiesel => 'Diesel cars and vans registered from September 2015 onwards.';
+  String get cLabelDiesel =>
+      'Diesel cars and vans registered from September 2015 onwards.';
 
   @override
-  String get cLabelIndustrial => 'Industrial vehicles and buses registered from 2014 onwards.';
+  String get cLabelIndustrial =>
+      'Industrial vehicles and buses registered from 2014 onwards.';
 
   @override
   String get yourCarDetails => 'Your car details';
@@ -649,7 +676,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navigateToCar => 'Navigate to car';
 
   @override
-  String get errorConfirmSpaceReservation => 'Unable to confirm space reservation';
+  String get errorConfirmSpaceReservation =>
+      'Unable to confirm space reservation';
 
   @override
   String get errorReserveSpace => 'Unable to reserve space';
@@ -676,7 +704,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getHelp => 'Get Help';
 
   @override
-  String get enterEmailToReset => 'Enter your email address below to proceed with';
+  String get enterEmailToReset =>
+      'Enter your email address below to proceed with';
 
   @override
   String get emailAddress => 'Email address';
@@ -691,7 +720,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setNewPassword => 'Set a new password';
 
   @override
-  String get createStrongPassword => 'Create a strong password for your account';
+  String get createStrongPassword =>
+      'Create a strong password for your account';
 
   @override
   String get newPassword => 'New password';
@@ -706,13 +736,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get howToPublishPaidSpaceTitle => 'How do I publish a paid space?';
 
   @override
-  String get howToPublishPaidSpaceDescription => 'To publish a paid space, you must meet the following requirements:';
+  String get howToPublishPaidSpaceDescription =>
+      'To publish a paid space, you must meet the following requirements:';
 
   @override
-  String get publishPaidSpaceRequirement1 => 'Enter your vehicle information in the app so it can be used at the time of reservation.';
+  String get publishPaidSpaceRequirement1 =>
+      'Enter your vehicle information in the app so it can be used at the time of reservation.';
 
   @override
-  String get publishPaidSpaceRequirement2 => 'Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.';
+  String get publishPaidSpaceRequirement2 =>
+      'Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.';
 
   @override
   String reservationPendingNote(String expiresAt) {
@@ -723,10 +756,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get howToEarnMoneyTitle => 'How do I earn money from my paid space?';
 
   @override
-  String get howToEarnMoneyDescription => 'To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.';
+  String get howToEarnMoneyDescription =>
+      'To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.';
 
   @override
-  String get earningsTransferDescription => 'Once the reservation is confirmed, the amount of your reservation — minus LetDem\'s service fees — will be transferred to you.';
+  String get earningsTransferDescription =>
+      'Once the reservation is confirmed, the amount of your reservation — minus LetDem\'s service fees — will be transferred to you.';
 
   @override
   String minutesLeft(Object minutes) {
@@ -739,13 +774,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get earningsLocationDescription => 'You can see the total amount earned in the Earnings section of your profile.';
+  String get earningsLocationDescription =>
+      'You can see the total amount earned in the Earnings section of your profile.';
 
   @override
-  String get howToWithdrawFundsTitle => 'How do I withdraw my funds to a personal account?';
+  String get howToWithdrawFundsTitle =>
+      'How do I withdraw my funds to a personal account?';
 
   @override
-  String get howToWithdrawFundsDescription => 'To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you\'ll be able to withdraw them using one of your linked bank accounts.';
+  String get howToWithdrawFundsDescription =>
+      'To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you\'ll be able to withdraw them using one of your linked bank accounts.';
 
   @override
   String get earningsSection => 'Earnings';
@@ -778,13 +816,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordsDoNotMatch => 'Passwords do not match';
 
   @override
-  String get passwordRequirements => 'Ensure to use at least 8 characters, with a number, an uppercase letter, and one of the following special characters: \$, ., &, @';
+  String get passwordRequirements =>
+      'Ensure to use at least 8 characters, with a number, an uppercase letter, and one of the following special characters: \$, ., &, @';
 
   @override
   String get emailSentTitle => 'We sent you an email';
 
   @override
-  String get emailSentDescription => 'We\'ve sent an OTP to your email. Enter it below to reset your password.';
+  String get emailSentDescription =>
+      'We\'ve sent an OTP to your email. Enter it below to reset your password.';
 
   @override
   String get mailSentTo => 'Mail is sent to: ';
@@ -810,7 +850,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get howToCreateScheduledNotificationsTitle => 'How to create scheduled notifications?';
+  String get howToCreateScheduledNotificationsTitle =>
+      'How to create scheduled notifications?';
 
   @override
   String get howToEarnPointsTitle => 'How to earn LetDem Points?';
@@ -819,61 +860,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publishAlertTitle => 'Publish an Alert';
 
   @override
-  String get publishAlertDescription => 'If another user confirms the existence of the alert.';
+  String get publishAlertDescription =>
+      'If another user confirms the existence of the alert.';
 
   @override
   String get point => 'point';
 
   @override
-  String get howToEarnPointsDescription => 'Earn LetDem Points by contributing to the community through these actions:';
+  String get howToEarnPointsDescription =>
+      'Earn LetDem Points by contributing to the community through these actions:';
 
   @override
   String get reservePaidSpaceTitle => 'Reserve a paid parking space';
 
   @override
-  String get reservePaidSpaceDescription => 'To the user who reserves and pays for a space published by another user. Once this reservation is confirmed.';
+  String get reservePaidSpaceDescription =>
+      'To the user who reserves and pays for a space published by another user. Once this reservation is confirmed.';
 
   @override
   String get publishFreeSpaceTitle => 'Publish a free parking space';
 
   @override
-  String get publishFreeSpaceDescription => 'If another user uses it and selects “I’ll take it” as feedback after arriving at the location.';
+  String get publishFreeSpaceDescription =>
+      'If another user uses it and selects “I’ll take it” as feedback after arriving at the location.';
 
   @override
   String get additionalNotes => 'Additional notes';
 
   @override
-  String get pointsNote1 => 'The user who gives up a paid parking space doesn’t earn points, but does earn money.';
+  String get pointsNote1 =>
+      'The user who gives up a paid parking space doesn’t earn points, but does earn money.';
 
   @override
-  String get pointsNote2 => 'In all actions, points are granted only if the contribution is useful and confirmed by another user.';
+  String get pointsNote2 =>
+      'In all actions, points are granted only if the contribution is useful and confirmed by another user.';
 
   @override
-  String get howToCreateScheduledNotificationsDescription => 'To schedule a parking notification, follow these steps:';
+  String get howToCreateScheduledNotificationsDescription =>
+      'To schedule a parking notification, follow these steps:';
 
   @override
   String get searchDestinationTitle => 'Search destination';
 
   @override
-  String get searchDestinationDescription => 'Search for your destination using the search bar on the main screen.';
+  String get searchDestinationDescription =>
+      'Search for your destination using the search bar on the main screen.';
 
   @override
   String get selectAddressTitle => 'Select address';
 
   @override
-  String get selectAddressDescription => 'Select the desired address and tap the \"Notify me about available space\" button.';
+  String get selectAddressDescription =>
+      'Select the desired address and tap the \"Notify me about available space\" button.';
 
   @override
   String get configureAlertTitle => 'Configure alert';
 
   @override
-  String get configureAlertDescription => 'Select the time range and distance from your location to receive notifications.';
+  String get configureAlertDescription =>
+      'Select the time range and distance from your location to receive notifications.';
 
   @override
-  String get scheduledNotificationsManagement => 'Manage your notifications from the \'Scheduled Notifications\' section.';
+  String get scheduledNotificationsManagement =>
+      'Manage your notifications from the \'Scheduled Notifications\' section.';
 
   @override
-  String get scheduledNotificationsAlert => 'You’ll receive a notification whenever a space becomes available in your configured area.';
+  String get scheduledNotificationsAlert =>
+      'You’ll receive a notification whenever a space becomes available in your configured area.';
 
   @override
   String get createNewAccount => 'CREATE NEW ACCOUNT';
@@ -950,7 +1003,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weWillSendOTP => 'We sent you an email';
 
   @override
-  String get verificationInstructions => 'Kindly check the email you provided for an OTP to verify your email and enter it below';
+  String get verificationInstructions =>
+      'Kindly check the email you provided for an OTP to verify your email and enter it below';
 
   @override
   String get resending => 'Resending';
@@ -959,19 +1013,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verificationSuccess => 'Verification success';
 
   @override
-  String get verificationSuccessMessage => 'Your account email has been verified successfully. You can proceed to the app.';
+  String get verificationSuccessMessage =>
+      'Your account email has been verified successfully. You can proceed to the app.';
 
   @override
   String get findShareParking => 'Find & Share parking spaces near you';
 
   @override
-  String get parkingDescription => 'Get access to wide range of parking spaces within your location and beyond';
+  String get parkingDescription =>
+      'Get access to wide range of parking spaces within your location and beyond';
 
   @override
   String get geolocationPermission => 'Geolocation permission';
 
   @override
-  String get enableGeolocationDescription => 'Kindly enable geolocation to allow the app to track your location automatically. This process must be completed to use the app.';
+  String get enableGeolocationDescription =>
+      'Kindly enable geolocation to allow the app to track your location automatically. This process must be completed to use the app.';
 
   @override
   String get enableGeolocation => 'Enable geolocation';
@@ -1022,7 +1079,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressInformationTitle => 'Your address information';
 
   @override
-  String get addressInformationDescription => 'Input your full address and location of residence';
+  String get addressInformationDescription =>
+      'Input your full address and location of residence';
 
   @override
   String get enterAddress => 'Enter your address';
@@ -1046,7 +1104,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bankInformationTitle => 'Bank information';
 
   @override
-  String get bankInformationDescription => 'Enter your IBAN to complete this step';
+  String get bankInformationDescription =>
+      'Enter your IBAN to complete this step';
 
   @override
   String get enterIBAN => 'Enter your IBAN';
@@ -1058,7 +1117,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get iban => 'IBAN';
 
   @override
-  String get bankAccountNote => 'Kindly note that this bank account is required to receive payout from our payment provider.';
+  String get bankAccountNote =>
+      'Kindly note that this bank account is required to receive payout from our payment provider.';
 
   @override
   String get detailsSubmitted => 'Details submitted';
@@ -1067,13 +1127,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gotItThanks => 'Got it, thanks';
 
   @override
-  String get accountDetailsSuccess => 'Your account connection details submitted successfully, you will soon be able to receive money for paid spaces.';
+  String get accountDetailsSuccess =>
+      'Your account connection details submitted successfully, you will soon be able to receive money for paid spaces.';
 
   @override
   String get selectCountry => 'Select country';
 
   @override
-  String get selectCountryDescription => 'Select your country of residence to continue';
+  String get selectCountryDescription =>
+      'Select your country of residence to continue';
 
   @override
   String get spain => 'Spain';
@@ -1121,25 +1183,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectIdType => 'Select ID type';
 
   @override
-  String get selectIdDescription => 'Select your ID type and upload the front & Back of your Identity Card';
+  String get selectIdDescription =>
+      'Select your ID type and upload the front & Back of your Identity Card';
 
   @override
   String get nationalIdCard => 'National ID Card';
 
   @override
-  String get nationalIdDescription => 'Your government issued national identity card';
+  String get nationalIdDescription =>
+      'Your government issued national identity card';
 
   @override
   String get residentPermit => 'Resident Permit';
 
   @override
-  String get residentPermitDescription => 'Your government issued national resident permit';
+  String get residentPermitDescription =>
+      'Your government issued national resident permit';
 
   @override
   String get personalInfoTitle => 'Your personal information';
 
   @override
-  String get personalInfoDescription => 'Input your personal details as it is on your ID Card';
+  String get personalInfoDescription =>
+      'Input your personal details as it is on your ID Card';
 
   @override
   String get phoneNumber => 'Phone number';
@@ -1180,7 +1246,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get activeReservationExists => 'There’s an active reservation on your account. It needs to be finished or cancelled before you can publish a new paid space.';
+  String get activeReservationExists =>
+      'There’s an active reservation on your account. It needs to be finished or cancelled before you can publish a new paid space.';
 
   @override
   String get whatIsThisWaitingTime => 'What\'s this?';
@@ -1214,7 +1281,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get exceedsBalanceToast => 'You cannot withdraw more than your available balance.';
+  String get exceedsBalanceToast =>
+      'You cannot withdraw more than your available balance.';
 
   @override
   String timeToWaitMustBeBetween(String min, String max) {
@@ -1238,7 +1306,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spacePublishedSuccesfully => 'Space published successfully';
 
   @override
-  String get spacePublishedDescription => 'Your space have been published successfully, people can now have access to use space.';
+  String get spacePublishedDescription =>
+      'Your space have been published successfully, people can now have access to use space.';
 
   @override
   String get speedLimitAlert => 'Speed limit alert';
@@ -1277,10 +1346,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fatigueAlertTitle => 'Fatigue alert';
 
   @override
-  String get fatigueAlertMessage => 'You have been driving for 3 hours. Please consider taking a break.';
+  String get fatigueAlertMessage =>
+      'You have been driving for 3 hours. Please consider taking a break.';
 
   @override
-  String get fatigueAlertVoice => 'You have been driving for three hours. Please take a rest.';
+  String get fatigueAlertVoice =>
+      'You have been driving for three hours. Please take a rest.';
 
   @override
   String get addEvent => 'Add alert';
@@ -1295,19 +1366,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationPermissionDenied => 'Location permission denied';
 
   @override
-  String get locationPermissionDeniedPermanently => 'Location permissions permanently denied, please enable in settings';
+  String get locationPermissionDeniedPermanently =>
+      'Location permissions permanently denied, please enable in settings';
 
   @override
   String get failedToLoadMap => 'Failed to load map';
 
   @override
-  String get failedToInitializeLocation => 'Failed to initialize location services';
+  String get failedToInitializeLocation =>
+      'Failed to initialize location services';
 
   @override
   String get failedToInitNavigation => 'Failed to initialize navigation';
 
   @override
-  String get failedToStartNavigation => 'Failed to start navigation visualization';
+  String get failedToStartNavigation =>
+      'Failed to start navigation visualization';
 
   @override
   String get freeCameraMode => 'Free camera';
@@ -1337,7 +1411,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPaymentsYet => 'No payments yet';
 
   @override
-  String get noPaymentsDescription => 'Your payments history will appear here, once you make a payment';
+  String get noPaymentsDescription =>
+      'Your payments history will appear here, once you make a payment';
 
   @override
   String get tooCloseToLocation => 'Too close to location';
@@ -1354,7 +1429,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notifyAvailableSpace => 'Notify me of available space in this area';
+  String get notifyAvailableSpace =>
+      'Notify me of available space in this area';
 
   @override
   String get dateAndTime => 'Date & Time';
@@ -1383,7 +1459,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationScheduled => 'Notification scheduled';
 
   @override
-  String get notificationScheduledDescription => 'You will be notified when a space is available in this area';
+  String get notificationScheduledDescription =>
+      'You will be notified when a space is available in this area';
 
   @override
   String get minutesShort => 'mins';
@@ -1404,7 +1481,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startBeforeEnd => 'Start time should be before end time';
 
   @override
-  String get timeGreaterThanCurrent => 'Start and end times should be greater than the current time';
+  String get timeGreaterThanCurrent =>
+      'Start and end times should be greater than the current time';
 
   @override
   String get maxScheduleDays => 'You can only schedule up to 5 days';
@@ -1450,22 +1528,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get locationPermissionPermanentlyDenied => 'Location permissions permanently denied, please enable in settings';
+  String get locationPermissionPermanentlyDenied =>
+      'Location permissions permanently denied, please enable in settings';
 
   @override
-  String get failedToInitializeLocationServices => 'Failed to initialize location services';
+  String get failedToInitializeLocationServices =>
+      'Failed to initialize location services';
 
   @override
   String get failedToGetCurrentLocation => 'Failed to get current location';
 
   @override
-  String get failedToStartNavigationSimulation => 'Failed to start navigation simulation';
+  String get failedToStartNavigationSimulation =>
+      'Failed to start navigation simulation';
 
   @override
   String get failedToInitializeRouting => 'Failed to initialize routing';
 
   @override
-  String get couldNotCalculateRoute => 'Could not calculate route. Please try again.';
+  String get couldNotCalculateRoute =>
+      'Could not calculate route. Please try again.';
 
   @override
   String get failedToInitializeNavigation => 'Failed to initialize navigation';
@@ -1541,7 +1623,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arrivedAtDestination => 'You have arrived at your destination.';
 
   @override
-  String get rateThisParkingSpace => 'How would you like to rate this parking space?';
+  String get rateThisParkingSpace =>
+      'How would you like to rate this parking space?';
 
   @override
   String get customNavigation => 'Custom navigation';
@@ -1571,7 +1654,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hasBeenOccupied => ' has been occupied';
 
   @override
-  String get aNewSpaceHasBeenPublished => 'A new space has been published within ';
+  String get aNewSpaceHasBeenPublished =>
+      'A new space has been published within ';
 
   @override
   String get around => ' around ';
@@ -1586,13 +1670,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNotificationsYet => 'No notifications yet';
 
   @override
-  String get notificationsWillAppear => 'Your app notifications will appear here\nwhenever there is a new activity';
+  String get notificationsWillAppear =>
+      'Your app notifications will appear here\nwhenever there is a new activity';
 
   @override
   String get noScheduledNotificationsYet => 'No scheduled notifications yet';
 
   @override
-  String get scheduledNotificationsWillAppear => 'Your app scheduled notifications will appear\nhere whenever you set this reminder';
+  String get scheduledNotificationsWillAppear =>
+      'Your app scheduled notifications will appear\nhere whenever you set this reminder';
 
   @override
   String get justNow => 'Just now';
@@ -1604,19 +1690,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPaymentMethodsAdded => 'No payment methods added';
 
   @override
-  String get noPaymentMethodsDescription => 'You haven\'t added any payment methods yet.\nAdd one to make payments easily.';
+  String get noPaymentMethodsDescription =>
+      'You haven\'t added any payment methods yet.\nAdd one to make payments easily.';
 
   @override
   String get paymentMethodAdded => 'Payment Method Added';
 
   @override
-  String get paymentMethodAddedDescription => 'Your payment method has been successfully added.';
+  String get paymentMethodAddedDescription =>
+      'Your payment method has been successfully added.';
 
   @override
   String get pleaseCompleteCardDetails => 'Please complete the card details';
 
   @override
-  String get failedToAddPaymentMethod => 'Failed to add payment method. Please try again.';
+  String get failedToAddPaymentMethod =>
+      'Failed to add payment method. Please try again.';
 
   @override
   String get cardNumber => 'Card number';
@@ -1656,13 +1745,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPayoutMethodsYet => 'No payout methods yet';
 
   @override
-  String get payoutMethodsDescription => 'Your added payout methods will appear\nhere once you set them up in your profile';
+  String get payoutMethodsDescription =>
+      'Your added payout methods will appear\nhere once you set them up in your profile';
 
   @override
   String get payoutMethodAdded => 'Payout method added';
 
   @override
-  String get payoutMethodAddedDescription => 'Your payout method has been added successfully.';
+  String get payoutMethodAddedDescription =>
+      'Your payout method has been added successfully.';
 
   @override
   String get addPayoutMethod => 'Add bank account';
@@ -1692,7 +1783,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reschedule => 'Reschedule';
 
   @override
-  String get notificationRescheduledSuccessfully => 'Notification rescheduled successfully';
+  String get notificationRescheduledSuccessfully =>
+      'Notification rescheduled successfully';
 
   @override
   String get spaceReminder => 'Space reminder';
@@ -1716,16 +1808,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activeMayus => 'ACTIVE';
 
   @override
-  String get antiMoneyLaunderingMessage => 'The Anti-money Laundering Directive forces us to verify your identity in order to receive payment for your online sales. You will only need to verify yourself once.';
+  String get antiMoneyLaunderingMessage =>
+      'The Anti-money Laundering Directive forces us to verify your identity in order to receive payment for your online sales. You will only need to verify yourself once.';
 
   @override
-  String get couldNotOpenTermsAndConditions => 'Could not open Terms & Conditions link';
+  String get couldNotOpenTermsAndConditions =>
+      'Could not open Terms & Conditions link';
 
   @override
   String get byAgreementStripe => 'By continuing, I agree to the ';
 
   @override
-  String get stripeConnectedAccountAgreement => 'Stripe Connected Account Agreement';
+  String get stripeConnectedAccountAgreement =>
+      'Stripe Connected Account Agreement';
 
   @override
   String get and => ' and ';
@@ -1734,10 +1829,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stripeTermsOfService => 'Stripe Terms of Service';
 
   @override
-  String get accountInformationChanged => 'Account information changed successfully';
+  String get accountInformationChanged =>
+      'Account information changed successfully';
 
   @override
-  String get accountInformationChangedDescription => 'Your account information has been changed successfully,';
+  String get accountInformationChangedDescription =>
+      'Your account information has been changed successfully,';
 
   @override
   String get orders => 'Bookings';
@@ -1772,7 +1869,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noOrdersYet => 'No bookings yet';
 
   @override
-  String get noOrdersDescription => 'You have not made any orders yet.\nStart exploring and make your first order!';
+  String get noOrdersDescription =>
+      'You have not made any orders yet.\nStart exploring and make your first order!';
 
   @override
   String get alerts => 'Alerts';
@@ -1844,7 +1942,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTransactionsYet => 'No transactions yet';
 
   @override
-  String get transactionsHistoryMessage => 'Your transactions history will be listed here when you have any activity to show.';
+  String get transactionsHistoryMessage =>
+      'Your transactions history will be listed here when you have any activity to show.';
 
   @override
   String get loadingTransactions => 'Loading transactions';
@@ -1856,7 +1955,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get success => 'Success';
 
   @override
-  String get withdrawalRequestSuccess => 'Withdrawal request has been sent successfully.';
+  String get withdrawalRequestSuccess =>
+      'Withdrawal request has been sent successfully.';
 
   @override
   String withdrawalToBank(String method) {
@@ -1873,7 +1973,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noWithdrawalsYet => 'No withdrawals yet';
 
   @override
-  String get withdrawalHistoryMessage => 'Your withdrawal history will appear here\nwhenever you make a withdrawal';
+  String get withdrawalHistoryMessage =>
+      'Your withdrawal history will appear here\nwhenever you make a withdrawal';
 
   @override
   String amountCannotExceed(String balance) {
@@ -1892,7 +1993,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentMethodAddedTitle => 'Payment method added';
 
   @override
-  String get paymentMethodAddedSubtext => 'Your payment method has been successfully added.';
+  String get paymentMethodAddedSubtext =>
+      'Your payment method has been successfully added.';
 
   @override
   String get addPaymentMethodTitle => 'Add payment method';
@@ -1910,25 +2012,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterYourName => 'Please enter your name';
 
   @override
-  String get paymentSuccessfulReservation => 'Your payment was successful. The space is now reserved.';
+  String get paymentSuccessfulReservation =>
+      'Your payment was successful. The space is now reserved.';
 
   @override
-  String get paymentFailedRequiresAction => 'Payment failed or requires further action';
+  String get paymentFailedRequiresAction =>
+      'Payment failed or requires further action';
 
   @override
   String get connectionPending => 'Connection pending';
 
   @override
-  String get connectionPendingMessage => 'Your account connection is still pending, you will be notified when the connection is complete';
+  String get connectionPendingMessage =>
+      'Your account connection is still pending, you will be notified when the connection is complete';
 
   @override
   String get somethingWentWrongGeneric => 'Something went wrong';
 
   @override
-  String get contactSupportMessage => 'There seems to be an issue with your account. Please contact support for assistance.';
+  String get contactSupportMessage =>
+      'There seems to be an issue with your account. Please contact support for assistance.';
 
   @override
-  String get insufficientBalance => 'You do not have enough balance to withdraw';
+  String get insufficientBalance =>
+      'You do not have enough balance to withdraw';
 
   @override
   String get loading => 'Loading...';
@@ -1967,19 +2074,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservationConfirmedTitle => 'Reservation confirmed';
 
   @override
-  String get reservationConfirmedDescription => 'Your reservation has been confirmed successfully, we will update your balance shortly.';
+  String get reservationConfirmedDescription =>
+      'Your reservation has been confirmed successfully, we will update your balance shortly.';
 
   @override
   String get reservationCancelledOwnerTitle => 'Reservation cancelled';
 
   @override
-  String get reservationCancelledOwnerDescription => 'Now we will proceed to refund the total amount of reservation to the requester.';
+  String get reservationCancelledOwnerDescription =>
+      'Now we will proceed to refund the total amount of reservation to the requester.';
 
   @override
   String get reservationCancelledRequesterTitle => 'Reservation cancelled';
 
   @override
-  String get reservationCancelledRequesterDescription => 'Now we will refund the total amount of reservation to your bank account.';
+  String get reservationCancelledRequesterDescription =>
+      'Now we will refund the total amount of reservation to your bank account.';
 
   @override
   String get networkError => 'Network error';
@@ -2194,7 +2304,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccount => 'Delete account';
 
   @override
-  String get deleteAccountConfirmation => 'Are you sure you want to delete your account? This action cannot be undone.';
+  String get deleteAccountConfirmation =>
+      'Are you sure you want to delete your account? This action cannot be undone.';
 
   @override
   String get pleaseEnterYourPhoneNumber => 'Please enter your phone number';
@@ -2242,19 +2353,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get faqPublishPaidSpaceQuestion => 'How do i publish a paid space?';
 
   @override
-  String get faqPublishPaidSpaceAnswer => 'To publish a paid space, you must meet the following requirements:\n\n• Enter your vehicle information in the app so it can be used at the time of reservation.\n• Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.';
+  String get faqPublishPaidSpaceAnswer =>
+      'To publish a paid space, you must meet the following requirements:\n\n• Enter your vehicle information in the app so it can be used at the time of reservation.\n• Create an earnings account from your profile. You will need to register your tax information, which is required to receive payments in the app due to European anti-money laundering regulations.';
 
   @override
   String get faqEarnMoneyQuestion => 'How do i earn money from my paid space?';
 
   @override
-  String get faqEarnMoneyAnswer => 'To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.\n\nOnce the reservation is confirmed, the amount of your reservation — minus LetDem\'s service fees — will be transferred to you.\n\nYou can see the total amount earned in the Earnings section of your profile.';
+  String get faqEarnMoneyAnswer =>
+      'To earn money from your space, it must be reserved by another user. Once the space is reserved, you must confirm the reservation using the confirmation code provided to the user who made the booking. After you receive this code, proceed with confirming the reservation.\n\nOnce the reservation is confirmed, the amount of your reservation — minus LetDem\'s service fees — will be transferred to you.\n\nYou can see the total amount earned in the Earnings section of your profile.';
 
   @override
-  String get faqWithdrawFundsQuestion => 'How do i withdraw my funds to a personal account?';
+  String get faqWithdrawFundsQuestion =>
+      'How do i withdraw my funds to a personal account?';
 
   @override
-  String get faqWithdrawFundsAnswer => 'To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you\'ll be able to withdraw them using one of your linked bank accounts.';
+  String get faqWithdrawFundsAnswer =>
+      'To withdraw funds, they first need to be released by the payment provider. This usually takes around 10 days. Once the funds are released, they will be available in the app, and you\'ll be able to withdraw them using one of your linked bank accounts.';
 
   @override
   String get helpLetDemPointsTitle => 'How to earn LetDem Points?';
@@ -2263,55 +2378,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpLetDemPointsReserveTitle => 'Reserve a paid parking space';
 
   @override
-  String get helpLetDemPointsReserveDescription => 'to the user who reserves and pays for a space published by another user. Once this reservation is confirmed.';
+  String get helpLetDemPointsReserveDescription =>
+      'to the user who reserves and pays for a space published by another user. Once this reservation is confirmed.';
 
   @override
   String get helpLetDemPointsPublishTitle => 'Publish a free parking space';
 
   @override
-  String get helpLetDemPointsPublishDescription => 'if another user uses it and selects \"I\'ll take it\" as feedback after arriving at the location.';
+  String get helpLetDemPointsPublishDescription =>
+      'if another user uses it and selects \"I\'ll take it\" as feedback after arriving at the location.';
 
   @override
-  String get helpLetDemPointsAlertTitle => 'Publish an alert (Police, Road Closed, Accident)';
+  String get helpLetDemPointsAlertTitle =>
+      'Publish an alert (Police, Road Closed, Accident)';
 
   @override
-  String get helpLetDemPointsAlertDescription => 'if another user confirms the existence of the alert.';
+  String get helpLetDemPointsAlertDescription =>
+      'if another user confirms the existence of the alert.';
 
   @override
   String get helpLetDemPointsAdditionalNotesTitle => 'Additional Notes';
 
   @override
-  String get helpLetDemPointsAdditionalNote1 => '• The user who gives up a paid parking space doesn\'t earn points, but does earn money.';
+  String get helpLetDemPointsAdditionalNote1 =>
+      '• The user who gives up a paid parking space doesn\'t earn points, but does earn money.';
 
   @override
-  String get helpLetDemPointsAdditionalNote2 => '• In all actions, points are granted only if the contribution is useful and confirmed by another user.';
+  String get helpLetDemPointsAdditionalNote2 =>
+      '• In all actions, points are granted only if the contribution is useful and confirmed by another user.';
 
   @override
-  String get helpScheduledNotificationsTitle => 'How to create scheduled space notifications?';
+  String get helpScheduledNotificationsTitle =>
+      'How to create scheduled space notifications?';
 
   @override
-  String get helpScheduledNotificationsIntro => 'To schedule a parking notification:';
+  String get helpScheduledNotificationsIntro =>
+      'To schedule a parking notification:';
 
   @override
-  String get helpScheduledNotificationsStep1 => 'Search for your destination using the search bar on the main screen.';
+  String get helpScheduledNotificationsStep1 =>
+      'Search for your destination using the search bar on the main screen.';
 
   @override
-  String get helpScheduledNotificationsStep2 => 'Select the desired address and tap the \"Notify me about available space\" button.';
+  String get helpScheduledNotificationsStep2 =>
+      'Select the desired address and tap the \"Notify me about available space\" button.';
 
   @override
-  String get helpScheduledNotificationsStep3 => 'Configure the alert by selecting:';
+  String get helpScheduledNotificationsStep3 =>
+      'Configure the alert by selecting:';
 
   @override
-  String get helpScheduledNotificationsStep3Detail1 => '• The time range during which you want to receive notifications.';
+  String get helpScheduledNotificationsStep3Detail1 =>
+      '• The time range during which you want to receive notifications.';
 
   @override
-  String get helpScheduledNotificationsStep3Detail2 => '• The distance in meters from the selected location that should be considered as the notification area.';
+  String get helpScheduledNotificationsStep3Detail2 =>
+      '• The distance in meters from the selected location that should be considered as the notification area.';
 
   @override
-  String get helpScheduledNotificationsInfo1 => 'Once the alert is created, you can manage it from your profile in the \"Scheduled Notifications\" section, where you\'ll see all your active or expired alerts.';
+  String get helpScheduledNotificationsInfo1 =>
+      'Once the alert is created, you can manage it from your profile in the \"Scheduled Notifications\" section, where you\'ll see all your active or expired alerts.';
 
   @override
-  String get helpScheduledNotificationsInfo2 => 'Whenever a parking space is published within the configured area, you\'ll receive a notification so you can quickly head to the space.';
+  String get helpScheduledNotificationsInfo2 =>
+      'Whenever a parking space is published within the configured area, you\'ll receive a notification so you can quickly head to the space.';
 
   @override
   String get unhandledError => 'Unhandled error';
@@ -2323,10 +2453,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePaymentMethod => 'Change payment method';
 
   @override
-  String get paymentFailedDescription => 'The reservation failed because your payment didn\'t go through successfully';
+  String get paymentFailedDescription =>
+      'The reservation failed because your payment didn\'t go through successfully';
 
   @override
-  String get errorReserveSpaceDescription => 'Please try again later. If the issue persists, contact support.';
+  String get errorReserveSpaceDescription =>
+      'Please try again later. If the issue persists, contact support.';
 
   @override
   String speedLimitVoiceAlert(String speedLimit) {

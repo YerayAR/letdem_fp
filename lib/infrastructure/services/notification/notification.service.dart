@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:here_sdk/core.dart' as HERE;
 import 'package:letdem/core/extensions/user.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/confirmed_space_detail.view.dart';
 import 'package:letdem/features/activities/presentation/views/view_all.view.dart';
@@ -7,6 +9,8 @@ import 'package:letdem/features/users/presentation/views/reservations/reservatio
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 
+import '../../../common/popups/popup.dart';
+import '../../../features/activities/presentation/modals/space.popup.dart';
 import '../../../features/activities/presentation/views/spaces/reserved_space.view.dart';
 import '../../../features/map/presentation/views/route.view.dart';
 
@@ -67,14 +71,31 @@ class NotificationHandler {
 
   void _goToDestinationDetails(String spaceId) {
     print('Fetching space details for $spaceId...');
-    NavigatorHelper.to(NavigationMapScreen(
-      spaceID: spaceId,
-      latitude: null,
-      longitude: null,
-      googlePlaceID: null,
-      hideToggle: false,
-      destinationStreetName: '',
-    ));
+    NavigatorHelper.to(
+      NavigationMapScreen(
+        spaceID: spaceId,
+        latitude: null,
+        longitude: null,
+        onPremiumSpaceViewed: (space) async {
+          var currentPosition = await Geolocator.getCurrentPosition();
+          AppPopup.showBottomSheet(
+            context,
+            SpacePopupSheet(
+              space: space,
+              currentPosition: HERE.GeoCoordinates(
+                currentPosition.latitude,
+                currentPosition.longitude,
+              ),
+              onRefreshTrigger: () {},
+            ),
+          );
+          return;
+        },
+        googlePlaceID: null,
+        hideToggle: false,
+        destinationStreetName: '',
+      ),
+    );
   }
 
   void _goToReservationDetails() {
@@ -95,7 +116,8 @@ class NotificationHandler {
     } else {
       NavigatorHelper.to(
         ConfirmedSpaceReviewView(
-            payload: context.userProfile!.activeReservation!),
+          payload: context.userProfile!.activeReservation!,
+        ),
       );
     }
   }
