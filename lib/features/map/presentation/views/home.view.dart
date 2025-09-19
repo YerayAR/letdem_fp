@@ -96,24 +96,22 @@ class _HomeViewState extends State<HomeView>
     });
 
     // Handle foreground notifications (when app is open)
-    OneSignal.Notifications.addForegroundWillDisplayListener(
-      (event) {
-        event.preventDefault();
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+      event.preventDefault();
 
-        final data = event.notification.additionalData;
+      final data = event.notification.additionalData;
 
-        // Only handle specific data updates, NOT navigation
-        if (data != null && data['page_to_redirect'] != null) {
-          if (data['page_to_redirect'] == 'wallet') {
-            // Just refresh user data, don't navigate
-            context.loadUser();
-          }
-          // Add other data refresh cases here if needed
+      // Only handle specific data updates, NOT navigation
+      if (data != null && data['page_to_redirect'] != null) {
+        if (data['page_to_redirect'] == 'wallet') {
+          // Just refresh user data, don't navigate
+          context.loadUser();
         }
+        // Add other data refresh cases here if needed
+      }
 
-        event.notification.display();
-      },
-    );
+      event.notification.display();
+    });
   }
 
   @override
@@ -257,7 +255,9 @@ class _HomeViewState extends State<HomeView>
   void _setupLocationUpdates() {
     if (_mapController == null ||
         _currentPosition == null ||
-        _isListeningToLocation) return;
+        _isListeningToLocation) {
+      return;
+    }
 
     try {
       _locationEngine = LocationEngine();
@@ -304,12 +304,15 @@ class _HomeViewState extends State<HomeView>
   }
 
   void _addMyLocationToMap(Location myLocation) {
-    _locationIndicator ??= LocationIndicator()
-      ..isAccuracyVisualized = false
-      ..locationIndicatorStyle = LocationIndicatorIndicatorStyle.navigation
-      ..enable(_mapController!)
-      ..setHaloColor(
-          LocationIndicatorIndicatorStyle.navigation, Colors.transparent);
+    _locationIndicator ??=
+        LocationIndicator()
+          ..isAccuracyVisualized = false
+          ..locationIndicatorStyle = LocationIndicatorIndicatorStyle.navigation
+          ..enable(_mapController!)
+          ..setHaloColor(
+            LocationIndicatorIndicatorStyle.navigation,
+            Colors.transparent,
+          );
 
     _locationIndicator!.updateLocation(myLocation);
 
@@ -342,7 +345,9 @@ class _HomeViewState extends State<HomeView>
   void _fetchNearbyPlaces(GeoCoordinates position) {
     _lastFetchPosition = position;
     _locationWebSocketService.sendLocation(
-        position.latitude, position.longitude);
+      position.latitude,
+      position.longitude,
+    );
   }
 
   void _onRefreshPressed() {
@@ -386,7 +391,8 @@ class _HomeViewState extends State<HomeView>
       try {
         final imageData = _assetsProvider.getEventIcon(event.type);
         print(
-            "??Adding ${event.type} marker at ${event.location.point.lat}, ${event.location.point.lng}");
+          "??Adding ${event.type} marker at ${event.location.point.lat}, ${event.location.point.lng}",
+        );
         final marker = MapMarker(
           GeoCoordinates(event.location.point.lat, event.location.point.lng),
           MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
@@ -406,32 +412,35 @@ class _HomeViewState extends State<HomeView>
     });
 
     // Add pan gesture listener to detect map movement
-    _mapController!.gestures.panListener = PanListener(
-      (GestureState state, Point2D origin, Point2D translation,
-          double velocity) {
-        if (state == GestureState.begin) {
-          // User started interacting with map - disable auto-follow
-          setState(() {
-            _isUserInteracting = true;
-            _isFollowingLocation = false;
-          });
-        } else if (state == GestureState.end) {
-          setState(() {
-            _isUserInteracting = false;
-          });
-          // Get current camera position when pan ends
-          final currentCameraPosition =
-              _mapController!.camera.state.targetCoordinates;
-          _onCameraPositionChanged(currentCameraPosition);
-        }
-      },
-    );
+    _mapController!.gestures.panListener = PanListener((
+      GestureState state,
+      Point2D origin,
+      Point2D translation,
+      double velocity,
+    ) {
+      if (state == GestureState.begin) {
+        // User started interacting with map - disable auto-follow
+        setState(() {
+          _isUserInteracting = true;
+          _isFollowingLocation = false;
+        });
+      } else if (state == GestureState.end) {
+        setState(() {
+          _isUserInteracting = false;
+        });
+        // Get current camera position when pan ends
+        final currentCameraPosition =
+            _mapController!.camera.state.targetCoordinates;
+        _onCameraPositionChanged(currentCameraPosition);
+      }
+    });
   }
 
   void _pickMapMarker(Point2D touchPoint) {
     final rectangle = Rectangle2D(touchPoint, Size2D(1, 1));
-    final filter =
-        MapSceneMapPickFilter([MapSceneMapPickFilterContentType.mapItems]);
+    final filter = MapSceneMapPickFilter([
+      MapSceneMapPickFilterContentType.mapItems,
+    ]);
 
     _mapController?.pick(filter, rectangle, (result) {
       if (result == null || result.mapItems == null) return;
@@ -457,21 +466,25 @@ class _HomeViewState extends State<HomeView>
   static const double MAX_ZOOM_LEVEL =
       20.0; // More zoomed in (higher values = more zoomed in)
 
-// Add this method to set up zoom limits
+  // Add this method to set up zoom limits
   void _setupZoomLimits() {
     if (_mapController == null) return;
 
     // Set zoom range using MapCameraLimits
     _mapController!.camera.limits.zoomRange = MapMeasureRange(
-        MapMeasureKind.zoomLevel, MIN_ZOOM_LEVEL, MAX_ZOOM_LEVEL);
+      MapMeasureKind.zoomLevel,
+      MIN_ZOOM_LEVEL,
+      MAX_ZOOM_LEVEL,
+    );
   }
 
   void _onMapCreated(HereMapController controller) {
     _mapController = controller;
     _setTapGestureHandler();
 
-    _mapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay,
-        (error) {
+    _mapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay, (
+      error,
+    ) {
       if (error != null) {
         debugPrint('Map load error: $error');
         return;
@@ -503,113 +516,113 @@ class _HomeViewState extends State<HomeView>
     return isLocationLoading || isLoadingAssets
         ? const HomePageShimmer()
         : hasNoPermission
-            ? const NoMapPermissionSection()
-            : BlocConsumer<MapBloc, MapState>(
-                listener: (context, state) {
-                  // if (state is MapLoaded && _mapController != null) {
-                  //   _addMapMarkers(state.payload.spaces, state.payload.events);
-                  // }
-                },
-                builder: (context, state) {
-                  return Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      _currentPosition != null
-                          ? HereMap(onMapCreated: _onMapCreated)
-                          : const Center(child: CircularProgressIndicator()),
-                      HomeMapBottomSection(
-                        onRefreshTriggered: () {
-                          if (_currentPosition != null) {
-                            // context.read<MapBloc>().add(GetNearbyPlaces(
-                            //       queryParams: MapQueryParams(
-                            //         currentPoint:
-                            //             "${_currentPosition!.latitude},${_currentPosition!.longitude}",
-                            //         radius: 8000,
-                            //         drivingMode: false,
-                            //         options: ['spaces', 'events'],
-                            //       ),
-                            //     ));
-                          }
-                        },
-                      ),
-                      // Refresh chip on top - only shown when map is moved
-                      if (_showRefreshButton)
-                        Positioned(
-                          top: 10,
-                          child: SafeArea(
-                            child: Center(
-                              child: AnimatedOpacity(
-                                opacity: _showRefreshButton ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 300),
-                                child: GestureDetector(
-                                  onTap: _onRefreshPressed,
-                                  child: FittedBox(
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.5),
-                                              spreadRadius: 1,
-                                              blurRadius: 7,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 10),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.refresh,
-                                                color: AppColors.primary500,
-                                                size: 17),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              "Refresh",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                  ),
+        ? const NoMapPermissionSection()
+        : BlocConsumer<MapBloc, MapState>(
+          listener: (context, state) {
+            // if (state is MapLoaded && _mapController != null) {
+            //   _addMapMarkers(state.payload.spaces, state.payload.events);
+            // }
+          },
+          builder: (context, state) {
+            return Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                _currentPosition != null
+                    ? HereMap(onMapCreated: _onMapCreated)
+                    : const Center(child: CircularProgressIndicator()),
+                HomeMapBottomSection(
+                  onRefreshTriggered: () {
+                    if (_currentPosition != null) {
+                      // context.read<MapBloc>().add(GetNearbyPlaces(
+                      //       queryParams: MapQueryParams(
+                      //         currentPoint:
+                      //             "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                      //         radius: 8000,
+                      //         drivingMode: false,
+                      //         options: ['spaces', 'events'],
+                      //       ),
+                      //     ));
+                    }
+                  },
+                ),
+                // Refresh chip on top - only shown when map is moved
+                if (_showRefreshButton)
+                  Positioned(
+                    top: 10,
+                    child: SafeArea(
+                      child: Center(
+                        child: AnimatedOpacity(
+                          opacity: _showRefreshButton ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: GestureDetector(
+                            onTap: _onRefreshPressed,
+                            child: FittedBox(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 1,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.refresh,
+                                      color: AppColors.primary500,
+                                      size: 17,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "Refresh",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      // My Location button - shown when not following location
-                      if (!_isFollowingLocation && _currentPosition != null)
-                        Positioned(
-                          bottom:
-                              265, // Adjust based on your bottom section height
-                          right: 16,
-                          child: FloatingActionButton(
-                            mini: true,
-                            onPressed: _enableLocationFollowing,
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.primary500,
-                            elevation: 4,
-                            child: Icon(Icons.my_location, size: 20),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              );
+                      ),
+                    ),
+                  ),
+                // My Location button - shown when not following location
+                if (!_isFollowingLocation && _currentPosition != null)
+                  Positioned(
+                    bottom: 265, // Adjust based on your bottom section height
+                    right: 16,
+                    child: FloatingActionButton(
+                      mini: true,
+                      onPressed: _enableLocationFollowing,
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primary500,
+                      elevation: 4,
+                      child: Icon(Icons.my_location, size: 20),
+                    ),
+                  ),
+              ],
+            );
+          },
+        );
   }
 
   // ---------------------------------------------------------------------------
   // Popup Builders
   // ---------------------------------------------------------------------------
 
-  showEventPopup({
-    required Event event,
-  }) {
+  showEventPopup({required Event event}) {
     AppPopup.showBottomSheet(
       context,
       EventFeedback(event: event, currentDistance: _distanceToEvent(event)),
@@ -631,9 +644,7 @@ class _HomeViewState extends State<HomeView>
     );
   }
 
-  showSpacePopup({
-    required Space space,
-  }) {
+  showSpacePopup({required Space space}) {
     AppPopup.showBottomSheet(
       context,
       SpacePopupSheet(
@@ -641,15 +652,17 @@ class _HomeViewState extends State<HomeView>
         currentPosition: _currentPosition!,
         onRefreshTrigger: () {
           if (_currentPosition != null) {
-            context.read<MapBloc>().add(GetNearbyPlaces(
-                  queryParams: MapQueryParams(
-                    currentPoint:
-                        "${_currentPosition!.latitude},${_currentPosition!.longitude}",
-                    radius: 8000,
-                    drivingMode: false,
-                    options: ['spaces', 'events'],
-                  ),
-                ));
+            context.read<MapBloc>().add(
+              GetNearbyPlaces(
+                queryParams: MapQueryParams(
+                  currentPoint:
+                      "${_currentPosition!.latitude},${_currentPosition!.longitude}",
+                  radius: 8000,
+                  drivingMode: false,
+                  options: ['spaces', 'events'],
+                ),
+              ),
+            );
           }
         },
       ),

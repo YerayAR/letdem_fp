@@ -44,9 +44,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 class NavigationView extends StatefulWidget {
   final double destinationLat;
   final double destinationLng;
-
   final bool isNavigatingToParking;
-
   final String? parkingSpaceID;
 
   const NavigationView({
@@ -68,9 +66,16 @@ class _NavigationViewState extends State<NavigationView> {
   static const double _containerPadding = 15;
   static const double _borderRadius = 20;
   static const int _distanceTriggerThreshold = 120;
-
+  static const int DISTANCE_THREESHOLD = 5;
+  bool _isLocationEngineReady = false;
+  bool _isVisualNavigatorReady = false;
+  Timer? _locationStabilityTimer;
+  int _stableLocationCount = 0;
+  static const int _requiredStableUpdates = 3;
   DateTime? _navigationStartTime;
   bool _hasShownFatigueAlert = false;
+  bool _isMapReady = false; // NEW: Track map readiness
+  bool _isLocationReady = false; // NEW: Track location readiness
 
   HereMapController? _hereMapController;
   HERE.RoutingEngine? _routingEngine;
@@ -116,121 +121,6 @@ class _NavigationViewState extends State<NavigationView> {
   int _lastRerouteTime = 0;
   String normalManuevers = "";
 
-  int DISTANCE_THREESHOLD = 5;
-
-  // Method to initialize WebSocket connection
-  void _initializeWebSocketConnection() {
-    if (_currentLocation == null) {
-      debugPrint('⚠️ Current location is null, cannot initialize WebSocket');
-      return;
-    }
-
-    debugPrint('🔌 Initializing WebSocket connection...');
-
-    _locationWebSocketService.connectAndSendInitialLocation(
-      latitude: _currentLocation!.latitude,
-      longitude: _currentLocation!.longitude,
-      onEvent: (MapNearbyPayload payload) {
-        debugPrint(
-          '📥 Received WebSocket data: ${payload.spaces.length} spaces, ${payload.events.length} events',
-        );
-
-        // Update map with real-time data
-        if (mounted) {
-          _addMapMarkers(payload.events, payload.spaces);
-
-          // Handle alerts from WebSocket
-          // if (payload.alerts.isNotEmpty) {
-          //   for (var alert in payload.alerts) {
-          //     AlertHelper.showWarning(
-          //       context: context,
-          //       title: alert.type.toLowerCase() == "camera"
-          //           ? context.l10n.cameraAlertTitle
-          //           : context.l10n.radarAlertTitle,
-          //       subtext: alert.type.toLowerCase() == "camera"
-          //           ? context.l10n.cameraAlertMessage
-          //           : context.l10n.radarAlertMessage,
-          //     );
-          //   }
-          // }
-        }
-      },
-      onError: (error) {
-        debugPrint('❌ WebSocket error: $error');
-        // Optionally show error to user or fallback to HTTP requests
-      },
-      onDone: () {
-        debugPrint('🔌 WebSocket connection closed');
-      },
-    );
-  }
-
-  void _forceInitialLocationUpdate() async {
-    if (_visualNavigator == null || _currentLocation == null) return;
-
-    try {
-      // Create a location object with current position
-      final initialLocation = HERE.Location.withCoordinates(_currentLocation!);
-
-      // Force the visual navigator to process this location
-      _visualNavigator!.onLocationUpdated(initialLocation);
-
-      // Also update the location engine if it exists
-      if (_locationEngine != null) {
-        // Get a fresh location reading
-        final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-          timeLimit: const Duration(seconds: 10),
-        );
-
-        final freshLocation = HERE.Location.withCoordinates(
-          HERE.GeoCoordinates(position.latitude, position.longitude),
-        );
-
-        _visualNavigator!.onLocationUpdated(freshLocation);
-      }
-
-      // move camera to current location
-      _hereMapController?.camera.lookAtPointWithMeasure(
-        _currentLocation!,
-        MapMeasure(MapMeasureKind.distanceInMeters, 500),
-      );
-
-      debugPrint('✅ Forced initial location update sent to navigator');
-
-      // Set loading to false after forcing the update
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('❌ Error forcing initial location update: $e');
-    }
-  }
-
-  // Method to send location updates via WebSocket
-  void _sendLocationUpdateViaWebSocket(double latitude, double longitude) {
-    if (_locationWebSocketService.isConnected) {
-      _locationWebSocketService.sendLocation(latitude, longitude);
-    } else {
-      debugPrint('⚠️ WebSocket not connected, attempting to connect...');
-      // If not connected, try to connect first
-      _locationWebSocketService.connectAndSendInitialLocation(
-        latitude: latitude,
-        longitude: longitude,
-        onEvent: (MapNearbyPayload payload) {
-          if (mounted) {
-            _addMapMarkers(payload.events, payload.spaces);
-          }
-        },
-        onError: (error) {
-          debugPrint('❌ WebSocket error during reconnect: $error');
-        },
-      );
-    }
-  }
-
   final Map<String, IconData> _directionIcons = {
     'turn right': Icons.turn_right,
     'turn left': Icons.turn_left,
@@ -241,6 +131,8 @@ class _NavigationViewState extends State<NavigationView> {
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
   final Map<MapMarker, Space> _spaceMarkers = {};
   final Map<MapMarker, Event> _eventMarkers = {};
+  final Map<String, MapMarker> _spaceMarkersById = {};
+  final Map<String, MapMarker> _eventMarkersById = {};
 
   final speech = SpeechService();
 
@@ -255,13 +147,6 @@ class _NavigationViewState extends State<NavigationView> {
     _actualDestinationLat = widget.destinationLat;
     _actualDestinationLng = widget.destinationLng;
 
-    // _lifecycleListener = AppLifecycleListener(
-    //   onDetach: _cleanupNavigation,
-    //   onHide: _cleanupNavigation,
-    //   onPause: _cleanupNavigation,
-    //   onRestart: _startNavigation,
-    // );
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _configureTTSLanguage();
       _requestLocationPermission();
@@ -271,185 +156,14 @@ class _NavigationViewState extends State<NavigationView> {
   void _configureTTSLanguage() {
     String languageCode = Localizations.localeOf(context).languageCode;
     speech.setLanguage(languageCode);
-
     debugPrint('🗣️ TTS language configured to: $languageCode');
-  }
-
-  void _setupSpeedLimitListener() {
-    if (_visualNavigator == null) return;
-
-    debugPrint('🚗 Setting up speed limit listener...');
-
-    _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
-      HERE.SpeedLimit? speedLimit,
-    ) {
-      setState(() {
-        if (speedLimit == null) {
-          debugPrint('⚠️ No speed limit information available');
-          _roadSpeedLimit = null;
-        } else {
-          debugPrint(
-            '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
-          );
-          _roadSpeedLimit = speedLimit;
-        }
-      });
-    });
-
-    debugPrint('✅ Speed limit listener set up successfully');
-  }
-
-  Widget _buildSpeedLimitIndicator() {
-    return Positioned(
-      top: MediaQuery.of(context).padding.top + 120,
-      right: _mapPadding,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
-              decoration: BoxDecoration(
-                color:
-                    _isOverSpeedLimit
-                        ? Colors.redAccent.withOpacity(
-                          0.2,
-                        ) // Red background when overspending
-                        : Colors.orange.shade50, // Normal orange background
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    (_currentSpeed * 3.6).round().toString(),
-                    style: TextStyle(
-                      // CHANGE: Use red text when over speeding, orange when normal
-                      color:
-                          _isOverSpeedLimit
-                              ? Colors.redAccent.withValues(
-                                alpha: 0.8,
-                              ) // Red text when over speeding
-                              : Colors.orange.shade700, // Normal orange text
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    ),
-                  ),
-                  Text(
-                    context.l10n.kmPerHour,
-                    style: TextStyle(
-                      color:
-                          _isOverSpeedLimit
-                              ? Colors.redAccent.withValues(
-                                alpha: 0.8,
-                              ) // Red text when over speeding
-                              : Colors.orange.shade700, // Normal orange text
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                // CHANGE: Make speed limit sign border red when over speeding
-                border: Border.all(
-                  color: Colors.red,
-                  width:
-                      _isOverSpeedLimit
-                          ? 3
-                          : 2, // Thicker border when over speeding
-                ),
-              ),
-              child: Center(
-                child:
-                    _roadSpeedLimit != null &&
-                            _roadSpeedLimit!.speedLimitInMetersPerSecond != null
-                        ? Text(
-                          "${(_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
-                          style: TextStyle(
-                            // CHANGE: Make speed limit text red when over speeding
-                            color:
-                                _isOverSpeedLimit ? Colors.red : Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        )
-                        : Icon(
-                          Icons.speed,
-                          color: Colors.grey.shade400,
-                          size: 18,
-                        ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showSpeedLimitAlert() {
-    if (_roadSpeedLimit == null || !context.isSpeedAlertEnabled) return;
-
-    final speedLimitKmh =
-        (_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
-
-    AlertHelper.showWarning(
-      context: context,
-      title: context.l10n.speedLimitAlert,
-      subtext: context.l10n.speedLimitWarning,
-    );
-
-    Timer.periodic(const Duration(seconds: 3), (timer) {
-      timer.cancel();
-    });
-
-    if (!_isMuted) {
-      speech.speak(context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()));
-    }
-  }
-
-  putParkingSpacesOnMap() {
-    if (_currentLocation == null) return;
-
-    context.read<MapBloc>().add(
-      GetNearbyPlaces(
-        queryParams: MapQueryParams(
-          currentPoint:
-              "${_currentLocation?.latitude},${_currentLocation?.longitude}",
-          previousPoint:
-              "${_currentLocation?.latitude},${_currentLocation?.longitude}",
-          radius: 1000,
-          drivingMode: true,
-          options: ['spaces', 'events', 'alerts'],
-        ),
-      ),
-    );
   }
 
   @override
   void dispose() {
     debugPrint('🗑️ Disposing NavigationView...');
-
+    _locationStabilityTimer?.cancel();
+    _locationStabilityTimer = null;
     // Cancel all timers first
     _rerouteDebounceTimer?.cancel();
     _rerouteDebounceTimer = null;
@@ -457,11 +171,11 @@ class _NavigationViewState extends State<NavigationView> {
     // Cleanup navigation with better error handling
     _cleanupNavigation();
 
-    // Dispose speech service
-
     // Clear all map markers
     _spaceMarkers.clear();
     _eventMarkers.clear();
+    _spaceMarkersById.clear();
+    _eventMarkersById.clear();
 
     // Dispose notifiers
     _distanceNotifier.dispose();
@@ -496,88 +210,141 @@ class _NavigationViewState extends State<NavigationView> {
       return;
     }
 
-    setState(() => _isLoading = false);
+    // Get initial location
+    await _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      var currentLocationGeo = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+
+      debugPrint(
+        '📍 Current location: ${currentLocationGeo.latitude}, ${currentLocationGeo.longitude}',
+      );
+
+      _currentLocation = HERE.GeoCoordinates(
+        currentLocationGeo.latitude,
+        currentLocationGeo.longitude,
+      );
+
+      _lastLatitude = currentLocationGeo.latitude;
+      _lastLongitude = currentLocationGeo.longitude;
+      _distanceTraveled = 0;
+      _lastTriggerDistance = 0;
+
+      setState(() {
+        _isLocationReady = true;
+        _isLoading = false;
+      });
+
+      // Initialize WebSocket connection after getting location
+      _initializeWebSocketConnection();
+
+      // ❌ REMOVE THIS LINE:
+      // _attemptToStartNavigation();
+    } catch (e) {
+      debugPrint('❌ Error getting current location: $e');
+      setState(() {
+        _errorMessage = "Failed to get current location";
+        _isLoading = false;
+        _isLocationReady = false; // Make sure to reset this on error
+      });
+    }
+  }
+
+  void _attemptToStartNavigation() {
+    debugPrint('🚀 Attempting to start navigation...');
+    debugPrint('  - Is navigating: $_isNavigating');
+    debugPrint('  - Is loading: $_isLoading');
+    debugPrint('  - Map ready: $_isMapReady');
+    debugPrint('  - Location ready: $_isLocationReady');
+    debugPrint('  - Location engine ready: $_isLocationEngineReady');
+    debugPrint('  - Current location: ${_currentLocation != null}');
+
+    // ✅ ADD THIS CHECK:
+    if (_isNavigating || _isLoading) {
+      debugPrint('⚠️ Navigation already in progress, skipping...');
+      return;
+    }
+    // Check if all prerequisites are met
+    if (!_isMapReady || !_isLocationReady || !_isLocationEngineReady) {
+      debugPrint('⏳ Not all prerequisites ready, waiting...');
+      return;
+    }
+    if (_isMapReady &&
+        _isLocationReady &&
+        _isLocationEngineReady &&
+        _currentLocation != null) {
+      debugPrint('🚀 All systems ready, starting navigation...');
+      _calculateRoute(
+        _currentLocation!,
+        HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
+      );
+    } else {
+      debugPrint(
+        '⏳ Waiting for prerequisites: Map ready: $_isMapReady, Location ready: $_isLocationReady, Engine ready: $_isLocationEngineReady',
+      );
+    }
   }
 
   void _onMapCreated(HereMapController hereMapController) async {
     debugPrint('🗺️ Map created!');
+
+    setState(() => _isLoading = true);
+
     await _assetsProvider.loadAssets();
     _hereMapController = hereMapController;
+
+    // Configure map settings
+    _configureMapSettings();
+
+    // Load map scene
+    _loadMapScene();
+  }
+
+  void _configureMapSettings() {
+    if (_hereMapController == null) return;
 
     _hereMapController?.gestures.enableDefaultAction(GestureType.pan);
     _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
     _hereMapController?.gestures.enableDefaultAction(GestureType.twoFingerPan);
-    _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
 
-    _hereMapController?.mapScene.enableFeatures({
+    // Enable map features
+    final features = {
       MapFeatures.buildingFootprints: MapFeatureModes.buildingFootprintsAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow,
-    });
-
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.trafficIncidents: MapFeatureModes.trafficIncidentsAll,
-    });
-
-    // Additional traffic-related features
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll,
-    });
-
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.vehicleRestrictions:
           MapFeatureModes.vehicleRestrictionsActiveAndInactive,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.contours: MapFeatureModes.contoursAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.congestionZones: MapFeatureModes.congestionZonesAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.environmentalZones: MapFeatureModes.environmentalZonesAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.landmarks: MapFeatureModes.landmarksTextured,
-    });
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.shadows: MapFeatureModes.shadowsAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
       MapFeatures.safetyCameras: MapFeatureModes.defaultMode,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.shadows: MapFeatureModes.shadowsAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.terrain: MapFeatureModes.defaultMode,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.trafficFlow: MapFeatureModes.trafficIncidentsAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.lowSpeedZones: MapFeatureModes.lowSpeedZonesAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.ambientOcclusion: MapFeatureModes.ambientOcclusionAll,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.vehicleRestrictions:
-          MapFeatureModes.vehicleRestrictionsActiveAndInactive,
-    });
-    _hereMapController?.mapScene.enableFeatures({
-      MapFeatures.contours: MapFeatureModes.contoursAll,
-    });
+    };
+
+    for (final entry in features.entries) {
+      _hereMapController?.mapScene.enableFeatures({entry.key: entry.value});
+    }
+
+    // Set up gesture listeners
+    _setupGestureListeners();
+
+    // Add destination marker
+    _addInitialDestinationMarker();
+  }
+
+  void _setupGestureListeners() {
     _hereMapController?.gestures.tapListener = TapListener((
       HERE.Point2D touchPoint,
     ) {
       _pickMapMarker(touchPoint);
     });
-    // add map marker for destination
+
     _hereMapController?.gestures.panListener = PanListener((
       GestureState state,
       HERE.Point2D point1,
@@ -595,31 +362,19 @@ class _NavigationViewState extends State<NavigationView> {
         }
       }
     });
-
-    _loadMapScene();
   }
 
-  void _toggleCameraTracking() {
-    if (_visualNavigator == null) return;
-
-    setState(() {
-      _isCameraLocked = !_isCameraLocked;
-      _isUserPanning = false;
-    });
-
-    if (_isCameraLocked) {
-      _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
-      debugPrint('🔒 Camera tracking re-enabled');
-    } else {
-      _visualNavigator!.cameraBehavior = null;
-      debugPrint('🔓 Camera tracking disabled');
-    }
+  void _addInitialDestinationMarker() {
+    var icon = _assetsProvider.destinationMarkerLarge;
+    final marker = MapMarker(
+      HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(marker);
   }
 
   void _loadMapScene() {
     if (_hereMapController == null) return;
-
-    setState(() => _isLoading = true);
 
     _hereMapController!.mapScene.loadSceneForMapScheme(MapScheme.normalDay, (
       error,
@@ -635,15 +390,824 @@ class _NavigationViewState extends State<NavigationView> {
 
       debugPrint('✅ Map scene loaded.');
 
+      // Set initial camera position
+      MapMeasure mapMeasureZoom = MapMeasure(
+        MapMeasureKind.distanceInMeters,
+        _initialZoomDistanceInMeters,
+      );
+
+      _hereMapController!.camera.lookAtPointWithMeasure(
+        HERE.GeoCoordinates(widget.destinationLat, widget.destinationLng),
+        mapMeasureZoom,
+      );
+
+      // Initialize location engine
       _initLocationEngine();
-      _startNavigation();
+
+      // ❌ REMOVE: setState(() { _isMapReady = true; });
+      // ❌ REMOVE: _attemptToStartNavigation();
     });
+  }
+
+  void _waitForLocationEngineStability() {
+    debugPrint('⏳ Waiting for location engine stability...');
+
+    _locationStabilityTimer = Timer.periodic(
+      const Duration(milliseconds: 500),
+      (timer) {
+        if (_currentLocation != null) {
+          _stableLocationCount++;
+          debugPrint('📍 Stable location count: $_stableLocationCount');
+
+          if (_stableLocationCount >= _requiredStableUpdates) {
+            timer.cancel();
+            setState(() {
+              _isLocationEngineReady = true;
+              _isMapReady = true;
+            });
+            debugPrint(
+              '✅ Location engine is stable, attempting navigation start',
+            );
+            _attemptToStartNavigation();
+          }
+        } else {
+          _stableLocationCount = 0; // Reset if we lose location
+        }
+      },
+    );
+  }
+
+  void _initLocationEngine() {
+    debugPrint('🛰️ Initializing Location Engine...');
+    try {
+      _locationEngine = HERE.LocationEngine();
+      debugPrint('✅ Location Engine initialized.');
+
+      // Don't set _isMapReady here anymore - wait for stability
+      _waitForLocationEngineStability();
+    } on InstantiationException {
+      debugPrint('❌ Initialization of LocationEngine failed.');
+      setState(() {
+        _errorMessage = context.l10n.failedToInitializeLocation;
+        _isLoading = false;
+        _isMapReady = false;
+        _isLocationEngineReady = false;
+      });
+    }
+  }
+
+  void _calculateRoute(
+    HERE.GeoCoordinates start,
+    HERE.GeoCoordinates destination,
+  ) {
+    debugPrint('🧭 Calculating route...');
+    debugPrint('📍 Start: ${start.latitude}, ${start.longitude}');
+    debugPrint(
+      '🎯 Destination: ${destination.latitude}, ${destination.longitude}',
+    );
+
+    setState(() => _isLoading = true);
+
+    // Initialize routing engine if needed
+    if (_routingEngine == null) {
+      try {
+        _routingEngine = HERE.RoutingEngine();
+        debugPrint('✅ Routing Engine initialized.');
+      } on InstantiationException {
+        debugPrint('❌ Initialization of RoutingEngine failed.');
+        setState(() {
+          _errorMessage = "Failed to initialize routing";
+          _isLoading = false;
+        });
+        return;
+      }
+    }
+
+    HERE.Waypoint startWaypoint = HERE.Waypoint(start);
+    HERE.Waypoint destinationWaypoint = HERE.Waypoint(destination);
+
+    final carOptions = HERE.CarOptions();
+    carOptions.routeOptions.enableTolls = true;
+    carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
+
+    _routingEngine!.calculateCarRoute(
+      [startWaypoint, destinationWaypoint],
+      carOptions,
+      (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+        if (routingError == null && routeList != null && routeList.isNotEmpty) {
+          HERE.Route calculatedRoute = routeList.first;
+
+          _totalRouteTime = calculatedRoute.duration.inSeconds;
+          _distanceNotifier.value = calculatedRoute.lengthInMeters;
+
+          _addDestinationMarker(calculatedRoute);
+          _setMapCameraFocus();
+
+          setState(() {
+            _isNavigating = true;
+            _isLoading = false;
+          });
+
+          // IMPORTANT: Set navigation start time here
+          _navigationStartTime = DateTime.now();
+          debugPrint('🕐 Navigation started at: $_navigationStartTime');
+
+          debugPrint('✅ Route calculated successfully');
+          _startGuidance(calculatedRoute);
+        } else {
+          final error = routingError?.toString() ?? "Unknown error";
+          debugPrint('❌ Error while calculating route: $error');
+          setState(() {
+            _errorMessage = context.l10n.navigationError;
+            _isLoading = false;
+          });
+        }
+      },
+    );
+  }
+
+  void _startGuidance(HERE.Route route) {
+    if (_hereMapController == null) {
+      _handleNavigationSetupError('Map controller not ready');
+      return;
+    }
+
+    debugPrint('🧭 Starting visual guidance...');
+    _configureTTSLanguage();
+
+    try {
+      // Initialize visual navigator
+      _visualNavigator = HERE.VisualNavigator();
+      debugPrint('✅ VisualNavigator initialized.');
+
+      // CRITICAL: Set the route FIRST
+      _visualNavigator!.route = route;
+      debugPrint('✅ Route set on visual navigator');
+
+      // Start rendering
+      _visualNavigator!.startRendering(_hereMapController!);
+      debugPrint('📡 Started rendering navigator.');
+
+      // Mark visual navigator as ready
+      setState(() {
+        _isVisualNavigatorReady = true;
+      });
+
+      // Add a small delay to ensure rendering is stable
+      Future.delayed(const Duration(seconds: 2), () {
+        if (_visualNavigator != null && mounted) {
+          _setupNavigationWithStableConnection();
+          debugPrint('✅ Navigation guidance setup completed');
+        }
+      });
+    } on InstantiationException catch (e) {
+      debugPrint('❌ Initialization of VisualNavigator failed: $e');
+      _handleNavigationSetupError('Failed to initialize navigation: $e');
+    } catch (e) {
+      debugPrint('❌ Unexpected error starting guidance: $e');
+      _handleNavigationSetupError('Unexpected navigation error: $e');
+    }
+  }
+  // void _setupNavigationWithStableConnection() {
+  //   debugPrint('🔧 Setting up navigation with stable connection...');
+  //
+  //   // Setup listeners first
+  //   _setupNavigationListeners();
+  //   _setupRouteDeviationListener();
+  //
+  //   // Setup location source with callback for when it's ready
+  //   _setupLocationSourceWithCallback(_visualNavigator!, () {
+  //     debugPrint('✅ Location source is connected and stable');
+  //
+  //     // Now setup camera behavior
+  //     if (_isCameraLocked) {
+  //       _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
+  //     }
+  //
+  //     // Set camera orientation for 3D navigation view
+  //     _hereMapController!.camera.setOrientationAtTarget(
+  //       HERE.GeoOrientationUpdate(0, 65),
+  //     );
+  //
+  //     // Force initial location update after everything is ready
+  //     _forceInitialLocationUpdate();
+  //
+  //     debugPrint('✅ Navigation guidance started successfully');
+  //   });
+  // }
+
+  void _setupNavigationWithStableConnection() {
+    debugPrint('🔧 Setting up navigation with stable connection...');
+
+    // Setup route deviation listener first
+    _setupRouteDeviationListener();
+
+    // Start location engine
+    _startLocationEngineForNavigation();
+
+    // IMPORTANT: Delay setting up progress/instruction listeners
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (_visualNavigator != null && mounted) {
+        _setupNavigationListeners();
+        debugPrint('🎯 Navigation listeners set up after delay');
+      }
+    });
+  }
+
+  void _startLocationEngineForNavigation() {
+    debugPrint('📍 Starting location engine for navigation...');
+
+    if (_locationEngine == null || _visualNavigator == null) {
+      debugPrint('❌ Location engine or visual navigator is null');
+      _handleNavigationSetupError(
+        'Critical navigation components not initialized',
+      );
+      return;
+    }
+
+    try {
+      // Create a dedicated location listener for the visual navigator
+      _locationEngine!.addLocationListener(
+        HERE.LocationListener((HERE.Location location) {
+          debugPrint('📍 NAVIGATION LOCATION UPDATE:');
+          debugPrint('  - Lat: ${location.coordinates.latitude}');
+          debugPrint('  - Lng: ${location.coordinates.longitude}');
+          debugPrint('  - Accuracy: ${location.horizontalAccuracyInMeters}');
+
+          // Update current location state
+          _currentLocation = location.coordinates;
+          double? speed = location.speedInMetersPerSecond;
+
+          if (mounted) {
+            setState(() {
+              _currentSpeed = speed ?? 0;
+              _checkSpeedLimit();
+            });
+          }
+
+          // Update distance tracking
+          if (_lastLatitude == 0 && _lastLongitude == 0) {
+            _lastLatitude = location.coordinates.latitude;
+            _lastLongitude = location.coordinates.longitude;
+          }
+          _checkDistanceTrigger(
+            location.coordinates.latitude,
+            location.coordinates.longitude,
+          );
+
+          // CRITICAL: Send location update to visual navigator
+          try {
+            _visualNavigator!.onLocationUpdated(location);
+            debugPrint('✅ Location sent to visual navigator successfully');
+          } catch (e) {
+            debugPrint('❌ Error sending location to visual navigator: $e');
+          }
+        }),
+      );
+
+      // Start the location engine
+      _locationEngine!.startWithLocationAccuracy(
+        HERE.LocationAccuracy.navigation,
+      );
+
+      // Setup camera behavior immediately (don't wait for callback)
+      _setupCameraBehavior();
+
+      debugPrint('✅ Location engine started for navigation');
+    } catch (e) {
+      debugPrint('❌ Failed to start location engine for navigation: $e');
+      _handleNavigationSetupError('Failed to start location tracking: $e');
+    }
+  }
+
+  void _setupCameraBehavior() {
+    if (_visualNavigator == null || _hereMapController == null) return;
+
+    try {
+      // Setup camera behavior
+      if (_isCameraLocked) {
+        _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
+        debugPrint('📷 Camera behavior set to fixed');
+      }
+
+      // Set camera orientation for 3D navigation view
+      _hereMapController!.camera.setOrientationAtTarget(
+        HERE.GeoOrientationUpdate(0, 65),
+      );
+      debugPrint('📷 Camera orientation set for navigation');
+
+      // Force initial camera position if we have current location
+      if (_currentLocation != null) {
+        _hereMapController!.camera.lookAtPointWithMeasure(
+          _currentLocation!,
+          MapMeasure(MapMeasureKind.distanceInMeters, 500),
+        );
+        debugPrint('📷 Camera positioned at current location');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error setting up camera behavior: $e');
+    }
+  }
+
+  void _handleNavigationSetupError(String errorMessage) {
+    debugPrint('❌ Navigation setup error: $errorMessage');
+
+    if (mounted) {
+      setState(() {
+        _errorMessage = errorMessage;
+        _isNavigating = false;
+        _isLoading = false;
+        _isVisualNavigatorReady = false;
+      });
+    }
+  }
+
+  void _setupNavigationListeners() {
+    DateTime lastUpdateTime = DateTime.now();
+
+    _visualNavigator!.routeProgressListener = HERE.RouteProgressListener((
+      HERE.RouteProgress routeProgress,
+    ) {
+      debugPrint('🎯 ROUTE PROGRESS UPDATE RECEIVED'); // Add this debug line
+
+      final now = DateTime.now();
+      HERE.SectionProgress lastSectionProgress =
+          routeProgress.sectionProgress.last;
+      int remainingDistance = lastSectionProgress.remainingDistanceInMeters;
+
+      if (now.difference(lastUpdateTime).inMilliseconds < 500) {
+        return; // Throttle updates
+      }
+
+      if (!_isMuted &&
+          normalManuevers != _lastSpokenInstruction &&
+          normalManuevers.isNotEmpty) {
+        _lastSpokenInstruction = normalManuevers;
+        speech.speak(normalManuevers, context);
+      }
+
+      if (routeProgress.maneuverProgress.isNotEmpty) {
+        _nextManuoverDistance =
+            routeProgress.maneuverProgress.first.remainingDistanceInMeters
+                .floor();
+      }
+
+      final remainingDurationInSeconds =
+          lastSectionProgress.remainingDuration.inSeconds;
+      _distanceNotifier.value = remainingDistance;
+
+      bool isAtDestination = remainingDistance <= DISTANCE_THREESHOLD;
+      bool isParkingNavigation =
+          _currentSpace != null || widget.isNavigatingToParking;
+
+      if (isAtDestination && !_hasShownArrivalNotification) {
+        debugPrint('✅ Arrived at destination!');
+        _handleArrival(isParkingNavigation);
+      }
+
+      lastUpdateTime = now;
+
+      if (mounted) {
+        setState(() {
+          _totalRouteTime = remainingDurationInSeconds;
+        });
+
+        _checkFatigueAlert();
+      }
+    });
+
+    _visualNavigator!.eventTextListener = HERE.EventTextListener((
+      HERE.EventText eventText,
+    ) {
+      debugPrint('🗣️ EVENT TEXT UPDATE RECEIVED'); // Add this debug line
+
+      String? streetName = getStreetNameFromManeuver(
+        eventText.maneuverNotificationDetails!.maneuver,
+      );
+
+      debugPrint("🗣️ Voice maneuver text: $streetName");
+      if (mounted) {
+        setState(() {
+          _navigationInstruction = streetName;
+          normalManuevers = eventText.text;
+        });
+      }
+    });
+
+    _setupSpeedLimitListener();
+  }
+
+  void _handleArrival(bool isParkingNavigation) {
+    setState(() {
+      _hasShownArrivalNotification = true;
+    });
+
+    if (!isParkingNavigation) {
+      AppPopup.showDialogSheet(
+        context,
+        ArrivalNotificationWidget(
+          onClose: () {
+            NavigatorHelper.pop();
+          },
+        ),
+      );
+    } else if (!_hasShownParkingRating && !_isPopupDisplayed) {
+      _showParkingRatingDialog();
+    }
+
+    if (!isParkingNavigation) {
+      _showToast(
+        context.l10n.arrivedAtDestination,
+        backgroundColor: AppColors.green600,
+      );
+      putParkingSpacesOnMap();
+    }
+  }
+
+  void _showParkingRatingDialog() {
+    setState(() {
+      _hasShownParkingRating = true;
+      _isPopupDisplayed = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted && _currentSpace != null) {
+        if (_currentSpace!.isPremium) {
+          AppPopup.showBottomSheet(
+            context,
+            SpacePopupSheet(
+              space: _currentSpace!,
+              currentPosition: HERE.GeoCoordinates(
+                _currentLocation!.latitude,
+                _currentLocation!.longitude,
+              ),
+              onRefreshTrigger: () {
+                NavigatorHelper.pop();
+                _isPopupDisplayed = false;
+                _hasShownParkingRating = false;
+              },
+            ),
+          );
+        } else {
+          AppPopup.showBottomSheet(
+            context,
+            ParkingRatingWidget(
+              isOwner: _currentSpace!.isOwner,
+              spaceID: _currentSpace!.id,
+              onSubmit: () {
+                NavigatorHelper.pop();
+                _isPopupDisplayed = false;
+                _hasShownParkingRating = false;
+              },
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _checkFatigueAlert() {
+    if (context.isFatigueAlertEnabled &&
+        _navigationStartTime != null &&
+        !_hasShownFatigueAlert &&
+        DateTime.now().difference(_navigationStartTime!).inSeconds >= 10800) {
+      _hasShownFatigueAlert = true;
+      AlertHelper.showWarning(
+        context: context,
+        title: context.l10n.fatigueAlertTitle,
+        subtext: context.l10n.fatigueAlertMessage,
+      );
+
+      if (!_isMuted) {
+        speech.speak(context.l10n.fatigueAlertVoice, context);
+      }
+    }
+  }
+
+  void _checkSpeedLimit() {
+    if (_currentSpeed > 0 && _roadSpeedLimit != null) {
+      final buffer = _roadSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
+      _isOverSpeedLimit =
+          _currentSpeed >
+          (_roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer);
+
+      if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
+        _showSpeedLimitAlert();
+        _isSpeedLimitAlertShown = true;
+      } else if (!_isOverSpeedLimit) {
+        _isSpeedLimitAlertShown = false;
+      }
+    }
+  }
+
+  void _forceInitialLocationUpdate() async {
+    if (_visualNavigator == null || _currentLocation == null) return;
+
+    try {
+      // Create a location object with current position
+      final initialLocation = HERE.Location.withCoordinates(_currentLocation!);
+
+      // Force the visual navigator to process this location
+      _visualNavigator!.onLocationUpdated(initialLocation);
+
+      // Move camera to current location
+      _hereMapController?.camera.lookAtPointWithMeasure(
+        _currentLocation!,
+        MapMeasure(MapMeasureKind.distanceInMeters, 500),
+      );
+
+      debugPrint('✅ Forced initial location update sent to navigator');
+    } catch (e) {
+      debugPrint('❌ Error forcing initial location update: $e');
+    }
+  }
+
+  void _setupSpeedLimitListener() {
+    if (_visualNavigator == null) return;
+
+    debugPrint('🚗 Setting up speed limit listener...');
+
+    _visualNavigator!.speedLimitListener = HERE.SpeedLimitListener((
+      HERE.SpeedLimit? speedLimit,
+    ) {
+      if (speedLimit == null) {
+        debugPrint('⚠️ No speed limit information available');
+        setState(() {
+          _roadSpeedLimit = null;
+        });
+        return;
+      }
+
+      debugPrint(
+        '🛑 Speed limit updated: ${speedLimit.speedLimitInMetersPerSecond} m/s',
+      );
+
+      setState(() {
+        _roadSpeedLimit = speedLimit;
+        _checkSpeedLimit();
+      });
+    });
+
+    debugPrint('✅ Speed limit listener set up successfully');
+  }
+
+  void _showSpeedLimitAlert() {
+    if (_roadSpeedLimit == null || !context.isSpeedAlertEnabled) return;
+
+    final speedLimitKmh =
+        (_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round();
+
+    AlertHelper.showWarning(
+      context: context,
+      title: context.l10n.speedLimitAlert,
+      subtext: context.l10n.speedLimitWarning,
+    );
+
+    if (!_isMuted) {
+      speech.speak(
+        context.l10n.speedLimitVoiceAlert(speedLimitKmh.toString()),
+        context,
+      );
+    }
+  }
+
+  void _setupRouteDeviationListener() {
+    if (_visualNavigator == null) return;
+
+    debugPrint('🛰️ Setting up route deviation listener...');
+
+    _visualNavigator!.routeDeviationListener = HERE.RouteDeviationListener((
+      HERE.RouteDeviation routeDeviation,
+    ) {
+      debugPrint('🛰️ Route deviation detected');
+
+      // CRITICAL FIX: Add startup grace period and stricter deviation criteria
+      if (_navigationStartTime == null) {
+        _navigationStartTime = DateTime.now();
+        debugPrint('🕐 Navigation start time recorded');
+      }
+
+      // Grace period: Don't recalculate for first 30 seconds or if recently recalculated
+      final timeSinceStart =
+          DateTime.now().difference(_navigationStartTime!).inSeconds;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final timeSinceLastReroute = now - _lastRerouteTime;
+
+      if (timeSinceStart < 30) {
+        debugPrint(
+          '⏳ Within startup grace period (${timeSinceStart}s), ignoring deviation',
+        );
+        return;
+      }
+
+      if (_isRecalculatingRoute) {
+        debugPrint('⏳ Already recalculating route. Skipping...');
+        return;
+      }
+
+      if (timeSinceLastReroute < 10000) {
+        // Increased from 5s to 10s
+        debugPrint(
+          '⏳ Too soon since last reroute (${timeSinceLastReroute}ms), ignoring',
+        );
+        return;
+      }
+
+      // More stringent deviation criteria
+      final minimumDeviationDistance = 50; // meters
+      final distanceFromRoute =
+          routeDeviation.traveledDistanceOnLastSectionInMeters?.toInt() ?? 0;
+      final remainingRouteDistance = _distanceNotifier.value;
+
+      debugPrint('📏 Deviation analysis:');
+      debugPrint('  - Distance from route: ${distanceFromRoute}m');
+      debugPrint('  - Remaining route distance: ${remainingRouteDistance}m');
+      debugPrint(
+        '  - Minimum deviation threshold: ${minimumDeviationDistance}m',
+      );
+
+      // Only recalculate if:
+      // 1. Far enough from destination (>200m instead of >50m)
+      // 2. Significant deviation (>50m from route)
+      // 3. Not a temporary GPS fluctuation
+      bool isSignificantDeviation =
+          distanceFromRoute >= minimumDeviationDistance;
+      bool isFarFromDestination = remainingRouteDistance > 200;
+      bool shouldRecalculate = isSignificantDeviation && isFarFromDestination;
+
+      if (shouldRecalculate) {
+        debugPrint(
+          '⚠️ Significant deviation confirmed, recalculating route...',
+        );
+
+        _rerouteDebounceTimer?.cancel();
+        _isRecalculatingRoute = true;
+        _lastRerouteTime = now;
+
+        _showToast(
+          context.l10n.recalculatingRoute,
+          backgroundColor: AppColors.red500,
+        );
+
+        // Add delay to prevent rapid recalculation
+        _rerouteDebounceTimer = Timer(const Duration(milliseconds: 2000), () {
+          if (_isRecalculatingRoute && mounted) {
+            _recalculateRouteFromCurrentLocation(
+              routeDeviation.currentLocation.originalLocation.coordinates,
+            );
+          }
+        });
+      } else {
+        debugPrint('✅ Deviation not significant enough for recalculation');
+        debugPrint('  - Significant deviation: $isSignificantDeviation');
+        debugPrint('  - Far from destination: $isFarFromDestination');
+      }
+    });
+
+    debugPrint('✅ Route deviation listener setup completed');
+  }
+
+  void _recalculateRouteFromCurrentLocation(
+    HERE.GeoCoordinates currentPosition,
+  ) {
+    if (_routingEngine == null || !mounted) {
+      debugPrint(
+        '❌ Cannot recalculate: routing engine null or widget disposed',
+      );
+      setState(() {
+        _isRecalculatingRoute = false;
+      });
+      return;
+    }
+
+    try {
+      debugPrint(
+        '🧭 Recalculating route from: ${currentPosition.latitude}, ${currentPosition.longitude}',
+      );
+
+      HERE.Waypoint startWaypoint = HERE.Waypoint(currentPosition);
+      HERE.Waypoint destinationWaypoint = HERE.Waypoint(
+        HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
+      );
+
+      final carOptions = HERE.CarOptions();
+      carOptions.routeOptions.enableTolls = true;
+      carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
+
+      _routingEngine!.calculateCarRoute(
+        [startWaypoint, destinationWaypoint],
+        carOptions,
+        (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+          if (!mounted) return;
+
+          if (routingError == null &&
+              routeList != null &&
+              routeList.isNotEmpty) {
+            HERE.Route calculatedRoute = routeList.first;
+
+            debugPrint('✅ Route recalculated successfully');
+            debugPrint(
+              '  - New route length: ${calculatedRoute.lengthInMeters}m',
+            );
+            debugPrint(
+              '  - New route duration: ${calculatedRoute.duration.inMinutes}min',
+            );
+
+            if (_visualNavigator != null && mounted) {
+              // Update the visual navigator with new route
+              _visualNavigator!.route = calculatedRoute;
+
+              // Update UI state
+              _totalRouteTime = calculatedRoute.duration.inSeconds;
+              _distanceNotifier.value = calculatedRoute.lengthInMeters;
+
+              // Update destination marker
+              _addDestinationMarker(calculatedRoute);
+
+              setState(() {
+                _isNavigating = true;
+                _isRecalculatingRoute = false;
+              });
+
+              debugPrint('✅ Visual navigator updated with new route');
+            }
+          } else {
+            final error = routingError?.toString() ?? "Unknown routing error";
+            debugPrint('❌ Route recalculation failed: $error');
+
+            setState(() {
+              _isRecalculatingRoute = false;
+            });
+
+            _showToast(
+              context.l10n.couldNotRecalculateRoute,
+              backgroundColor: AppColors.red500,
+            );
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('❌ Exception during route recalculation: $e');
+      if (mounted) {
+        setState(() {
+          _isRecalculatingRoute = false;
+        });
+      }
+    }
+  }
+
+  String getStreetNameFromManeuver(
+    HERE.Maneuver maneuver, {
+    List<Locale> preferredLocales = const [],
+  }) {
+    String? name = maneuver.nextRoadTexts.names.getDefaultValue();
+    name ??= maneuver.roadTexts.names.getDefaultValue();
+    return name ?? context.l10n.unnamedRoad;
+  }
+
+  void _addDestinationMarker(HERE.Route calculatedRoute) {
+    // Remove old marker if exists
+    if (_destinationMarker != null) {
+      _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
+      _destinationMarker = null;
+    }
+
+    // Add marker exactly at the end of the road
+    var icon = _assetsProvider.destinationMarkerLarge;
+    _destinationMarker = MapMarker(
+      HERE.GeoCoordinates(
+        calculatedRoute.geometry.vertices.last.latitude,
+        calculatedRoute.geometry.vertices.last.longitude,
+      ),
+      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
+    );
+    _hereMapController!.mapScene.addMapMarker(_destinationMarker!);
+  }
+
+  void _setMapCameraFocus() {
+    if (_currentLocation == null) return;
+
+    MapMeasure mapMeasureZoom = MapMeasure(
+      MapMeasureKind.distanceInMeters,
+      _initialZoomDistanceInMeters,
+    );
+
+    _hereMapController!.camera.lookAtPointWithMeasure(
+      HERE.GeoCoordinates(
+        _currentLocation!.latitude,
+        _currentLocation!.longitude,
+      ),
+      mapMeasureZoom,
+    );
   }
 
   void _cleanupNavigation() {
     debugPrint('🧹 Starting comprehensive navigation cleanup...');
 
     try {
+      _locationStabilityTimer?.cancel();
+      _locationStabilityTimer = null;
+
       // Stop and cleanup VisualNavigator with null checks
       if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
@@ -694,12 +1258,18 @@ class _NavigationViewState extends State<NavigationView> {
           _isCameraLocked = true;
           _isUserPanning = false;
           _currentSpeed = 0;
+          _isLocationEngineReady = false;
+          _isVisualNavigatorReady = false;
+          _stableLocationCount = 0;
           _totalRouteTime = 0;
           _nextManuoverDistance = 0;
           normalManuevers = "";
           _lastSpokenInstruction = "";
-          _currentLocation = null;
           _errorMessage = "";
+
+          // ✅ ADDED: Reset critical state flags
+          _isMapReady = false;
+          _isLocationReady = false;
         });
       }
     } catch (e) {
@@ -709,73 +1279,162 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('🧹 Navigation cleanup completed');
   }
 
+  void _stopNavigation() {
+    debugPrint('🛑 Stopping navigation...');
+    _cleanupNavigation();
+
+    setState(() {
+      _isNavigating = false;
+      _navigationInstruction = "";
+    });
+
+    debugPrint('✅ Navigation stopped.');
+  }
+
   Future<bool> _handleBackPress() async {
     debugPrint('🔙 Back button pressed.');
     _cleanupNavigation();
     return true;
   }
 
-  void _initLocationEngine() {
-    debugPrint('🛰️ Initializing Location Engine...');
+  void _toggleCameraTracking() {
+    if (_visualNavigator == null) return;
+
+    setState(() {
+      _isCameraLocked = !_isCameraLocked;
+      _isUserPanning = false;
+    });
+
+    if (_isCameraLocked) {
+      _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
+      debugPrint('🔒 Camera tracking re-enabled');
+    } else {
+      _visualNavigator!.cameraBehavior = null;
+      debugPrint('🔓 Camera tracking disabled');
+    }
+  }
+
+  void _cleanupCurrentRoute() {
+    debugPrint('🧹 Cleaning up current route for destination switch...');
+
     try {
-      _locationEngine = HERE.LocationEngine();
-      debugPrint('✅ Location Engine initialized.');
-    } on InstantiationException {
-      debugPrint('❌ Initialization of LocationEngine failed.');
+      // Stop current visual navigator rendering but keep location engine running
+      if (_visualNavigator != null) {
+        _visualNavigator!.stopRendering();
+
+        // Clear listeners to prevent conflicts
+        _visualNavigator!.routeProgressListener = null;
+        _visualNavigator!.eventTextListener = null;
+        _visualNavigator!.routeDeviationListener = null;
+
+        // Clear the current route
+        _visualNavigator!.route = null;
+
+        debugPrint('✅ Current route cleared from visual navigator');
+      }
+
+      // Remove old destination marker if it exists
+      if (_destinationMarker != null) {
+        _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
+        _destinationMarker = null;
+        debugPrint('✅ Old destination marker removed');
+      }
+
+      // Reset navigation state variables (but keep location and map ready)
       setState(() {
-        _errorMessage = context.l10n.failedToInitializeLocation;
+        _navigationInstruction = "";
+        _totalRouteTime = 0;
+        _nextManuoverDistance = 0;
+        normalManuevers = "";
+        _lastSpokenInstruction = "";
+        _hasShownArrivalNotification = false;
+        _hasShownParkingRating = false;
+        _isPopupDisplayed = false;
+        _isRecalculatingRoute = false;
+      });
+
+      debugPrint('✅ Route cleanup completed successfully');
+    } catch (e) {
+      debugPrint('⚠️ Error during route cleanup: $e');
+    }
+  }
+
+  void _switchToNewDestination(Space space) {
+    debugPrint('🔄 Switching to new destination: ${space.location.streetName}');
+
+    if (_currentLocation != null) {
+      // ✅ ADDED: Clean up current navigation before switching
+      _cleanupCurrentRoute();
+
+      // Update destination coordinates
+      _actualDestinationLat = space.location.point.lat;
+      _actualDestinationLng = space.location.point.lng;
+
+      // Recalculate route to new destination
+      _calculateRoute(
+        _currentLocation!,
+        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
+      );
+
+      _showToast(
+        context.l10n.navigatingToParking,
+        backgroundColor: AppColors.primary500,
+      );
+    } else {
+      debugPrint('❌ Current location is null, cannot switch destination');
+      setState(() {
         _isLoading = false;
+        _errorMessage = "Unable to get current location";
       });
     }
   }
 
-  void _startNavigation() async {
-    _cleanupNavigation();
+  // WebSocket and location methods
+  void _initializeWebSocketConnection() {
+    if (_currentLocation == null) {
+      debugPrint('⚠️ Current location is null, cannot initialize WebSocket');
+      return;
+    }
 
-    await Future.delayed(const Duration(milliseconds: 200));
+    debugPrint('🔌 Initializing WebSocket connection...');
 
-    _navigationStartTime = DateTime.now();
-    _hasShownFatigueAlert = false;
+    _locationWebSocketService.connectAndSendInitialLocation(
+      latitude: _currentLocation!.latitude,
+      longitude: _currentLocation!.longitude,
+      onEvent: (MapNearbyPayload payload) {
+        debugPrint(
+          '📥 Received WebSocket data: ${payload.spaces.length} spaces, ${payload.events.length} events',
+        );
+        if (mounted) {
+          _addMapMarkers(payload.events, payload.spaces);
+        }
+      },
+      onError: (error) {
+        debugPrint('❌ WebSocket error: $error');
+      },
+      onDone: () {
+        debugPrint('🔌 WebSocket connection closed');
+      },
+    );
+  }
 
-    if (_hereMapController == null) return;
-
-    setState(() => _isLoading = true);
-
-    debugPrint('🚗 Starting navigation...');
-    double destLat = widget.destinationLat;
-    double destLng = widget.destinationLng;
-
-    try {
-      var currentLocationGeo = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.bestForNavigation,
-          timeLimit: Duration(seconds: 15),
-        ),
+  void _sendLocationUpdateViaWebSocket(double latitude, double longitude) {
+    if (_locationWebSocketService.isConnected) {
+      _locationWebSocketService.sendLocation(latitude, longitude);
+    } else {
+      debugPrint('⚠️ WebSocket not connected, attempting to connect...');
+      _locationWebSocketService.connectAndSendInitialLocation(
+        latitude: latitude,
+        longitude: longitude,
+        onEvent: (MapNearbyPayload payload) {
+          if (mounted) {
+            _addMapMarkers(payload.events, payload.spaces);
+          }
+        },
+        onError: (error) {
+          debugPrint('❌ WebSocket error during reconnect: $error');
+        },
       );
-
-      debugPrint(
-        '📍 Current location: ${currentLocationGeo.latitude}, ${currentLocationGeo.longitude}',
-      );
-
-      _currentLocation = HERE.GeoCoordinates(
-        currentLocationGeo.latitude,
-        currentLocationGeo.longitude,
-      );
-
-      _lastLatitude = currentLocationGeo.latitude;
-      _lastLongitude = currentLocationGeo.longitude;
-      _distanceTraveled = 0;
-      _lastTriggerDistance = 0;
-
-      _initializeWebSocketConnection();
-
-      _calculateRoute(_currentLocation!, HERE.GeoCoordinates(destLat, destLng));
-    } catch (e) {
-      debugPrint('❌ Error getting current location: $e');
-      setState(() {
-        _errorMessage = "Failed to get current location";
-        _isLoading = false;
-      });
     }
   }
 
@@ -790,7 +1449,6 @@ class _NavigationViewState extends State<NavigationView> {
 
     if (distanceBetweenPoints > 0) {
       _distanceTraveled += distanceBetweenPoints;
-
       _lastLatitude = latitude;
       _lastLongitude = longitude;
 
@@ -799,38 +1457,16 @@ class _NavigationViewState extends State<NavigationView> {
         _lastTriggerDistance =
             (_distanceTraveled ~/ _distanceTriggerThreshold) *
             _distanceTriggerThreshold;
-
         _showDistanceTriggerToast();
       }
     }
   }
 
-  Widget _buildWebSocketStatusIndicator() {
-    return Positioned(
-      top: MediaQuery.of(context).padding.top + 160,
-      right: _mapPadding,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color:
-              _locationWebSocketService.isConnected
-                  ? Colors.green.withValues(alpha: 0.8)
-                  : Colors.red.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          _locationWebSocketService.isConnected ? Icons.wifi : Icons.wifi_off,
-          color: Colors.white,
-          size: 16,
-        ),
-      ),
-    );
-  }
-
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
-    _sendLocationUpdateViaWebSocket(_lastLatitude!, _lastLongitude!);
+    _sendLocationUpdateViaWebSocket(_lastLatitude, _lastLongitude);
+
     context.read<MapBloc>().add(
       GetNearbyPlaces(
         queryParams: MapQueryParams(
@@ -844,7 +1480,183 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  showSpacePopup({required Space space}) {
+  void putParkingSpacesOnMap() {
+    if (_currentLocation == null) return;
+
+    context.read<MapBloc>().add(
+      GetNearbyPlaces(
+        queryParams: MapQueryParams(
+          currentPoint:
+              "${_currentLocation?.latitude},${_currentLocation?.longitude}",
+          previousPoint:
+              "${_currentLocation?.latitude},${_currentLocation?.longitude}",
+          radius: 1000,
+          drivingMode: true,
+          options: ['spaces', 'events', 'alerts'],
+        ),
+      ),
+    );
+  }
+
+  // Map marker methods
+  void _addMapMarkers(List<Event> events, List<Space> spaces) {
+    _updateEventMarkers(events);
+    _updateSpaceMarkers(spaces);
+  }
+
+  void _updateEventMarkers(List<Event> newEvents) {
+    Set<String> newEventIds = newEvents.map((e) => e.id).toSet();
+    Set<String> existingEventIds = _eventMarkersById.keys.toSet();
+    Set<String> eventsToRemove = existingEventIds.difference(newEventIds);
+
+    // Remove outdated event markers
+    for (String eventId in eventsToRemove) {
+      MapMarker? marker = _eventMarkersById[eventId];
+      if (marker != null) {
+        _hereMapController?.mapScene.removeMapMarker(marker);
+        _eventMarkers.remove(marker);
+        _eventMarkersById.remove(eventId);
+        debugPrint("🗑️ Removed outdated event marker: $eventId");
+      }
+    }
+
+    // Add or update event markers
+    for (var event in newEvents) {
+      MapMarker? existingMarker = _eventMarkersById[event.id];
+
+      if (existingMarker != null) {
+        HERE.GeoCoordinates existingCoords = existingMarker.coordinates;
+        bool positionChanged =
+            existingCoords.latitude != event.location.point.lat ||
+            existingCoords.longitude != event.location.point.lng;
+
+        if (positionChanged) {
+          _hereMapController?.mapScene.removeMapMarker(existingMarker);
+          _eventMarkers.remove(existingMarker);
+          _createEventMarker(event);
+          debugPrint("📍 Updated event marker position: ${event.id}");
+        }
+      } else {
+        _createEventMarker(event);
+        debugPrint("🆕 Added new event marker: ${event.id}");
+      }
+    }
+  }
+
+  void _updateSpaceMarkers(List<Space> newSpaces) {
+    Set<String> newSpaceIds = newSpaces.map((s) => s.id).toSet();
+    Set<String> existingSpaceIds = _spaceMarkersById.keys.toSet();
+    Set<String> spacesToRemove = existingSpaceIds.difference(newSpaceIds);
+
+    // Add or update space markers
+    for (var space in newSpaces) {
+      MapMarker? existingMarker = _spaceMarkersById[space.id];
+
+      if (existingMarker != null) {
+        HERE.GeoCoordinates existingCoords = existingMarker.coordinates;
+        bool positionChanged =
+            existingCoords.latitude != space.location.point.lat ||
+            existingCoords.longitude != space.location.point.lng;
+
+        Space? existingSpace = _spaceMarkers[existingMarker];
+        bool typeChanged = existingSpace?.type != space.type;
+
+        if (positionChanged || typeChanged) {
+          _hereMapController?.mapScene.removeMapMarker(existingMarker);
+          _spaceMarkers.remove(existingMarker);
+          _spaceMarkersById.remove(space.id);
+          _createSpaceMarker(space);
+          debugPrint("📍 Updated space marker: ${space.id}");
+        } else {
+          _spaceMarkers[existingMarker] = space;
+          debugPrint("✅ Space marker unchanged: ${space.id}");
+        }
+      } else {
+        _createSpaceMarker(space);
+        debugPrint("🆕 Added new space marker: ${space.id}");
+      }
+    }
+  }
+
+  void _createSpaceMarker(Space space) {
+    try {
+      final imageData = _assetsProvider.getImageForType(space.type);
+      final marker = MapMarker(
+        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
+        MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
+      );
+      marker.fadeDuration = const Duration(seconds: 1);
+
+      _hereMapController?.mapScene.addMapMarker(marker);
+      _spaceMarkers[marker] = space;
+      _spaceMarkersById[space.id] = marker;
+    } catch (e) {
+      debugPrint("Error adding space marker: $e");
+    }
+  }
+
+  void _createEventMarker(Event event) {
+    try {
+      Uint8List imageData = _assetsProvider.getEventIcon(event.type);
+      MapImage mapImage = MapImage.withPixelDataAndImageFormat(
+        imageData,
+        ImageFormat.png,
+      );
+
+      final marker = MapMarker(
+        HERE.GeoCoordinates(event.location.point.lat, event.location.point.lng),
+        mapImage,
+      );
+      marker.fadeDuration = const Duration(milliseconds: 300);
+
+      _hereMapController?.mapScene.addMapMarker(marker);
+      _eventMarkers[marker] = event;
+      _eventMarkersById[event.id] = marker;
+    } catch (e) {
+      debugPrint("Error adding event marker: $e");
+    }
+  }
+
+  void _pickMapMarker(HERE.Point2D touchPoint) {
+    final rectangle = HERE.Rectangle2D(touchPoint, HERE.Size2D(1, 1));
+    final filter = MapSceneMapPickFilter([
+      MapSceneMapPickFilterContentType.mapItems,
+    ]);
+
+    _hereMapController?.pick(filter, rectangle, (result) {
+      if (result == null || result.mapItems == null) return;
+
+      final markers = result.mapItems!.markers;
+      if (markers.isNotEmpty) {
+        final topMarker = markers.first;
+
+        if (_spaceMarkers.containsKey(topMarker)) {
+          final space = _spaceMarkers[topMarker]!;
+          showSpacePopup(space: space);
+        }
+        if (_eventMarkers.containsKey(topMarker)) {
+          final event = _eventMarkers[topMarker]!;
+          AppPopup.showBottomSheet(
+            context,
+            EventFeedback(
+              currentDistance: Geolocator.distanceBetween(
+                _currentLocation!.latitude,
+                _currentLocation!.longitude,
+                event.location.point.lat,
+                event.location.point.lng,
+              ),
+              event: event,
+              onSubmit: () {
+                NavigatorHelper.pop();
+              },
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void showSpacePopup({required Space space}) {
     if (space.isPremium) {
       AppPopup.showBottomSheet(
         context,
@@ -860,7 +1672,6 @@ class _NavigationViewState extends State<NavigationView> {
                 queryParams: MapQueryParams(
                   currentPoint:
                       "${_currentLocation!.latitude},${_currentLocation!.longitude}",
-                  // "${_currentPosition!.latitude},${_currentPosition!.longitude}",
                   radius: 8000,
                   drivingMode: false,
                   options: ['spaces', 'events'],
@@ -869,19 +1680,12 @@ class _NavigationViewState extends State<NavigationView> {
             );
             NavigatorHelper.pop();
             NavigatorHelper.pop();
-
-            // _switchToNewDestination(space);
           },
         ),
       );
       return;
     }
-    // if (context.userProfile!.activeReservation != null) {
-    //   Toast.showError(
-    //     "You cannot navigate to a space while you have an active reservation.",
-    //   );
-    //   return;
-    // }
+
     AppPopup.showBottomSheet(
       context,
       Padding(
@@ -972,8 +1776,6 @@ class _NavigationViewState extends State<NavigationView> {
                       _isLoading = true;
                     });
 
-                    // FIX: Don't call _stopNavigation() and _cleanupNavigation() together
-                    // Just update the route instead of full cleanup
                     _switchToNewDestination(space);
                   },
                 ),
@@ -985,793 +1787,137 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  // Fix 2: Add new method to switch destinations without full cleanup
-  void _switchToNewDestination(Space space) {
-    debugPrint('🔄 Switching to new destination: ${space.location.streetName}');
-
-    if (_currentLocation != null) {
-      // Update destination coordinates
-      _actualDestinationLat = space.location.point.lat;
-      _actualDestinationLng = space.location.point.lng;
-
-      // Recalculate route to new destination
-      _calculateRoute(
-        _currentLocation!,
-        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
-      );
-
-      _showToast(
-        context.l10n.navigatingToParking,
-        backgroundColor: AppColors.primary500,
-      );
-    } else {
-      debugPrint('❌ Current location is null, cannot switch destination');
-      setState(() {
-        _isLoading = false;
-        _errorMessage = "Unable to get current location";
-      });
-    }
+  void _showToast(String message, {Color backgroundColor = Colors.black}) {
+    // Toast implementation
   }
 
-  void _pickMapMarker(HERE.Point2D touchPoint) {
-    final rectangle = HERE.Rectangle2D(touchPoint, HERE.Size2D(1, 1));
-    final filter = MapSceneMapPickFilter([
-      MapSceneMapPickFilterContentType.mapItems,
-    ]);
-
-    _hereMapController?.pick(filter, rectangle, (result) {
-      if (result == null || result.mapItems == null) return;
-
-      final markers = result.mapItems!.markers;
-      if (markers.isNotEmpty) {
-        final topMarker = markers.first;
-
-        if (_spaceMarkers.containsKey(topMarker)) {
-          final space = _spaceMarkers[topMarker]!;
-
-          showSpacePopup(space: space);
-        }
-        if (_eventMarkers.containsKey(topMarker)) {
-          final event = _eventMarkers[topMarker]!;
-
-          AppPopup.showBottomSheet(
-            context,
-            EventFeedback(
-              currentDistance: Geolocator.distanceBetween(
-                _currentLocation!.latitude,
-                _currentLocation!.longitude,
-                event.location.point.lat,
-                event.location.point.lng,
+  // UI Widget methods
+  Widget _buildSpeedLimitIndicator() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 120,
+      right: _mapPadding,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 13),
+              decoration: BoxDecoration(
+                color:
+                    _isOverSpeedLimit
+                        ? Colors.redAccent.withOpacity(0.2)
+                        : Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
               ),
-              event: event,
-              onSubmit: () {
-                NavigatorHelper.pop();
-              },
-            ),
-          );
-        }
-      }
-    });
-  }
-
-  final Map<String, MapMarker> _spaceMarkersById = {}; // Track by space ID
-  final Map<String, MapMarker> _eventMarkersById = {}; // Track by event ID
-
-  void _addMapMarkers(List<Event> events, List<Space> spaces) {
-    // Process spaces
-    _updateSpaceMarkers(spaces);
-
-    // Process events
-    _updateEventMarkers(events);
-  }
-
-  double _calculateDistance(
-    HERE.GeoCoordinates coord1,
-    HERE.GeoCoordinates coord2,
-  ) {
-    return Geolocator.distanceBetween(
-      coord1.latitude,
-      coord1.longitude,
-      coord2.latitude,
-      coord2.longitude,
-    );
-  }
-
-  void _updateSpaceMarkers(List<Space> spaces) {
-    // Create a set of current space IDs from the new data
-    final currentSpaceIds = spaces.map((space) => space.id).toSet();
-
-    // Remove markers for spaces that are no longer present
-    final spacesToRemove = <String>[];
-    _spaceMarkersById.forEach((spaceId, marker) {
-      if (!currentSpaceIds.contains(spaceId)) {
-        spacesToRemove.add(spaceId);
-        _hereMapController?.mapScene.removeMapMarker(marker);
-        _spaceMarkers.remove(marker);
-      }
-    });
-
-    // Remove from tracking maps
-    for (final spaceId in spacesToRemove) {
-      _spaceMarkersById.remove(spaceId);
-    }
-
-    // Add or update markers for current spaces
-    for (final space in spaces) {
-      final existingMarker = _spaceMarkersById[space.id];
-
-      if (existingMarker != null) {
-        // Check if position has changed
-        final currentCoordinates = existingMarker.coordinates;
-        final newCoordinates = HERE.GeoCoordinates(
-          space.location.point.lat,
-          space.location.point.lng,
-        );
-
-        // Only update if position changed significantly (e.g., more than 1 meter)
-        final distance = _calculateDistance(currentCoordinates, newCoordinates);
-        if (distance > 1.0) {
-          // Remove old marker and create new one
-          _hereMapController?.mapScene.removeMapMarker(existingMarker);
-          _spaceMarkers.remove(existingMarker);
-          _createSpaceMarker(space);
-        }
-      } else {
-        _createSpaceMarker(space);
-      }
-    }
-  }
-
-  void _updateEventMarkers(List<Event> events) {
-    // Create a set of current event IDs from the new data
-    final currentEventIds = events.map((event) => event.id).toSet();
-
-    // Remove markers for events that are no longer present
-    final eventsToRemove = <String>[];
-    _eventMarkersById.forEach((eventId, marker) {
-      if (!currentEventIds.contains(eventId)) {
-        eventsToRemove.add(eventId);
-        _hereMapController?.mapScene.removeMapMarker(marker);
-        _eventMarkers.remove(marker);
-      }
-    });
-
-    // Remove from tracking maps
-    for (final eventId in eventsToRemove) {
-      _eventMarkersById.remove(eventId);
-    }
-
-    // Add or update markers for current events
-    for (final event in events) {
-      final existingMarker = _eventMarkersById[event.id];
-
-      if (existingMarker != null) {
-        // Check if position has changed
-        final currentCoordinates = existingMarker.coordinates;
-        final newCoordinates = HERE.GeoCoordinates(
-          event.location.point.lat,
-          event.location.point.lng,
-        );
-
-        // Only update if position changed significantly
-        final distance = _calculateDistance(currentCoordinates, newCoordinates);
-        if (distance > 1.0) {
-          // Remove old marker and create new one
-          _hereMapController?.mapScene.removeMapMarker(existingMarker);
-          _eventMarkers.remove(existingMarker);
-          _createEventMarker(event);
-        }
-        // If position hasn't changed significantly, keep existing marker
-      } else {
-        // Create new marker for new event
-        _createEventMarker(event);
-      }
-    }
-  }
-
-  void _createSpaceMarker(Space space) {
-    try {
-      final imageData = _assetsProvider.getImageForType(space.type);
-      final marker = MapMarker(
-        HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
-        MapImage.withPixelDataAndImageFormat(imageData, ImageFormat.png),
-      );
-      marker.fadeDuration = const Duration(
-        milliseconds: 300,
-      ); // Smoother animation
-
-      _hereMapController?.mapScene.addMapMarker(marker);
-      _spaceMarkers[marker] = space;
-      _spaceMarkersById[space.id] = marker;
-    } catch (e) {
-      debugPrint("Error adding space marker: $e");
-    }
-  }
-
-  void _createEventMarker(Event event) {
-    try {
-      Uint8List imageData = _assetsProvider.getEventIcon(event.type);
-
-      MapImage mapImage = MapImage.withPixelDataAndImageFormat(
-        imageData,
-        ImageFormat.png,
-      );
-
-      final marker = MapMarker(
-        HERE.GeoCoordinates(event.location.point.lat, event.location.point.lng),
-        mapImage,
-      );
-      marker.fadeDuration = const Duration(
-        milliseconds: 300,
-      ); // Smoother animation
-
-      _hereMapController?.mapScene.addMapMarker(marker);
-      _eventMarkers[marker] = event;
-      _eventMarkersById[event.id] = marker;
-    } catch (e) {
-      debugPrint("Error adding event marker: $e");
-    }
-  }
-
-  void _addDestinationMarker(HERE.Route calculatedRoute) {
-    // Remove old marker if exists
-    if (_destinationMarker != null) {
-      _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
-      _destinationMarker = null;
-    }
-
-    // Add marker exactly at the end of the road
-    var icon = _assetsProvider.destinationMarkerLarge;
-    _destinationMarker = MapMarker(
-      HERE.GeoCoordinates(
-        calculatedRoute.geometry.vertices.last.latitude,
-        calculatedRoute.geometry.vertices.last.longitude,
-      ),
-      MapImage.withPixelDataAndImageFormat(icon, ImageFormat.png),
-    );
-    _hereMapController!.mapScene.addMapMarker(_destinationMarker!);
-  }
-
-  void _setMapCameraFocus() {
-    MapMeasure mapMeasureZoom = MapMeasure(
-      MapMeasureKind.distanceInMeters,
-      _initialZoomDistanceInMeters,
-    );
-
-    _hereMapController!.camera.lookAtPointWithMeasure(
-      HERE.GeoCoordinates(
-        _currentLocation!.latitude,
-        _currentLocation!.longitude,
-      ),
-      mapMeasureZoom,
-    );
-  }
-
-  void _calculateRoute(
-    HERE.GeoCoordinates start,
-    HERE.GeoCoordinates destination,
-  ) {
-    debugPrint('🧭 Calculating route...');
-    print('📍 Start: ${start.latitude}, ${start.longitude}');
-    print('🎯 Destination: ${destination.latitude}, ${destination.longitude}');
-
-    // Don't reinitialize routing engine if it already exists
-    if (_routingEngine == null) {
-      try {
-        _routingEngine = HERE.RoutingEngine();
-        debugPrint('✅ Routing Engine initialized.');
-      } on InstantiationException {
-        debugPrint('❌ Initialization of RoutingEngine failed.');
-        setState(() {
-          _errorMessage = "Failed to initialize routing";
-          _isLoading = false;
-        });
-        return;
-      }
-    }
-
-    HERE.Waypoint startWaypoint = HERE.Waypoint(start);
-    HERE.Waypoint destinationWaypoint = HERE.Waypoint(destination);
-
-    final carOptions = HERE.CarOptions();
-    carOptions.routeOptions.enableTolls = true;
-    carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
-
-    _routingEngine!.calculateCarRoute(
-      [startWaypoint, destinationWaypoint],
-      carOptions,
-      (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
-        if (routingError == null && routeList != null && routeList.isNotEmpty) {
-          HERE.Route calculatedRoute = routeList.first;
-
-          _totalRouteTime = calculatedRoute.duration.inSeconds;
-          _distanceNotifier.value = calculatedRoute.lengthInMeters;
-
-          _addDestinationMarker(calculatedRoute);
-          _setMapCameraFocus();
-
-          setState(() {
-            _isNavigating = true;
-            _isLoading = false;
-          });
-
-          // If we already have a visual navigator, just update the route
-          if (_visualNavigator != null) {
-            _visualNavigator!.route = calculatedRoute;
-            debugPrint('✅ Updated existing navigation route');
-          } else {
-            _startGuidance(calculatedRoute);
-          }
-
-          // Set initial position after route update
-          Future.delayed(const Duration(milliseconds: 500), () {
-            _setInitialNavigationPosition();
-          });
-        } else {
-          final error = routingError?.toString() ?? "Unknown error";
-          debugPrint('❌ Error while calculating route: $error');
-          setState(() {
-            _errorMessage = context.l10n.navigationError;
-            _isLoading = false;
-          });
-        }
-      },
-    );
-  }
-
-  void _setInitialNavigationPosition() {
-    if (_currentLocation != null && _visualNavigator != null) {
-      // Create a simulated location update to kickstart navigation
-      final initialLocation = HERE.Location.withCoordinates(_currentLocation!);
-
-      // Send initial location to visual navigator
-      _visualNavigator!.onLocationUpdated(initialLocation);
-
-      debugPrint(
-        '📍 Set initial navigation position: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}',
-      );
-    }
-  }
-
-  void _startGuidance(HERE.Route route) {
-    if (_hereMapController == null) return;
-
-    debugPrint('🧭 Starting visual guidance...');
-
-    _configureTTSLanguage();
-
-    try {
-      _visualNavigator = HERE.VisualNavigator();
-      _setupRouteDeviationListener();
-      debugPrint('✅ VisualNavigator initialized.');
-    } on InstantiationException {
-      debugPrint('❌ Initialization of VisualNavigator failed.');
-      setState(() {
-        _errorMessage = context.l10n.failedToInitNavigation;
-        _isNavigating = false;
-      });
-      return;
-    }
-
-    _visualNavigator!.startRendering(_hereMapController!);
-    debugPrint('📡 Started rendering navigator.');
-
-    DateTime lastUpdateTime = DateTime.now();
-
-    _visualNavigator!.routeProgressListener = HERE.RouteProgressListener((
-      HERE.RouteProgress routeProgress,
-    ) {
-      final now = DateTime.now();
-      HERE.SectionProgress lastSectionProgress =
-          routeProgress.sectionProgress.last;
-      int remainingDistance = lastSectionProgress.remainingDistanceInMeters;
-
-      print('🟡 Route progress update at ${now.toIso8601String()}');
-      print('➡️ Remaining distance in section: $remainingDistance meters');
-
-      if (now.difference(lastUpdateTime).inMilliseconds < 500) {
-        print('⏱ Throttling update. Skipping this tick.');
-        return;
-      }
-
-      if (!_isMuted && normalManuevers != _lastSpokenInstruction) {
-        _lastSpokenInstruction = normalManuevers;
-        speech.speak(normalManuevers);
-      }
-
-      _nextManuoverDistance =
-          routeProgress.maneuverProgress.first.remainingDistanceInMeters
-              .floor();
-      final remainingDurationInSeconds =
-          lastSectionProgress.remainingDuration.inSeconds;
-      _distanceNotifier.value = remainingDistance;
-
-      bool isAtDestination = remainingDistance <= DISTANCE_THREESHOLD;
-      bool isParkingNavigation =
-          _currentSpace != null || widget.isNavigatingToParking;
-
-      print('🎯 Distance to destination: $remainingDistance meters');
-      print('🅿️ Is parking navigation: $isParkingNavigation');
-      print('🔔 Has shown arrival: $_hasShownArrivalNotification');
-      print('⭐ Has shown rating: $_hasShownParkingRating');
-
-      if (isAtDestination && !_hasShownArrivalNotification) {
-        print('✅ Arrived at destination!');
-
-        if (!isParkingNavigation) {
-          AppPopup.showDialogSheet(
-            context,
-            ArrivalNotificationWidget(
-              onClose: () {
-                NavigatorHelper.pop();
-              },
-            ),
-          );
-        }
-
-        setState(() {
-          _hasShownArrivalNotification = true;
-        });
-
-        if (isParkingNavigation &&
-            !_hasShownParkingRating &&
-            !_isPopupDisplayed) {
-          setState(() {
-            _hasShownParkingRating = true;
-            _isPopupDisplayed = true;
-          });
-
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              if (_currentSpace!.isPremium) {
-                // check the users active reservatoon exist
-
-                AppPopup.showBottomSheet(
-                  context,
-                  SpacePopupSheet(
-                    space: _currentSpace!,
-                    currentPosition: HERE.GeoCoordinates(
-                      _currentLocation!.latitude,
-                      _currentLocation!.longitude,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    (_currentSpeed * 3.6).round().toString(),
+                    style: TextStyle(
+                      color:
+                          _isOverSpeedLimit
+                              ? Colors.redAccent.withValues(alpha: 0.8)
+                              : Colors.orange.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
                     ),
-                    onRefreshTrigger: () {
-                      NavigatorHelper.pop();
-                      _isPopupDisplayed = false;
-                      _hasShownParkingRating = false;
-                    },
                   ),
-                );
-                return;
-              } else {
-                AppPopup.showBottomSheet(
-                  context,
-                  ParkingRatingWidget(
-                    spaceID: _currentSpace!.id,
-                    onSubmit: () {
-                      NavigatorHelper.pop();
-                      _isPopupDisplayed = false;
-                      _hasShownParkingRating = false;
-                    },
+                  Text(
+                    context.l10n.kmPerHour,
+                    style: TextStyle(
+                      color:
+                          _isOverSpeedLimit
+                              ? Colors.redAccent.withValues(alpha: 0.8)
+                              : Colors.orange.shade700,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                );
-              }
-            }
-          });
-        } else if (!isParkingNavigation) {
-          print('🎯 Standard destination reached. Showing toast.');
-          _showToast(
-            context.l10n.arrivedAtDestination,
-            backgroundColor: AppColors.green600,
-          );
-
-          putParkingSpacesOnMap();
-        }
-      }
-
-      lastUpdateTime = now;
-
-      final maneuver = routeProgress.maneuverProgress;
-      if (maneuver.isEmpty) {
-        print('⚠️ No maneuvers found in route progress.');
-        return;
-      }
-
-      if (mounted) {
-        setState(() {
-          _totalRouteTime = remainingDurationInSeconds;
-        });
-
-        if (context.isFatigueAlertEnabled) {
-          if (_navigationStartTime != null &&
-              !_hasShownFatigueAlert &&
-              DateTime.now().difference(_navigationStartTime!).inSeconds >=
-                  10800) {
-            _hasShownFatigueAlert = true;
-            AlertHelper.showWarning(
-              context: context,
-              title: context.l10n.fatigueAlertTitle,
-              subtext: context.l10n.fatigueAlertMessage,
-            );
-
-            if (!_isMuted) {
-              speech.speak(context.l10n.fatigueAlertVoice);
-            }
-          }
-        }
-      }
-    });
-
-    _visualNavigator!.eventTextListener = HERE.EventTextListener((
-      HERE.EventText eventText,
-    ) {
-      String? streetName = getStreetNameFromManeuver(
-        eventText.maneuverNotificationDetails!.maneuver,
-      );
-
-      debugPrint("🗣️ Voice maneuver text: $streetName");
-      if (mounted) {
-        setState(() {
-          _navigationInstruction = streetName;
-          normalManuevers = eventText.text;
-        });
-      }
-    });
-
-    _visualNavigator!.route = route;
-    _setupLocationSource(_visualNavigator!, route);
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.red,
+                  width: _isOverSpeedLimit ? 3 : 2,
+                ),
+              ),
+              child: Center(
+                child:
+                    _roadSpeedLimit != null &&
+                            _roadSpeedLimit!.speedLimitInMetersPerSecond != null
+                        ? Text(
+                          "${(_roadSpeedLimit!.speedLimitInMetersPerSecond! * 3.6).round()}",
+                          style: TextStyle(
+                            color:
+                                _isOverSpeedLimit ? Colors.red : Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        )
+                        : Icon(
+                          Icons.speed,
+                          color: Colors.grey.shade400,
+                          size: 18,
+                        ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  void _setupRouteDeviationListener() {
-    _visualNavigator!.routeDeviationListener = HERE.RouteDeviationListener((
-      HERE.RouteDeviation routeDeviation,
-    ) {
-      debugPrint('🛰️ Route deviation listener triggered');
-
-      if (_isRecalculatingRoute) {
-        debugPrint('⏳ Already recalculating route. Skipping...');
-        return;
-      }
-
-      HERE.Route? route = _visualNavigator?.route;
-      if (route == null) {
-        debugPrint(
-          '❌ No active route found. Skipping route deviation handling.',
-        );
-        return;
-      }
-
-      HERE.GeoCoordinates currentGeoCoordinates =
-          routeDeviation.currentLocation.originalLocation.coordinates;
-      debugPrint(
-        '📍 Current location: (${currentGeoCoordinates.latitude}, ${currentGeoCoordinates.longitude})',
-      );
-
-      double distanceInMeters = Geolocator.distanceBetween(
-        _currentLocation!.latitude,
-        _currentLocation!.longitude,
-        currentGeoCoordinates.latitude,
-        currentGeoCoordinates.longitude,
-      );
-      debugPrint('📏 Calculated deviation: $distanceInMeters meters');
-
-      final now = DateTime.now().millisecondsSinceEpoch;
-
-      debugPrint('⏰ Time since last reroute: ${now - _lastRerouteTime} ms');
-
-      bool isSignificantlyOffRoute = true;
-      bool isFarEnoughFromDestination = _distanceNotifier.value > 50;
-      bool isTimeElapsedSinceLastReroute = (now - _lastRerouteTime > 5000);
-
-      if (isSignificantlyOffRoute &&
-          isFarEnoughFromDestination &&
-          isTimeElapsedSinceLastReroute) {
-        debugPrint(
-          '⚠️ Significant deviation detected! Off by ${distanceInMeters}m',
-        );
-        debugPrint('📡 Initiating reroute sequence...');
-
-        _rerouteDebounceTimer?.cancel();
-
-        _isRecalculatingRoute = true;
-        _lastRerouteTime = now;
-
-        _showToast(
-          context.l10n.recalculatingRoute,
-          backgroundColor: AppColors.red500,
-        );
-
-        Future.delayed(const Duration(milliseconds: 100), () {
-          debugPrint('🚀 Launching route recalculation from new position...');
-          _recalculateRouteFromCurrentLocation(currentGeoCoordinates);
-        });
-      } else {
-        debugPrint('✅ No reroute needed at this time.');
-        if (!isFarEnoughFromDestination) {
-          debugPrint('🏁 Already close to destination.');
-        }
-        if (!isTimeElapsedSinceLastReroute) {
-          debugPrint('⌛ Too soon since last reroute.');
-        }
-      }
-    });
+  Widget _buildWebSocketStatusIndicator() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 160,
+      right: _mapPadding,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color:
+              _locationWebSocketService.isConnected
+                  ? Colors.green.withValues(alpha: 0.8)
+                  : Colors.red.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          _locationWebSocketService.isConnected ? Icons.wifi : Icons.wifi_off,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
+    );
   }
 
-  void _recalculateRouteFromCurrentLocation(
-    HERE.GeoCoordinates currentPosition,
-  ) {
-    if (_currentLocation == null) return;
-
-    try {
-      debugPrint('🧭 Recalculating route from current position...');
-
-      HERE.Waypoint startWaypoint = HERE.Waypoint(currentPosition);
-
-      HERE.Waypoint destinationWaypoint = HERE.Waypoint(
-        HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
-      );
-
-      final carOptions = HERE.CarOptions();
-      carOptions.routeOptions.enableTolls = true;
-      carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
-
-      _routingEngine ??= HERE.RoutingEngine();
-
-      _routingEngine!.calculateCarRoute(
-        [startWaypoint, destinationWaypoint],
-        carOptions,
-        (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
-          if (routingError == null &&
-              routeList != null &&
-              routeList.isNotEmpty) {
-            HERE.Route calculatedRoute = routeList.first;
-
-            _totalRouteTime = calculatedRoute.duration.inSeconds;
-            _distanceNotifier.value = calculatedRoute.lengthInMeters;
-
-            if (_visualNavigator != null && mounted) {
-              _visualNavigator!.route = calculatedRoute;
-
-              _addDestinationMarker(calculatedRoute);
-              _setMapCameraFocus();
-
-              setState(() {
-                _isNavigating = true;
-                _isRecalculatingRoute = false;
-              });
-            }
-          } else {
-            final error = routingError?.toString() ?? "Unknown error";
-            debugPrint('❌ Error while recalculating route: $error');
-
-            setState(() {
-              _isRecalculatingRoute = false;
-            });
-
-            _showToast(
-              context.l10n.couldNotRecalculateRoute,
-              backgroundColor: AppColors.red500,
-            );
-          }
-        },
-      );
-    } catch (e) {
-      debugPrint('❌ Exception during route recalculation: $e');
-      setState(() {
-        _isRecalculatingRoute = false;
-      });
-    }
+  String _getCurrentLoadingMessage(BuildContext context) {
+    if (_errorMessage.isNotEmpty) return _errorMessage;
+    if (!_isLocationReady) return "Getting your location...";
+    if (!_isMapReady) return "Initializing map services...";
+    if (_isLoading && !_isNavigating) return "Calculating best route...";
+    if (_isRecalculatingRoute) return "Recalculating route...";
+    return "Starting navigation...";
   }
-
-  String getStreetNameFromManeuver(
-    HERE.Maneuver maneuver, {
-    List<Locale> preferredLocales = const [],
-  }) {
-    String? name = maneuver.nextRoadTexts.names.getDefaultValue();
-
-    name ??= maneuver.roadTexts.names.getDefaultValue();
-
-    return name ?? context.l10n.unnamedRoad;
-  }
-
-  HERE.GeoCoordinates? getRouteDestination() {
-    if (_visualNavigator?.route != null) {
-      final route = _visualNavigator!.route!;
-      if (route.sections.isNotEmpty) {
-        final lastSection = route.sections.last;
-        // return lastSection.geometry.vertices.last.latitude
-        return HERE.GeoCoordinates(
-          lastSection.geometry.vertices.last.latitude,
-          lastSection.geometry.vertices.last.longitude,
-        );
-      }
-    }
-    return null;
-  }
-
-  void _setupLocationSource(
-    HERE.LocationListener locationListener,
-    HERE.Route route,
-  ) {
-    debugPrint('📍 Setting up navigation with visual map...');
-    try {
-      _visualNavigator!.route = route;
-      _locationEngine = HERE.LocationEngine();
-
-      _locationEngine!.addLocationListener(
-        HERE.LocationListener((HERE.Location location) {
-          _currentLocation = location.coordinates;
-          double? speed = location.speedInMetersPerSecond;
-
-          setState(() {
-            _currentSpeed = speed ?? 0;
-            if (_currentSpeed > 0 && _roadSpeedLimit != null) {
-              final buffer =
-                  _roadSpeedLimit!.speedLimitInMetersPerSecond! * 0.05;
-              _isOverSpeedLimit =
-                  _currentSpeed >
-                  _roadSpeedLimit!.speedLimitInMetersPerSecond! + buffer;
-
-              if (_isOverSpeedLimit && !_isMuted && !_isSpeedLimitAlertShown) {
-                _showSpeedLimitAlert();
-                _isSpeedLimitAlertShown = true;
-              } else if (!_isOverSpeedLimit) {
-                _isSpeedLimitAlertShown = false;
-              }
-            }
-          });
-
-          if (_lastLatitude == 0 && _lastLongitude == 0) {
-            _lastLatitude = location.coordinates.latitude;
-            _lastLongitude = location.coordinates.longitude;
-          }
-
-          _checkDistanceTrigger(
-            location.coordinates.latitude,
-            location.coordinates.longitude,
-          );
-          // Send location update via WebSocket instead of HTTP request
-          locationListener.onLocationUpdated(location);
-        }),
-      );
-      _locationEngine?.startWithLocationAccuracy(
-        HERE.LocationAccuracy.navigation,
-      );
-
-      _visualNavigator!.startRendering(_hereMapController!);
-      _setupSpeedLimitListener();
-
-      _hereMapController!.camera.setOrientationAtTarget(
-        HERE.GeoOrientationUpdate(0, 65),
-      );
-      // Force initial location update after a short delay
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        _forceInitialLocationUpdate();
-      });
-
-      debugPrint('✅ Navigation with 3D view started successfully');
-    } catch (e) {
-      debugPrint('❌ Failed to set up location simulation: $e');
-      setState(() {
-        _errorMessage = context.l10n.failedToStartNavigation;
-        _isNavigating = false;
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _stopNavigation() {
-    debugPrint('🛑 Stopping navigation...');
-    _cleanupNavigation();
-
-    setState(() {
-      _isNavigating = false;
-      _navigationInstruction = "";
-    });
-
-    debugPrint('✅ Navigation stopped.');
-  }
-
-  void _showToast(String message, {Color backgroundColor = Colors.black}) {}
 
   Widget _buildNavigationInstructionCard() {
     IconData directionIcon = Icons.navigation;
@@ -1854,9 +2000,7 @@ class _NavigationViewState extends State<NavigationView> {
                   ),
                   Dimens.space(1),
                   CircleAvatar(
-                    backgroundColor: AppColors.neutral500.withValues(
-                      alpha: 0.5,
-                    ),
+                    backgroundColor: AppColors.neutral500.withOpacity(0.5),
                     child: IconButton(
                       icon: Icon(
                         _isMuted ? Icons.volume_off : Icons.volume_up,
@@ -1865,7 +2009,6 @@ class _NavigationViewState extends State<NavigationView> {
                       onPressed: () {
                         setState(() {
                           _isMuted = !_isMuted;
-
                           if (_visualNavigator != null) {
                             debugPrint(
                               '🔊 Voice ${_isMuted ? 'muted' : 'unmuted'}',
@@ -1885,12 +2028,12 @@ class _NavigationViewState extends State<NavigationView> {
               )
               : Center(
                 child: Shimmer.fromColors(
-                  baseColor: Colors.white.withValues(alpha: 0.5),
+                  baseColor: Colors.white.withOpacity(0.5),
                   highlightColor: Colors.grey[100]!,
                   child: Text(
-                    context.l10n.waitingForNavigation,
+                    _getCurrentLoadingMessage(context), // ← Changed to this
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withOpacity(0.7),
                       fontSize: 16,
                     ),
                   ),
@@ -1995,8 +2138,10 @@ class _NavigationViewState extends State<NavigationView> {
                   setState(() {
                     _errorMessage = "";
                     _isLoading = false;
+                    _isMapReady = false;
+                    _isLocationReady = false;
                   });
-                  _startNavigation();
+                  _requestLocationPermission();
                 },
                 child: Text(context.l10n.tryAgain),
               ),
@@ -2094,18 +2239,6 @@ class _NavigationViewState extends State<NavigationView> {
   }
 }
 
-class Debouncer {
-  final Duration delay;
-  Timer? _timer;
-
-  Debouncer({required this.delay});
-
-  void run(VoidCallback action) {
-    _timer?.cancel();
-    _timer = Timer(delay, action);
-  }
-}
-
 class ArrivalNotificationWidget extends StatelessWidget {
   final VoidCallback? onClose;
 
@@ -2148,5 +2281,17 @@ class ArrivalNotificationWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class Debouncer {
+  final Duration delay;
+  Timer? _timer;
+
+  Debouncer({required this.delay});
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
   }
 }

@@ -41,6 +41,7 @@ import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/repository/withdrawal.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/l10n/app_localizations.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
