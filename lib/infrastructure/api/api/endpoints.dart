@@ -26,7 +26,6 @@ class EndPoints {
   static String baseURL = "https://api-staging.letdem.org/v1";
 
   static bool showApiLogs = true;
-  // /v1/users/me/update-device-id
   static Endpoint<DeviceIdDTO> updateDeviceIdEndpoint = Endpoint(
     url: "/users/me/update-device-id",
     method: HTTPMethod.PUT,
