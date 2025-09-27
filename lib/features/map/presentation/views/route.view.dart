@@ -133,8 +133,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
         _latitudeDelta = spaceDetails.location.point.lat;
         _longitudeDelta = spaceDetails.location.point.lng;
 
-        print(double.parse(spaceDetails.price ?? "0") > 0);
-        if (double.parse(spaceDetails.price ?? "0") > 0) {
+        if (spaceDetails.isPremium) {
           widget.onPremiumSpaceViewed?.call(spaceDetails);
           NavigatorHelper.pop();
           return;

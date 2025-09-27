@@ -14,10 +14,6 @@ class LocationWebSocketService {
 
   bool get isConnected => _channel != null && _channel!.closeCode == null;
 
-  /// Connects to the WebSocket and sends the initial location
-  ///
-  ///
-  ///
   void connectAndSendInitialLocation({
     required double latitude,
     required double longitude,
@@ -28,7 +24,7 @@ class LocationWebSocketService {
     var token = await SecureStorageHelper().read('access_token');
 
     final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/maps/nearby?token=${token}',
+      'ws://api-staging.letdem.org/ws/maps/nearby?token=$token',
     );
 
     _channel = WebSocketChannel.connect(wsUrl);

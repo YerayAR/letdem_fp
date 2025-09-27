@@ -146,6 +146,7 @@ class _HomeViewState extends State<HomeView>
       longitude: _currentPosition?.longitude ?? -122.0312,
       onEvent: (event) {
         var payload = event;
+        print((payload as MapNearbyPayload).spaces.first.id);
         _addMapMarkers(payload.spaces!, payload.events!);
         // Handle incoming WebSocket events if needed
         debugPrint("WebSocket event received: $event");
