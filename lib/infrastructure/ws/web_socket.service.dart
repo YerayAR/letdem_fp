@@ -14,10 +14,6 @@ class LocationWebSocketService {
 
   bool get isConnected => _channel != null && _channel!.closeCode == null;
 
-  /// Connects to the WebSocket and sends the initial location
-  ///
-  ///
-  ///
   void connectAndSendInitialLocation({
     required double latitude,
     required double longitude,
@@ -28,7 +24,7 @@ class LocationWebSocketService {
     var token = await SecureStorageHelper().read('access_token');
 
     final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/maps/nearby?token=${token}',
+      'ws://api-staging.letdem.org/ws/maps/nearby?token=$token',
     );
 
     _channel = WebSocketChannel.connect(wsUrl);
@@ -37,6 +33,9 @@ class LocationWebSocketService {
     _channel!.stream.listen(
       (event) {
         var dta = MapNearbyPayload.fromJson(jsonDecode(event));
+        // if (kDebugMode) {
+        //   Toast.show('📥 Received location event: $event');
+        // }
         onEvent(dta);
       },
       onDone: () {
@@ -148,9 +147,8 @@ class UserWebSocketService {
     void Function()? onDone,
     void Function(dynamic error)? onError,
   }) async {
-
     var token = await SecureStorageHelper().read('access_token');
-    if(token == null) return;
+    if (token == null) return;
 
     final wsUrl = Uri.parse(
       'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
@@ -162,7 +160,6 @@ class UserWebSocketService {
 
       // Close existing connection if any
       await disconnect();
-
 
       var token = await SecureStorageHelper().read('access_token');
       if (token == null || token.isEmpty) {
@@ -248,9 +245,9 @@ class UserWebSocketService {
         },
       );
 
-      _log('✅ Connected to User WebSocket');
+      // _log('✅ Connected to User WebSocket');
     } catch (e) {
-      _log('❌ Failed to connect to User WebSocket: $e', type: 'error');
+      // _log('❌ Failed to connect to User WebSocket: $e', type: 'error');
       _handleReconnect(onEvent: onEvent, onDone: onDone, onError: onError);
       onError?.call(e);
     }

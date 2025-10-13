@@ -633,6 +633,10 @@ class _NavigationViewState extends State<NavigationView> {
           debugPrint('  - Lat: ${location.coordinates.latitude}');
           debugPrint('  - Lng: ${location.coordinates.longitude}');
           debugPrint('  - Accuracy: ${location.horizontalAccuracyInMeters}');
+          _sendLocationUpdateViaWebSocket(
+            location.coordinates.latitude,
+            location.coordinates.longitude,
+          );
 
           // Update current location state
           _currentLocation = location.coordinates;
@@ -1465,7 +1469,6 @@ class _NavigationViewState extends State<NavigationView> {
   void _showDistanceTriggerToast() {
     if (widget.isNavigatingToParking) return;
     debugPrint('Distance trigger: $_distanceTraveled meters traveled');
-    _sendLocationUpdateViaWebSocket(_lastLatitude, _lastLongitude);
 
     context.read<MapBloc>().add(
       GetNearbyPlaces(

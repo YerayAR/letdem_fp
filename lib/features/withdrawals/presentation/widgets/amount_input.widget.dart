@@ -40,8 +40,9 @@ class _AmountInputCardState extends State<AmountInputCard> {
     final entered = double.tryParse(value) ?? 0;
 
     if (entered > balance) {
-      setState(() =>
-          _errorText = context.l10n.amountCannotExceed(balance.toString()));
+      setState(
+        () => _errorText = context.l10n.amountCannotExceed(balance.toString()),
+      );
       widget.onChange?.call('0');
       return;
     } else {
@@ -113,50 +114,61 @@ class _AmountInputCardState extends State<AmountInputCard> {
             children: [
               SizedBox(
                 child: IconButton(
-                        icon: Icon(Icons.info_outline,
-                            color: AppColors.primary400, size: 18),
-                        onPressed: () {
-                          AppPopup.showDialogSheet(
-                            context,
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  context.l10n.pendingFundsInfo(
-                                    context.userProfile!.constantsSettings
-                                        .withdrawalAmount.minimum
-                                        .formatPrice(context),
-                                    context.userProfile!.constantsSettings
-                                        .withdrawalAmount.maximum
-                                        .formatPrice(context),
-                                  ),
-                                  style: Typo.mediumBody,
-                                  textAlign: TextAlign.center,
-                                ),
-                                Dimens.space(3),
-                                PrimaryButton(
-                                  onTap: () {
-                                    NavigatorHelper.pop();
-                                  },
-                                  text: context.l10n.gotIt,
-                                ),
-                              ],
+                  icon: Icon(
+                    Icons.info_outline,
+                    color: AppColors.primary400,
+                    size: 18,
+                  ),
+                  onPressed: () {
+                    AppPopup.showDialogSheet(
+                      context,
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            context.l10n.pendingFundsInfo(
+                              context
+                                  .userProfile!
+                                  .constantsSettings
+                                  .withdrawalAmount
+                                  .minimum
+                                  .formatPrice(context),
+                              context
+                                  .userProfile!
+                                  .constantsSettings
+                                  .withdrawalAmount
+                                  .maximum
+                                  .formatPrice(context),
                             ),
-                          );
-                        },
+                            style: Typo.mediumBody,
+                            textAlign: TextAlign.center,
+                          ),
+                          Dimens.space(3),
+                          PrimaryButton(
+                            onTap: () {
+                              NavigatorHelper.pop();
+                            },
+                            text: context.l10n.gotIt,
+                          ),
+                        ],
                       ),
+                    );
+                  },
+                ),
               ),
               Flexible(
                 child: Text(
-                  context.l10n.pendingToBeCleared(context
-                          .userProfile!.earningAccount!.pendingBalance
-                          .toStringAsFixed(2)),
+                  context.l10n.pendingToBeCleared(
+                    context.userProfile!.earningAccount!.pendingBalance
+                        .toStringAsFixed(2),
+                  ),
                   textAlign: TextAlign.center,
                   style: Typo.mediumBody.copyWith(
                     fontSize: 13,
-                    color: _errorText != null
-                        ? AppColors.red500
-                        : AppColors.neutral300,
+                    color:
+                        _errorText != null
+                            ? AppColors.red500
+                            : AppColors.neutral300,
                   ),
                 ),
               ),

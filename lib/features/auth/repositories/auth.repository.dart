@@ -23,19 +23,22 @@ class AuthRepository extends AuthInterface {
   @override
   Future register(RegisterDTO registerDTO) async {
     await ApiService.sendRequest(
-        endpoint: EndPoints.registerEndpoint.copyWithDTO(registerDTO));
+      endpoint: EndPoints.registerEndpoint.copyWithDTO(registerDTO),
+    );
   }
 
   Future resendVerificationCodeForgotPassword(EmailDTO dto) async {
     return ApiService.sendRequest(
-        endpoint: EndPoints.resendVerificationCodeForgotPasswordEndpoint
-            .copyWithDTO(dto));
+      endpoint: EndPoints.resendVerificationCodeForgotPasswordEndpoint
+          .copyWithDTO(dto),
+    );
   }
 
   @override
   Future<Tokens> verifyEmailEvent(VerifyEmailDTO dto) async {
     ApiResponse res = await ApiService.sendRequest(
-        endpoint: EndPoints.verifyEmailEndpoint.copyWithDTO(dto));
+      endpoint: EndPoints.verifyEmailEndpoint.copyWithDTO(dto),
+    );
 
     return Tokens(accessToken: res.data['token']);
   }
@@ -43,31 +46,36 @@ class AuthRepository extends AuthInterface {
   @override
   Future resendVerificationCode(EmailDTO dto) {
     return ApiService.sendRequest(
-        endpoint: EndPoints.resendVerificationCodeEndpoint.copyWithDTO(dto));
+      endpoint: EndPoints.resendVerificationCodeEndpoint.copyWithDTO(dto),
+    );
   }
 
   @override
   Future findForgotPasswordAccount(EmailDTO dto) {
     return ApiService.sendRequest(
-        endpoint: EndPoints.requestForgotPasswordEndpoint.copyWithDTO(dto));
+      endpoint: EndPoints.requestForgotPasswordEndpoint.copyWithDTO(dto),
+    );
   }
 
   @override
   Future validateResetPassword(VerifyEmailDTO dto) {
     return ApiService.sendRequest(
-        endpoint: EndPoints.resetPasswordEndpoint.copyWithDTO(dto));
+      endpoint: EndPoints.resetPasswordEndpoint.copyWithDTO(dto),
+    );
   }
 
   @override
   Future resetPassword(ResetPasswordDTO dto) {
     return ApiService.sendRequest(
-        endpoint: EndPoints.resetForgotPasswordEndpoint.copyWithDTO(dto));
+      endpoint: EndPoints.resetForgotPasswordEndpoint.copyWithDTO(dto),
+    );
   }
 
   @override
   Future<Tokens> googleLogin(TokenDTO dto) async {
     ApiResponse res = await ApiService.sendRequest(
-        endpoint: EndPoints.socialLogin.copyWithDTO(dto));
+      endpoint: EndPoints.socialLogin.copyWithDTO(dto),
+    );
 
     return Tokens(accessToken: res.data['token']);
   }
@@ -75,7 +83,8 @@ class AuthRepository extends AuthInterface {
   @override
   Future<Tokens> googleSignup(TokenDTO dto) async {
     ApiResponse res = await ApiService.sendRequest(
-        endpoint: EndPoints.socialSignup.copyWithDTO(dto));
+      endpoint: EndPoints.socialSignup.copyWithDTO(dto),
+    );
 
     return Tokens(accessToken: res.data['token']);
   }
