@@ -74,8 +74,8 @@ class _NavigationViewState extends State<NavigationView> {
   static const int _requiredStableUpdates = 3;
   DateTime? _navigationStartTime;
   bool _hasShownFatigueAlert = false;
-  bool _isMapReady = false; // NEW: Track map readiness
-  bool _isLocationReady = false; // NEW: Track location readiness
+  bool _isMapReady = false;
+  bool _isLocationReady = false;
 
   HereMapController? _hereMapController;
   HERE.RoutingEngine? _routingEngine;
@@ -164,23 +164,19 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('🗑️ Disposing NavigationView...');
     _locationStabilityTimer?.cancel();
     _locationStabilityTimer = null;
-    // Cancel all timers first
+
     _rerouteDebounceTimer?.cancel();
     _rerouteDebounceTimer = null;
 
-    // Cleanup navigation with better error handling
     _cleanupNavigation();
 
-    // Clear all map markers
     _spaceMarkers.clear();
     _eventMarkers.clear();
     _spaceMarkersById.clear();
     _eventMarkersById.clear();
 
-    // Dispose notifiers
     _distanceNotifier.dispose();
 
-    // Disable wakelock
     WakelockPlus.disable();
 
     debugPrint('✅ NavigationView disposed');
@@ -210,7 +206,6 @@ class _NavigationViewState extends State<NavigationView> {
       return;
     }
 
-    // Get initial location
     await _getCurrentLocation();
   }
 
@@ -242,17 +237,13 @@ class _NavigationViewState extends State<NavigationView> {
         _isLoading = false;
       });
 
-      // Initialize WebSocket connection after getting location
       _initializeWebSocketConnection();
-
-      // ❌ REMOVE THIS LINE:
-      // _attemptToStartNavigation();
     } catch (e) {
       debugPrint('❌ Error getting current location: $e');
       setState(() {
         _errorMessage = "Failed to get current location";
         _isLoading = false;
-        _isLocationReady = false; // Make sure to reset this on error
+        _isLocationReady = false;
       });
     }
   }
@@ -266,12 +257,11 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('  - Location engine ready: $_isLocationEngineReady');
     debugPrint('  - Current location: ${_currentLocation != null}');
 
-    // ✅ ADD THIS CHECK:
     if (_isNavigating || _isLoading) {
       debugPrint('⚠️ Navigation already in progress, skipping...');
       return;
     }
-    // Check if all prerequisites are met
+
     if (!_isMapReady || !_isLocationReady || !_isLocationEngineReady) {
       debugPrint('⏳ Not all prerequisites ready, waiting...');
       return;
@@ -300,10 +290,8 @@ class _NavigationViewState extends State<NavigationView> {
     await _assetsProvider.loadAssets();
     _hereMapController = hereMapController;
 
-    // Configure map settings
     _configureMapSettings();
 
-    // Load map scene
     _loadMapScene();
   }
 
@@ -314,7 +302,6 @@ class _NavigationViewState extends State<NavigationView> {
     _hereMapController?.gestures.enableDefaultAction(GestureType.pinchRotate);
     _hereMapController?.gestures.enableDefaultAction(GestureType.twoFingerPan);
 
-    // Enable map features
     final features = {
       MapFeatures.buildingFootprints: MapFeatureModes.buildingFootprintsAll,
       MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow,
@@ -332,10 +319,8 @@ class _NavigationViewState extends State<NavigationView> {
       _hereMapController?.mapScene.enableFeatures({entry.key: entry.value});
     }
 
-    // Set up gesture listeners
     _setupGestureListeners();
 
-    // Add destination marker
     _addInitialDestinationMarker();
   }
 
@@ -391,7 +376,6 @@ class _NavigationViewState extends State<NavigationView> {
 
       debugPrint('✅ Map scene loaded.');
 
-      // Set initial camera position
       MapMeasure mapMeasureZoom = MapMeasure(
         MapMeasureKind.distanceInMeters,
         _initialZoomDistanceInMeters,
@@ -402,11 +386,7 @@ class _NavigationViewState extends State<NavigationView> {
         mapMeasureZoom,
       );
 
-      // Initialize location engine
       _initLocationEngine();
-
-      // ❌ REMOVE: setState(() { _isMapReady = true; });
-      // ❌ REMOVE: _attemptToStartNavigation();
     });
   }
 
@@ -432,7 +412,7 @@ class _NavigationViewState extends State<NavigationView> {
             _attemptToStartNavigation();
           }
         } else {
-          _stableLocationCount = 0; // Reset if we lose location
+          _stableLocationCount = 0;
         }
       },
     );
@@ -444,7 +424,6 @@ class _NavigationViewState extends State<NavigationView> {
       _locationEngine = HERE.LocationEngine();
       debugPrint('✅ Location Engine initialized.');
 
-      // Don't set _isMapReady here anymore - wait for stability
       _waitForLocationEngineStability();
     } on InstantiationException {
       debugPrint('❌ Initialization of LocationEngine failed.');
@@ -484,16 +463,12 @@ class _NavigationViewState extends State<NavigationView> {
 
     final carOptions = HERE.CarOptions();
 
-    // ✅ CRITICAL: Enable traffic in route options
     carOptions.routeOptions.enableTolls = true;
     carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
 
-    // 🚦 ADD THESE LINES TO ENABLE TRAFFIC:
     carOptions.routeOptions.departureTime = DateTime.now();
     carOptions.routeOptions.trafficOptimizationMode =
         HERE.TrafficOptimizationMode.timeDependent;
-
-    // 🎯 ADD SPAN CALCULATION FOR TRAFFIC VISUALIZATION:
 
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
@@ -544,24 +519,19 @@ class _NavigationViewState extends State<NavigationView> {
     _configureTTSLanguage();
 
     try {
-      // Initialize visual navigator
       _visualNavigator = HERE.VisualNavigator();
       debugPrint('✅ VisualNavigator initialized.');
 
-      // CRITICAL: Set the route FIRST
       _visualNavigator!.route = route;
       debugPrint('✅ Route set on visual navigator');
 
-      // Start rendering
       _visualNavigator!.startRendering(_hereMapController!);
       debugPrint('📡 Started rendering navigator.');
 
-      // Mark visual navigator as ready
       setState(() {
         _isVisualNavigatorReady = true;
       });
 
-      // Add a small delay to ensure rendering is stable
       Future.delayed(const Duration(seconds: 2), () {
         if (_visualNavigator != null && mounted) {
           _setupNavigationWithStableConnection();
@@ -576,44 +546,14 @@ class _NavigationViewState extends State<NavigationView> {
       _handleNavigationSetupError('Unexpected navigation error: $e');
     }
   }
-  // void _setupNavigationWithStableConnection() {
-  //   debugPrint('🔧 Setting up navigation with stable connection...');
-  //
-  //   // Setup listeners first
-  //   _setupNavigationListeners();
-  //   _setupRouteDeviationListener();
-  //
-  //   // Setup location source with callback for when it's ready
-  //   _setupLocationSourceWithCallback(_visualNavigator!, () {
-  //     debugPrint('✅ Location source is connected and stable');
-  //
-  //     // Now setup camera behavior
-  //     if (_isCameraLocked) {
-  //       _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
-  //     }
-  //
-  //     // Set camera orientation for 3D navigation view
-  //     _hereMapController!.camera.setOrientationAtTarget(
-  //       HERE.GeoOrientationUpdate(0, 65),
-  //     );
-  //
-  //     // Force initial location update after everything is ready
-  //     _forceInitialLocationUpdate();
-  //
-  //     debugPrint('✅ Navigation guidance started successfully');
-  //   });
-  // }
 
   void _setupNavigationWithStableConnection() {
     debugPrint('🔧 Setting up navigation with stable connection...');
 
-    // Setup route deviation listener first
     _setupRouteDeviationListener();
 
-    // Start location engine
     _startLocationEngineForNavigation();
 
-    // IMPORTANT: Delay setting up progress/instruction listeners
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (_visualNavigator != null && mounted) {
         _setupNavigationListeners();
@@ -634,7 +574,6 @@ class _NavigationViewState extends State<NavigationView> {
     }
 
     try {
-      // Create a dedicated location listener for the visual navigator
       _locationEngine!.addLocationListener(
         HERE.LocationListener((HERE.Location location) {
           debugPrint('📍 NAVIGATION LOCATION UPDATE:');
@@ -646,7 +585,6 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.longitude,
           );
 
-          // Update current location state
           _currentLocation = location.coordinates;
           double? speed = location.speedInMetersPerSecond;
 
@@ -657,7 +595,6 @@ class _NavigationViewState extends State<NavigationView> {
             });
           }
 
-          // Update distance tracking
           if (_lastLatitude == 0 && _lastLongitude == 0) {
             _lastLatitude = location.coordinates.latitude;
             _lastLongitude = location.coordinates.longitude;
@@ -667,7 +604,6 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.longitude,
           );
 
-          // CRITICAL: Send location update to visual navigator
           try {
             _visualNavigator!.onLocationUpdated(location);
             debugPrint('✅ Location sent to visual navigator successfully');
@@ -677,12 +613,10 @@ class _NavigationViewState extends State<NavigationView> {
         }),
       );
 
-      // Start the location engine
       _locationEngine!.startWithLocationAccuracy(
         HERE.LocationAccuracy.navigation,
       );
 
-      // Setup camera behavior immediately (don't wait for callback)
       _setupCameraBehavior();
 
       debugPrint('✅ Location engine started for navigation');
@@ -696,19 +630,16 @@ class _NavigationViewState extends State<NavigationView> {
     if (_visualNavigator == null || _hereMapController == null) return;
 
     try {
-      // Setup camera behavior
       if (_isCameraLocked) {
         _visualNavigator!.cameraBehavior = HERE.FixedCameraBehavior();
         debugPrint('📷 Camera behavior set to fixed');
       }
 
-      // Set camera orientation for 3D navigation view
       _hereMapController!.camera.setOrientationAtTarget(
         HERE.GeoOrientationUpdate(0, 65),
       );
       debugPrint('📷 Camera orientation set for navigation');
 
-      // Force initial camera position if we have current location
       if (_currentLocation != null) {
         _hereMapController!.camera.lookAtPointWithMeasure(
           _currentLocation!,
@@ -740,7 +671,7 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.routeProgressListener = HERE.RouteProgressListener((
       HERE.RouteProgress routeProgress,
     ) {
-      debugPrint('🎯 ROUTE PROGRESS UPDATE RECEIVED'); // Add this debug line
+      debugPrint('🎯 ROUTE PROGRESS UPDATE RECEIVED');
 
       final now = DateTime.now();
       HERE.SectionProgress lastSectionProgress =
@@ -748,7 +679,7 @@ class _NavigationViewState extends State<NavigationView> {
       int remainingDistance = lastSectionProgress.remainingDistanceInMeters;
 
       if (now.difference(lastUpdateTime).inMilliseconds < 500) {
-        return; // Throttle updates
+        return;
       }
 
       if (!_isMuted &&
@@ -791,7 +722,7 @@ class _NavigationViewState extends State<NavigationView> {
     _visualNavigator!.eventTextListener = HERE.EventTextListener((
       HERE.EventText eventText,
     ) {
-      debugPrint('🗣️ EVENT TEXT UPDATE RECEIVED'); // Add this debug line
+      debugPrint('🗣️ EVENT TEXT UPDATE RECEIVED');
 
       String? streetName = getStreetNameFromManeuver(
         eventText.maneuverNotificationDetails!.maneuver,
@@ -916,13 +847,10 @@ class _NavigationViewState extends State<NavigationView> {
     if (_visualNavigator == null || _currentLocation == null) return;
 
     try {
-      // Create a location object with current position
       final initialLocation = HERE.Location.withCoordinates(_currentLocation!);
 
-      // Force the visual navigator to process this location
       _visualNavigator!.onLocationUpdated(initialLocation);
 
-      // Move camera to current location
       _hereMapController?.camera.lookAtPointWithMeasure(
         _currentLocation!,
         MapMeasure(MapMeasureKind.distanceInMeters, 500),
@@ -993,13 +921,11 @@ class _NavigationViewState extends State<NavigationView> {
     ) {
       debugPrint('🛰️ Route deviation detected');
 
-      // CRITICAL FIX: Add startup grace period and stricter deviation criteria
       if (_navigationStartTime == null) {
         _navigationStartTime = DateTime.now();
         debugPrint('🕐 Navigation start time recorded');
       }
 
-      // Grace period: Don't recalculate for first 30 seconds or if recently recalculated
       final timeSinceStart =
           DateTime.now().difference(_navigationStartTime!).inSeconds;
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -1018,15 +944,13 @@ class _NavigationViewState extends State<NavigationView> {
       }
 
       if (timeSinceLastReroute < 10000) {
-        // Increased from 5s to 10s
         debugPrint(
           '⏳ Too soon since last reroute (${timeSinceLastReroute}ms), ignoring',
         );
         return;
       }
 
-      // More stringent deviation criteria
-      final minimumDeviationDistance = 50; // meters
+      final minimumDeviationDistance = 50;
       final distanceFromRoute =
           routeDeviation.traveledDistanceOnLastSectionInMeters?.toInt() ?? 0;
       final remainingRouteDistance = _distanceNotifier.value;
@@ -1038,10 +962,6 @@ class _NavigationViewState extends State<NavigationView> {
         '  - Minimum deviation threshold: ${minimumDeviationDistance}m',
       );
 
-      // Only recalculate if:
-      // 1. Far enough from destination (>200m instead of >50m)
-      // 2. Significant deviation (>50m from route)
-      // 3. Not a temporary GPS fluctuation
       bool isSignificantDeviation =
           distanceFromRoute >= minimumDeviationDistance;
       bool isFarFromDestination = remainingRouteDistance > 200;
@@ -1061,7 +981,6 @@ class _NavigationViewState extends State<NavigationView> {
           backgroundColor: AppColors.red500,
         );
 
-        // Add delay to prevent rapid recalculation
         _rerouteDebounceTimer = Timer(const Duration(milliseconds: 2000), () {
           if (_isRecalculatingRoute && mounted) {
             _recalculateRouteFromCurrentLocation(
@@ -1126,15 +1045,12 @@ class _NavigationViewState extends State<NavigationView> {
             );
 
             if (_visualNavigator != null && mounted) {
-              // Update the visual navigator with new route
               _visualNavigator!.route = calculatedRoute;
 
-              // Update UI state
               _totalRouteTime = calculatedRoute.duration.inSeconds;
               _distanceNotifier.value = calculatedRoute.lengthInMeters;
               _addTrafficAwareRoutePolyline(calculatedRoute);
 
-              // Update destination marker
               _addDestinationMarker(calculatedRoute);
 
               setState(() {
@@ -1179,13 +1095,11 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _addDestinationMarker(HERE.Route calculatedRoute) {
-    // Remove old marker if exists
     if (_destinationMarker != null) {
       _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
       _destinationMarker = null;
     }
 
-    // Add marker exactly at the end of the road
     var icon = _assetsProvider.destinationMarkerLarge;
     _destinationMarker = MapMarker(
       HERE.GeoCoordinates(
@@ -1225,7 +1139,7 @@ class _NavigationViewState extends State<NavigationView> {
         _routePolylines.clear();
         debugPrint('✅ Route polylines cleared');
       }
-      // Stop and cleanup VisualNavigator with null checks
+
       if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
         _visualNavigator!.routeProgressListener = null;
@@ -1238,29 +1152,24 @@ class _NavigationViewState extends State<NavigationView> {
         debugPrint('✅ VisualNavigator cleaned up');
       }
 
-      // Stop and cleanup LocationEngine with proper error handling
       if (_locationEngine != null) {
         _locationEngine!.stop();
         _locationEngine = null;
         debugPrint('✅ LocationEngine stopped and cleaned up');
       }
 
-      // Clean up map scene safely
       if (_hereMapController != null) {
-        // Remove all markers safely
         final allMarkers = [..._spaceMarkers.keys, ..._eventMarkers.keys];
         if (allMarkers.isNotEmpty) {
           _hereMapController!.mapScene.removeMapMarkers(allMarkers);
         }
 
-        // Reset camera behavior safely
         _hereMapController!.camera.setOrientationAtTarget(
           HERE.GeoOrientationUpdate(0, 0),
         );
         debugPrint('✅ Map scene cleaned up');
       }
 
-      // Reset all state variables safely
       if (mounted) {
         setState(() {
           _isNavigating = false;
@@ -1284,7 +1193,6 @@ class _NavigationViewState extends State<NavigationView> {
           _lastSpokenInstruction = "";
           _errorMessage = "";
 
-          // ✅ ADDED: Reset critical state flags
           _isMapReady = false;
           _isLocationReady = false;
         });
@@ -1340,29 +1248,25 @@ class _NavigationViewState extends State<NavigationView> {
         _routePolylines.clear();
         debugPrint('✅ Route polylines cleared');
       }
-      // Stop current visual navigator rendering but keep location engine running
+
       if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
 
-        // Clear listeners to prevent conflicts
         _visualNavigator!.routeProgressListener = null;
         _visualNavigator!.eventTextListener = null;
         _visualNavigator!.routeDeviationListener = null;
 
-        // Clear the current route
         _visualNavigator!.route = null;
 
         debugPrint('✅ Current route cleared from visual navigator');
       }
 
-      // Remove old destination marker if it exists
       if (_destinationMarker != null) {
         _hereMapController!.mapScene.removeMapMarker(_destinationMarker!);
         _destinationMarker = null;
         debugPrint('✅ Old destination marker removed');
       }
 
-      // Reset navigation state variables (but keep location and map ready)
       setState(() {
         _navigationInstruction = "";
         _totalRouteTime = 0;
@@ -1385,14 +1289,11 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('🔄 Switching to new destination: ${space.location.streetName}');
 
     if (_currentLocation != null) {
-      // ✅ ADDED: Clean up current navigation before switching
       _cleanupCurrentRoute();
 
-      // Update destination coordinates
       _actualDestinationLat = space.location.point.lat;
       _actualDestinationLng = space.location.point.lng;
 
-      // Recalculate route to new destination
       _calculateRoute(
         _currentLocation!,
         HERE.GeoCoordinates(space.location.point.lat, space.location.point.lng),
@@ -1411,7 +1312,6 @@ class _NavigationViewState extends State<NavigationView> {
     }
   }
 
-  // WebSocket and location methods
   void _initializeWebSocketConnection() {
     if (_currentLocation == null) {
       debugPrint('⚠️ Current location is null, cannot initialize WebSocket');
@@ -1440,7 +1340,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  // Add to state variables
   final List<MapPolyline> _routePolylines = [];
 
   void _addTrafficAwareRoutePolyline(HERE.Route route) {
@@ -1448,36 +1347,30 @@ class _NavigationViewState extends State<NavigationView> {
 
     debugPrint('🚦 Adding traffic-aware route visualization...');
 
-    // Clear old polylines
     if (_routePolylines.isNotEmpty) {
       _hereMapController!.mapScene.removeMapPolylines(_routePolylines);
       _routePolylines.clear();
     }
 
-    // Process each section
     for (var section in route.sections) {
-      // Process each span in the section
       for (var span in section.spans) {
-        // Get the geometry for this span
         HERE.GeoPolyline spanGeometry = span.geometry;
 
-        // Calculate traffic color based on span data
         Color trafficColor = _getTrafficColorFromSpan(span);
 
         try {
-          // Create polyline for this span
           MapPolyline polyline = MapPolyline.withRepresentation(
             spanGeometry,
             MapPolylineSolidRepresentation(
               MapMeasureDependentRenderSize.withSingleSize(
                 RenderSizeUnit.pixels,
-                16, // Line width
+                16,
               ),
               trafficColor,
-              LineCap.round, // ✅ ADDED: Required LineCap parameter
+              LineCap.round,
             ),
           );
-          // Add to map
+
           _hereMapController!.mapScene.addMapPolyline(polyline);
           _routePolylines.add(polyline);
         } catch (e) {
@@ -1490,7 +1383,6 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   Color _getTrafficColorFromSpan(HERE.Span span) {
-    // Method 1: Compare duration with baseDuration (RECOMMENDED)
     if (span.duration.inSeconds > 0 && span.baseDuration.inSeconds > 0) {
       double trafficDelay =
           span.duration.inSeconds / span.baseDuration.inSeconds;
@@ -1498,21 +1390,19 @@ class _NavigationViewState extends State<NavigationView> {
       debugPrint('🚦 Span traffic ratio: $trafficDelay');
 
       if (trafficDelay <= 1.1) {
-        return Colors.green; // Free flow (≤10% delay)
+        return Colors.green;
       } else if (trafficDelay <= 1.3) {
-        return Colors.yellow; // Light traffic (10-30% delay)
+        return Colors.yellow;
       } else if (trafficDelay <= 1.6) {
-        return Colors.orange; // Moderate traffic (30-60% delay)
+        return Colors.orange;
       } else {
-        return Colors.red; // Heavy traffic (>60% delay)
+        return Colors.red;
       }
     }
 
-    // Method 2: Use DynamicSpeedInfo if available
     if (span.dynamicSpeedInfo != null) {
       final speedInfo = span.dynamicSpeedInfo!;
 
-      // Check if there's traffic data
       if (speedInfo.trafficSpeedInMetersPerSecond != null &&
           speedInfo.baseSpeedInMetersPerSecond != null) {
         double speedRatio =
@@ -1520,22 +1410,20 @@ class _NavigationViewState extends State<NavigationView> {
             speedInfo.baseSpeedInMetersPerSecond!;
 
         if (speedRatio >= 0.8) {
-          return Colors.green; // >80% of normal speed
+          return Colors.green;
         } else if (speedRatio >= 0.6) {
-          return Colors.yellow; // 60-80% of normal speed
+          return Colors.yellow;
         } else if (speedRatio >= 0.4) {
-          return Colors.orange; // 40-60% of normal speed
+          return Colors.orange;
         } else {
-          return Colors.red; // <40% of normal speed
+          return Colors.red;
         }
       }
     }
 
-    // Fallback: No traffic data available
-    return const Color(0xFF4A90E2); // Default blue for route
+    return const Color(0xFF4A90E2);
   }
 
-  // Alternative simpler version using just duration comparison
   Color _getSimpleTrafficColor(HERE.Span span) {
     double delayPercentage =
         ((span.duration.inSeconds - span.baseDuration.inSeconds) /
@@ -1627,7 +1515,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  // Map marker methods
   void _addMapMarkers(List<Event> events, List<Space> spaces) {
     _updateEventMarkers(events);
     _updateSpaceMarkers(spaces);
@@ -1638,7 +1525,6 @@ class _NavigationViewState extends State<NavigationView> {
     Set<String> existingEventIds = _eventMarkersById.keys.toSet();
     Set<String> eventsToRemove = existingEventIds.difference(newEventIds);
 
-    // Remove outdated event markers
     for (String eventId in eventsToRemove) {
       MapMarker? marker = _eventMarkersById[eventId];
       if (marker != null) {
@@ -1649,7 +1535,6 @@ class _NavigationViewState extends State<NavigationView> {
       }
     }
 
-    // Add or update event markers
     for (var event in newEvents) {
       MapMarker? existingMarker = _eventMarkersById[event.id];
 
@@ -1677,7 +1562,6 @@ class _NavigationViewState extends State<NavigationView> {
     Set<String> existingSpaceIds = _spaceMarkersById.keys.toSet();
     Set<String> spacesToRemove = existingSpaceIds.difference(newSpaceIds);
 
-    // Add or update space markers
     for (var space in newSpaces) {
       MapMarker? existingMarker = _spaceMarkersById[space.id];
 
@@ -1916,11 +1800,8 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  void _showToast(String message, {Color backgroundColor = Colors.black}) {
-    // Toast implementation
-  }
+  void _showToast(String message, {Color backgroundColor = Colors.black}) {}
 
-  // UI Widget methods
   Widget _buildSpeedLimitIndicator() {
     return Positioned(
       top: MediaQuery.of(context).padding.top + 120,
@@ -2160,7 +2041,7 @@ class _NavigationViewState extends State<NavigationView> {
                   baseColor: Colors.white.withOpacity(0.5),
                   highlightColor: Colors.grey[100]!,
                   child: Text(
-                    _getCurrentLoadingMessage(context), // ← Changed to this
+                    _getCurrentLoadingMessage(context),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 16,
