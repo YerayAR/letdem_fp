@@ -320,6 +320,7 @@ class _NavigationViewState extends State<NavigationView> {
       MapFeatures.trafficFlow: MapFeatureModes.trafficFlowWithFreeFlow,
       MapFeatures.trafficIncidents: MapFeatureModes.trafficIncidentsAll,
       MapFeatures.roadExitLabels: MapFeatureModes.roadExitLabelsAll,
+
       MapFeatures.vehicleRestrictions:
           MapFeatureModes.vehicleRestrictionsActiveAndInactive,
       MapFeatures.landmarks: MapFeatureModes.landmarksTextured,
@@ -461,14 +462,9 @@ class _NavigationViewState extends State<NavigationView> {
     HERE.GeoCoordinates destination,
   ) {
     debugPrint('🧭 Calculating route...');
-    debugPrint('📍 Start: ${start.latitude}, ${start.longitude}');
-    debugPrint(
-      '🎯 Destination: ${destination.latitude}, ${destination.longitude}',
-    );
 
     setState(() => _isLoading = true);
 
-    // Initialize routing engine if needed
     if (_routingEngine == null) {
       try {
         _routingEngine = HERE.RoutingEngine();
@@ -487,8 +483,17 @@ class _NavigationViewState extends State<NavigationView> {
     HERE.Waypoint destinationWaypoint = HERE.Waypoint(destination);
 
     final carOptions = HERE.CarOptions();
+
+    // ✅ CRITICAL: Enable traffic in route options
     carOptions.routeOptions.enableTolls = true;
     carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
+
+    // 🚦 ADD THESE LINES TO ENABLE TRAFFIC:
+    carOptions.routeOptions.departureTime = DateTime.now();
+    carOptions.routeOptions.trafficOptimizationMode =
+        HERE.TrafficOptimizationMode.timeDependent;
+
+    // 🎯 ADD SPAN CALCULATION FOR TRAFFIC VISUALIZATION:
 
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
@@ -497,9 +502,15 @@ class _NavigationViewState extends State<NavigationView> {
         if (routingError == null && routeList != null && routeList.isNotEmpty) {
           HERE.Route calculatedRoute = routeList.first;
 
+          debugPrint('✅ Route calculated with traffic data');
+          debugPrint('📊 Sections: ${calculatedRoute.sections.length}');
+          debugPrint(
+            '📊 Total spans: ${calculatedRoute.sections.fold(0, (sum, section) => sum + section.spans.length)}',
+          );
+
           _totalRouteTime = calculatedRoute.duration.inSeconds;
           _distanceNotifier.value = calculatedRoute.lengthInMeters;
-
+          _addTrafficAwareRoutePolyline(calculatedRoute);
           _addDestinationMarker(calculatedRoute);
           _setMapCameraFocus();
 
@@ -508,11 +519,8 @@ class _NavigationViewState extends State<NavigationView> {
             _isLoading = false;
           });
 
-          // IMPORTANT: Set navigation start time here
           _navigationStartTime = DateTime.now();
-          debugPrint('🕐 Navigation started at: $_navigationStartTime');
-
-          debugPrint('✅ Route calculated successfully');
+          debugPrint('✅ Route calculated successfully with traffic');
           _startGuidance(calculatedRoute);
         } else {
           final error = routingError?.toString() ?? "Unknown error";
@@ -1124,6 +1132,7 @@ class _NavigationViewState extends State<NavigationView> {
               // Update UI state
               _totalRouteTime = calculatedRoute.duration.inSeconds;
               _distanceNotifier.value = calculatedRoute.lengthInMeters;
+              _addTrafficAwareRoutePolyline(calculatedRoute);
 
               // Update destination marker
               _addDestinationMarker(calculatedRoute);
@@ -1211,7 +1220,11 @@ class _NavigationViewState extends State<NavigationView> {
     try {
       _locationStabilityTimer?.cancel();
       _locationStabilityTimer = null;
-
+      if (_routePolylines.isNotEmpty) {
+        _hereMapController?.mapScene.removeMapPolylines(_routePolylines);
+        _routePolylines.clear();
+        debugPrint('✅ Route polylines cleared');
+      }
       // Stop and cleanup VisualNavigator with null checks
       if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
@@ -1322,6 +1335,11 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('🧹 Cleaning up current route for destination switch...');
 
     try {
+      if (_routePolylines.isNotEmpty) {
+        _hereMapController?.mapScene.removeMapPolylines(_routePolylines);
+        _routePolylines.clear();
+        debugPrint('✅ Route polylines cleared');
+      }
       // Stop current visual navigator rendering but keep location engine running
       if (_visualNavigator != null) {
         _visualNavigator!.stopRendering();
@@ -1420,6 +1438,114 @@ class _NavigationViewState extends State<NavigationView> {
         debugPrint('🔌 WebSocket connection closed');
       },
     );
+  }
+
+  // Add to state variables
+  final List<MapPolyline> _routePolylines = [];
+
+  void _addTrafficAwareRoutePolyline(HERE.Route route) {
+    if (_hereMapController == null) return;
+
+    debugPrint('🚦 Adding traffic-aware route visualization...');
+
+    // Clear old polylines
+    if (_routePolylines.isNotEmpty) {
+      _hereMapController!.mapScene.removeMapPolylines(_routePolylines);
+      _routePolylines.clear();
+    }
+
+    // Process each section
+    for (var section in route.sections) {
+      // Process each span in the section
+      for (var span in section.spans) {
+        // Get the geometry for this span
+        HERE.GeoPolyline spanGeometry = span.geometry;
+
+        // Calculate traffic color based on span data
+        Color trafficColor = _getTrafficColorFromSpan(span);
+
+        try {
+          // Create polyline for this span
+          MapPolyline polyline = MapPolyline.withRepresentation(
+            spanGeometry,
+            MapPolylineSolidRepresentation(
+              MapMeasureDependentRenderSize.withSingleSize(
+                RenderSizeUnit.pixels,
+                16, // Line width
+              ),
+              trafficColor,
+              LineCap.round, // ✅ ADDED: Required LineCap parameter
+            ),
+          );
+          // Add to map
+          _hereMapController!.mapScene.addMapPolyline(polyline);
+          _routePolylines.add(polyline);
+        } catch (e) {
+          debugPrint('❌ Error adding traffic polyline for span: $e');
+        }
+      }
+    }
+
+    debugPrint('✅ Added ${_routePolylines.length} traffic polylines');
+  }
+
+  Color _getTrafficColorFromSpan(HERE.Span span) {
+    // Method 1: Compare duration with baseDuration (RECOMMENDED)
+    if (span.duration.inSeconds > 0 && span.baseDuration.inSeconds > 0) {
+      double trafficDelay =
+          span.duration.inSeconds / span.baseDuration.inSeconds;
+
+      debugPrint('🚦 Span traffic ratio: $trafficDelay');
+
+      if (trafficDelay <= 1.1) {
+        return Colors.green; // Free flow (≤10% delay)
+      } else if (trafficDelay <= 1.3) {
+        return Colors.yellow; // Light traffic (10-30% delay)
+      } else if (trafficDelay <= 1.6) {
+        return Colors.orange; // Moderate traffic (30-60% delay)
+      } else {
+        return Colors.red; // Heavy traffic (>60% delay)
+      }
+    }
+
+    // Method 2: Use DynamicSpeedInfo if available
+    if (span.dynamicSpeedInfo != null) {
+      final speedInfo = span.dynamicSpeedInfo!;
+
+      // Check if there's traffic data
+      if (speedInfo.trafficSpeedInMetersPerSecond != null &&
+          speedInfo.baseSpeedInMetersPerSecond != null) {
+        double speedRatio =
+            speedInfo.trafficSpeedInMetersPerSecond! /
+            speedInfo.baseSpeedInMetersPerSecond!;
+
+        if (speedRatio >= 0.8) {
+          return Colors.green; // >80% of normal speed
+        } else if (speedRatio >= 0.6) {
+          return Colors.yellow; // 60-80% of normal speed
+        } else if (speedRatio >= 0.4) {
+          return Colors.orange; // 40-60% of normal speed
+        } else {
+          return Colors.red; // <40% of normal speed
+        }
+      }
+    }
+
+    // Fallback: No traffic data available
+    return const Color(0xFF4A90E2); // Default blue for route
+  }
+
+  // Alternative simpler version using just duration comparison
+  Color _getSimpleTrafficColor(HERE.Span span) {
+    double delayPercentage =
+        ((span.duration.inSeconds - span.baseDuration.inSeconds) /
+            span.baseDuration.inSeconds) *
+        100;
+
+    if (delayPercentage < 10) return Colors.green;
+    if (delayPercentage < 30) return Colors.yellow;
+    if (delayPercentage < 60) return Colors.orange;
+    return Colors.red;
   }
 
   void _sendLocationUpdateViaWebSocket(double latitude, double longitude) {

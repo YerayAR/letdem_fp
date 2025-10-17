@@ -67,7 +67,8 @@ class NavigationMapScreen extends StatefulWidget {
 
 class _NavigationMapScreenState extends State<NavigationMapScreen> {
   final List<MapMarker> _mapMarkers = [];
-  final List<MapPolyline> _mapPolylines = [];
+  final List<MapPolyline> _mapPolylines =
+      []; // ✅ Changed to store multiple polylines
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
   RouteInfo? _routeInfo;
   late geolocator.Position _currentLocation;
@@ -93,10 +94,8 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     print("Latitude: ${widget.latitude}");
     print("Longitude: ${widget.longitude}");
 
-    // if latitude and longitude and space details are not provided, call a special method to get the location info from space id;
     if (widget.latitude == null && widget.longitude == null) {
       getInfoFromSpaceID(widget.spaceID);
-      // }
     } else {
       _initializeRouting();
     }
@@ -240,7 +239,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   }
 
   RouteInfo retrieveRouteInfoFromHereMap() {
-    // Extract basic info
     final durationSeconds = _currentRoute!.duration.inSeconds;
     final trafficDelaySeconds = _currentRoute!.trafficDelay.inSeconds;
 
@@ -268,12 +266,24 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     carOptions.routeOptions.enableTolls = true;
     carOptions.routeOptions.optimizationMode = routing.OptimizationMode.fastest;
 
+    // ✅ Enable traffic data for route calculation
+    carOptions.routeOptions.departureTime = DateTime.now();
+    carOptions.routeOptions.trafficOptimizationMode =
+        routing.TrafficOptimizationMode.timeDependent;
+
     _routingEngine!.calculateCarRoute(waypoints, carOptions, (
       routing.RoutingError? error,
       List<routing.Route>? routes,
     ) {
       if (error == null && routes != null && routes.isNotEmpty) {
         _currentRoute = routes.first;
+
+        print('✅ Route calculated with traffic data');
+        print('📊 Sections: ${_currentRoute!.sections.length}');
+        print(
+          '📊 Total spans: ${_currentRoute!.sections.fold(0, (sum, section) => sum + section.spans.length)}',
+        );
+
         _renderRoute(_currentRoute!);
         _addMarker(
           GeoCoordinates(
@@ -308,31 +318,102 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   }
 
   void _renderRoute(routing.Route route) {
-    _displayRoutePolyline(route);
+    _displayTrafficAwareRoutePolyline(
+      route,
+    ); // ✅ Changed to traffic-aware method
     _zoomToRoute(route);
   }
 
-  void _displayRoutePolyline(routing.Route route) {
+  // ✅ NEW METHOD: Display route with traffic-aware coloring
+  void _displayTrafficAwareRoutePolyline(routing.Route route) {
     if (_hereMapController == null) return;
 
-    try {
-      final polyline = MapPolyline.withRepresentation(
-        route.geometry,
-        MapPolylineSolidRepresentation(
-          MapMeasureDependentRenderSize.withSingleSize(
-            RenderSizeUnit.pixels,
-            20,
-          ),
-          AppColors.primary300,
-          LineCap.round,
-        ),
-      );
+    print('🚦 Adding traffic-aware route visualization...');
 
-      _hereMapController!.mapScene.addMapPolyline(polyline);
-      _mapPolylines.add(polyline);
-    } catch (e) {
-      print("Polyline rendering error: $e");
+    // Clear old polylines
+    if (_mapPolylines.isNotEmpty) {
+      _hereMapController!.mapScene.removeMapPolylines(_mapPolylines);
+      _mapPolylines.clear();
     }
+
+    // Process each section
+    for (var section in route.sections) {
+      // Process each span in the section
+      for (var span in section.spans) {
+        // Get the geometry for this span
+        GeoPolyline spanGeometry = span.geometry;
+
+        // Calculate traffic color based on span data
+        Color trafficColor = _getTrafficColorFromSpan(span);
+
+        try {
+          // Create polyline for this span
+          MapPolyline polyline = MapPolyline.withRepresentation(
+            spanGeometry,
+            MapPolylineSolidRepresentation(
+              MapMeasureDependentRenderSize.withSingleSize(
+                RenderSizeUnit.pixels,
+                17, // Line width
+              ),
+              trafficColor,
+              LineCap.round,
+            ),
+          );
+
+          // Add to map
+          _hereMapController!.mapScene.addMapPolyline(polyline);
+          _mapPolylines.add(polyline);
+        } catch (e) {
+          print('❌ Error adding traffic polyline for span: $e');
+        }
+      }
+    }
+
+    print('✅ Added ${_mapPolylines.length} traffic polylines');
+  }
+
+  // ✅ NEW METHOD: Determine traffic color from span data
+  Color _getTrafficColorFromSpan(routing.Span span) {
+    // Method 1: Compare duration with baseDuration (RECOMMENDED)
+    if (span.duration.inSeconds > 0 && span.baseDuration.inSeconds > 0) {
+      double trafficDelay =
+          span.duration.inSeconds / span.baseDuration.inSeconds;
+
+      if (trafficDelay <= 1.1) {
+        return Colors.green; // Free flow (≤10% delay)
+      } else if (trafficDelay <= 1.3) {
+        return Colors.yellow; // Light traffic (10-30% delay)
+      } else if (trafficDelay <= 1.6) {
+        return Colors.orange; // Moderate traffic (30-60% delay)
+      } else {
+        return Colors.red; // Heavy traffic (>60% delay)
+      }
+    }
+
+    // Method 2: Use DynamicSpeedInfo if available
+    if (span.dynamicSpeedInfo != null) {
+      final speedInfo = span.dynamicSpeedInfo!;
+
+      if (speedInfo.trafficSpeedInMetersPerSecond != null &&
+          speedInfo.baseSpeedInMetersPerSecond != null) {
+        double speedRatio =
+            speedInfo.trafficSpeedInMetersPerSecond! /
+            speedInfo.baseSpeedInMetersPerSecond!;
+
+        if (speedRatio >= 0.8) {
+          return Colors.green; // >80% of normal speed
+        } else if (speedRatio >= 0.6) {
+          return Colors.yellow; // 60-80% of normal speed
+        } else if (speedRatio >= 0.4) {
+          return Colors.orange; // 40-60% of normal speed
+        } else {
+          return Colors.red; // <40% of normal speed
+        }
+      }
+    }
+
+    // Fallback: No traffic data available
+    return const Color(0xFF4A90E2); // Default blue for route
   }
 
   void _zoomToRoute(routing.Route route) {
