@@ -28,6 +28,8 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/country_codes.model.dart';
 
+import '../../../../../utils/connection_utils.dart';
+
 class PublishSpaceScreen extends StatefulWidget {
   final File file;
   final bool isPaid;
@@ -160,7 +162,11 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
     return true;
   }
 
-  void _publishSpace() {
+  void _publishSpace() async {
+    final isConnected = await ConnectionHelper.showNoConnectionDialog(context);
+
+    if (!isConnected) return;
+
     if (isPublishing) return;
 
     // Check if location data is available
@@ -190,7 +196,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
       }
     }
 
-    if (!isPublishing){
+    if (!isPublishing) {
       // Set local loading state immediately for instant feedback
       setState(() {
         isPublishing = true;
@@ -342,7 +348,8 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                 (spaceType) =>
                                     spaceType != PublishSpaceType.paidFree &&
                                     spaceType != PublishSpaceType.paidBlue &&
-                                    spaceType != PublishSpaceType.paidDisabled &&
+                                    spaceType !=
+                                        PublishSpaceType.paidDisabled &&
                                     spaceType != PublishSpaceType.paidGreenZone,
                               )
                               .map(
@@ -387,7 +394,10 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
                                               ),
                                               Dimens.space(1),
                                               Text(
-                                                getSpaceTypeText(spaceType, context),
+                                                getSpaceTypeText(
+                                                  spaceType,
+                                                  context,
+                                                ),
                                                 style: Typo.smallBody.copyWith(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,

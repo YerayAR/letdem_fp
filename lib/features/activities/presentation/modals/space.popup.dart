@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -23,13 +25,15 @@ import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/views/spaces/reserved_space.view.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/payment/payment.model.dart';
+
+import '../../../../utils/connection_utils.dart';
+import '../../../map/presentation/views/route.view.dart';
 
 class SpacePopupSheet extends StatefulWidget {
   final Space space;
@@ -461,7 +465,31 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
               space.isPremium
                   ? context.l10n.reserveSpace
                   : context.l10n.navigateToSpace,
-          onTap: () {
+          onTap: () async {
+            final isConnected = await ConnectionHelper.showNoConnectionDialog(
+              context,
+            );
+
+            if (!isConnected) return;
+
+            final price =
+                double.tryParse((widget.space.price ?? 0).toString()) ?? 0;
+
+            if ((context.userProfile?.earningAccount?.balance ?? 0) < price) {
+              await AppPopup.showDialogSheet(
+                context,
+                ConfirmationDialog(
+                  isError: true,
+                  title: 'Saldo en letdem',
+                  subtext:
+                      'No dispone de saldo suficiente para reservar este aparcamiento.',
+                  onProceed: () {
+                    NavigatorHelper.pop();
+                  },
+                ),
+              );
+            }
+
             if (widget.space.isPremium) {
               if (context.userProfile!.defaultPaymentMethod == null) {
                 NavigatorHelper.to(const AddPaymentMethod());
@@ -473,6 +501,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   ),
                 );
               }
+              return;
             } else {
               NavigatorHelper.to(
                 NavigationMapScreen(
@@ -484,6 +513,7 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   longitude: widget.space.location.point.lng,
                 ),
               );
+              return;
             }
           },
         );
@@ -676,22 +706,22 @@ class _ThreeDSProcessDialogState extends State<ThreeDSProcessDialog> {
       child: Dialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+        child: const Padding(
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Spinner
-              const SizedBox(
+              SizedBox(
                 width: 48,
                 height: 48,
                 child: CircularProgressIndicator(strokeWidth: 3),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
 
               // Title
-              const Text(
+              Text(
                 'Reservation in progress',
                 style: TextStyle(
                   fontSize: 18,
@@ -701,16 +731,16 @@ class _ThreeDSProcessDialogState extends State<ThreeDSProcessDialog> {
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               // Description
-              const Text(
+              Text(
                 'Please wait while we process your reservation...',
                 style: TextStyle(fontSize: 14, color: Colors.black54),
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
             ],
           ),
         ),

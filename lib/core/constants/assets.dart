@@ -43,7 +43,12 @@ class AppAssets {
   static String closeRoad = 'assets/icon/closed_road.svg';
   static String accident = 'assets/icon/accident.svg';
 
-//   car tag types
+  static String pointAdd = 'assets/icon/point_add.svg';
+  static String altRoute = 'assets/icon/alt_route.svg';
+  static String circlePoint = 'assets/icon/circle_point.svg';
+  static String addAlert = 'assets/icon/add_alert.svg';
+
+  //   car tag types
 
   static String carTagZero = 'assets/icon/car_tags/zero.svg';
   static String carTagEco = 'assets/icon/car_tags/eco.svg';
@@ -61,9 +66,9 @@ class AppAssets {
 
   static String destinationMapMarker = 'assets/icon/destination_pin.png';
 
-//
+  //
 
-//   location
+  //   location
   static String location = 'assets/icon/Location.svg';
   static String card = 'assets/icon/card.svg';
   static String bank = 'assets/icon/bank.svg';
