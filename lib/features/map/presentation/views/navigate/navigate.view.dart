@@ -158,6 +158,8 @@ class _NavigationViewState extends State<NavigationView> {
 
   bool _isOpenRoutes = false;
 
+  List<HERE.Route> routesList = [];
+
   @override
   void initState() {
     print("IS navigating to parking: ${widget.isNavigatingToParking}");
@@ -637,7 +639,9 @@ class _NavigationViewState extends State<NavigationView> {
             _isLoading = false;
           });
 
+          print('routeList ==> 1 // ${routeList.length}');
           // Por ahora tomamos la primera ruta como activa
+          routesList = routeList;
           final selectedRoute = routeList.first;
           _totalRouteTime = selectedRoute.duration.inSeconds;
           _distanceNotifier.value = selectedRoute.lengthInMeters;
@@ -1469,6 +1473,8 @@ class _NavigationViewState extends State<NavigationView> {
           if (routingError == null &&
               routeList != null &&
               routeList.isNotEmpty) {
+            print('routeList ==> ${routeList.length}');
+
             HERE.Route calculatedRoute = routeList.first;
 
             debugPrint('✅ Route recalculated successfully');
@@ -2201,6 +2207,7 @@ class _NavigationViewState extends State<NavigationView> {
               speed: _currentSpeed,
               heightContainer: _heightContainer,
               isLoading: _isLoading,
+              routesList: routesList,
               toggleCameraTracking: _toggleCameraTracking,
               isNavigating: _isNavigating,
               errorMessage: _errorMessage,

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:here_sdk/mapview.dart';
+import 'package:here_sdk/routing.dart' as HERE;
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/time.dart';
 import 'package:shimmer/shimmer.dart';
@@ -45,6 +46,7 @@ class NavigateContent extends StatefulWidget {
     required this.openRouter,
     required this.totalRouteTime,
     required this.distanceValue,
+    required this.routesList,
   });
 
   final Function(HereMapController)? onMapCreated;
@@ -74,6 +76,7 @@ class NavigateContent extends StatefulWidget {
   final VoidCallback openRouter;
   final String totalRouteTime;
   final String distanceValue;
+  final List<HERE.Route> routesList;
 
   String get distance {
     return "${(totalRouteTime)} ($distanceValue)";
@@ -568,17 +571,23 @@ class _NavigateContentState extends State<NavigateContent>
             ),
           ],
         ),
-        child: _tabItemInformation(),
+        child: _tabItemInformation(
+          distance: widget.distanceValue,
+          time: widget.totalRouteTime,
+          name: 'Via - lorem Ipsun',
+        ),
       ),
     );
   }
 
   Widget _tabListRoutes() {
     return ListView.separated(
-      itemCount: 4,
+      itemCount: widget.routesList.length,
       separatorBuilder: (_, __) => const SizedBox(height: 15),
       padding: const EdgeInsets.only(top: 30),
       itemBuilder: (_, index) {
+        final item = widget.routesList[index];
+
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           padding: EdgeInsets.symmetric(
@@ -597,13 +606,23 @@ class _NavigateContentState extends State<NavigateContent>
               ),
             ],
           ),
-          child: _tabItemInformation(),
+          child: _tabItemInformation(
+            distance: item.lengthInMeters.toFormattedDistance(),
+            time: item.duration.inSeconds.toFormattedTime(),
+            name: '',
+            isSelected: false,
+          ),
         );
       },
     );
   }
 
-  Widget _tabItemInformation() {
+  Widget _tabItemInformation({
+    bool isSelected = true,
+    required String distance,
+    required String time,
+    required String name,
+  }) {
     return Row(
       children: [
         Expanded(
@@ -621,26 +640,38 @@ class _NavigateContentState extends State<NavigateContent>
                 ),
               ),
               Text(
-                '13:59 - ${widget.totalRouteTime}',
+                time,
                 style: const TextStyle(color: Colors.black, fontSize: 15),
               ),
-              const Text(
-                'Via - lorem Ipsun',
-                style: TextStyle(color: Color(0xFF445D6F), fontSize: 15),
-              ),
+              // Text(
+              //   name,
+              //   style: const TextStyle(color: Color(0xFF445D6F), fontSize: 15),
+              // ),
             ],
           ),
         ),
-        SizedBox(
-          width: 120,
-          child: PrimaryButton(
-            onTap: widget.openRouter,
-            color: AppColors.primary500,
-            widgetImage: SvgPicture.asset(AppAssets.mapRoutes),
-            textColor: Colors.white,
-            text: 'Reanudar',
+        if (isSelected)
+          SizedBox(
+            width: 120,
+            child: PrimaryButton(
+              onTap: widget.openRouter,
+              color: AppColors.primary500,
+              widgetImage: SvgPicture.asset(AppAssets.mapRoutes),
+              textColor: Colors.white,
+              text: 'Reanudar',
+            ),
           ),
-        ),
+        if (!isSelected)
+          SizedBox(
+            width: 80,
+            child: PrimaryButton(
+              onTap: widget.openRouter,
+              color: AppColors.primary500,
+              widgetImage: SvgPicture.asset(AppAssets.mapRoutes),
+              textColor: Colors.white,
+              text: 'Ir',
+            ),
+          ),
       ],
     );
   }
