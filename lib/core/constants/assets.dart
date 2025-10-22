@@ -47,6 +47,7 @@ class AppAssets {
   static String altRoute = 'assets/icon/alt_route.svg';
   static String circlePoint = 'assets/icon/circle_point.svg';
   static String addAlert = 'assets/icon/add_alert.svg';
+  static String mapRoutes = 'assets/icon/map_routes.svg';
 
   //   car tag types
 

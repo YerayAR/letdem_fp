@@ -8,6 +8,7 @@ import 'package:letdem/core/extensions/time.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../../../common/popups/popup.dart';
+import '../../../../../../common/widgets/button.dart';
 import '../../../../../../core/constants/assets.dart';
 import '../../../../../../core/constants/colors.dart';
 import '../../../../../../core/constants/dimens.dart';
@@ -30,7 +31,6 @@ class NavigateContent extends StatefulWidget {
     this.borderRadius = 20,
     required this.onError,
     required this.errorMessage,
-    required this.distance,
     required this.navigationInstruction,
     required this.isMuted,
     required this.onMuted,
@@ -41,6 +41,10 @@ class NavigateContent extends StatefulWidget {
     required this.isMapReady,
     required this.isRecalculatingRoute,
     required this.stopNavigation,
+    required this.isOpenRoutes,
+    required this.openRouter,
+    required this.totalRouteTime,
+    required this.distanceValue,
   });
 
   final Function(HereMapController)? onMapCreated;
@@ -56,7 +60,6 @@ class NavigateContent extends StatefulWidget {
   final double borderRadius;
   final VoidCallback onError;
   final String errorMessage;
-  final String distance;
   final String navigationInstruction;
   final bool isMuted;
   final VoidCallback onMuted;
@@ -67,6 +70,14 @@ class NavigateContent extends StatefulWidget {
   final bool isMapReady;
   final bool isRecalculatingRoute;
   final VoidCallback stopNavigation;
+  final bool isOpenRoutes;
+  final VoidCallback openRouter;
+  final String totalRouteTime;
+  final String distanceValue;
+
+  String get distance {
+    return "${(totalRouteTime)} ($distanceValue)";
+  }
 
   final Map<String, IconData> directionIcons = {
     'turn right': Icons.turn_right,
@@ -79,90 +90,160 @@ class NavigateContent extends StatefulWidget {
   State<NavigateContent> createState() => _NavigateContentState();
 }
 
-class _NavigateContentState extends State<NavigateContent> {
+class _NavigateContentState extends State<NavigateContent>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.expand,
       children: [
         HereMap(onMapCreated: widget.onMapCreated),
-        NavigateBottom(
-          mapPadding: widget.mapPadding,
-          radius: widget.buttonRadius,
-          speed: widget.speed,
-          isLimit: widget.isLimit,
-          height: widget.heightContainer,
-        ),
+
+        if (widget.isOpenRoutes)
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            top: MediaQuery.of(context).padding.top + widget.mapPadding,
+            bottom: 0,
+            left: widget.mapPadding,
+            right: widget.mapPadding,
+            child: Column(
+              children: [
+                Container(
+                  clipBehavior: Clip.antiAlias,
+                  padding: EdgeInsets.all(widget.mapPadding * .5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: TabBar(
+                    controller: tabController,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: AppColors.primary500,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    dividerColor: Colors.transparent,
+                    unselectedLabelStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                    ),
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    tabs: const [Tab(text: 'Mapa'), Tab(text: 'Lista')],
+                  ),
+                ),
+
+                Expanded(
+                  child: TabBarView(
+                    controller: tabController,
+                    children: [_tabMap(), _tabListRoutes()],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        if (!widget.isOpenRoutes)
+          NavigateBottom(
+            mapPadding: widget.mapPadding,
+            radius: widget.buttonRadius,
+            speed: widget.speed,
+            isLimit: widget.isLimit,
+            height: widget.heightContainer,
+          ),
         // if (kDebugMode) _buildWebSocketStatusIndicator(),
         if (widget.isLoading) _buildLoadingIndicator(),
-        Positioned(
-          // top: MediaQuery.of(context).padding.top + 200,
-          right: widget.mapPadding,
-          bottom: widget.heightContainer + 15,
-          child: Column(
-            spacing: 15,
-            children: [
-              CircleAvatar(
-                radius: widget.buttonRadius,
-                backgroundColor: Colors.white,
-                child: IconButton(
-                  icon: Icon(
-                    widget.isCameraLocked
-                        ? Icons.gps_fixed
-                        : Icons.gps_not_fixed,
-                    color:
-                        widget.isCameraLocked
-                            ? AppColors.primary500
-                            : Colors.grey,
-                  ),
-                  onPressed: widget.toggleCameraTracking,
-                  tooltip:
+
+        if (!widget.isOpenRoutes)
+          Positioned(
+            // top: MediaQuery.of(context).padding.top + 200,
+            right: widget.mapPadding,
+            bottom: widget.heightContainer + 15,
+            child: Column(
+              spacing: 15,
+              children: [
+                CircleAvatar(
+                  radius: widget.buttonRadius,
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: Icon(
                       widget.isCameraLocked
-                          ? context.l10n.freeCameraMode
-                          : context.l10n.lockPositionMode,
+                          ? Icons.gps_fixed
+                          : Icons.gps_not_fixed,
+                      color:
+                          widget.isCameraLocked
+                              ? AppColors.primary500
+                              : Colors.grey,
+                    ),
+                    onPressed: widget.toggleCameraTracking,
+                    tooltip:
+                        widget.isCameraLocked
+                            ? context.l10n.freeCameraMode
+                            : context.l10n.lockPositionMode,
+                  ),
                 ),
-              ),
 
-              // CircleAvatar(
-              //   radius: widget.buttonRadius,
-              //   backgroundColor: Colors.white,
-              //   child: IconButton(
-              //     icon: SvgPicture.asset(
-              //       AppAssets.circlePoint,
-              //       width: 20,
-              //       height: 20,
-              //     ),
-              //     onPressed: () {},
-              //   ),
-              // ),
+                // CircleAvatar(
+                //   radius: widget.buttonRadius,
+                //   backgroundColor: Colors.white,
+                //   child: IconButton(
+                //     icon: SvgPicture.asset(
+                //       AppAssets.circlePoint,
+                //       width: 20,
+                //       height: 20,
+                //     ),
+                //     onPressed: () {},
+                //   ),
+                // ),
 
-              // CircleAvatar(
-              //   radius: widget.buttonRadius * 1.2,
-              //   backgroundColor: AppColors.primary500,
-              //   child: IconButton(
-              //     icon: SvgPicture.asset(
-              //       AppAssets.addAlert,
-              //       width: 25,
-              //       height: 25,
-              //     ),
-              //     onPressed: () {
-              //       AppPopup.showBottomSheet(
-              //         context,
-              //         const AddEventBottomSheet(),
-              //       );
-              //     },
-              //   ),
-              // ),
-            ],
+                // CircleAvatar(
+                //   radius: widget.buttonRadius * 1.2,
+                //   backgroundColor: AppColors.primary500,
+                //   child: IconButton(
+                //     icon: SvgPicture.asset(
+                //       AppAssets.addAlert,
+                //       width: 25,
+                //       height: 25,
+                //     ),
+                //     onPressed: () {
+                //       AppPopup.showBottomSheet(
+                //         context,
+                //         const AddEventBottomSheet(),
+                //       );
+                //     },
+                //   ),
+                // ),
+              ],
+            ),
           ),
-        ),
         if (widget.errorMessage.isNotEmpty) _buildErrorMessage(),
-        Positioned(
-          top: MediaQuery.of(context).padding.top,
-          left: 0,
-          right: 0,
-          child: _buildNavigationInstructionCard(),
-        ),
-        if (widget.isNavigating)
+
+        if (!widget.isOpenRoutes)
+          Positioned(
+            top: MediaQuery.of(context).padding.top,
+            left: 0,
+            right: 0,
+            child: _buildNavigationInstructionCard(),
+          ),
+        if (widget.isNavigating && !widget.isOpenRoutes)
           Positioned(
             // bottom: 30,
             bottom: 0,
@@ -281,7 +362,7 @@ class _NavigateContentState extends State<NavigateContent> {
                 color: const Color(0xFF445D6F),
               ),
               tooltip: 'Cambiar ruta',
-              onPressed: () {},
+              onPressed: widget.openRouter,
             ),
           ),
         ],
@@ -462,5 +543,105 @@ class _NavigateContentState extends State<NavigateContent> {
       return "Recalculating route...";
     }
     return "Starting navigation...";
+  }
+
+  Widget _tabMap() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: EdgeInsets.symmetric(
+          horizontal: widget.mapPadding,
+          vertical: widget.mapPadding + 5,
+        ),
+        height: widget.heightContainer,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(widget.borderRadius),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: _tabItemInformation(),
+      ),
+    );
+  }
+
+  Widget _tabListRoutes() {
+    return ListView.separated(
+      itemCount: 4,
+      separatorBuilder: (_, __) => const SizedBox(height: 15),
+      padding: const EdgeInsets.only(top: 30),
+      itemBuilder: (_, index) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: EdgeInsets.symmetric(
+            horizontal: widget.mapPadding,
+            vertical: widget.mapPadding,
+          ),
+          height: widget.heightContainer,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: _tabItemInformation(),
+        );
+      },
+    );
+  }
+
+  Widget _tabItemInformation() {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            spacing: 5,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.distanceValue,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              Text(
+                '13:59 - ${widget.totalRouteTime}',
+                style: const TextStyle(color: Colors.black, fontSize: 15),
+              ),
+              const Text(
+                'Via - lorem Ipsun',
+                style: TextStyle(color: Color(0xFF445D6F), fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 120,
+          child: PrimaryButton(
+            onTap: widget.openRouter,
+            color: AppColors.primary500,
+            widgetImage: SvgPicture.asset(AppAssets.mapRoutes),
+            textColor: Colors.white,
+            text: 'Reanudar',
+          ),
+        ),
+      ],
+    );
   }
 }

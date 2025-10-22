@@ -156,6 +156,8 @@ class _NavigationViewState extends State<NavigationView> {
 
   bool _isConnected = true;
 
+  bool _isOpenRoutes = false;
+
   @override
   void initState() {
     print("IS navigating to parking: ${widget.isNavigatingToParking}");
@@ -2194,6 +2196,7 @@ class _NavigationViewState extends State<NavigationView> {
             body: NavigateContent(
               onMapCreated: _onMapCreated,
               isLimit: _isOverSpeedLimit,
+              isOpenRoutes: _isOpenRoutes,
               isCameraLocked: _isCameraLocked,
               speed: _currentSpeed,
               heightContainer: _heightContainer,
@@ -2210,8 +2213,12 @@ class _NavigationViewState extends State<NavigationView> {
               isMapReady: _isMapReady,
               isRecalculatingRoute: _isRecalculatingRoute,
               stopNavigation: _stopNavigation,
-              distance:
-                  "${(_totalRouteTime.toFormattedTime())} (${_distanceNotifier.value.toFormattedDistance()})",
+              openRouter: () {
+                _isOpenRoutes = !_isOpenRoutes;
+                setState(() {});
+              },
+              totalRouteTime: _totalRouteTime.toFormattedTime(),
+              distanceValue: _distanceNotifier.value.toFormattedDistance(),
               onError: () {
                 setState(() {
                   _errorMessage = "";
