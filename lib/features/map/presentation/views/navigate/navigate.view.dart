@@ -408,7 +408,7 @@ class _NavigationViewState extends State<NavigationView> {
 
     _setupGestureListeners();
 
-    _addInitialDestinationMarker();
+    // _addInitialDestinationMarker();
   }
 
   void _setupGestureListeners() {
@@ -1745,7 +1745,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-  final List<MapPolyline> _routePolylines = [];
 
   void _addTrafficAwareRoutePolyline(HERE.Route route) {
     if (_hereMapController == null) return;

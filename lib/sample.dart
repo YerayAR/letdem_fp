@@ -22,7 +22,6 @@ import 'package:letdem/core/utils/dates.dart';
 import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
-import 'package:letdem/features/map/presentation/views/navigate.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
@@ -33,6 +32,8 @@ import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/map/coordinate.model.dart';
+
+import 'features/map/presentation/views/navigate/navigate.view.dart';
 
 class NavigationMapScreenTest extends StatefulWidget {
   final double? latitude;

@@ -22,7 +22,7 @@ import 'package:letdem/models/map/coordinate.model.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
-import '../../../../../sample.dart';
+import '../../../../map/presentation/views/route.view.dart';
 
 class MapSearchBottomSheet extends StatefulWidget {
   const MapSearchBottomSheet({super.key});
@@ -103,7 +103,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     CoordinatesData? coordinates,
   ]) {
     NavigatorHelper.to(
-      NavigationMapScreenTest(
+      NavigationMapScreen(
         destinationStreetName: streetName,
         hideToggle: false,
         googlePlaceID: googlePlaceID,
