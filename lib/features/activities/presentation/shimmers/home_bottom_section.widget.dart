@@ -12,6 +12,7 @@ import 'package:letdem/features/activities/presentation/utils/publish_space_hand
 import 'package:letdem/features/activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
 
 import '../../../../infrastructure/services/mapbox_search/models/service.dart';
+import '../../../../utils/connection_utils.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
   final VoidCallback onRefreshTriggered;
@@ -55,10 +56,10 @@ class HomeMapBottomSection extends StatelessWidget {
                     HereSearchApiService()
                         .getLocationResults(value, context)
                         .then((value) {
-                      for (var element in value) {
-                        print(element.toJson());
-                      }
-                    });
+                          for (var element in value) {
+                            print(element.toJson());
+                          }
+                        });
                   },
                   prefixIcon: IconlyLight.search,
                   placeHolder: context.l10n.enterDestination,
@@ -80,9 +81,17 @@ class HomeMapBottomSection extends StatelessWidget {
                   flex: context.isSpanish ? 6 : 1,
                   child: PrimaryButton(
                     onTap: () async {
+                      final isConnected =
+                          await ConnectionHelper.showNoConnectionDialog(
+                            context,
+                          );
+
+                      if (!isConnected) return;
+
                       PublishSpaceHandler.showSpaceOptions(context, () {
                         onRefreshTriggered();
                       });
+                      return;
                     },
                     icon: !context.isSpanish ? IconlyBold.location : null,
                     text: context.l10n.publishSpace,
@@ -97,7 +106,9 @@ class HomeMapBottomSection extends StatelessWidget {
                     borderColor: Colors.transparent,
                     onTap: () {
                       AppPopup.showBottomSheet(
-                          context, const AddEventBottomSheet());
+                        context,
+                        const AddEventBottomSheet(),
+                      );
                     },
                     icon: !context.isSpanish ? IconlyBold.star : null,
                     color: AppColors.primary500,

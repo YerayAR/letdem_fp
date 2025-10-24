@@ -163,10 +163,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get validCard => 'Tarjeta válida';
 
   @override
-  String get enterCardDetails => 'Ingrese los detalles de la tarjeta';
+  String get enterCardDetails => 'Ingrese los datos de la tarjeta';
 
   @override
-  String get passwordStrength => 'Fortaleza de la contraseña';
+  String get passwordStrength => 'Seguridad de la contraseña';
 
   @override
   String get passwordWeak => 'Débil';
@@ -243,7 +243,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get personalInfo => 'Información personal';
 
   @override
-  String get addressInfo => 'Información de dirección';
+  String get addressInfo => 'Información de la dirección';
 
   @override
   String get documentUpload => 'Subir documentos';
@@ -276,25 +276,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get accident => 'Accidente';
 
   @override
-  String get freeSpace => 'Gratuito';
+  String get freeSpace => 'Espacio gratuito';
 
   @override
   String get blueZone => 'Zona azul';
 
   @override
-  String get disabledSpace => 'Minusválidos';
+  String get disabledSpace => 'Espacio de minusválidos';
 
   @override
   String get greenZone => 'Zona verde';
 
   @override
-  String get paidFreeSpace => 'Zona gratuito';
+  String get paidFreeSpace => 'Zona gratuita';
 
   @override
   String get paidBlueZone => 'Zona azul de pago';
 
   @override
-  String get paidDisabledSpace => 'Minusválidos de pago';
+  String get paidDisabledSpace => 'Espacio pago de minusválidos';
 
   @override
   String get paidGreenZone => 'Zona verde de pago';
@@ -441,7 +441,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get callSpaceOwner => 'Llamar al propietario';
 
   @override
-  String get couldNotLaunchDialer => 'No se pudo abrir el marcador';
+  String get couldNotLaunchDialer => 'No se pudo abrir el teléfono';
 
   @override
   String get viewDetails => 'Ver detalles';
@@ -459,7 +459,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get showAll => 'Ver todo';
 
   @override
-  String get noContributions => 'No hay contribuciones todavía';
+  String get noContributions => 'Todavía no tienes contribuciones';
 
   @override
   String get noContributionsDescription =>
@@ -564,7 +564,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get registerCarDetails =>
-      'Registra tu coche con los detalles\npara seguridad y accesibilidad';
+      'Registra tu coche con los detalles\npor seguridad y accesibilidad';
 
   @override
   String get tapToRegisterCar => 'Toca para registrar coche';
@@ -600,7 +600,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get whatIsThis => '¿Qué es esto?';
 
   @override
-  String get whatTagMeans => 'Qué eignifican las etiquetas';
+  String get whatTagMeans => 'Qué significan las etiquetas';
 
   @override
   String get gotIt => 'Entendido';
@@ -688,7 +688,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorReserveSpace => 'No se pudo reservar el aparcamiento';
 
   @override
-  String get errorSendFeedback => 'No se pudo enviar la retroalimentación';
+  String get errorSendFeedback => 'No se pudo enviar el feeback';
 
   @override
   String get errorTakeSpace => 'No se pudo tomar el aparcamiento';
@@ -706,7 +706,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get forgotPassword => 'Olvidé mi contraseña';
 
   @override
-  String get getHelp => 'Obtener ayuda';
+  String get getHelp => 'Ayuda';
 
   @override
   String get enterEmailToReset =>
@@ -811,7 +811,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get taxInformation => 'Información fiscal';
 
   @override
-  String get paymentProvider => 'proveedor de pagos';
+  String get paymentProvider => 'Proveedor de pagos';
 
   @override
   String get pleaseEnterYourNumber => 'Por favor ingresa tu número de teléfono';
@@ -831,7 +831,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get emailSentDescription =>
-      'Hemos enviado un código OTP a tu correo. Ingrésalo abajo para restablecer tu contraseña.';
+      'Hemos enviado un código a tu correo. Ingrésalo abajo para restablecer tu contraseña.';
 
   @override
   String get mailSentTo => 'Correo enviado a: ';
@@ -1013,7 +1013,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get verificationInstructions =>
-      'Por favor revisa el correo proporcionado para obtener un código OTP y verificar tu correo. Ingrésalo abajo';
+      'Por favor revisa el correo proporcionado para obtener un código de un solo uso y verifica tu correo. Ingrésalo abajo';
 
   @override
   String get resending => 'Reenviando';
@@ -1160,7 +1160,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get uploadIDDescription => 'Sube ambos lados de tu DNI';
 
   @override
-  String get uploadIDFront => 'Toca para subir el frente del DNI';
+  String get uploadIDFront => 'Toca para subir el anverso del DNI';
 
   @override
   String get uploadIDBack => 'Toca para subir el reverso del DNI';
@@ -1543,7 +1543,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get locationPermissionPermanentlyDenied =>
-      'Permisos de ubicación denegados permanentemente, habilítelos en la configuración';
+      'Permisos de ubicación denegados permanentemente, habilítalos en la configuración';
 
   @override
   String get failedToInitializeLocationServices =>
@@ -1902,7 +1902,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get emailNotifications => 'Notificaciones por correo';
 
   @override
-  String get pushNotifications => 'Notificaciones push';
+  String get pushNotifications => 'Notificaciones móviles';
 
   @override
   String get availableSpaces => 'Aparcamientos disponibles';
@@ -1935,7 +1935,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get letdemPoints => 'Puntos LetDem';
 
   @override
-  String get walletBalance => 'Saldo de cartera';
+  String get walletBalance => 'Saldo en cartera';
 
   @override
   String get withdraw => 'Retirar';
@@ -1962,7 +1962,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get seeAll => 'Ver todo';
 
   @override
-  String get noTransactionsYet => 'No hay transacciones todavía';
+  String get noTransactionsYet => 'Todavía no hay transacciones';
 
   @override
   String get transactionsHistoryMessage =>
@@ -2054,7 +2054,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get contactSupportMessage =>
-      'Parece que hay un problema con tu cuenta. Por favor contacta soporte para asistencia.';
+      'Parece que hay un problema con tu cuenta. Por favor contacta con soporte para asistencia.';
 
   @override
   String get insufficientBalance => 'No tienes suficiente saldo para retirar';
@@ -2252,7 +2252,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get serverError => 'Error del servidor';
 
   @override
-  String get requestFailed => 'Solicitud falló';
+  String get requestFailed => 'Falló la solicitud';
 
   @override
   String get invalidEmailFormat => 'Formato de email inválido';
@@ -2484,7 +2484,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get paymentFailedDescription =>
-      'La reserva falló porque tu pago no se procesó correctamente';
+      'La reserva falló porque el pago no se procesó correctamente';
 
   @override
   String get errorReserveSpaceDescription =>

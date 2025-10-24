@@ -15,7 +15,6 @@ import 'package:letdem/core/enums/LetDemLocationType.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/add_location.widget.dart';
 import 'package:letdem/features/activities/presentation/widgets/search/address_component.widget.dart';
-import 'package:letdem/features/map/presentation/views/route.view.dart';
 import 'package:letdem/features/search/search_location_bloc.dart';
 import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/models/location/local_location.model.dart';
@@ -23,6 +22,7 @@ import 'package:letdem/models/map/coordinate.model.dart';
 
 import '../../../../../infrastructure/services/mapbox_search/models/cache.dart';
 import '../../../../../infrastructure/services/res/navigator.dart';
+import '../../../../../sample.dart';
 
 class MapSearchBottomSheet extends StatefulWidget {
   const MapSearchBottomSheet({super.key});
@@ -103,7 +103,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     CoordinatesData? coordinates,
   ]) {
     NavigatorHelper.to(
-      NavigationMapScreen(
+      NavigationMapScreenTest(
         destinationStreetName: streetName,
         hideToggle: false,
         googlePlaceID: googlePlaceID,

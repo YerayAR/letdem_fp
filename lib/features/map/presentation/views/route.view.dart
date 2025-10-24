@@ -24,7 +24,7 @@ import 'package:letdem/core/utils/dates.dart';
 import 'package:letdem/core/utils/parsers.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart';
-import 'package:letdem/features/map/presentation/views/navigate.view.dart';
+import 'package:letdem/features/map/presentation/views/navigate/navigate.view.dart';
 import 'package:letdem/features/scheduled_notifications/schedule_notifications_bloc.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/infrastructure/api/api/api.service.dart';
