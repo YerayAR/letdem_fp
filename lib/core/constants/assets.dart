@@ -14,6 +14,8 @@ class AppAssets {
   static String ellipse = 'assets/icon/ellipse.svg';
   static String ellipseLeft = 'assets/icon/ellipseLeft.svg';
 
+  static String phoneScreenshot = 'assets/audio/phone.png';
+
   static String destinationMapMarkerLarge =
       'assets/icon/destination_marker.png';
   static String green = 'assets/icon/green.svg';

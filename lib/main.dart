@@ -52,7 +52,6 @@ import 'package:toastification/toastification.dart';
 
 import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
-import 'l10n/app_localizations.dart';
 
 Future _initializeHERESDK() async {
   try {
