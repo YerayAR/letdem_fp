@@ -14,6 +14,7 @@ import '../../../../../../core/constants/assets.dart';
 import '../../../../../../core/constants/colors.dart';
 import '../../../../../../core/constants/dimens.dart';
 import '../../../../../activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
+import '../../../../../activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
 import 'navigate_bottom.dart';
 
 class NavigateContent extends StatefulWidget {
@@ -204,36 +205,36 @@ class _NavigateContentState extends State<NavigateContent>
                   ),
                 ),
 
-                // CircleAvatar(
-                //   radius: widget.buttonRadius,
-                //   backgroundColor: Colors.white,
-                //   child: IconButton(
-                //     icon: SvgPicture.asset(
-                //       AppAssets.circlePoint,
-                //       width: 20,
-                //       height: 20,
-                //     ),
-                //     onPressed: () {},
-                //   ),
-                // ),
+                CircleAvatar(
+                  radius: widget.buttonRadius,
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: SvgPicture.asset(
+                      AppAssets.circlePoint,
+                      width: 20,
+                      height: 20,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
 
-                // CircleAvatar(
-                //   radius: widget.buttonRadius * 1.2,
-                //   backgroundColor: AppColors.primary500,
-                //   child: IconButton(
-                //     icon: SvgPicture.asset(
-                //       AppAssets.addAlert,
-                //       width: 25,
-                //       height: 25,
-                //     ),
-                //     onPressed: () {
-                //       AppPopup.showBottomSheet(
-                //         context,
-                //         const AddEventBottomSheet(),
-                //       );
-                //     },
-                //   ),
-                // ),
+                CircleAvatar(
+                  radius: widget.buttonRadius * 1.2,
+                  backgroundColor: AppColors.primary500,
+                  child: IconButton(
+                    icon: SvgPicture.asset(
+                      AppAssets.addAlert,
+                      width: 25,
+                      height: 25,
+                    ),
+                    onPressed: () {
+                      AppPopup.showBottomSheet(
+                        context,
+                        const AddEventBottomSheet(),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -319,19 +320,23 @@ class _NavigateContentState extends State<NavigateContent>
           //       Navigator.pop(context);
           //     },
           //   ),
-          // ),}
+          // ),
           CircleAvatar(
             radius: widget.buttonRadius,
             backgroundColor: const Color(0xFFF4F4F4),
             child: IconButton(
               icon: SvgPicture.asset(
-                AppAssets.addAlert,
+                AppAssets.pointAdd,
                 width: 25,
                 height: 25,
                 color: const Color(0xFF445D6F),
               ),
               onPressed: () {
-                AppPopup.showBottomSheet(context, const AddEventBottomSheet());
+                // AppPopup.showBottomSheet(context, const AddEventBottomSheet());
+                AppPopup.showBottomSheet(
+                  context,
+                  const MapSearchBottomSheet(title: 'Añadir ruta'),
+                );
               },
             ),
           ),
@@ -523,7 +528,7 @@ class _NavigateContentState extends State<NavigateContent>
             Container(
               height: 60,
               decoration: BoxDecoration(color: AppColors.primary500),
-              child: Row(mainAxisAlignment: MainAxisAlignment.center),
+              child: const Row(mainAxisAlignment: MainAxisAlignment.center),
             ),
           ],
         ),

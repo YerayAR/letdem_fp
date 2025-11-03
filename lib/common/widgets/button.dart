@@ -4,6 +4,8 @@ import 'package:letdem/common/widgets/loader.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 
+import '../../utils/connection_utils.dart';
+
 class PrimaryButton extends StatelessWidget {
   final Color? color;
   final bool outline;
@@ -27,6 +29,8 @@ class PrimaryButton extends StatelessWidget {
 
   final double? borderRadius;
 
+  final bool isVerifyConecction;
+
   const PrimaryButton({
     super.key,
     this.color,
@@ -45,6 +49,7 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.widgetImage,
     this.textColor,
+    this.isVerifyConecction = false,
   });
 
   @override
@@ -89,8 +94,17 @@ class PrimaryButton extends StatelessWidget {
       highlightColor: Colors.white.withOpacity(0.1),
       splashColor: Colors.grey.withOpacity(0.1),
       borderRadius: BorderRadius.circular(10000),
-      onTap: () {
-        if (isLoading && onTap == null) {
+      onTap: () async {
+        bool isConnect = true;
+
+        if (isVerifyConecction) {
+          isConnect = await ConnectionHelper.checkInternetAccess();
+        }
+
+        if (!isConnect) {
+          await ConnectionHelper.showNoConnectionDialog(context);
+          return;
+        } else if (isLoading && onTap == null) {
           return;
         } else {
           if (isDisabled) {
@@ -106,95 +120,107 @@ class PrimaryButton extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(borderRadius ?? 10000),
-          color: isDisabled
-              ? AppColors.primary200
-              : background ??
-                  (outline
-                      ? Colors.transparent
-                      : color ?? AppColors.primary500),
-          border: outline
-              ? Border.all(
-                  color: borderColor ?? AppColors.primary500,
-                  width: borderWidth != null
-                      ? borderWidth!
-                      : icon == null
-                          ? 2
-                          : 1)
-              : null,
+          color:
+              isDisabled
+                  ? AppColors.primary200
+                  : background ??
+                      (outline
+                          ? Colors.transparent
+                          : color ?? AppColors.primary500),
+          border:
+              outline
+                  ? Border.all(
+                    color: borderColor ?? AppColors.primary500,
+                    width:
+                        borderWidth != null
+                            ? borderWidth!
+                            : icon == null
+                            ? 2
+                            : 1,
+                  )
+                  : null,
         ),
         child: Center(
-          child: isLoading
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LoadingIndicator(
-                      color: loadingIndicatorColor ?? Colors.white,
-                    ),
-                    // const SizedBox(width: 10),
-                    // Text(
-                    //   randomLoadingText,
-                    //   style: TextStyle(
-                    //     fontSize: 14,
-                    //     fontWeight: FontWeight.w600,
-                    //     color: Colors.white.withOpacity(0.5),
-                    //   ),
-                    // ),
-                  ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: widgetImage != null
-                          ? [widgetImage!, Dimens.space(1)]
-                          : icon != null
-                              ? [
+          child:
+              isLoading
+                  ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LoadingIndicator(
+                        color: loadingIndicatorColor ?? Colors.white,
+                      ),
+                      // const SizedBox(width: 10),
+                      // Text(
+                      //   randomLoadingText,
+                      //   style: TextStyle(
+                      //     fontSize: 14,
+                      //     fontWeight: FontWeight.w600,
+                      //     color: Colors.white.withOpacity(0.5),
+                      //   ),
+                      // ),
+                    ],
+                  )
+                  : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children:
+                            widgetImage != null
+                                ? [widgetImage!, Dimens.space(1)]
+                                : icon != null
+                                ? [
                                   Icon(
                                     icon,
-                                    color: outline
-                                        ? color ?? AppColors.primary500
-                                        : textColor ??
-                                            (isDisabled
-                                                ? Colors.white.withOpacity(0.8)
-                                                : Colors.white),
+                                    color:
+                                        outline
+                                            ? color ?? AppColors.primary500
+                                            : textColor ??
+                                                (isDisabled
+                                                    ? Colors.white.withOpacity(
+                                                      0.8,
+                                                    )
+                                                    : Colors.white),
                                     size: 18,
                                   ),
-                                  Dimens.space(1)
+                                  Dimens.space(1),
                                 ]
-                              : [],
-                    ),
-                    Text(
-                      text,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight:
-                            icon != null ? FontWeight.w700 : FontWeight.w600,
-                        color: textColor ??
-                            (isDisabled
-                                ? Colors.white.withOpacity(0.8)
-                                : outline
-                                    ? color ?? AppColors.primary500
-                                    : Colors.white),
+                                : [],
                       ),
-                    ),
-                    Row(
-                      children: iconRight != null
-                          ? [
-                              Dimens.space(1),
-                              Icon(
-                                iconRight,
-                                color: isDisabled
-                                    ? Colors.white.withOpacity(0.8)
-                                    : outline
-                                        ? color ?? AppColors.primary500
-                                        : Colors.white,
-                                size: 18,
-                              ),
-                            ]
-                          : [],
-                    ),
-                  ],
-                ),
+                      Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight:
+                              icon != null ? FontWeight.w700 : FontWeight.w600,
+                          color:
+                              textColor ??
+                              (isDisabled
+                                  ? Colors.white.withOpacity(0.8)
+                                  : outline
+                                  ? color ?? AppColors.primary500
+                                  : Colors.white),
+                        ),
+                      ),
+                      Row(
+                        children:
+                            iconRight != null
+                                ? [
+                                  Dimens.space(1),
+                                  Icon(
+                                    iconRight,
+                                    color:
+                                        isDisabled
+                                            ? Colors.white.withOpacity(0.8)
+                                            : outline
+                                            ? color ?? AppColors.primary500
+                                            : Colors.white,
+                                    size: 18,
+                                  ),
+                                ]
+                                : [],
+                      ),
+                    ],
+                  ),
         ),
       ),
     );

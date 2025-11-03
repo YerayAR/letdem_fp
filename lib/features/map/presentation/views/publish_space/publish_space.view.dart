@@ -28,8 +28,6 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/country_codes.model.dart';
 
-import '../../../../../utils/connection_utils.dart';
-
 class PublishSpaceScreen extends StatefulWidget {
   final File file;
   final bool isPaid;
@@ -163,10 +161,6 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
   }
 
   void _publishSpace() async {
-    final isConnected = await ConnectionHelper.showNoConnectionDialog(context);
-
-    if (!isConnected) return;
-
     if (isPublishing) return;
 
     // Check if location data is available
@@ -582,6 +576,7 @@ class _PublishSpaceScreenState extends State<PublishSpaceScreen> {
               child: Padding(
                 padding: EdgeInsets.all(Dimens.defaultMargin),
                 child: PrimaryButton(
+                  isVerifyConecction: true,
                   isLoading: isPublishing,
                   onTap: _publishSpace,
                   isDisabled: _isPublishDisabled,
