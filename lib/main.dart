@@ -44,6 +44,7 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/app_localizations.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
+import 'package:letdem/onboarding.view.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -259,12 +260,12 @@ class LetDemApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: MaterialApp(
-        darkTheme: ThemeData.light(), // Optional, will be ignored
+        darkTheme: ThemeData.light(), // Optional, will be ignored as
         themeMode: ThemeMode.light, // Forces light theme always
         locale: context.watch<LocaleProvider>().defaultLocale,
         localizationsDelegates: const [
           AppLocalizations.delegate, // Add this line
-
+          //:Q
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

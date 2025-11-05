@@ -149,6 +149,7 @@ class RegisteredCarWidget extends StatelessWidget {
                                   onTap: () {
                                     NavigatorHelper.to(
                                       NavigationView(
+                                        preCalculatedRoute: null,
                                         destinationLat:
                                             car.lastParkingLocation!.lat ?? 0,
                                         destinationLng:
@@ -295,6 +296,7 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
                             onTap: () {
                               NavigatorHelper.to(
                                 NavigationView(
+                                  preCalculatedRoute: null,
                                   destinationLat: widget.lastParked?.lat ?? 0,
                                   destinationLng: widget.lastParked?.lng ?? 0,
                                 ),

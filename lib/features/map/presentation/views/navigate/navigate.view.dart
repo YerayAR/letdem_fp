@@ -52,6 +52,7 @@ class NavigationView extends StatefulWidget {
   final double destinationLng;
   final bool isNavigatingToParking;
   final String? parkingSpaceID;
+  final HERE.Route? preCalculatedRoute; // Add this
 
   const NavigationView({
     super.key,
@@ -59,6 +60,7 @@ class NavigationView extends StatefulWidget {
     this.isNavigatingToParking = false,
     required this.destinationLng,
     this.parkingSpaceID,
+    this.preCalculatedRoute,
   });
 
   @override
@@ -343,6 +345,9 @@ class _NavigationViewState extends State<NavigationView> {
     debugPrint('  - Location ready: $_isLocationReady');
     debugPrint('  - Location engine ready: $_isLocationEngineReady');
     debugPrint('  - Current location: ${_currentLocation != null}');
+    debugPrint(
+      '  - Pre-calculated route: ${widget.preCalculatedRoute != null}',
+    ); // Add log
 
     if (_isNavigating || _isLoading) {
       debugPrint('⚠️ Navigation already in progress, skipping...');
@@ -353,19 +358,75 @@ class _NavigationViewState extends State<NavigationView> {
       debugPrint('⏳ Not all prerequisites ready, waiting...');
       return;
     }
+
     if (_isMapReady &&
         _isLocationReady &&
         _isLocationEngineReady &&
         _currentLocation != null) {
       debugPrint('🚀 All systems ready, starting navigation...');
-      _calculateRoute(
-        _currentLocation!,
-        HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
-      );
+
+      // ✅ Check if we have a pre-calculated route
+      if (widget.preCalculatedRoute != null) {
+        debugPrint('✅ Using pre-calculated route from previous screen');
+        _usePreCalculatedRoute(widget.preCalculatedRoute!);
+      } else {
+        debugPrint('🧭 No pre-calculated route, calculating new route');
+        _calculateRoute(
+          _currentLocation!,
+          HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
+        );
+      }
     } else {
       debugPrint(
         '⏳ Waiting for prerequisites: Map ready: $_isMapReady, Location ready: $_isLocationReady, Engine ready: $_isLocationEngineReady',
       );
+    }
+  }
+
+  void _usePreCalculatedRoute(HERE.Route route) {
+    debugPrint('📍 Using pre-calculated route');
+    debugPrint('  - Duration: ${route.duration.inMinutes} minutes');
+    debugPrint(
+      '  - Distance: ${(route.lengthInMeters / 1000).toStringAsFixed(1)} km',
+    );
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Set route info
+      _totalRouteTime = route.duration.inSeconds;
+      _distanceNotifier.value = route.lengthInMeters;
+
+      // Store route for visual display
+      routesList = [route];
+
+      // Draw the route on map with traffic colors
+      _addTrafficAwareRoutePolyline(route);
+
+      // Add destination marker
+      _addDestinationMarker(route);
+
+      // Set camera focus
+      _setMapCameraFocus();
+
+      setState(() {
+        _isNavigating = true;
+        _isLoading = false;
+      });
+
+      // Set navigation start time
+      _navigationStartTime = DateTime.now();
+
+      debugPrint('✅ Pre-calculated route set, starting guidance...');
+
+      // Start guidance with the route
+      _startGuidance(route);
+    } catch (e) {
+      debugPrint('❌ Error using pre-calculated route: $e');
+      setState(() {
+        _errorMessage = "Failed to use pre-calculated route";
+        _isLoading = false;
+      });
     }
   }
 
@@ -1353,7 +1414,7 @@ class _NavigationViewState extends State<NavigationView> {
         return;
       }
 
-      final minimumDeviationDistance = 50;
+      final minimumDeviationDistance = 20;
       final distanceFromRoute =
           routeDeviation.traveledDistanceOnLastSectionInMeters?.toInt() ?? 0;
       final remainingRouteDistance = _distanceNotifier.value;
@@ -1744,7 +1805,6 @@ class _NavigationViewState extends State<NavigationView> {
       },
     );
   }
-
 
   void _addTrafficAwareRoutePolyline(HERE.Route route) {
     if (_hereMapController == null) return;
@@ -2214,7 +2274,7 @@ class _NavigationViewState extends State<NavigationView> {
     return BlocConsumer<MapBloc, MapState>(
       listener: (context, state) {
         if (state is MapLoaded) {
-          _addMapMarkers(state.payload.events, state.payload.spaces);
+          // _addMapMarkers(state.payload.events, state.payload.spaces);
 
           if (state.payload.alerts.isNotEmpty) {
             for (var alert in state.payload.alerts) {

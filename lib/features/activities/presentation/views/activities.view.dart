@@ -23,10 +23,7 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 
 import '../widgets/no_car_registered.widget.dart';
 
-enum ContributionType {
-  space,
-  event,
-}
+enum ContributionType { space, event }
 
 class ActivitiesView extends StatefulWidget {
   const ActivitiesView({super.key});
@@ -42,37 +39,38 @@ class _ActivitiesViewState extends State<ActivitiesView> {
   }
 
   Widget _buildFooter(ActivitiesState state, bool isAllRouted) {
-    Widget item = ContributionsSection(
-      isAllRouted: isAllRouted,
-    );
+    Widget item = ContributionsSection(isAllRouted: isAllRouted);
 
     return item;
   }
 
   Widget _buidShowAllButton(ActivitiesState state) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(
-        context.l10n.contributions,
-        style: Typo.mediumBody.copyWith(
-          fontWeight: FontWeight.w600,
-          fontSize: 18,
-        ),
-      ),
-      if (state is ActivitiesLoaded && state.activities.isNotEmpty)
-        TextButton(
-          onPressed: () {
-            NavigatorHelper.to(const ViewAllView());
-          },
-          child: Text(
-            context.l10n.seeAll,
-            style: Typo.smallBody.copyWith(
-              color: AppColors.primary500,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          context.l10n.contributions,
+          style: Typo.mediumBody.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
           ),
         ),
-    ]);
+        if (state is ActivitiesLoaded && state.activities.isNotEmpty)
+          TextButton(
+            onPressed: () {
+              NavigatorHelper.to(const ViewAllView());
+            },
+            child: Text(
+              context.l10n.seeAll,
+              style: Typo.smallBody.copyWith(
+                color: AppColors.primary500,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   @override
@@ -94,40 +92,41 @@ class _ActivitiesViewState extends State<ActivitiesView> {
 
           var w = StyledBody(
             isBottomPadding: false,
-            children: context.watch<UserBloc>().state is UserLoaded &&
-                    (context.watch<UserBloc>().state as UserLoaded)
-                            .user
-                            .activeReservation !=
-                        null
-                ? [
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          context.read<ActivitiesBloc>().add(
-                                GetActivitiesEvent(),
-                              );
-                          context.read<UserBloc>().add(FetchUserInfoEvent());
-                          context.read<CarBloc>().add(const GetCarEvent());
-                        },
-                        child: ListView(
-                          children: [
-                            const NotificationAppBar(),
-                            const CarSection(),
-                            const ActiveReservationSection(),
-                            _buidShowAllButton(state),
-                            _buildFooter(state, true),
-                          ],
+            children:
+                context.watch<UserBloc>().state is UserLoaded &&
+                        (context.watch<UserBloc>().state as UserLoaded)
+                                .user
+                                .activeReservation !=
+                            null
+                    ? [
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            context.read<ActivitiesBloc>().add(
+                              GetActivitiesEvent(),
+                            );
+                            context.read<UserBloc>().add(FetchUserInfoEvent());
+                            context.read<CarBloc>().add(const GetCarEvent());
+                          },
+                          child: ListView(
+                            children: [
+                              const NotificationAppBar(),
+                              const CarSection(),
+                              const ActiveReservationSection(),
+                              _buidShowAllButton(state),
+                              _buildFooter(state, true),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ]
-                : [
-                    const NotificationAppBar(),
-                    const CarSection(),
-                    const ActiveReservationSection(),
-                    _buidShowAllButton(state),
-                    Expanded(child: _buildFooter(state, false)),
-                  ],
+                    ]
+                    : [
+                      const NotificationAppBar(),
+                      const CarSection(),
+                      const ActiveReservationSection(),
+                      _buidShowAllButton(state),
+                      Expanded(child: _buildFooter(state, false)),
+                    ],
           );
 
           return w;
@@ -145,24 +144,26 @@ class NotificationAppBar extends StatelessWidget {
     // Fix: Add null safety check for userProfile
 
     return StyledAppBar(
-      suffix: context.watch<UserBloc>().state is! UserLoaded
-          ? null
-          : context.watch<UserBloc>().state is UserLoaded &&
+      suffix:
+          context.watch<UserBloc>().state is! UserLoaded
+              ? null
+              : context.watch<UserBloc>().state is UserLoaded &&
                   (context.watch<UserBloc>().state as UserLoaded)
                           .unreadNotificationsCount ==
                       0
               ? null
               : CircleAvatar(
-                  radius: 8,
-                  backgroundColor: AppColors.red500,
-                  child: Text(
-                    '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
-                    style: Typo.smallBody.copyWith(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  )),
+                radius: 8,
+                backgroundColor: AppColors.red500,
+                child: Text(
+                  '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
+                  style: Typo.smallBody.copyWith(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
       title: context.l10n.activities,
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       icon: Iconsax.notification5,
@@ -187,17 +188,9 @@ class CarSection extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is CarLoaded && state.car != null) {
-          return ProfileSection(
-            child: [
-              RegisteredCarWidget(car: state.car!),
-            ],
-          );
+          return ProfileSection(child: [RegisteredCarWidget(car: state.car!)]);
         }
-        return const ProfileSection(
-          child: [
-            NoCarRegisteredWidget(),
-          ],
-        );
+        return const ProfileSection(child: [NoCarRegisteredWidget()]);
       },
     );
   }
@@ -214,9 +207,11 @@ class ActiveReservationSection extends StatelessWidget {
                     .activeReservation !=
                 null
         ? ActiveReservationView(
-            payload: (context.watch<UserBloc>().state as UserLoaded)
-                .user
-                .activeReservation!)
+          payload:
+              (context.watch<UserBloc>().state as UserLoaded)
+                  .user
+                  .activeReservation!,
+        )
         : const SizedBox.shrink();
   }
 }
@@ -229,57 +224,61 @@ class ContributionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ActivitiesBloc, ActivitiesState>(
       builder: (context, state) {
-        final contributions = context.userProfile == null
-            ? []
-            : context.userProfile!.contributions;
+        final contributions =
+            context.userProfile == null
+                ? []
+                : context.userProfile!.contributions;
         final isEmpty = contributions.isEmpty;
 
         return Container(
           margin: const EdgeInsets.only(top: 5),
           // height: context.userProfile?.activeReservation != null ? 400 : null,
-          height: context.watch<UserBloc>().state is UserLoaded &&
-                  (context.watch<UserBloc>().state as UserLoaded)
-                          .user
-                          .activeReservation !=
-                      null
-              ? 400
-              : null,
+          height:
+              context.watch<UserBloc>().state is UserLoaded &&
+                      (context.watch<UserBloc>().state as UserLoaded)
+                              .user
+                              .activeReservation !=
+                          null
+                  ? 400
+                  : null,
           width: double.infinity,
           // Fix: Add constraints to prevent unbounded height issues
-          constraints: const BoxConstraints(
-            minHeight: 200,
-          ),
+          constraints: const BoxConstraints(minHeight: 200),
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimens.defaultRadius),
               topRight: Radius.circular(Dimens.defaultRadius),
-              bottomLeft: isAllRouted
-                  ? Radius.circular(Dimens.defaultRadius)
-                  : Radius.zero,
-              bottomRight: isAllRouted
-                  ? Radius.circular(Dimens.defaultRadius)
-                  : Radius.zero,
+              bottomLeft:
+                  isAllRouted
+                      ? Radius.circular(Dimens.defaultRadius)
+                      : Radius.zero,
+              bottomRight:
+                  isAllRouted
+                      ? Radius.circular(Dimens.defaultRadius)
+                      : Radius.zero,
             ),
           ),
-          child: isEmpty
-              ? const NoContributionsWidget()
-              : ListView(
-                  // Fix: Prevent overflow in column
-                  // mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...contributions.map((activity) {
-                      return ContributionItem(
-                        showDivider: contributions.last != activity,
-                        type: activity.type.toLowerCase() == "space"
-                            ? ContributionType.space
-                            : ContributionType.event,
-                        activity: activity,
-                      );
-                    }).toList(),
-                  ],
-                ),
+          child:
+              isEmpty
+                  ? const NoContributionsWidget()
+                  : ListView(
+                    // Fix: Prevent overflow in column
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...contributions.map((activity) {
+                        return ContributionItem(
+                          showDivider: contributions.last != activity,
+                          type:
+                              activity.type.toLowerCase() == "space"
+                                  ? ContributionType.space
+                                  : ContributionType.event,
+                          activity: activity,
+                        );
+                      }).toList(),
+                    ],
+                  ),
         );
       },
     );
@@ -311,23 +310,25 @@ class ContributionsSectionWithListView extends StatelessWidget {
               topRight: Radius.circular(Dimens.defaultRadius),
             ),
           ),
-          child: isEmpty
-              ? const NoContributionsWidget()
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: contributions.length,
-                  itemBuilder: (context, index) {
-                    final activity = contributions[index];
-                    return ContributionItem(
-                      showDivider: index < contributions.length - 1,
-                      type: activity.type.toLowerCase() == "space"
-                          ? ContributionType.space
-                          : ContributionType.event,
-                      activity: activity,
-                    );
-                  },
-                ),
+          child:
+              isEmpty
+                  ? const NoContributionsWidget()
+                  : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: contributions.length,
+                    itemBuilder: (context, index) {
+                      final activity = contributions[index];
+                      return ContributionItem(
+                        showDivider: index < contributions.length - 1,
+                        type:
+                            activity.type.toLowerCase() == "space"
+                                ? ContributionType.space
+                                : ContributionType.event,
+                        activity: activity,
+                      );
+                    },
+                  ),
         );
       },
     );

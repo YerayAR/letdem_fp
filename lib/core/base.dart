@@ -9,12 +9,15 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/presentation/views/activities.view.dart';
-import 'package:letdem/features/users/presentation/views/profile.view.dart';
-import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/map/presentation/views/home.view.dart';
+import 'package:letdem/features/users/presentation/views/profile.view.dart';
+import 'package:letdem/features/users/user_bloc.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/infrastructure/ws/web_socket.service.dart';
+import 'package:letdem/onboarding.view.dart';
 
 class BaseView extends StatefulWidget {
   const BaseView({super.key});
@@ -36,7 +39,17 @@ class _BaseViewState extends State<BaseView> {
   @override
   void initState() {
     super.initState();
+    checkTutorialStepShown();
     _initializeUserWebSocket();
+  }
+
+  void checkTutorialStepShown() async {
+    var isShown = await SecureStorageHelper().read("tutorial_step_shown");
+    if (isShown == null || isShown != "true") {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        NavigatorHelper.to(TutorialOnboardingView());
+      });
+    }
   }
 
   void _initializeUserWebSocket() {
