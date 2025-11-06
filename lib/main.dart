@@ -76,11 +76,14 @@ Future _initializeHERESDK() async {
 
     try {
       await SDKNativeEngine.makeSharedInstance(sdkOptions);
+
       print("HERE SDK initialized ✅");
-    } on InstantiationException catch (e) {
+    } on InstantiationException catch (e,st) {
+      print(st);
       print("HERE SDK Instantiation failed ❌: $e");
     }
-  } catch (e) {
+  } catch (e,st) {
+    print(st);
     print("Error initializing HERE SDK ❌: $e");
   }
 }
