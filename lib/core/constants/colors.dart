@@ -30,6 +30,9 @@ class AppColors {
 
   static var green500 = const Color(0xff22D27D);
 
+  static Color purple600 = const Color(0xFF7B00CC);
+  static Color purple50 = const Color(0xFFF3E5FF);
+
   static Color scaffoldColor = const Color(0xffF5F5F5);
 
   static var primary300 = const Color(0xffC466FF);

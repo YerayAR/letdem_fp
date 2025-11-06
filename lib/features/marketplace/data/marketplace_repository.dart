@@ -5,8 +5,8 @@ import '../models/store.model.dart';
 
 class MarketplaceRepository {
   // IP local de la máquina Windows para dispositivos físicos
-  static const String baseUrl = 'http://192.168.1.35:8000/v1/marketplace';
-  static const String baseHost = 'http://192.168.1.35:8000';
+  static const String baseUrl = 'http://192.168.1.103:8000/v1/marketplace';
+  static const String baseHost = 'http://192.168.1.103:8000';
 
   // Helper para normalizar URLs que vienen con localhost del backend
   static String _normalizeUrl(String url) {

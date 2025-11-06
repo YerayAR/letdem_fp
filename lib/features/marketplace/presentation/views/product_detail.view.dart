@@ -7,6 +7,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import '../../models/product.model.dart';
 import '../../models/store.model.dart';
+import 'redeem_type_selection.view.dart';
 
 class ProductDetailView extends StatefulWidget {
   final Product product;
@@ -604,6 +605,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   Widget _buildBottomBar(BuildContext context, double total, int userPoints) {
+    final canRedeem = userPoints >= requiredPointsFor30Percent;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -618,61 +621,110 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.neutral200),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Cancelar',
-                  style: Typo.mediumBody.copyWith(
-                    color: AppColors.neutral600,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  if (usePoints && userPoints < requiredPointsFor30Percent) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '❌ No tienes suficientes puntos. Necesitas $requiredPointsFor30Percent',
-                          style: Typo.mediumBody.copyWith(color: Colors.white),
+            // Botón de Canjear (solo si tiene suficientes puntos)
+            if (canRedeem)
+              Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => RedeemTypeSelectionView(
+                              product: widget.product,
+                              store: widget.store,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.purple600,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        backgroundColor: AppColors.red500,
-                        duration: const Duration(seconds: 3),
                       ),
-                    );
-                  } else {
-                    _showConfirmPurchase(context, total, userPoints);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary500,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                      icon: Icon(
+                        Iconsax.ticket_discount,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        'Canjear con 500 puntos (30% OFF)',
+                        style: Typo.mediumBody.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: Text(
-                  'Confirmar compra',
-                  style: Typo.mediumBody.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                  const SizedBox(height: 12),
+                  Divider(color: AppColors.neutral200),
+                  const SizedBox(height: 12),
+                ],
               ),
+            // Botones de compra normal
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColors.neutral200),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Cancelar',
+                      style: Typo.mediumBody.copyWith(
+                        color: AppColors.neutral600,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (usePoints && userPoints < requiredPointsFor30Percent) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '❌ No tienes suficientes puntos. Necesitas $requiredPointsFor30Percent',
+                              style: Typo.mediumBody.copyWith(color: Colors.white),
+                            ),
+                            backgroundColor: AppColors.red500,
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      } else {
+                        _showConfirmPurchase(context, total, userPoints);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary500,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Confirmar compra',
+                      style: Typo.mediumBody.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
