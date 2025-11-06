@@ -1,16 +1,54 @@
-# letdem
+# LetDem Mobile - Marketplace
 
-A new Flutter project.
+Aplicación móvil Flutter para LetDem con integración completa del sistema de Marketplace.
+
+## Características del Marketplace
+
+- **Catálogo de Tiendas**: Exploración de tiendas por categorías (Ropa, Alimentación, Moda, Gasolineras, Farmacias, Restaurantes)
+- **Productos**: Visualización detallada de productos con imágenes, precios, descuentos y stock
+- **Sistema de Puntos LetDem**: Gestión de puntos y balance monetario
+- **Búsqueda y Filtros**: Búsqueda por nombre y filtrado por categorías
+- **Arquitectura BLoC**: Gestión de estado con patrón BLoC
+- **Integración con API**: Conexión al backend Django para datos en tiempo real
+
+## Estructura del Marketplace
+
+```
+lib/features/marketplace/
+├── data/
+│   └── marketplace_repository.dart
+├── models/
+│   ├── product.model.dart
+│   └── store.model.dart
+├── presentation/
+│   ├── bloc/
+│   │   ├── store_catalog_bloc.dart
+│   │   └── store_products_bloc.dart
+│   ├── views/
+│   │   ├── marketplace_start.view.dart
+│   │   ├── store_catalog.view.dart
+│   │   ├── store_products.view.dart
+│   │   └── product_detail.view.dart
+│   └── widgets/
+│       ├── store_card.widget.dart
+│       ├── product_card.widget.dart
+│       └── category_filter.widget.dart
+```
+
+## Acceso
+
+El marketplace se accede desde la pestaña **Profile** en el BottomNavigationBar de la aplicación.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Este proyecto usa Flutter. Para ejecutarlo:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter pub get
+flutter run
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Recursos
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Documentación Flutter](https://docs.flutter.dev/)
+- [Flutter BLoC](https://bloclibrary.dev/)
