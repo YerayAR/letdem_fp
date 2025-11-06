@@ -5,17 +5,17 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:async';
+import 'redeem_in_store_result.view.dart';
 
-class RedeemOnlineScannerView extends StatefulWidget {
-  const RedeemOnlineScannerView({super.key});
+class RedeemInStoreScannerView extends StatefulWidget {
+  const RedeemInStoreScannerView({super.key});
 
   @override
-  State<RedeemOnlineScannerView> createState() =>
-      _RedeemOnlineScannerViewState();
+  State<RedeemInStoreScannerView> createState() =>
+      _RedeemInStoreScannerViewState();
 }
 
-class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
+class _RedeemInStoreScannerViewState extends State<RedeemInStoreScannerView> {
   bool _isScanning = true;
   bool _flashOn = false;
   MobileScannerController? _scannerController;
@@ -28,7 +28,6 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
   }
 
   Future<void> _initializeScanner() async {
-    // Pedir permiso de cámara
     final status = await Permission.camera.request();
     
     if (status.isGranted) {
@@ -63,45 +62,20 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
     _scannerController?.stop();
 
     // Por ahora, cualquier QR es válido
-    // TODO: Validar formato del QR y parsear datos del producto
-    _showScannedDialog(qrData);
-  }
-
-  void _showScannedDialog(String data) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+    // TODO: Validar formato del QR y parsear datos del voucher de la tienda
+    // TODO: Llamar al backend para validar y aplicar descuento
+    
+    // Simulación temporal - navegar a resultado
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RedeemInStoreResultView(
+          success: true,
+          storeName: 'Tienda Demo',
+          amount: 50.00,
+          discount: 15.00, // 30% de descuento
+          finalAmount: 35.00,
         ),
-        title: Text(
-          'QR Escaneado',
-          style: Typo.largeBody.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        content: Text(
-          'Datos: $data\n\nTODO: Navegar a confirmación',
-          style: Typo.mediumBody,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _isScanning = true;
-              });
-              _scannerController?.start();
-            },
-            child: Text(
-              'Cerrar',
-              style: Typo.mediumBody.copyWith(
-                color: AppColors.purple600,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -156,7 +130,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
                   await openAppSettings();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.purple600,
+                  backgroundColor: AppColors.primary500,
                 ),
                 child: Text(
                   'Abrir Configuración',
@@ -177,7 +151,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
         color: Colors.grey[900],
         child: Center(
           child: CircularProgressIndicator(
-            color: AppColors.purple600,
+            color: AppColors.primary500,
           ),
         ),
       );
@@ -200,7 +174,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
   Widget _buildScannerOverlay() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withOpacity(0.3),
       ),
       child: Center(
         child: Column(
@@ -212,7 +186,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
               height: 280,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: AppColors.purple600,
+                  color: AppColors.primary500,
                   width: 3,
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -234,7 +208,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
-                'Coloca el código QR dentro del marco',
+                'Coloca el código QR de la tienda dentro del marco',
                 textAlign: TextAlign.center,
                 style: Typo.mediumBody.copyWith(
                   color: Colors.white,
@@ -246,7 +220,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
-                'El código se escaneará automáticamente',
+                'El cajero te mostrará el código en su terminal',
                 textAlign: TextAlign.center,
                 style: Typo.smallBody.copyWith(
                   color: Colors.white.withOpacity(0.7),
@@ -268,16 +242,16 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
         decoration: BoxDecoration(
           border: Border(
             top: top
-                ? BorderSide(color: AppColors.purple600, width: 4)
+                ? BorderSide(color: AppColors.primary500, width: 4)
                 : BorderSide.none,
             bottom: !top
-                ? BorderSide(color: AppColors.purple600, width: 4)
+                ? BorderSide(color: AppColors.primary500, width: 4)
                 : BorderSide.none,
             left: left
-                ? BorderSide(color: AppColors.purple600, width: 4)
+                ? BorderSide(color: AppColors.primary500, width: 4)
                 : BorderSide.none,
             right: !left
-                ? BorderSide(color: AppColors.purple600, width: 4)
+                ? BorderSide(color: AppColors.primary500, width: 4)
                 : BorderSide.none,
           ),
         ),
@@ -286,9 +260,10 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
   }
 
   Widget _buildScanLine() {
-    return TweenAnimationBuilder<double>(
+    return _RepeatableTweenAnimation(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: const Duration(seconds: 2),
+      repeat: true,
       builder: (context, value, child) {
         return Positioned(
           top: value * 260,
@@ -297,10 +272,10 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
           child: Container(
             height: 2,
             decoration: BoxDecoration(
-              color: AppColors.purple600,
+              color: AppColors.primary500,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.purple600.withOpacity(0.5),
+                  color: AppColors.primary500.withOpacity(0.5),
                   blurRadius: 8,
                   spreadRadius: 2,
                 ),
@@ -308,9 +283,6 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
             ),
           ),
         );
-      },
-      onEnd: () {
-        // La animación se repite automáticamente con repeat: true
       },
     );
   }
@@ -344,7 +316,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Escanear QR',
+                'Escanear QR de Tienda',
                 style: Typo.mediumBody.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -362,7 +334,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _flashOn
-                      ? AppColors.purple600.withOpacity(0.8)
+                      ? AppColors.primary500.withOpacity(0.8)
                       : Colors.black.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
@@ -394,15 +366,8 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildControlButton(
-                    icon: Iconsax.gallery,
-                    label: 'Galería',
-                    onTap: () {
-                      // TODO: Abrir galería para seleccionar imagen con QR
-                    },
-                  ),
                   _buildControlButton(
                     icon: Iconsax.document_text,
                     label: 'Ingresar código',
@@ -414,7 +379,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
               ),
               Dimens.space(2),
               Text(
-                'También puedes ingresar el código manualmente',
+                'Si no puedes escanear, ingresa el código manualmente',
                 textAlign: TextAlign.center,
                 style: Typo.smallBody.copyWith(
                   color: Colors.white.withOpacity(0.6),
@@ -439,7 +404,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.purple600.withOpacity(0.2),
+              color: AppColors.primary500.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -479,7 +444,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Ingresa el código del producto manualmente',
+              'Ingresa el código del voucher de la tienda',
               style: Typo.smallBody.copyWith(
                 color: AppColors.neutral600,
               ),
@@ -488,14 +453,14 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
             TextField(
               controller: controller,
               decoration: InputDecoration(
-                hintText: 'Ej: PROD-12345',
+                hintText: 'Ej: STORE-12345',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: AppColors.purple600,
+                    color: AppColors.primary500,
                     width: 2,
                   ),
                 ),
@@ -522,7 +487,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.purple600,
+              backgroundColor: AppColors.primary500,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -542,32 +507,7 @@ class _RedeemOnlineScannerViewState extends State<RedeemOnlineScannerView> {
   }
 }
 
-// Extension para hacer que TweenAnimationBuilder se repita
-extension on TweenAnimationBuilder {
-  static Widget Function({
-    required Tween<double> tween,
-    required Duration duration,
-    required bool repeat,
-    required Widget Function(BuildContext, double, Widget?) builder,
-    VoidCallback? onEnd,
-  }) get repeatableBuilder {
-    return ({
-      required Tween<double> tween,
-      required Duration duration,
-      required bool repeat,
-      required Widget Function(BuildContext, double, Widget?) builder,
-      VoidCallback? onEnd,
-    }) {
-      return _RepeatableTweenAnimation(
-        tween: tween,
-        duration: duration,
-        repeat: repeat,
-        builder: builder,
-      );
-    };
-  }
-}
-
+// Widget para animación repetida de la línea de escaneo
 class _RepeatableTweenAnimation extends StatefulWidget {
   final Tween<double> tween;
   final Duration duration;

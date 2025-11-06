@@ -4,9 +4,10 @@ import '../models/product.model.dart';
 import '../models/store.model.dart';
 
 class MarketplaceRepository {
-  // IP local de la máquina Windows para dispositivos físicos
-  static const String baseUrl = 'http://192.168.1.103:8000/v1/marketplace';
-  static const String baseHost = 'http://192.168.1.103:8000';
+  // IP de la máquina Windows en la red local para dispositivo físico
+  // Usa 10.0.2.2 para emulador, 192.168.1.35 para dispositivo físico
+  static const String baseUrl = 'http://192.168.1.35:8000/v1/marketplace';
+  static const String baseHost = 'http://192.168.1.35:8000';
 
   // Helper para normalizar URLs que vienen con localhost del backend
   static String _normalizeUrl(String url) {
@@ -129,6 +130,88 @@ class MarketplaceRepository {
         return Product.fromJson(data);
       } else {
         throw Exception('Error al cargar producto: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> purchaseWithRedeem({
+    required String productId,
+    required int quantity,
+    required String authToken,
+    String? paymentIntentId,
+  }) async {
+    try {
+      final body = {
+        'product_id': productId,
+        'quantity': quantity,
+      };
+      
+      if (paymentIntentId != null) {
+        body['payment_intent_id'] = paymentIntentId;
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/purchase/with-redeem/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $authToken',
+        },
+        body: json.encode(body),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar al servidor');
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['error'] ?? 'Error al procesar compra');
+      }
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> purchaseWithoutRedeem({
+    required String productId,
+    required int quantity,
+    required String authToken,
+    String? paymentIntentId,
+  }) async {
+    try {
+      final body = {
+        'product_id': productId,
+        'quantity': quantity,
+      };
+      
+      if (paymentIntentId != null) {
+        body['payment_intent_id'] = paymentIntentId;
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/purchase/without-redeem/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $authToken',
+        },
+        body: json.encode(body),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar al servidor');
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['error'] ?? 'Error al procesar compra');
       }
     } catch (e) {
       throw Exception('Error de conexión: $e');

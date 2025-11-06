@@ -6,6 +6,7 @@ import 'package:letdem/core/constants/typo.dart';
 import '../../models/product.model.dart';
 import '../../models/store.model.dart';
 import 'redeem_online_intro.view.dart';
+import 'redeem_in_store_intro.view.dart';
 
 class RedeemTypeSelectionView extends StatelessWidget {
   final Product product;
@@ -205,8 +206,12 @@ class RedeemTypeSelectionView extends StatelessWidget {
               'Genera un código QR para usar en el momento de pago en la tienda física',
           color: AppColors.primary500,
           onTap: () {
-            // TODO: Navegar a vista de QR para canje en tienda
-            _showComingSoonDialog(context, 'Canje en Tienda');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RedeemInStoreIntroView(),
+              ),
+            );
           },
         ),
         Dimens.space(2),

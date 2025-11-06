@@ -8,6 +8,7 @@ import 'package:letdem/features/users/user_bloc.dart';
 import '../../models/product.model.dart';
 import '../../models/store.model.dart';
 import 'redeem_type_selection.view.dart';
+import 'purchase_redeem_question.view.dart';
 
 class ProductDetailView extends StatefulWidget {
   final Product product;
@@ -52,8 +53,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         _buildProductInfo(),
                         _buildQuantitySelector(),
                         _buildPriceBreakdown(total, baseTotal, pointsDiscount, userPoints),
-                        _buildPointsSection(userPoints),
-                        _buildDescriptionSection(),
                       ],
                     ),
                   ),
@@ -443,166 +442,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildPointsSection(int userPoints) {
-    final canUsePoints = userPoints >= requiredPointsFor30Percent;
-    
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.primary50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Tus puntos: $userPoints',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary500,
-                ),
-              ),
-              if (canUsePoints)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.green600,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    '✓ Puedes canjear',
-                    style: Typo.smallBody.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            canUsePoints
-                ? 'Tienes suficientes puntos para obtener 30% de descuento'
-                : 'Necesitas $requiredPointsFor30Percent puntos para obtener 30% de descuento',
-            style: Typo.smallBody.copyWith(
-              color: canUsePoints ? AppColors.green600 : AppColors.neutral600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (canUsePoints)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() => usePoints = !usePoints);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: usePoints ? AppColors.primary500 : AppColors.primary200,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  usePoints ? '✓ Canjear puntos (30% OFF)' : 'Canjear puntos (30% OFF)',
-                  style: Typo.mediumBody.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            )
-          else
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.neutral200,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  '❌ No tienes puntos suficientes',
-                  style: Typo.mediumBody.copyWith(
-                    color: AppColors.neutral400,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDescriptionSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Descripción',
-            style: Typo.largeBody.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            widget.product.description.isEmpty
-                ? 'No hay descripción disponible'
-                : widget.product.description,
-            style: Typo.mediumBody.copyWith(
-              color: AppColors.neutral600,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.primary50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary200),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Iconsax.info_circle,
-                  color: AppColors.primary500,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    '${widget.product.stock} puntos equivalen a un 30%',
-                    style: Typo.smallBody.copyWith(
-                      color: AppColors.primary600,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Dimens.space(2),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBottomBar(BuildContext context, double total, int userPoints) {
     final canRedeem = userPoints >= requiredPointsFor30Percent;
@@ -624,49 +463,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Botón de Canjear (solo si tiene suficientes puntos)
-            if (canRedeem)
-              Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RedeemTypeSelectionView(
-                              product: widget.product,
-                              store: widget.store,
-                            ),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.purple600,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: Icon(
-                        Iconsax.ticket_discount,
-                        color: Colors.white,
-                      ),
-                      label: Text(
-                        'Canjear con 500 puntos (30% OFF)',
-                        style: Typo.mediumBody.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Divider(color: AppColors.neutral200),
-                  const SizedBox(height: 12),
-                ],
-              ),
             // Botones de compra normal
             Row(
               children: [
@@ -693,20 +489,16 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      if (usePoints && userPoints < requiredPointsFor30Percent) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '❌ No tienes suficientes puntos. Necesitas $requiredPointsFor30Percent',
-                              style: Typo.mediumBody.copyWith(color: Colors.white),
-                            ),
-                            backgroundColor: AppColors.red500,
-                            duration: const Duration(seconds: 3),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PurchaseRedeemQuestionView(
+                            product: widget.product,
+                            store: widget.store,
+                            quantity: quantity,
                           ),
-                        );
-                      } else {
-                        _showConfirmPurchase(context, total, userPoints);
-                      }
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary500,
