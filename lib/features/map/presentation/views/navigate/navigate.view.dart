@@ -118,6 +118,8 @@ class _NavigationViewState extends State<NavigationView> {
   late double _actualDestinationLat;
   late double _actualDestinationLng;
 
+  int indexRouteSelected = 0;
+
   String _lastSpokenInstruction = "";
   final ValueNotifier<int> _distanceNotifier = ValueNotifier<int>(0);
   final LocationWebSocketService _locationWebSocketService =
@@ -628,6 +630,7 @@ class _NavigationViewState extends State<NavigationView> {
           // Por ahora tomamos la primera ruta como activa
           routesList = routeList;
           final selectedRoute = routeList.first;
+          indexRouteSelected = 0;
           _totalRouteTime = selectedRoute.duration.inSeconds;
           _distanceNotifier.value = selectedRoute.lengthInMeters;
           _addDestinationMarker(selectedRoute);
@@ -804,6 +807,30 @@ class _NavigationViewState extends State<NavigationView> {
     } catch (e) {
       debugPrint('❌ Unexpected error starting guidance: $e');
       _handleNavigationSetupError('Unexpected navigation error: $e');
+    }
+  }
+
+  void _resetNavigation() {
+    // Detener navigator anterior
+    if (_visualNavigator != null) {
+      _visualNavigator!.stopRendering();
+      _visualNavigator!.route = null;
+      _visualNavigator = null;
+    }
+
+    // Quitar polylines previas
+    _clearPreviousRoutes();
+
+    // Quitar marcadores si usas
+    _removeDestinationMarker();
+
+    debugPrint('🔄 Navegación reseteada correctamente');
+  }
+
+  void _removeDestinationMarker() {
+    if (_destinationMarker != null) {
+      _hereMapController?.mapScene.removeMapMarker(_destinationMarker!);
+      _destinationMarker = null;
     }
   }
 
@@ -1745,7 +1772,6 @@ class _NavigationViewState extends State<NavigationView> {
     );
   }
 
-
   void _addTrafficAwareRoutePolyline(HERE.Route route) {
     if (_hereMapController == null) return;
 
@@ -2266,9 +2292,22 @@ class _NavigationViewState extends State<NavigationView> {
               isMapReady: _isMapReady,
               isRecalculatingRoute: _isRecalculatingRoute,
               stopNavigation: _stopNavigation,
+              indexRoute: indexRouteSelected,
               openRouter: () {
                 _isOpenRoutes = !_isOpenRoutes;
                 setState(() {});
+              },
+              startGuidance: (i) {
+                final value = routesList[i];
+                _totalRouteTime = value.duration.inSeconds;
+                _distanceNotifier.value = value.lengthInMeters;
+                _addDestinationMarker(value);
+                _setMapCameraFocus();
+                // _resetNavigation();
+                _cleanupCurrentRoute();
+                _startGuidance(value);
+                indexRouteSelected = i;
+                // setState(() {});
               },
               totalRouteTime: _totalRouteTime.toFormattedTime(),
               distanceValue: _distanceNotifier.value.toFormattedDistance(),

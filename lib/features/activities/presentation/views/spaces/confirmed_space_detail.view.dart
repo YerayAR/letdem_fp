@@ -17,6 +17,7 @@ import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/activities_bloc.dart';
 import 'package:letdem/features/activities/activities_state.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
+import 'package:letdem/features/activities/presentation/views/spaces/extend_time_space.view.dart';
 import 'package:letdem/features/auth/dto/verify_email.dto.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
@@ -37,7 +38,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
   String otp = "";
   final OtpFieldController otpController = OtpFieldController();
 
-  void _onBack(){
+  void _onBack() {
     NavigatorHelper.pop();
     NavigatorHelper.pop();
   }
@@ -47,7 +48,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
     return Scaffold(
       body: BlocConsumer<ActivitiesBloc, ActivitiesState>(
         listener: (context, state) {
-          if (state is ReservationSpaceCancelled){
+          if (state is ReservationSpaceCancelled) {
             // Handle cancelled reservation
             AppPopup.showDialogSheet(
               context,
@@ -82,42 +83,75 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                   padding: const EdgeInsets.only(bottom: 40),
                   children: [
                     _buildImagePreview(),
+
                     const SizedBox(height: 24),
+
                     _buildInfoCards(),
+
                     Dimens.space(6),
+
                     _buildStatusStepper(),
+
                     Dimens.space(6),
+
                     _buildConfirmOrderButton(context),
+
                     Dimens.space(2),
-                    SizedBox(
-                      child:
-                          widget.payload.status == "PENDING"
-                              ? null
-                              : PrimaryButton(
-                                isLoading: isStateLoading,
-                                isDisabled: isStateLoading,
-                                text: context.l10n.cancel,
-                                color: AppColors.red500,
-                                textColor: Colors.white,
-                                onTap: () {
-                                  AppPopup.showDialogSheet(
-                                    context,
-                                    ConfirmationDialog(
-                                      title: context.l10n.cancelReservationConfirmationTitle,
-                                      subtext: context.l10n.cancelReservationConfirmationText,
-                                      onProceed: () {
-                                        NavigatorHelper.pop();
-                                        context.read<ActivitiesBloc>().add(
-                                          CancelReservationEvent(
-                                            reservationId: widget.payload.id,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
+
+                    PrimaryButton(
+                      text: 'Extender tiempo',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const ExtendTimeSpaceView();
+                            },
+                          ),
+                        );
+                      },
+                      textColor: Colors.white,
+                      color: AppColors.neutral300,
+                      // color:
+                      //     isReserved
+                      //         ? null
+                      //         : AppColors.neutral300, // Color deshabilitado
                     ),
+
+                    Dimens.space(2),
+
+                    if (!(widget.payload.status == "PENDING"))
+                      PrimaryButton(
+                        isLoading: isStateLoading,
+                        isDisabled: isStateLoading,
+                        text: context.l10n.cancel,
+                        color: AppColors.red500,
+                        textColor: Colors.white,
+                        onTap: () {
+                          AppPopup.showDialogSheet(
+                            context,
+                            ConfirmationDialog(
+                              title:
+                                  context
+                                      .l10n
+                                      .cancelReservationConfirmationTitle,
+                              subtext:
+                                  context
+                                      .l10n
+                                      .cancelReservationConfirmationText,
+                              onProceed: () {
+                                NavigatorHelper.pop();
+                                context.read<ActivitiesBloc>().add(
+                                  CancelReservationEvent(
+                                    reservationId: widget.payload.id,
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+
                     Dimens.space(2),
                   ],
                 ),
