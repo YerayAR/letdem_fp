@@ -1,7 +1,10 @@
 import 'dart:ui';
 
 class AppColors {
+  static Color red700 = const Color(0xffCC3000);
+  static Color red600 = const Color(0xffE63900);
   static Color red500 = const Color(0xffFE4E1D);
+  static Color red200 = const Color(0xffFFB8A3);
   static Color red50 = const Color(0xffFFEDE8);
 
   static Color primary50 = const Color(0xFFF5E6FF);
@@ -15,6 +18,8 @@ class AppColors {
   static Color secondary500 = const Color(0xffFFC700);
   static Color secondary50 = const Color(0xffFFF9E6);
 
+  static Color neutral900 = const Color(0xff1A2730);
+  static Color neutral700 = const Color(0xff2C3E4D);
   static Color neutral600 = const Color(0xff364A59);
   static Color neutral500 = const Color(0xff4B5D6B);
   static Color neutral400 = const Color(0xff6B7C8C);
@@ -26,9 +31,15 @@ class AppColors {
   static Color tetiary5000 = const Color(0xfffce5f9);
 
   static Color green50 = const Color(0xffE9FBF2);
-  static Color green600 = const Color(0xff1BA864);
-
+  static Color green200 = const Color(0xff7FE8B3);
   static var green500 = const Color(0xff22D27D);
+  static Color green600 = const Color(0xff1BA864);
+  static Color green700 = const Color(0xff158751);
+
+  static Color purple700 = const Color(0xFF6200A3);
+  static Color purple600 = const Color(0xFF7B00CC);
+  static Color purple200 = const Color(0xFFD899FF);
+  static Color purple50 = const Color(0xFFF3E5FF);
 
   static Color scaffoldColor = const Color(0xffF5F5F5);
 

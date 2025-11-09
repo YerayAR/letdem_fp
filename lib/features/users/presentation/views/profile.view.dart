@@ -27,6 +27,7 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/marketplace_start.view.dart';
 import 'package:letdem/infrastructure/services/earnings/eranings.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
@@ -203,6 +204,9 @@ class _MainActionsSection extends StatelessWidget {
             children: [
               _settingsRow(context.l10n.contributions, IconlyLight.star, () {
                 NavigatorHelper.to(const ViewAllView());
+              }),
+              _settingsRow('Marketplace', IconlyLight.bag_2, () {
+                NavigatorHelper.to(const MarketplaceStartView());
               }),
               _settingsRow(
                   context.l10n.scheduledNotifications, IconlyLight.time_circle,

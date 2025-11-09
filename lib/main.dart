@@ -40,6 +40,8 @@ import 'package:letdem/features/wallet/repository/transaction.repository.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/repository/withdrawal.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
+import 'package:letdem/features/marketplace/data/marketplace_repository.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/app_localizations.dart';
 import 'package:letdem/l10n/locales.dart';
@@ -55,13 +57,22 @@ import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
 
 Future _initializeHERESDK() async {
+  // Initialize Stripe separately with its own error handling
+  try {
+    print("Stripe init starting...");
+    Stripe.publishableKey = AppCredentials.stripePublishableKey;
+    await Stripe.instance.applySettings();
+    print("Stripe initialized ✅");
+  } catch (e, st) {
+    print("Stripe initialization error: $e");
+    print("Stack trace: $st");
+    // Don't stop HERE SDK initialization if Stripe fails
+  }
+
+  // Initialize HERE SDK
   try {
     print("HERE SDK init starting...");
     SdkContext.init(IsolateOrigin.main);
-
-    Stripe.publishableKey = AppCredentials.stripePublishableKey;
-
-    await Stripe.instance.applySettings();
 
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
@@ -76,14 +87,13 @@ Future _initializeHERESDK() async {
 
     try {
       await SDKNativeEngine.makeSharedInstance(sdkOptions);
-
       print("HERE SDK initialized ✅");
-    } on InstantiationException catch (e,st) {
-      print(st);
+    } on InstantiationException catch (e, st) {
+      print("Stack trace: $st");
       print("HERE SDK Instantiation failed ❌: $e");
     }
-  } catch (e,st) {
-    print(st);
+  } catch (e, st) {
+    print("Stack trace: $st");
     print("Error initializing HERE SDK ❌: $e");
   }
 }
@@ -163,6 +173,7 @@ void main() async {
           RepositoryProvider(create: (_) => MapRepository()),
           RepositoryProvider(create: (_) => ScheduleNotificationsRepository()),
           RepositoryProvider(create: (_) => NotificationRepository()),
+          RepositoryProvider(create: (_) => MarketplaceRepository()),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -244,6 +255,12 @@ void main() async {
               create:
                   (context) =>
                       CarBloc(carRepository: context.read<CarRepository>()),
+            ),
+            BlocProvider(
+              create:
+                  (context) => StoreCatalogBloc(
+                    repository: context.read<MarketplaceRepository>(),
+                  ),
             ),
           ],
           child: const AnnotatedRegion<SystemUiOverlayStyle>(
