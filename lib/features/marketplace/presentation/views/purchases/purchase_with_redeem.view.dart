@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:iconsax/iconsax.dart';
@@ -588,13 +587,6 @@ class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
     setState(() => _isProcessing = true);
 
     try {
-      // Verificar conectividad antes de iniciar
-      final results = await Connectivity().checkConnectivity();
-      final netLabel = results.map((e) => e.toString().split('.').last).join(',');
-      print('[NET] connectivity='+netLabel);
-      if (results.isEmpty || results.contains(ConnectivityResult.none)) {
-        throw Exception('Sin conexión a Internet');
-      }
       // Obtener token de autenticación
       final token = await SecureStorageHelper().read('access_token');
       

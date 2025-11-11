@@ -16,21 +16,11 @@ class FileService {
   }
 
   final ImagePicker _imagePicker = ImagePicker();
-  DateTime? _lastPickTime;
-  static const Duration _pickThrottle = Duration(milliseconds: 500);
 
   static const int maxFileSizeInBytes = 6 * 1024 * 1024; // 2 MB
 
   Future<File?> pickFile(FileSourceOption source) async {
     try {
-      // Throttle to prevent buffer overflow in native ImageReader
-      final now = DateTime.now();
-      if (_lastPickTime != null && now.difference(_lastPickTime!) < _pickThrottle) {
-        Toast.showError('Please wait a moment before taking another photo');
-        return null;
-      }
-      _lastPickTime = now;
-
       File? file;
 
       if (source == FileSourceOption.camera) {

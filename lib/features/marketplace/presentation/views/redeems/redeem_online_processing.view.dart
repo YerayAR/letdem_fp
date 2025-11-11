@@ -286,7 +286,7 @@ class _RedeemOnlineProcessingViewState
               _steps[index],
               style: Typo.mediumBody.copyWith(
                 color: isCompleted || isCurrent
-                    ? AppColors.neutral800
+                    ? AppColors.neutal900
                     : AppColors.neutral400,
                 fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w400,
               ),

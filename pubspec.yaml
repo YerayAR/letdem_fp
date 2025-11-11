@@ -85,9 +85,6 @@ dependencies:
   web_socket_channel: ^3.0.3
   image_picker_ios: ^0.8.12+2
 
-  # Connectivity
-  connectivity_plus: ^7.0.0
-
   smooth_page_indicator: ^1.2.1
 
   # The "flutter_lints" package below contains a set of recommended lints to

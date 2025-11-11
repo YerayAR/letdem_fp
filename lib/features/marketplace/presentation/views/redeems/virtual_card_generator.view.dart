@@ -39,7 +39,6 @@ import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:share_plus/share_plus.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 
 
@@ -121,10 +120,6 @@ class _VirtualCardGeneratorViewState extends State<VirtualCardGeneratorView> {
 
   Future<void> _generateCard() async {
     print('[CARD] generate START selectedAmount=$_selectedAmount available=${widget.availablePoints} mode=$_redeemMode');
-
-    final results = await Connectivity().checkConnectivity();
-    final netLabel = results.map((e) => e.toString().split('.').last).join(',');
-    print('[NET] connectivity='+netLabel);
 
     if (_selectedAmount < kPointsRequired ||
 
