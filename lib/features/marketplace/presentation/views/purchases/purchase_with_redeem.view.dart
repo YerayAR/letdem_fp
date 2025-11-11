@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:iconsax/iconsax.dart';
@@ -6,16 +7,16 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
-import '../../models/product.model.dart';
-import '../../models/store.model.dart';
-import '../../data/marketplace_repository.dart';
+import 'package:letdem/features/marketplace/models/product.model.dart';
+import 'package:letdem/features/marketplace/models/store.model.dart';
+import 'package:letdem/features/marketplace/repository/marketplace_repository.dart';
 
-class PurchaseWithoutRedeemView extends StatefulWidget {
+class PurchaseWithRedeemView extends StatefulWidget {
   final Product product;
   final Store store;
   final int quantity;
 
-  const PurchaseWithoutRedeemView({
+  const PurchaseWithRedeemView({
     super.key,
     required this.product,
     required this.store,
@@ -23,10 +24,10 @@ class PurchaseWithoutRedeemView extends StatefulWidget {
   });
 
   @override
-  State<PurchaseWithoutRedeemView> createState() => _PurchaseWithoutRedeemViewState();
+  State<PurchaseWithRedeemView> createState() => _PurchaseWithRedeemViewState();
 }
 
-class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
+class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
   bool _isProcessing = false;
   bool _isPurchaseComplete = false;
 
@@ -34,7 +35,10 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, userState) {
-        final total = widget.product.finalPrice * widget.quantity;
+        final userPoints = userState is UserLoaded ? userState.user.totalPoints : 0;
+        final baseTotal = widget.product.finalPrice * widget.quantity;
+        final discountAmount = baseTotal * 0.3;
+        final finalTotal = baseTotal - discountAmount;
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -44,8 +48,8 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
                 _buildHeader(context),
                 Expanded(
                   child: _isPurchaseComplete
-                      ? _buildSuccessScreen(total)
-                      : _buildPurchaseForm(total),
+                      ? _buildSuccessScreen(finalTotal, userPoints)
+                      : _buildPurchaseForm(baseTotal, discountAmount, finalTotal, userPoints),
                 ),
               ],
             ),
@@ -78,7 +82,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              _isPurchaseComplete ? '¡Compra exitosa!' : 'Compra sin canje',
+              _isPurchaseComplete ? '¡Compra exitosa!' : 'Compra con canje',
               style: Typo.largeBody.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -89,38 +93,40 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     );
   }
 
-  Widget _buildPurchaseForm(double total) {
+  Widget _buildPurchaseForm(double baseTotal, double discountAmount, double finalTotal, int userPoints) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildInfoBanner(),
+          _buildRedeemBanner(),
           const SizedBox(height: 24),
           _buildProductCard(),
           const SizedBox(height: 16),
-          _buildPriceBreakdown(total),
+          _buildPriceBreakdown(baseTotal, discountAmount, finalTotal),
+          const SizedBox(height: 16),
+          _buildPointsDeduction(userPoints),
           const SizedBox(height: 24),
           _buildPaymentSection(),
           const SizedBox(height: 24),
-          _buildConfirmButton(total),
+          _buildConfirmButton(finalTotal, userPoints),
         ],
       ),
     );
   }
 
-  Widget _buildInfoBanner() {
+  Widget _buildRedeemBanner() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary500, AppColors.primary600],
+          colors: [AppColors.purple600, AppColors.purple700],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary500.withOpacity(0.3),
+            color: AppColors.purple600.withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -135,7 +141,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Iconsax.shopping_cart,
+              Iconsax.ticket_discount,
               color: Colors.white,
               size: 32,
             ),
@@ -146,7 +152,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Compra normal',
+                  '30% de descuento',
                   style: Typo.mediumBody.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -154,7 +160,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Sin uso de puntos',
+                  'Usando 500 puntos',
                   style: Typo.smallBody.copyWith(
                     color: Colors.white.withOpacity(0.9),
                   ),
@@ -163,7 +169,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
           ),
           Icon(
-            Iconsax.wallet_2,
+            Iconsax.verify5,
             color: Colors.white,
             size: 28,
           ),
@@ -229,7 +235,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     );
   }
 
-  Widget _buildPriceBreakdown(double total) {
+  Widget _buildPriceBreakdown(double baseTotal, double discountAmount, double finalTotal) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -247,56 +253,112 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Precio unitario',
-                style: Typo.mediumBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
-              ),
-              Text(
-                '\$${widget.product.finalPrice.toStringAsFixed(2)}',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+          _buildPriceRow('Subtotal', '\$${baseTotal.toStringAsFixed(2)}', false),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Cantidad',
-                style: Typo.mediumBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
-              ),
-              Text(
-                'x${widget.quantity}',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          _buildPriceRow(
+            'Descuento (30%)',
+            '-\$${discountAmount.toStringAsFixed(2)}',
+            false,
+            color: AppColors.green600,
           ),
           Divider(color: AppColors.neutral200, height: 24),
+          _buildPriceRow(
+            'Total a pagar',
+            '\$${finalTotal.toStringAsFixed(2)}',
+            true,
+            color: AppColors.purple600,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceRow(String label, String value, bool isBold, {Color? color}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: Typo.mediumBody.copyWith(
+            fontWeight: isBold ? FontWeight.w700 : FontWeight.w400,
+            color: color ?? AppColors.neutral600,
+          ),
+        ),
+        Text(
+          value,
+          style: Typo.mediumBody.copyWith(
+            fontWeight: FontWeight.w700,
+            color: color ?? AppColors.neutral900,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPointsDeduction(int userPoints) {
+    final remainingPoints = userPoints - 500;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.purple50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.purple200),
+      ),
+      child: Column(
+        children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total a pagar',
-                style: Typo.largeBody.copyWith(
-                  fontWeight: FontWeight.w700,
+                'Puntos actuales',
+                style: Typo.smallBody.copyWith(
+                  color: AppColors.neutral600,
                 ),
               ),
               Text(
-                '\$${total.toStringAsFixed(2)}',
-                style: Typo.largeBody.copyWith(
-                  color: AppColors.primary500,
+                '$userPoints pts',
+                style: Typo.smallBody.copyWith(
                   fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Se descontarán',
+                style: Typo.smallBody.copyWith(
+                  color: AppColors.red600,
+                ),
+              ),
+              Text(
+                '-500 pts',
+                style: Typo.smallBody.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.red600,
+                ),
+              ),
+            ],
+          ),
+          Divider(color: AppColors.purple200, height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Puntos restantes',
+                style: Typo.mediumBody.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.purple600,
+                ),
+              ),
+              Text(
+                '$remainingPoints pts',
+                style: Typo.mediumBody.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.purple600,
                 ),
               ),
             ],
@@ -360,13 +422,13 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     );
   }
 
-  Widget _buildConfirmButton(double total) {
+  Widget _buildConfirmButton(double finalTotal, int userPoints) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _isProcessing ? null : () => _processPurchase(total),
+        onPressed: _isProcessing ? null : () => _processPurchase(finalTotal, userPoints),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary500,
+          backgroundColor: AppColors.purple600,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -383,7 +445,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
                 ),
               )
             : Text(
-                'Confirmar compra • \$${total.toStringAsFixed(2)}',
+                'Confirmar compra • \$${finalTotal.toStringAsFixed(2)}',
                 style: Typo.mediumBody.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -393,7 +455,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     );
   }
 
-  Widget _buildSuccessScreen(double total) {
+  Widget _buildSuccessScreen(double finalTotal, int userPoints) {
+    final remainingPoints = userPoints - 500;
+    
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -422,7 +486,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Tu compra ha sido\nprocesada correctamente',
+              'Tu compra con canje de puntos\nha sido procesada',
               style: Typo.mediumBody.copyWith(
                 color: AppColors.neutral600,
               ),
@@ -432,25 +496,47 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.primary50,
+                color: AppColors.purple50,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primary200),
+                border: Border.all(color: AppColors.purple200),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Text(
-                    'Total pagado',
-                    style: Typo.mediumBody.copyWith(
-                      color: AppColors.neutral600,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total pagado',
+                        style: Typo.mediumBody.copyWith(
+                          color: AppColors.neutral600,
+                        ),
+                      ),
+                      Text(
+                        '\$${finalTotal.toStringAsFixed(2)}',
+                        style: Typo.largeBody.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.purple600,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    '\$${total.toStringAsFixed(2)}',
-                    style: Typo.largeBody.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary600,
-                    ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Puntos restantes',
+                        style: Typo.mediumBody.copyWith(
+                          color: AppColors.neutral600,
+                        ),
+                      ),
+                      Text(
+                        '$remainingPoints pts',
+                        style: Typo.mediumBody.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -485,10 +571,30 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     );
   }
 
-  Future<void> _processPurchase(double total) async {
+  Future<void> _processPurchase(double finalTotal, int userPoints) async {
+    if (userPoints < 500) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No tienes suficientes puntos',
+            style: Typo.mediumBody.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppColors.red500,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isProcessing = true);
 
     try {
+      // Verificar conectividad antes de iniciar
+      final results = await Connectivity().checkConnectivity();
+      final netLabel = results.map((e) => e.toString().split('.').last).join(',');
+      print('[NET] connectivity='+netLabel);
+      if (results.isEmpty || results.contains(ConnectivityResult.none)) {
+        throw Exception('Sin conexión a Internet');
+      }
       // Obtener token de autenticación
       final token = await SecureStorageHelper().read('access_token');
       
@@ -497,11 +603,13 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
       }
 
       // Llamar al backend para iniciar la compra
-      final response = await MarketplaceRepository().purchaseWithoutRedeem(
+      print('[BUY] purchase_with_redeem START productId=${widget.product.id} qty=${widget.quantity}');
+      final response = await MarketplaceRepository().purchaseWithRedeem(
         productId: widget.product.id,
         quantity: widget.quantity,
         authToken: token,
       );
+      print('[BUY] purchase_with_redeem RESPONSE requires_payment=${response['requires_payment']}');
 
       // Si requiere pago con Stripe
       if (response['requires_payment'] == true) {
@@ -526,19 +634,24 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
         }
         
         // Procesar pago con Stripe
+        print('[BUY] Stripe.confirmPayment START');
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
         );
+        print('[BUY] Stripe.confirmPayment DONE status=${paymentIntent.status} id=${paymentIntent.id}');
         
         if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
             paymentIntent.status == PaymentIntentsStatus.Succeeded) {
           // Pago exitoso, confirmar compra en backend
-          await MarketplaceRepository().purchaseWithoutRedeem(
+          final confirmResponse = await MarketplaceRepository().purchaseWithRedeem(
             productId: widget.product.id,
             quantity: widget.quantity,
             authToken: token,
             paymentIntentId: paymentIntent.id,
           );
+          
+          // Actualizar información del usuario (incluyendo puntos)
+          context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
           
           setState(() {
             _isProcessing = false;
@@ -549,6 +662,8 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
         }
       } else {
         // Compra completada directamente (todo de wallet)
+        context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+        
         setState(() {
           _isProcessing = false;
           _isPurchaseComplete = true;

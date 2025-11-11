@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import '../../models/product.model.dart';
 import '../../models/store.model.dart';
-import '../views/product_detail.view.dart';
+import '../views/catalog/product_detail.view.dart';
+import '../bloc/cart/cart_bloc.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -24,9 +26,12 @@ class ProductCard extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProductDetailView(
-                    product: product,
-                    store: store!,
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<CartBloc>(),
+                    child: ProductDetailView(
+                      product: product,
+                      store: store!,
+                    ),
                   ),
                 ),
               );

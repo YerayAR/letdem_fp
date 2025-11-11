@@ -3,8 +3,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import '../../models/product.model.dart';
-import '../../models/store.model.dart';
+import 'package:letdem/features/marketplace/models/product.model.dart';
+import 'package:letdem/features/marketplace/models/store.model.dart';
 import 'redeem_online_success.view.dart';
 import 'dart:async';
 

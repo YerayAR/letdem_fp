@@ -23,7 +23,9 @@ import '../../../features/users/repository/user.repository.dart';
 enum Environment { STG, PROD, DEV }
 
 class EndPoints {
+  // STAGING
   static String baseURL = "https://api-staging.letdem.org/v1";
+  static String marketplaceURL = "https://api-staging.letdem.org/v1";
 
   static bool showApiLogs = true;
   static Endpoint<DeviceIdDTO> updateDeviceIdEndpoint = Endpoint(
