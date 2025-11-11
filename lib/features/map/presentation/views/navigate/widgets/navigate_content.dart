@@ -538,37 +538,6 @@ class _NavigateContentState extends State<NavigateContent>
             Container(
               height: 60,
               decoration: BoxDecoration(color: AppColors.primary500),
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: widget
-                    .routesList
-                    .first
-                    .sections
-                    .first
-                    .sectionNotices
-                    .length
-                    .clamp(0, 10),
-                separatorBuilder:
-                    (context, index) => Container(
-                      width: 1,
-                      height: 60,
-                      color: Colors.white.withOpacity(0.3),
-                    ),
-                itemBuilder: (context, index) {
-                  IconData icon = _getManeuverIcon(index);
-
-                  return Container(
-                    width: 100,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      icon,
-                      color: Colors.white.withOpacity(0.7),
-                      size: 28,
-                    ),
-                  );
-                },
-              ),
             ),
           ],
         ),

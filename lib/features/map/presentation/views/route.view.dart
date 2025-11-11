@@ -641,15 +641,23 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     if (_hereMapController == null) return;
 
     try {
+      final screenHeight = _hereMapController!.viewportSize.height;
+
+      final bottomSheetHeight = screenHeight * 0.5;
+
+      final topPadding = 100.0;
+      final sidePadding = 50.0;
+      final bottomPadding = bottomSheetHeight + 50.0;
+
       final update =
           MapCameraUpdateFactory.lookAtAreaWithGeoOrientationAndViewRectangle(
             route.boundingBox,
             GeoOrientationUpdate(0, 0),
             Rectangle2D(
-              Point2D(50, 50),
+              Point2D(sidePadding, topPadding),
               Size2D(
-                _hereMapController!.viewportSize.width - 100,
-                _hereMapController!.viewportSize.height - 100,
+                _hereMapController!.viewportSize.width - (sidePadding * 2),
+                screenHeight - topPadding - bottomPadding,
               ),
             ),
           );
