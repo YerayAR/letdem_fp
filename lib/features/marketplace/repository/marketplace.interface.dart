@@ -6,7 +6,11 @@ import '../models/voucher.model.dart';
 abstract class IMarketplaceRepository {
   Future<List<Store>> fetchStores({String? category, String? search});
   Future<Store> fetchStoreById(String id);
-  Future<List<Product>> fetchProducts({String? storeId, String? search});
+  Future<List<Product>> fetchProducts({
+    String? storeId,
+    String? search,
+    int? limit,
+  });
   Future<Product> fetchProductById(String id);
   Future<Map<String, dynamic>> purchaseWithRedeem({
     required String productId,

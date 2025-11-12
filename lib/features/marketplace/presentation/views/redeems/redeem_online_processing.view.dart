@@ -158,7 +158,7 @@ class _RedeemOnlineProcessingViewState
                 ),
               ],
             ),
-            child: Icon(
+            child: const Icon(
               Iconsax.ticket_discount,
               size: 60,
               color: Colors.white,
@@ -261,13 +261,13 @@ class _RedeemOnlineProcessingViewState
             ),
             child: Center(
               child: isCompleted
-                  ? Icon(
+                  ? const Icon(
                       Icons.check,
                       size: 16,
                       color: Colors.white,
                     )
                   : isCurrent
-                      ? SizedBox(
+                      ? const SizedBox(
                           width: 12,
                           height: 12,
                           child: CircularProgressIndicator(
@@ -285,9 +285,7 @@ class _RedeemOnlineProcessingViewState
             child: Text(
               _steps[index],
               style: Typo.mediumBody.copyWith(
-                color: isCompleted || isCurrent
-                    ? AppColors.neutal900
-                    : AppColors.neutral400,
+                color: (isCompleted || isCurrent) ? AppColors.neutral900 : AppColors.neutral400,
                 fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
