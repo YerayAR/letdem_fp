@@ -27,7 +27,7 @@ import 'package:letdem/features/users/presentation/widgets/settings_container.wi
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/marketplace_start.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/start/marketplace_start.view.dart';
 import 'package:letdem/infrastructure/services/earnings/eranings.service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
