@@ -1,0 +1,1 @@
+export 'catalog/product_detail.page.dart';

@@ -24,8 +24,7 @@ import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
-import 'package:letdem/features/marketplace/data/marketplace_repository.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
+import 'package:letdem/features/marketplace/data/marketplace_data.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
@@ -51,6 +50,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
+import 'features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
 import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
 
@@ -170,7 +170,7 @@ void main() async {
           RepositoryProvider(create: (_) => MapRepository()),
           RepositoryProvider(create: (_) => ScheduleNotificationsRepository()),
           RepositoryProvider(create: (_) => NotificationRepository()),
-          RepositoryProvider(create: (_) => MarketplaceRepository()),
+          RepositoryProvider(create: (_) => MarketplaceRepositoryImpl()),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -256,7 +256,7 @@ void main() async {
             BlocProvider(
               create:
                   (context) => StoreCatalogBloc(
-                    repository: context.read<MarketplaceRepository>(),
+                    repository: context.read<MarketplaceRepositoryImpl>(),
                   ),
             ),
           ],
