@@ -5,6 +5,8 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/accounts/presentation/bloc/user/user_bloc.dart';
+
+import '../../../users/user_bloc.dart';
 import '../../models/product.model.dart';
 import '../../models/store.model.dart';
 import 'redeem_online_processing.view.dart';
@@ -115,11 +117,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
           color: AppColors.green600.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          Iconsax.tick_circle,
-          size: 40,
-          color: AppColors.green600,
-        ),
+        child: Icon(Iconsax.tick_circle, size: 40, color: AppColors.green600),
       ),
     );
   }
@@ -130,10 +128,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.neutral200,
-          width: 1.5,
-        ),
+        border: Border.all(color: AppColors.neutral200, width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -166,11 +161,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
                   color: AppColors.primary500.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  Iconsax.box,
-                  color: AppColors.primary500,
-                  size: 28,
-                ),
+                child: Icon(Iconsax.box, color: AppColors.primary500, size: 28),
               ),
               Dimens.space(2),
               Expanded(
@@ -209,10 +200,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.neutral50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.neutral200,
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.neutral200, width: 1),
       ),
       child: Row(
         children: [
@@ -234,15 +222,11 @@ class RedeemOnlineConfirmView extends StatelessWidget {
               children: [
                 Text(
                   store.name,
-                  style: Typo.mediumBody.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(
                   store.category.displayName,
-                  style: Typo.smallBody.copyWith(
-                    color: AppColors.neutral500,
-                  ),
+                  style: Typo.smallBody.copyWith(color: AppColors.neutral500),
                 ),
               ],
             ),
@@ -281,9 +265,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
             children: [
               Text(
                 'Precio original:',
-                style: Typo.mediumBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
+                style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
               ),
               Text(
                 '\$${originalPrice.toStringAsFixed(2)}',
@@ -345,10 +327,16 @@ class RedeemOnlineConfirmView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: canRedeem ? AppColors.green600.withOpacity(0.1) : AppColors.red600.withOpacity(0.1),
+        color:
+            canRedeem
+                ? AppColors.green600.withOpacity(0.1)
+                : AppColors.red600.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: canRedeem ? AppColors.green600.withOpacity(0.3) : AppColors.red600.withOpacity(0.3),
+          color:
+              canRedeem
+                  ? AppColors.green600.withOpacity(0.3)
+                  : AppColors.red600.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -374,9 +362,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Tienes $userPoints pts • Se usarán 500 pts',
-                  style: Typo.smallBody.copyWith(
-                    color: AppColors.neutral700,
-                  ),
+                  style: Typo.smallBody.copyWith(color: AppColors.neutral700),
                 ),
               ],
             ),
@@ -399,11 +385,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Iconsax.clock,
-            color: AppColors.orange600,
-            size: 24,
-          ),
+          Icon(Iconsax.clock, color: AppColors.orange600, size: 24),
           Dimens.space(2),
           Expanded(
             child: Column(
@@ -452,20 +434,22 @@ class RedeemOnlineConfirmView extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: canRedeem
-                    ? () {
-                        // Navegar a vista de procesamiento
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RedeemOnlineProcessingView(
-                              product: product,
-                              store: store,
+                onPressed:
+                    canRedeem
+                        ? () {
+                          // Navegar a vista de procesamiento
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => RedeemOnlineProcessingView(
+                                    product: product,
+                                    store: store,
+                                  ),
                             ),
-                          ),
-                        );
-                      }
-                    : null,
+                          );
+                        }
+                        : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.purple600,
                   foregroundColor: Colors.white,
@@ -490,9 +474,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Cancelar',
-                style: Typo.mediumBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
+                style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
               ),
             ),
           ],
