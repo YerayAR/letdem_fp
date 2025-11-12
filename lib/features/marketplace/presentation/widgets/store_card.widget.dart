@@ -185,15 +185,8 @@ class StoreCard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                                create: (_) => StoreProductsBloc(storeId: store.id),
-                              ),
-                              BlocProvider.value(
-                                value: context.read<CartBloc>(),
-                              ),
-                            ],
+                  builder: (_) => BlocProvider(
+                            create: (_) => StoreProductsBloc(storeId: store.id),
                             child: StoreProductsView(store: store),
                           ),
                         ),

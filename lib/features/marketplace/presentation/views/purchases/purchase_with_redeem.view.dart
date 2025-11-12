@@ -8,7 +8,7 @@ import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 import '../../../models/product.model.dart';
 import '../../../models/store.model.dart';
-import '../../../data/marketplace_repository.dart';
+import '../../../repository/marketplace_repository.dart';
 
 class PurchaseWithRedeemView extends StatefulWidget {
   final Product product;

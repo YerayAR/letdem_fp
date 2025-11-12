@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../models/product.model.dart';
-import '../../data/marketplace_repository.dart';
+import '../../repository/marketplace_repository.dart';
 
 part 'store_products_event.dart';
 part 'store_products_state.dart';
