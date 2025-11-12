@@ -40,8 +40,9 @@ import 'package:letdem/features/wallet/repository/transaction.repository.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/repository/withdrawal.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
-import 'package:letdem/features/marketplace/data/marketplace_repository.dart';
+import 'package:letdem/features/marketplace/repository/marketplace_repository.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/app_localizations.dart';
 import 'package:letdem/l10n/locales.dart';
@@ -261,6 +262,9 @@ void main() async {
                   (context) => StoreCatalogBloc(
                     repository: context.read<MarketplaceRepository>(),
                   ),
+            ),
+            BlocProvider(
+              create: (context) => CartBloc(),
             ),
           ],
           child: const AnnotatedRegion<SystemUiOverlayStyle>(

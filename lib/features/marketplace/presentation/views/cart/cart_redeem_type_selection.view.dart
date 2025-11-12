@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import '../../models/product.model.dart';
-import '../../models/store.model.dart';
-import 'redeem_online_intro.view.dart';
-import 'redeem_in_store_intro.view.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_state.dart';
+import 'package:letdem/features/marketplace/presentation/views/redeems/redeem_online_intro.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/redeems/redeem_in_store_intro.view.dart';
 
-class RedeemTypeSelectionView extends StatelessWidget {
-  final Product product;
-  final Store store;
-
-  const RedeemTypeSelectionView({
-    super.key,
-    required this.product,
-    required this.store,
-  });
+class CartRedeemTypeSelectionView extends StatelessWidget {
+  const CartRedeemTypeSelectionView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +36,14 @@ class RedeemTypeSelectionView extends StatelessWidget {
                       ),
                       Dimens.space(3),
                       Text(
-                        'Elige si quiere canjear el código online ya o hacer en el momento de la compra en la tienda (Recuerda que el canje tiene un límite temporal de 2 días)',
+                        'Elige si quiere canjear los códigos online ya o hacer en el momento de la compra en la tienda (Recuerda que el canje tiene un límite temporal de 2 días)',
                         style: Typo.mediumBody.copyWith(
                           color: AppColors.neutral600,
                           height: 1.5,
                         ),
                       ),
                       Dimens.space(4),
-                      _buildProductInfo(),
+                      _buildCartSummary(context),
                       Dimens.space(5),
                       _buildRedeemOptions(context),
                     ],
@@ -81,9 +75,16 @@ class RedeemTypeSelectionView extends StatelessWidget {
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Icon(
-              Iconsax.close_square,
+              Iconsax.arrow_left,
               color: AppColors.neutral600,
               size: 24,
+            ),
+          ),
+          Dimens.space(2),
+          Text(
+            'Seleccionar tipo de canje',
+            style: Typo.mediumBody.copyWith(
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -91,107 +92,132 @@ class RedeemTypeSelectionView extends StatelessWidget {
     );
   }
 
-  Widget _buildProductInfo() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary500.withOpacity(0.1),
-            AppColors.primary200.withOpacity(0.1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.primary200,
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  Widget _buildCartSummary(BuildContext context) {
+    return BlocBuilder<CartBloc, CartState>(
+      builder: (context, cartState) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.purple600.withOpacity(0.1),
+                AppColors.purple200.withOpacity(0.1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.purple200,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary500,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Iconsax.box,
-                  color: Colors.white,
-                  size: 24,
-                ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.purple600,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Iconsax.shopping_cart,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  Dimens.space(2),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Resumen del carrito',
+                          style: Typo.mediumBody.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          '${cartState.itemCount} producto${cartState.itemCount != 1 ? "s" : ""}',
+                          style: Typo.smallBody.copyWith(
+                            color: AppColors.neutral500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               Dimens.space(2),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Divider(color: AppColors.purple200),
+              Dimens.space(1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total:',
+                    style: Typo.smallBody.copyWith(
+                      color: AppColors.neutral600,
+                    ),
+                  ),
+                  Text(
+                    '\$${cartState.total.toStringAsFixed(2)}',
+                    style: Typo.mediumBody.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.purple600,
+                    ),
+                  ),
+                ],
+              ),
+              if (cartState.totalPointsNeeded > 0) ...[
+                Dimens.space(0.5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      product.name,
-                      style: Typo.mediumBody.copyWith(
-                        fontWeight: FontWeight.w700,
+                      'Puntos a usar:',
+                      style: Typo.smallBody.copyWith(
+                        color: AppColors.neutral600,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      store.name,
-                      style: Typo.smallBody.copyWith(
-                        color: AppColors.neutral500,
+                      '${cartState.totalPointsNeeded} pts',
+                      style: Typo.mediumBody.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.green600,
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
+              if (cartState.totalDiscount > 0) ...[
+                Dimens.space(0.5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Ahorro total:',
+                      style: Typo.smallBody.copyWith(
+                        color: AppColors.neutral600,
+                      ),
+                    ),
+                    Text(
+                      '\$${cartState.totalDiscount.toStringAsFixed(2)}',
+                      style: Typo.mediumBody.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.green600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
-          Dimens.space(2),
-          Divider(color: AppColors.primary200),
-          Dimens.space(1),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Precio:',
-                style: Typo.smallBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
-              ),
-              Text(
-                '\$${product.finalPrice.toStringAsFixed(2)}',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary500,
-                ),
-              ),
-            ],
-          ),
-          Dimens.space(0.5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Descuento con 500 pts:',
-                style: Typo.smallBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
-              ),
-              Text(
-                '30% OFF',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.green600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -203,7 +229,7 @@ class RedeemTypeSelectionView extends StatelessWidget {
           icon: Iconsax.shop,
           title: 'Canje en tienda',
           description:
-              'Genera un código QR para usar en el momento de pago en la tienda física',
+              'Genera códigos QR para usar en el momento de pago en la tienda física',
           color: AppColors.primary500,
           onTap: () {
             Navigator.push(
@@ -220,7 +246,7 @@ class RedeemTypeSelectionView extends StatelessWidget {
           icon: Iconsax.global,
           title: 'Canje online',
           description:
-              'Escanea el código QR del producto en la tienda online para aplicar tu descuento',
+              'Escanea los códigos QR de los productos en la tienda online para aplicar tus descuentos',
           color: AppColors.purple600,
           onTap: () {
             Navigator.push(
@@ -310,48 +336,6 @@ class RedeemTypeSelectionView extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showComingSoonDialog(BuildContext context, String type) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              Iconsax.info_circle,
-              color: AppColors.primary500,
-            ),
-            Dimens.space(1),
-            Text(
-              'Próximamente',
-              style: Typo.largeBody.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'La funcionalidad de "$type" estará disponible próximamente.',
-          style: Typo.mediumBody,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Entendido',
-              style: Typo.mediumBody.copyWith(
-                color: AppColors.primary500,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

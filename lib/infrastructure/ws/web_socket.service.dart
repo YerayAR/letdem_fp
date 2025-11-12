@@ -24,7 +24,7 @@ class LocationWebSocketService {
     var token = await SecureStorageHelper().read('access_token');
 
     final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/maps/nearby?token=$token',
+      'wss://api-staging.letdem.org/ws/maps/nearby?token=$token',
     );
 
     _channel = WebSocketChannel.connect(wsUrl);
@@ -134,7 +134,7 @@ class UserWebSocketService {
   WebSocketChannel? _channel;
   Timer? _reconnectTimer;
   int _reconnectAttempts = 0;
-  static const int maxReconnectAttempts = 5;
+  static const int maxReconnectAttempts = 1;  // Reducido a 1: solo 1 intento de reconexión
   static const Duration baseReconnectDelay = Duration(seconds: 5);
   bool _isReconnecting = false;
 
@@ -151,7 +151,7 @@ class UserWebSocketService {
     if (token == null) return;
 
     final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
+      'wss://api-staging.letdem.org/ws/users/refresh?token=$token',
     );
 
     try {
@@ -168,26 +168,14 @@ class UserWebSocketService {
         return;
       }
 
-      // First, let's check if the domain resolves
-      final wsUrl = Uri.parse(
-        'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
-      );
 
       _log('🔗 Attempting to connect to: ${wsUrl.toString()}');
 
       _channel = WebSocketChannel.connect(wsUrl);
 
-      // Add a connection timeout
-      final connectionTimeout = Timer(Duration(seconds: 10), () {
-        if (_channel != null && _channel!.closeCode == null) {
-          _log('⏰ Connection timeout', type: 'error');
-          _channel?.sink.close();
-        }
-      });
 
       _channel!.stream.listen(
         (event) {
-          connectionTimeout.cancel();
           _reconnectAttempts = 0; // Reset on successful connection
           _isReconnecting = false;
 
@@ -200,13 +188,11 @@ class UserWebSocketService {
           }
         },
         onDone: () {
-          connectionTimeout.cancel();
           _log('🔌 Disconnected from User WebSocket (onDone)');
           _handleReconnect(onEvent: onEvent, onDone: onDone, onError: onError);
           onDone?.call();
         },
         onError: (error) {
-          connectionTimeout.cancel();
           _log('❌ User WebSocket Error: $error', type: 'error');
 
           // Check if it's a DNS resolution error
