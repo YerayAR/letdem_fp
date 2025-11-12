@@ -412,10 +412,10 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.orange600.withOpacity(0.1),
+        color: AppColors.neutral600.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.orange600.withOpacity(0.3),
+          color: AppColors.neutral600.withOpacity(0.3),
           width: 1.5,
         ),
       ),
@@ -426,7 +426,7 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
             children: [
               Icon(
                 Iconsax.clock,
-                color: AppColors.orange600,
+                color: AppColors.neutral600,
                 size: 24,
               ),
               Dimens.space(1),
@@ -434,7 +434,7 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
                 'Tiempo restante',
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.orange600,
+                  color: AppColors.neutral600,
                 ),
               ),
             ],
@@ -445,7 +445,7 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
             style: Typo.largeBody.copyWith(
               fontSize: 36,
               fontWeight: FontWeight.w700,
-              color: AppColors.orange600,
+              color: AppColors.neutral600,
             ),
           ),
           Dimens.space(1),
