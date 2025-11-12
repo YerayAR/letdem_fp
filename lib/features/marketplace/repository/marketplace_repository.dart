@@ -127,11 +127,12 @@ class MarketplaceRepository extends IMarketplaceRepository {
   }
 
   @override
-  Future<List<Product>> fetchProducts({String? storeId, String? search}) async {
+  Future<List<Product>> fetchProducts({int? limit, String? storeId, String? search}) async {
     try {
       var uri = Uri.parse('$baseUrl/products/');
 
       final queryParams = <String, String>{};
+      if (limit != null) queryParams['limit'] = limit.toString();
       if (storeId != null) queryParams['store'] = storeId;
       if (search != null) queryParams['search'] = search;
 
