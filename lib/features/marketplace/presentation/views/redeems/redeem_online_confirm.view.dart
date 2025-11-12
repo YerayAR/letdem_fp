@@ -5,9 +5,9 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/features/marketplace/models/product.model.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
-import 'package:letdem/features/marketplace/presentation/views/redeems/redeem_online_processing.view.dart';
+import '../../models/product.model.dart';
+import '../../models/store.model.dart';
+import 'redeem_online_processing.view.dart';
 
 class RedeemOnlineConfirmView extends StatelessWidget {
   final Product product;
@@ -390,10 +390,10 @@ class RedeemOnlineConfirmView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.secondary600.withOpacity(0.1),
+        color: AppColors.neutral600.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.secondary600.withOpacity(0.3),
+          color: AppColors.neutral600.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -401,7 +401,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
         children: [
           Icon(
             Iconsax.clock,
-            color: AppColors.secondary600,
+            color: AppColors.neutral600,
             size: 24,
           ),
           Dimens.space(2),
@@ -413,7 +413,7 @@ class RedeemOnlineConfirmView extends StatelessWidget {
                   'Validez del descuento',
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.secondary600,
+                    color: AppColors.neutral600,
                   ),
                 ),
                 const SizedBox(height: 4),
