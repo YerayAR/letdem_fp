@@ -6,9 +6,7 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import '../../models/store.model.dart';
 import '../bloc/store_products_bloc.dart';
-import '../bloc/cart/cart_bloc.dart';
-import '../views/catalog/store_products.view.dart';
-
+import '../views/store_products.view.dart';
 
 class StoreCard extends StatelessWidget {
   final Store store;
@@ -185,15 +183,8 @@ class StoreCard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                                create: (_) => StoreProductsBloc(storeId: store.id),
-                              ),
-                              BlocProvider.value(
-                                value: context.read<CartBloc>(),
-                              ),
-                            ],
+                          builder: (_) => BlocProvider(
+                            create: (_) => StoreProductsBloc(storeId: store.id),
                             child: StoreProductsView(store: store),
                           ),
                         ),

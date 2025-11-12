@@ -3,9 +3,10 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'redeem_in_store_scanner.view.dart';
 
-class RedeemOnlineIntroView extends StatelessWidget {
-  const RedeemOnlineIntroView({super.key});
+class RedeemInStoreIntroView extends StatelessWidget {
+  const RedeemInStoreIntroView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class RedeemOnlineIntroView extends StatelessWidget {
                       _buildMainIcon(),
                       Dimens.space(4),
                       Text(
-                        'Canje Online',
+                        'Canje en Tienda',
                         style: Typo.largeBody.copyWith(
                           fontWeight: FontWeight.w700,
                           fontSize: 32,
@@ -33,7 +34,7 @@ class RedeemOnlineIntroView extends StatelessWidget {
                       ),
                       Dimens.space(2),
                       Text(
-                        '¿Deseas canjear tus puntos para obtener un descuento del 30% en tu próxima compra online?',
+                        'Escanea el código QR que te muestre el cajero en la tienda física para aplicar tu descuento del 30%',
                         style: Typo.mediumBody.copyWith(
                           color: AppColors.neutral600,
                           height: 1.5,
@@ -89,13 +90,13 @@ class RedeemOnlineIntroView extends StatelessWidget {
         width: 120,
         height: 120,
         decoration: BoxDecoration(
-          color: AppColors.purple600.withOpacity(0.1),
+          color: AppColors.primary500.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(
-          Iconsax.ticket_discount,
+          Iconsax.shop,
           size: 60,
-          color: AppColors.purple600,
+          color: AppColors.primary500,
         ),
       ),
     );
@@ -115,26 +116,26 @@ class RedeemOnlineIntroView extends StatelessWidget {
         Dimens.space(2),
         _buildInstructionStep(
           number: '1',
-          title: 'Acepta el canje',
-          description: 'Confirma que deseas usar tus puntos para obtener el descuento',
+          title: 'Llega a la caja',
+          description: 'Dirígete al mostrador de pago con los productos que deseas comprar',
         ),
         Dimens.space(2),
         _buildInstructionStep(
           number: '2',
-          title: 'Recibes el descuento',
-          description: 'Se consumirán 500 puntos y tendrás tu descuento del 30% activo',
+          title: 'Solicita el descuento',
+          description: 'Indica al cajero que quieres usar tus puntos Letdem',
         ),
         Dimens.space(2),
         _buildInstructionStep(
           number: '3',
-          title: 'Compra en la tienda online',
-          description: 'Realiza tu compra en la tienda online asociada dentro del tiempo límite',
+          title: 'Escanea el código QR',
+          description: 'El cajero te mostrará un código QR en su terminal, escanéalo con tu cámara',
         ),
         Dimens.space(2),
         _buildInstructionStep(
           number: '4',
-          title: 'Aplica tu descuento',
-          description: 'El descuento se aplicará automáticamente al finalizar tu compra',
+          title: 'Descuento aplicado',
+          description: 'Una vez validado, recibirás tu descuento del 30% al instante',
         ),
       ],
     );
@@ -152,7 +153,7 @@ class RedeemOnlineIntroView extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: AppColors.purple600,
+            color: AppColors.primary500,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -195,10 +196,10 @@ class RedeemOnlineIntroView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.purple50,
+        color: AppColors.primary50,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.purple600.withOpacity(0.3),
+          color: AppColors.primary500.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -206,7 +207,7 @@ class RedeemOnlineIntroView extends StatelessWidget {
         children: [
           Icon(
             Iconsax.info_circle,
-            color: AppColors.purple600,
+            color: AppColors.primary500,
             size: 24,
           ),
           Dimens.space(2),
@@ -218,14 +219,14 @@ class RedeemOnlineIntroView extends StatelessWidget {
                   'Importante',
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.purple600,
+                    color: AppColors.primary500,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Este canje consume 500 puntos y tiene una validez de 2 días. Si no completas la compra, los puntos se devolverán automáticamente.',
+                  'Este canje consume 500 puntos y se aplica instantáneamente. El descuento se verá reflejado directamente en tu cuenta en la tienda.',
                   style: Typo.smallBody.copyWith(
-                  color: AppColors.neutral600,
+                    color: AppColors.neutral600,
                     height: 1.4,
                   ),
                 ),
@@ -258,13 +259,15 @@ class RedeemOnlineIntroView extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Navegar a confirmación de canje online
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Confirmación de canje online - Próximamente')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const RedeemInStoreScannerView(),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.purple600,
+                  backgroundColor: AppColors.primary500,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -275,13 +278,10 @@ class RedeemOnlineIntroView extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Iconsax.tick_circle,
-                      size: 20,
-                    ),
+                    Icon(Iconsax.scan, size: 20),
                     Dimens.space(1),
                     Text(
-                      'Aceptar y canjear',
+                      'Escanear código QR',
                       style: Typo.mediumBody.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,

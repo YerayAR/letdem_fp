@@ -3,8 +3,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/features/marketplace/models/product.model.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
+import '../../models/product.model.dart';
+import '../../models/store.model.dart';
 import 'redeem_online_success.view.dart';
 import 'dart:async';
 
@@ -158,7 +158,7 @@ class _RedeemOnlineProcessingViewState
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Iconsax.ticket_discount,
               size: 60,
               color: Colors.white,
@@ -261,13 +261,13 @@ class _RedeemOnlineProcessingViewState
             ),
             child: Center(
               child: isCompleted
-                  ? const Icon(
+                  ? Icon(
                       Icons.check,
                       size: 16,
                       color: Colors.white,
                     )
                   : isCurrent
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 12,
                           height: 12,
                           child: CircularProgressIndicator(
@@ -285,7 +285,9 @@ class _RedeemOnlineProcessingViewState
             child: Text(
               _steps[index],
               style: Typo.mediumBody.copyWith(
-                color: (isCompleted || isCurrent) ? AppColors.neutral900 : AppColors.neutral400,
+                color: isCompleted || isCurrent
+                    ? AppColors.neutral800
+                    : AppColors.neutral400,
                 fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w400,
               ),
             ),

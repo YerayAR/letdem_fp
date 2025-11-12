@@ -4,10 +4,10 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
-import 'package:letdem/features/marketplace/models/product.model.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
-import 'package:letdem/features/marketplace/presentation/views/purchases/purchase_with_redeem.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/purchases/purchase_without_redeem.view.dart';
+import '../../models/product.model.dart';
+import '../../models/store.model.dart';
+import 'purchase_with_redeem.view.dart';
+import 'purchase_without_redeem.view.dart';
 
 class PurchaseRedeemQuestionView extends StatelessWidget {
   final Product product;
