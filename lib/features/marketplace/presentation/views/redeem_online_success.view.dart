@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/features/marketplace/models/product.model.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_event.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/pending_vouchers/pending_vouchers_cubit.dart';
+import '../../models/product.model.dart';
+import '../../models/store.model.dart';
 import 'dart:async';
 
 class RedeemOnlineSuccessView extends StatefulWidget {
@@ -41,20 +37,6 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
     _updateTimeRemaining();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       _updateTimeRemaining();
-    });
-    
-    // Eliminar el producto del carrito y recargar pendientes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Eliminar del carrito
-      context.read<CartBloc>().add(RemoveFromCartEvent(widget.product.id));
-      
-      // Recargar vouchers pendientes para mostrar el nuevo voucher
-      try {
-        context.read<PendingVouchersCubit>().refreshVouchers();
-      } catch (e) {
-        // Si el cubit no está disponible, no hacemos nada
-        print('PendingVouchersCubit no disponible: $e');
-      }
     });
   }
 
@@ -430,10 +412,10 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.secondary50,
+        color: AppColors.orange600.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.secondary600.withOpacity(0.3),
+          color: AppColors.orange600.withOpacity(0.3),
           width: 1.5,
         ),
       ),
@@ -444,7 +426,7 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
             children: [
               Icon(
                 Iconsax.clock,
-                color: AppColors.secondary600,
+                color: AppColors.orange600,
                 size: 24,
               ),
               Dimens.space(1),
@@ -452,7 +434,7 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
                 'Tiempo restante',
                 style: Typo.mediumBody.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.secondary600,
+                  color: AppColors.orange600,
                 ),
               ),
             ],
@@ -463,7 +445,7 @@ class _RedeemOnlineSuccessViewState extends State<RedeemOnlineSuccessView> {
             style: Typo.largeBody.copyWith(
               fontSize: 36,
               fontWeight: FontWeight.w700,
-              color: AppColors.secondary600,
+              color: AppColors.orange600,
             ),
           ),
           Dimens.space(1),

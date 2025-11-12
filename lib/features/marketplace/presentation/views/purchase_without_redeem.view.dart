@@ -6,9 +6,9 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
-import 'package:letdem/features/marketplace/models/product.model.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
-import 'package:letdem/features/marketplace/repository/marketplace_repository.dart';
+import '../../models/product.model.dart';
+import '../../models/store.model.dart';
+import '../../data/marketplace_repository.dart';
 
 class PurchaseWithoutRedeemView extends StatefulWidget {
   final Product product;
@@ -489,26 +489,29 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     setState(() => _isProcessing = true);
 
     try {
+      // Obtener token de autenticación
       final token = await SecureStorageHelper().read('access_token');
+      
       if (token == null || token.isEmpty) {
         throw Exception('No estás autenticado');
       }
 
-      final repository = MarketplaceRepository();
-      print('[BUY] purchase_without_redeem START productId=${widget.product.id} qty=${widget.quantity}');
-      final response = await repository.purchaseWithoutRedeem(
+      // Llamar al backend para iniciar la compra
+      final response = await MarketplaceRepository().purchaseWithoutRedeem(
         productId: widget.product.id,
         quantity: widget.quantity,
         authToken: token,
       );
-      print('[BUY] purchase_without_redeem RESPONSE requires_payment=${response['requires_payment']}');
 
+      // Si requiere pago con Stripe
       if (response['requires_payment'] == true) {
         final clientSecret = response['client_secret'];
-        final breakdown = response['payment_breakdown'];
-        final fromWallet = (breakdown['from_wallet'] as num?)?.toDouble() ?? 0;
-        final fromStripe = (breakdown['from_stripe'] as num?)?.toDouble() ?? 0;
-
+        final paymentBreakdown = response['payment_breakdown'];
+        
+        // Mostrar información de pago
+        final fromWallet = paymentBreakdown['from_wallet'];
+        final fromStripe = paymentBreakdown['from_stripe'];
+        
         if (fromWallet > 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -521,24 +524,22 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
           );
         }
-
-        print('[BUY] Stripe.confirmPayment START');
+        
+        // Procesar pago con Stripe
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
         );
-        print('[BUY] Stripe.confirmPayment DONE status=${paymentIntent.status} id=${paymentIntent.id}');
-
+        
         if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
             paymentIntent.status == PaymentIntentsStatus.Succeeded) {
-          await repository.purchaseWithoutRedeem(
+          // Pago exitoso, confirmar compra en backend
+          await MarketplaceRepository().purchaseWithoutRedeem(
             productId: widget.product.id,
             quantity: widget.quantity,
             authToken: token,
             paymentIntentId: paymentIntent.id,
           );
-
-          context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
-
+          
           setState(() {
             _isProcessing = false;
             _isPurchaseComplete = true;
@@ -547,7 +548,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
           throw Exception('El pago no se completó');
         }
       } else {
-        context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+        // Compra completada directamente (todo de wallet)
         setState(() {
           _isProcessing = false;
           _isPurchaseComplete = true;
@@ -555,6 +556,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
       }
     } on StripeException catch (e) {
       setState(() => _isProcessing = false);
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -566,6 +568,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
       );
     } catch (e) {
       setState(() => _isProcessing = false);
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

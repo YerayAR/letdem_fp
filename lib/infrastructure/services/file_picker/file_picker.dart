@@ -26,9 +26,6 @@ class FileService {
       if (source == FileSourceOption.camera) {
         final XFile? pickedImage = await _imagePicker.pickImage(
           source: ImageSource.camera,
-          maxWidth: 1920,
-          maxHeight: 1920,
-          imageQuality: 85,
         );
         if (pickedImage != null) {
           file = File(pickedImage.path);

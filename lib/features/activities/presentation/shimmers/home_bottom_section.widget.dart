@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/common/widgets/textfield.dart';
@@ -67,12 +66,15 @@ class HomeMapBottomSection extends StatelessWidget {
                 ),
               ),
             ),
-          Dimens.space(2),
-          Text(
-            context.l10n.whatDoYouWantToDo,
-            style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),
-          ),
-          Dimens.space(2),
+            Dimens.space(2),
+            GestureDetector(
+              onTap: () {},
+              child: Text(
+                context.l10n.whatDoYouWantToDo,
+                style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),
+              ),
+            ),
+            Dimens.space(2),
             Row(
               children: [
                 Flexible(

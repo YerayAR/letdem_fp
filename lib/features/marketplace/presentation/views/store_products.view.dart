@@ -3,12 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/store_products_bloc.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_state.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
-import 'package:letdem/features/marketplace/presentation/widgets/product_card.widget.dart';
-import 'package:letdem/features/marketplace/presentation/views/cart/cart.view.dart';
+import '../bloc/store_products_bloc.dart';
+import '../../models/store.model.dart';
+import '../widgets/product_card.widget.dart';
 
 class StoreProductsView extends StatefulWidget {
   final Store store;
@@ -74,58 +71,6 @@ class _StoreProductsViewState extends State<StoreProductsView> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-          ),
-          BlocBuilder<CartBloc, CartState>(
-            builder: (context, cartState) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                        value: context.read<CartBloc>(),
-                        child: const CartView(),
-                      ),
-                    ),
-                  );
-                },
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Icon(
-                      Iconsax.shopping_cart,
-                      color: AppColors.neutral600,
-                      size: 24,
-                    ),
-                    if (cartState.itemCount > 0)
-                      Positioned(
-                        right: -6,
-                        top: -6,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: AppColors.red500,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            '${cartState.itemCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
           ),
         ],
       ),

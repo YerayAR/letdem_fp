@@ -47,12 +47,6 @@ android {
 
         versionName = flutter.versionName
     }
-    packagingOptions {
-        pickFirst 'lib/armeabi-v7a/libmagtsync.so'
-        pickFirst 'lib/arm64-v8a/libmagtsync.so'
-        pickFirst 'lib/x86/libmagtsync.so'
-        pickFirst 'lib/x86_64/libmagtsync.so'
-    }
 
     buildTypes {
         release {
