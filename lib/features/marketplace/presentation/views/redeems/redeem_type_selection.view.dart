@@ -3,10 +3,10 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import '../../models/product.model.dart';
-import '../../models/store.model.dart';
+import '../../../models/product.model.dart';
+import '../../../models/store.model.dart';
 import 'redeem_online_intro.view.dart';
-import 'redeem_in_store_intro.view.dart';
+import '../catalog/redeem_in_store_intro.view.dart';
 
 class RedeemTypeSelectionView extends StatelessWidget {
   final Product product;

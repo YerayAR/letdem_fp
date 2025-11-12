@@ -3,7 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'redeem_in_store_scanner.view.dart';
+import '../redeems/redeem_in_store_scanner.view.dart';
 
 class RedeemInStoreIntroView extends StatelessWidget {
   const RedeemInStoreIntroView({super.key});

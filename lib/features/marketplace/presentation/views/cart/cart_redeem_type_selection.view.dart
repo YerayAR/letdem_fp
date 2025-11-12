@@ -7,7 +7,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_state.dart';
 import 'package:letdem/features/marketplace/presentation/views/redeems/redeem_online_intro.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/redeems/redeem_in_store_intro.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/catalog/redeem_in_store_intro.view.dart';
 
 class CartRedeemTypeSelectionView extends StatelessWidget {
   const CartRedeemTypeSelectionView({super.key});

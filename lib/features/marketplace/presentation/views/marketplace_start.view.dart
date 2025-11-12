@@ -11,7 +11,7 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import '../bloc/store_catalog_bloc.dart';
-import 'store_catalog.view.dart';
+import 'catalog/store_catalog.view.dart';
 
 class MarketplaceStartView extends StatelessWidget {
   const MarketplaceStartView({super.key});

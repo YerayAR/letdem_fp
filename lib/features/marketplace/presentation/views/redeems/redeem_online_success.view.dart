@@ -4,8 +4,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import '../../models/product.model.dart';
-import '../../models/store.model.dart';
+import '../../../models/product.model.dart';
+import '../../../models/store.model.dart';
 import 'dart:async';
 
 class RedeemOnlineSuccessView extends StatefulWidget {

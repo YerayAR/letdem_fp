@@ -3,8 +3,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import '../../models/product.model.dart';
-import '../../models/store.model.dart';
+import '../../../models/product.model.dart';
+import '../../../models/store.model.dart';
 import 'redeem_online_success.view.dart';
 import 'dart:async';
 
@@ -158,7 +158,7 @@ class _RedeemOnlineProcessingViewState
                 ),
               ],
             ),
-            child: Icon(
+            child: const Icon(
               Iconsax.ticket_discount,
               size: 60,
               color: Colors.white,
@@ -261,13 +261,13 @@ class _RedeemOnlineProcessingViewState
             ),
             child: Center(
               child: isCompleted
-                  ? Icon(
+                  ? const Icon(
                       Icons.check,
                       size: 16,
                       color: Colors.white,
                     )
                   : isCurrent
-                      ? SizedBox(
+                      ? const SizedBox(
                           width: 12,
                           height: 12,
                           child: CircularProgressIndicator(

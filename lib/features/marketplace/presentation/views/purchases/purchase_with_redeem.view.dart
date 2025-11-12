@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:iconsax/iconsax.dart';
@@ -7,9 +6,9 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
-import 'package:letdem/features/marketplace/models/product.model.dart';
-import 'package:letdem/features/marketplace/models/store.model.dart';
-import 'package:letdem/features/marketplace/repository/marketplace_repository.dart';
+import '../../../models/product.model.dart';
+import '../../../models/store.model.dart';
+import '../../../data/marketplace_repository.dart';
 
 class PurchaseWithRedeemView extends StatefulWidget {
   final Product product;
@@ -588,13 +587,6 @@ class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
     setState(() => _isProcessing = true);
 
     try {
-      // Verificar conectividad antes de iniciar
-      final results = await Connectivity().checkConnectivity();
-      final netLabel = results.map((e) => e.toString().split('.').last).join(',');
-      print('[NET] connectivity='+netLabel);
-      if (results.isEmpty || results.contains(ConnectivityResult.none)) {
-        throw Exception('Sin conexión a Internet');
-      }
       // Obtener token de autenticación
       final token = await SecureStorageHelper().read('access_token');
       
@@ -603,13 +595,11 @@ class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
       }
 
       // Llamar al backend para iniciar la compra
-      print('[BUY] purchase_with_redeem START productId=${widget.product.id} qty=${widget.quantity}');
       final response = await MarketplaceRepository().purchaseWithRedeem(
         productId: widget.product.id,
         quantity: widget.quantity,
         authToken: token,
       );
-      print('[BUY] purchase_with_redeem RESPONSE requires_payment=${response['requires_payment']}');
 
       // Si requiere pago con Stripe
       if (response['requires_payment'] == true) {
@@ -634,11 +624,9 @@ class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
         }
         
         // Procesar pago con Stripe
-        print('[BUY] Stripe.confirmPayment START');
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
         );
-        print('[BUY] Stripe.confirmPayment DONE status=${paymentIntent.status} id=${paymentIntent.id}');
         
         if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
             paymentIntent.status == PaymentIntentsStatus.Succeeded) {
