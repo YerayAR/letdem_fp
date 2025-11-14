@@ -30,7 +30,8 @@ abstract class MarketplaceRepository {
   });
   Future<List<Voucher>> fetchPendingVouchers({required String authToken});
   Future<Voucher> createVirtualCard({
-    required String productId,
+    required int points,
+    String? productId,
     required String redeemType,
     required String authToken,
   });

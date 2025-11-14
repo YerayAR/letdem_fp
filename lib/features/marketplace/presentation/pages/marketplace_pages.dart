@@ -16,12 +16,9 @@ export 'purchases/purchase_with_redeem.page.dart';
 export 'purchases/purchase_without_redeem.page.dart';
 // Redeem Pages
 export 'redeems/pending_vouchers.page.dart';
-export 'redeems/redeem_in_store_result.page.dart';
-export 'redeems/redeem_in_store_scanner.page.dart';
 export 'redeems/redeem_online_confirm.page.dart';
 export 'redeems/redeem_online_intro.page.dart';
 export 'redeems/redeem_online_processing.page.dart';
-export 'redeems/redeem_online_scanner.page.dart';
 export 'redeems/redeem_online_success.page.dart';
 export 'redeems/redeem_type_selection.page.dart';
 export 'redeems/virtual_card_generator.page.dart';
