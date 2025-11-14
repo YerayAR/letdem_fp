@@ -13,7 +13,6 @@ import 'package:letdem/features/marketplace/presentation/bloc/store_catalog/stor
 import 'package:letdem/features/marketplace/presentation/pages/catalog/store_catalog.page.dart';
 import 'package:letdem/features/marketplace/presentation/pages/purchases/order_history.page.dart';
 import 'package:letdem/features/marketplace/presentation/pages/redeems/pending_vouchers.page.dart';
-import 'package:letdem/features/marketplace/presentation/pages/redeems/redeem_in_store_scanner.page.dart';
 import 'package:letdem/features/marketplace/presentation/pages/redeems/virtual_card_generator.page.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
@@ -200,22 +199,6 @@ class MarketplaceStartView extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const PendingVouchersView()),
-            );
-          },
-        ),
-        Dimens.space(1.5),
-        _buildWideActionButton(
-          context,
-          icon: Iconsax.scan_barcode,
-          label: 'Canjear en tienda',
-          subtitle: 'Muestra tu tarjeta virtual en caja',
-          accentColor: AppColors.primary500,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const RedeemInStoreScannerView(),
-              ),
             );
           },
         ),

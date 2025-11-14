@@ -3,7 +3,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'redeem_online_scanner.page.dart';
 
 class RedeemOnlineIntroView extends StatelessWidget {
   const RedeemOnlineIntroView({super.key});
@@ -258,14 +257,7 @@ class RedeemOnlineIntroView extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const RedeemOnlineScannerView(),
-                    ),
-                  );
-                },
+                onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.purple600,
                   foregroundColor: Colors.white,
@@ -275,19 +267,12 @@ class RedeemOnlineIntroView extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Iconsax.scan, size: 20),
-                    Dimens.space(1),
-                    Text(
-                      'Escanear código QR',
-                      style: Typo.mediumBody.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  'Entendido',
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

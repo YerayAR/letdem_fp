@@ -12,7 +12,7 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
   // IMPORTANTE: ajusta la URL con --dart-define=MARKETPLACE_HOST=<url>
   static const String baseHost = String.fromEnvironment(
     'MARKETPLACE_HOST',
-    defaultValue: 'https://api-staging.letdem.org',
+    defaultValue: 'http://192.168.1.34:8000',
   );
   static const String baseUrl = '$baseHost/v1/marketplace';
 
@@ -450,13 +450,23 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
   @override
   Future<Voucher> createVirtualCard({
-    required String productId,
+    required int points,
+    String? productId,
     required String redeemType,
     required String authToken,
   }) async {
+    if (authToken.isEmpty) {
+      throw Exception('No est�s autenticado');
+    }
+    if (points < 500 || points % 500 != 0) {
+      throw Exception('Los puntos deben ingresarse en m�ltiplos de 500');
+    }
     try {
-      final Map<String, dynamic> body = {'redeem_type': redeemType};
-      if (productId.isNotEmpty) {
+      final Map<String, dynamic> body = {
+        'redeem_type': redeemType,
+        'points': points,
+      };
+      if (productId != null && productId.isNotEmpty) {
         body['product_id'] = productId;
       }
 

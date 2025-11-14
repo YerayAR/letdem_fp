@@ -12,7 +12,9 @@
       "Bash(find:*)",
       "Bash(cat:*)",
       "Bash(git add:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
