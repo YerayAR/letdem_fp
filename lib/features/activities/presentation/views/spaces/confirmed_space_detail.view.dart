@@ -24,6 +24,8 @@ import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 
+import '../../../../track_location/view/track_location_view.dart';
+
 class ConfirmedSpaceReviewView extends StatefulWidget {
   final ReservedSpacePayload payload;
 
@@ -105,7 +107,9 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return const ExtendTimeSpaceView();
+                              return ExtendTimeSpaceView(
+                                spaceId: widget.payload.id,
+                              );
                             },
                           ),
                         );
@@ -117,6 +121,28 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                       //         ? null
                       //         : AppColors.neutral300, // Color deshabilitado
                     ),
+
+                    Dimens.space(2),
+
+                    if (!(widget.payload.status == "PENDING"))
+                      PrimaryButton(
+                        text: 'Ver ubicacion del solicitante',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return TrackLocationView(
+                                  payload: widget.payload,
+                                  spaceId: widget.payload.id,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        textColor: Colors.white,
+                        color: AppColors.neutral300,
+                      ),
 
                     Dimens.space(2),
 

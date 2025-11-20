@@ -23,8 +23,7 @@ abstract class IActivityRepository {
 
   Future publishRoadEvent(PublishRoadEventDTO dto);
 
-  Future eventFeedback({
-    required String eventID,
-    required bool isThere,
-  });
+  Future eventFeedback({required String eventID, required bool isThere});
+
+  Future extendTimeSpace({required String eventID, required int time});
 }

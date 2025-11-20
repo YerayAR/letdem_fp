@@ -12,6 +12,8 @@ import 'package:letdem/infrastructure/api/api/api.service.dart';
 import 'package:letdem/infrastructure/api/api/endpoints.dart';
 import 'package:letdem/infrastructure/api/api/models/response.model.dart';
 
+import '../dto/extend_time_space.dto.dart';
+
 class ActivityRepository extends IActivityRepository {
   @override
   Future<void> addActivity(Activity activity) {
@@ -26,11 +28,11 @@ class ActivityRepository extends IActivityRepository {
     return res;
   }
 
-  @override
-  Future<void> deleteActivity(String id) {
-    // TODO: implement deleteActivity
-    throw UnimplementedError();
-  }
+  // @override
+  // Future<void> deleteActivity(String id) {
+  //   // TODO: implement deleteActivity
+  //   throw UnimplementedError();
+  // }
 
   Future takeSpace(String spaceID, TakeSpaceType t) async {
     ApiResponse res = await ApiService.sendRequest(
@@ -113,5 +115,14 @@ class ActivityRepository extends IActivityRepository {
   @override
   Future deleteSpace(String spaceID) {
     return ApiService.sendRequest(endpoint: EndPoints.deleteSpace(spaceID));
+  }
+
+  @override
+  Future extendTimeSpace({required String eventID, required int time}) async {
+    return ApiService.sendRequest(
+      endpoint: EndPoints.extendTimeSpace(
+        eventID,
+      ).copyWithDTO(ExtendTimeSpaceDTO(time: time)),
+    );
   }
 }

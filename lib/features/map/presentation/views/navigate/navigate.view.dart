@@ -2293,9 +2293,24 @@ class _NavigationViewState extends State<NavigationView> {
               isRecalculatingRoute: _isRecalculatingRoute,
               stopNavigation: _stopNavigation,
               indexRoute: indexRouteSelected,
-              openRouter: () {
-                _isOpenRoutes = !_isOpenRoutes;
-                setState(() {});
+              openRouter: () async {
+                if (routesList.length > 1) {
+                  _isOpenRoutes = !_isOpenRoutes;
+                  setState(() {});
+                } else {
+                  await AppPopup.showDialogSheet(
+                    context,
+                    ConfirmationDialog(
+                      isError: true,
+                      title: 'Rutas alternativas',
+                      subtext:
+                          'No se encontraron más opciones de ruta disponibles.',
+                      onProceed: () {
+                        NavigatorHelper.pop();
+                      },
+                    ),
+                  );
+                }
               },
               startGuidance: (i) {
                 final value = routesList[i];
