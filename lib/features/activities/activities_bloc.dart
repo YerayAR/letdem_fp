@@ -28,6 +28,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     on<DeleteSpaceEvent>(_onDeleteSpaceEvent);
     on<ReserveSpaceEvent>(_onReserveSpace);
     on<ConfirmSpaceReserveEvent>(_onConfirmSpaceReserveEvent);
+    on<ExtendTimeEvent>(_onExtendTimeEvent);
   }
   Future<void> _onCancelReservationEvent(
     CancelReservationEvent event,
@@ -206,6 +207,27 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
         event.price == null,
       );
       emit(const ActivitiesPublished(totalPointsEarned: 0));
+    } on ApiError catch (err) {
+      emit(ActivitiesError(error: err.message));
+    } catch (err) {
+      print("Unable to publish space");
+    }
+  }
+
+  Future<void> _onExtendTimeEvent(
+    ExtendTimeEvent event,
+    Emitter<ActivitiesState> emit,
+  ) async {
+    try {
+      print('event_id ==> ${event.spaceId}');
+      // emit(ActivitiesLoading());
+
+      // // var base64 = await ImageCompressor.compressImageToBase64(event.image);
+      // await activityRepository.extendTimeSpace(
+      //   eventID: event.spaceId,
+      //   time: event.time,
+      // );
+      // emit(const ActivitiesPublished(totalPointsEarned: 0));
     } on ApiError catch (err) {
       emit(ActivitiesError(error: err.message));
     } catch (err) {

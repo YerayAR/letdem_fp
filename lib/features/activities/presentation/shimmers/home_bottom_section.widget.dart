@@ -12,7 +12,6 @@ import 'package:letdem/features/activities/presentation/utils/publish_space_hand
 import 'package:letdem/features/activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
 
 import '../../../../infrastructure/services/mapbox_search/models/service.dart';
-import '../../../../utils/connection_utils.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
   final VoidCallback onRefreshTriggered;
@@ -80,14 +79,8 @@ class HomeMapBottomSection extends StatelessWidget {
                 Flexible(
                   flex: context.isSpanish ? 6 : 1,
                   child: PrimaryButton(
+                    isVerifyConecction: true,
                     onTap: () async {
-                      final isConnected =
-                          await ConnectionHelper.showNoConnectionDialog(
-                            context,
-                          );
-
-                      if (!isConnected) return;
-
                       PublishSpaceHandler.showSpaceOptions(context, () {
                         onRefreshTriggered();
                       });
