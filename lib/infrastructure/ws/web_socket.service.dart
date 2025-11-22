@@ -133,13 +133,16 @@ class LocationWebSocketService {
 class UserWebSocketService {
   WebSocketChannel? _channel;
   Timer? _reconnectTimer;
+  Timer? _connectionTimeout;
   int _reconnectAttempts = 0;
   static const int maxReconnectAttempts = 5;
   static const Duration baseReconnectDelay = Duration(seconds: 5);
   bool _isReconnecting = false;
+  bool _intentionalDisconnect = false;
 
   bool get isConnected => _channel != null && _channel!.closeCode == null;
-  bool get shouldAttemptReconnect => _reconnectAttempts < maxReconnectAttempts;
+  bool get shouldAttemptReconnect =>
+      _reconnectAttempts < maxReconnectAttempts && !_intentionalDisconnect;
 
   /// Connects to the WebSocket to listen for user data updates
   Future<void> connect({
@@ -147,28 +150,24 @@ class UserWebSocketService {
     void Function()? onDone,
     void Function(dynamic error)? onError,
   }) async {
-    var token = await SecureStorageHelper().read('access_token');
-    if (token == null) return;
-
-    final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
-    );
+    // Clear intentional disconnect flag when explicitly connecting
+    _intentionalDisconnect = false;
 
     try {
-      // Cancel any existing reconnection attempts
+      // Cancel any existing reconnection timer
       _reconnectTimer?.cancel();
+      _connectionTimeout?.cancel();
 
-      // Close existing connection if any
-      await disconnect();
+      // Close existing connection if any (but preserve reconnect state)
+      await _closeExistingConnection();
 
-      var token = await SecureStorageHelper().read('access_token');
+      final token = await SecureStorageHelper().read('access_token');
       if (token == null || token.isEmpty) {
         _log('❌ No access token found', type: 'error');
         onError?.call('No access token');
         return;
       }
 
-      // First, let's check if the domain resolves
       final wsUrl = Uri.parse(
         'ws://api-staging.letdem.org/ws/users/refresh?token=$token',
       );
@@ -178,7 +177,7 @@ class UserWebSocketService {
       _channel = WebSocketChannel.connect(wsUrl);
 
       // Add a connection timeout
-      final connectionTimeout = Timer(Duration(seconds: 10), () {
+      _connectionTimeout = Timer(Duration(seconds: 10), () {
         if (_channel != null && _channel!.closeCode == null) {
           _log('⏰ Connection timeout', type: 'error');
           _channel?.sink.close();
@@ -187,7 +186,7 @@ class UserWebSocketService {
 
       _channel!.stream.listen(
         (event) {
-          connectionTimeout.cancel();
+          _connectionTimeout?.cancel();
           _reconnectAttempts = 0; // Reset on successful connection
           _isReconnecting = false;
 
@@ -200,13 +199,13 @@ class UserWebSocketService {
           }
         },
         onDone: () {
-          connectionTimeout.cancel();
+          _connectionTimeout?.cancel();
           _log('🔌 Disconnected from User WebSocket (onDone)');
           _handleReconnect(onEvent: onEvent, onDone: onDone, onError: onError);
           onDone?.call();
         },
         onError: (error) {
-          connectionTimeout.cancel();
+          _connectionTimeout?.cancel();
           _log('❌ User WebSocket Error: $error', type: 'error');
 
           // Check if it's a DNS resolution error
@@ -260,14 +259,24 @@ class UserWebSocketService {
     void Function(dynamic error)? onError,
     int delayMultiplier = 1,
   }) {
-    if (_isReconnecting || !shouldAttemptReconnect) {
-      if (!shouldAttemptReconnect) {
-        _log(
-          '🛑 Max reconnection attempts ($maxReconnectAttempts) reached. Giving up.',
-          type: 'error',
-        );
-        onError?.call('Max reconnection attempts reached');
-      }
+    // Don't reconnect if intentionally disconnected or already reconnecting
+    if (_intentionalDisconnect) {
+      _log('🛑 Intentional disconnect - not reconnecting', type: 'info');
+      return;
+    }
+
+    if (_isReconnecting) {
+      _log('⏳ Already reconnecting - skipping duplicate attempt', type: 'info');
+      return;
+    }
+
+    if (!shouldAttemptReconnect) {
+      _log(
+        '🛑 Max reconnection attempts ($maxReconnectAttempts) reached. Giving up.',
+        type: 'error',
+      );
+      _isReconnecting = false;
+      onError?.call('Max reconnection attempts reached');
       return;
     }
 
@@ -285,7 +294,15 @@ class UserWebSocketService {
     );
 
     _reconnectTimer = Timer(delay, () {
-      if (!_isReconnecting) return; // Check if we should still reconnect
+      // Check if disconnect was called during the delay
+      if (_intentionalDisconnect || !_isReconnecting) {
+        _log('🛑 Reconnection cancelled', type: 'info');
+        _isReconnecting = false;
+        return;
+      }
+
+      // Reset flag before connecting so we can detect new disconnections
+      _isReconnecting = false;
 
       connect(onEvent: onEvent, onDone: onDone, onError: onError);
     });
@@ -313,25 +330,50 @@ class UserWebSocketService {
     }
   }
 
-  /// Closes the WebSocket connection and stops reconnection attempts
-  Future<void> disconnect() async {
-    _log('🛑 Closing User WebSocket connection...');
-
-    _reconnectTimer?.cancel();
-    _reconnectTimer = null;
-    _isReconnecting = false;
-    _reconnectAttempts = 0;
+  /// Closes existing connection without affecting reconnection state
+  /// Used internally during reconnection flow
+  Future<void> _closeExistingConnection() async {
+    _connectionTimeout?.cancel();
+    _connectionTimeout = null;
 
     if (_channel != null) {
-      await _channel!.sink.close();
+      try {
+        await _channel!.sink.close();
+      } catch (e) {
+        _log('⚠️ Error closing existing connection: $e', type: 'warn');
+      }
       _channel = null;
     }
   }
 
-  /// Reset reconnection attempts (call this when you want to retry after giving up)
+  /// Closes the WebSocket connection and stops all reconnection attempts
+  /// Call this when you want to fully disconnect (e.g., user logout)
+  Future<void> disconnect() async {
+    _log('🛑 Closing User WebSocket connection...');
+
+    _intentionalDisconnect = true;
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _connectionTimeout?.cancel();
+    _connectionTimeout = null;
+    _isReconnecting = false;
+    _reconnectAttempts = 0;
+
+    if (_channel != null) {
+      try {
+        await _channel!.sink.close();
+      } catch (e) {
+        _log('⚠️ Error during disconnect: $e', type: 'warn');
+      }
+      _channel = null;
+    }
+  }
+
+  /// Reset reconnection state (call this when you want to retry after giving up)
   void resetReconnectionAttempts() {
     _reconnectAttempts = 0;
     _isReconnecting = false;
+    _intentionalDisconnect = false;
   }
 
   /// Check if domain is reachable (optional utility method)

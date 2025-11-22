@@ -154,6 +154,7 @@ class RegisteredCarWidget extends StatelessWidget {
                                             car.lastParkingLocation!.lat ?? 0,
                                         destinationLng:
                                             car.lastParkingLocation!.lng ?? 0,
+                                        isNavigatingToCar: true,
                                       ),
                                     );
                                   },
@@ -299,6 +300,7 @@ class _LastParkedWidgetState extends State<LastParkedWidget> {
                                   preCalculatedRoute: null,
                                   destinationLat: widget.lastParked?.lat ?? 0,
                                   destinationLng: widget.lastParked?.lng ?? 0,
+                                  isNavigatingToCar: true,
                                 ),
                               );
                             },

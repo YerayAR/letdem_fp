@@ -17,6 +17,8 @@ import '../../../../../activities/presentation/bottom_sheets/add_event_sheet.wid
 import '../../../../../activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
 import 'navigate_bottom.dart';
 
+enum _Direction { none, left, straight, right, uTurn }
+
 class NavigateContent extends StatefulWidget {
   NavigateContent({
     super.key,
@@ -544,10 +546,37 @@ class _NavigateContentState extends State<NavigateContent>
                         ),
                       ),
             ),
-            Container(
-              height: 60,
-              decoration: BoxDecoration(color: AppColors.primary500),
-              child: const Row(mainAxisAlignment: MainAxisAlignment.center),
+            Builder(
+              builder: (context) {
+                final direction = _getActiveDirection(widget.normalManuevers);
+                return Container(
+                  height: 60,
+                  decoration: BoxDecoration(color: AppColors.primary500),
+                  child: Row(
+                    children: [
+                      _buildDirectionArrow(
+                        icon: Icons.turn_left,
+                        isActive: direction == _Direction.left,
+                      ),
+                      _buildSoftDivider(),
+                      _buildDirectionArrow(
+                        icon: Icons.arrow_upward,
+                        isActive: direction == _Direction.straight,
+                      ),
+                      _buildSoftDivider(),
+                      _buildDirectionArrow(
+                        icon: Icons.turn_right,
+                        isActive: direction == _Direction.right,
+                      ),
+                      _buildSoftDivider(),
+                      _buildDirectionArrow(
+                        icon: Icons.u_turn_left,
+                        isActive: direction == _Direction.uTurn,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -567,6 +596,72 @@ class _NavigateContentState extends State<NavigateContent>
         ),
       ],
     );
+  }
+
+  Widget _buildDirectionArrow({
+    required IconData icon,
+    required bool isActive,
+  }) {
+    return Expanded(
+      child: Center(
+        child: Icon(
+          icon,
+          color: isActive ? Colors.white : Colors.white.withOpacity(0.6),
+          size: isActive ? 28 : 24,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSoftDivider() {
+    return Container(
+      width: 1,
+      height: 30,
+      color: Colors.white.withOpacity(0.2),
+    );
+  }
+
+  /// Determines the single active direction based on maneuver text
+  /// Only ONE direction can be active at a time
+  _Direction _getActiveDirection(String maneuver) {
+    if (maneuver.isEmpty) return _Direction.none;
+
+    final text = maneuver.toLowerCase();
+
+    // Check U-turn first (highest priority)
+    if (text.contains('u-turn') || text.contains('make a u')) {
+      return _Direction.uTurn;
+    }
+
+    // Check for left turns
+    if (text.contains('turn left') ||
+        text.contains('sharp left') ||
+        text.contains('slight left') ||
+        text.contains('bear left') ||
+        text.contains('keep left')) {
+      return _Direction.left;
+    }
+
+    // Check for right turns
+    if (text.contains('turn right') ||
+        text.contains('sharp right') ||
+        text.contains('slight right') ||
+        text.contains('bear right') ||
+        text.contains('keep right')) {
+      return _Direction.right;
+    }
+
+    // Default to straight for continue, head, go straight, etc.
+    if (text.contains('straight') ||
+        text.contains('continue') ||
+        text.contains('head') ||
+        text.contains('follow') ||
+        text.contains('stay')) {
+      return _Direction.straight;
+    }
+
+    // If we have a maneuver but couldn't classify, default to straight
+    return _Direction.straight;
   }
 
   String _getCurrentLoadingMessage(BuildContext context) {

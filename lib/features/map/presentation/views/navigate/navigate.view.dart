@@ -51,13 +51,15 @@ class NavigationView extends StatefulWidget {
   final double destinationLat;
   final double destinationLng;
   final bool isNavigatingToParking;
+  final bool isNavigatingToCar;
   final String? parkingSpaceID;
-  final HERE.Route? preCalculatedRoute; // Add this
+  final HERE.Route? preCalculatedRoute;
 
   const NavigationView({
     super.key,
     required this.destinationLat,
     this.isNavigatingToParking = false,
+    this.isNavigatingToCar = false,
     required this.destinationLng,
     this.parkingSpaceID,
     this.preCalculatedRoute,
@@ -386,12 +388,38 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _usePreCalculatedRoute(HERE.Route route) {
-    debugPrint('📍 Using pre-calculated route');
+    debugPrint('📍 Checking pre-calculated route');
     debugPrint('  - Duration: ${route.duration.inMinutes} minutes');
-    debugPrint(
-      '  - Distance: ${(route.lengthInMeters / 1000).toStringAsFixed(1)} km',
-    );
+    debugPrint('  - Distance: ${(route.lengthInMeters / 1000).toStringAsFixed(1)} km');
+    debugPrint('  - Sections: ${route.sections.length}');
 
+    // Get the route's starting point
+    final routeStart = route.geometry.vertices.first;
+    debugPrint('  - Route start: ${routeStart.latitude}, ${routeStart.longitude}');
+    debugPrint('  - Current location: ${_currentLocation?.latitude}, ${_currentLocation?.longitude}');
+
+    // Check if user is close to the route's starting point (within 100 meters)
+    if (_currentLocation != null) {
+      final distanceToRouteStart = Geolocator.distanceBetween(
+        _currentLocation!.latitude,
+        _currentLocation!.longitude,
+        routeStart.latitude,
+        routeStart.longitude,
+      );
+      debugPrint('  - Distance to route start: ${distanceToRouteStart.toStringAsFixed(0)}m');
+
+      // If user is more than 100m from route start, recalculate the route
+      if (distanceToRouteStart > 100) {
+        debugPrint('⚠️ User is too far from route start (${distanceToRouteStart.toStringAsFixed(0)}m), recalculating route...');
+        _calculateRoute(
+          _currentLocation!,
+          HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
+        );
+        return;
+      }
+    }
+
+    debugPrint('✅ User is close to route start, using pre-calculated route');
     setState(() => _isLoading = true);
 
     try {
@@ -402,9 +430,11 @@ class _NavigationViewState extends State<NavigationView> {
       // Store route for visual display
       routesList = [route];
 
+      debugPrint('🖊️ Drawing pre-calculated route polylines...');
       // Draw the route on map with traffic colors
       _addTrafficAwareRoutePolyline(route);
 
+      debugPrint('📍 Adding destination marker...');
       // Add destination marker
       _addDestinationMarker(route);
 
@@ -423,8 +453,9 @@ class _NavigationViewState extends State<NavigationView> {
 
       // Start guidance with the route
       _startGuidance(route);
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('❌ Error using pre-calculated route: $e');
+      debugPrint('📚 Stack trace: $stackTrace');
       setState(() {
         _errorMessage = "Failed to use pre-calculated route";
         _isLoading = false;
@@ -626,35 +657,38 @@ class _NavigationViewState extends State<NavigationView> {
     carOptions.routeOptions.trafficOptimizationMode =
         HERE.TrafficOptimizationMode.timeDependent;
 
+    debugPrint('🚗 Calling routingEngine.calculateCarRoute...');
+
     _routingEngine!.calculateCarRoute(
       [startWaypoint, destinationWaypoint],
       carOptions,
       (HERE.RoutingError? routingError, List<HERE.Route>? routeList) async {
+        debugPrint('📬 Route calculation callback received');
+        debugPrint('  - Error: $routingError');
+        debugPrint('  - Routes: ${routeList?.length ?? 0}');
+
         if (routingError == null && routeList != null && routeList.isNotEmpty) {
           debugPrint('✅ Found ${routeList.length} routes');
 
           // Limpia polylines anteriores si hace falta
           _clearPreviousRoutes();
 
-          for (int i = 0; i < routeList.length; i++) {
+          // Draw alternative routes first (underneath the main route)
+          for (int i = routeList.length - 1; i >= 1; i--) {
             final route = routeList[i];
 
-            // Duración y distancia de cada ruta
             debugPrint(
-              "🚗 Ruta $i: "
+              "🚗 Alternative route $i: "
               "${route.duration.inMinutes} min, "
               "${(route.lengthInMeters / 1000).toStringAsFixed(1)} km",
             );
 
-            // Estilo de polyline
-            final polylineColor =
-                (i == 0)
-                    ? const Color.fromARGB(200, 0, 0, 255)
-                    : const Color.fromARGB(160, 0, 200, 0);
+            // Alternative routes use simple gray/green color
+            final polylineColor = const Color.fromARGB(160, 128, 128, 128);
 
             final sizesMap = {
-              0.0: i == 0 ? 10.0 : 5.0, // ancho en zoom bajo
-              20.0: i == 0 ? 10.0 : 5.0, // ancho en zoom alto
+              0.0: 6.0,
+              20.0: 6.0,
             };
 
             final renderSize = HERE.MapMeasureDependentRenderSize(
@@ -675,11 +709,21 @@ class _NavigationViewState extends State<NavigationView> {
             );
 
             _hereMapController!.mapScene.addMapPolyline(polyline);
-
-            // Guardar referencias
             _routePolylines.add(polyline);
             _routesOnMap.add(route);
           }
+
+          // Draw main route with traffic-aware colors (on top)
+          final selectedRoute = routeList.first;
+          debugPrint(
+            "🚗 Main route: "
+            "${selectedRoute.duration.inMinutes} min, "
+            "${(selectedRoute.lengthInMeters / 1000).toStringAsFixed(1)} km",
+          );
+          debugPrint('🖊️ Drawing main route polylines...');
+          _addTrafficAwareRoutePolyline(selectedRoute);
+          debugPrint('✅ Main route polylines drawn');
+          _routesOnMap.insert(0, selectedRoute);
 
           // Actualiza estado
           setState(() {
@@ -687,10 +731,8 @@ class _NavigationViewState extends State<NavigationView> {
             _isLoading = false;
           });
 
-          print('routeList ==> 1 // ${routeList.length}');
-          // Por ahora tomamos la primera ruta como activa
+          debugPrint('routeList ==> ${routeList.length} routes');
           routesList = routeList;
-          final selectedRoute = routeList.first;
           indexRouteSelected = 0;
           _totalRouteTime = selectedRoute.duration.inSeconds;
           _distanceNotifier.value = selectedRoute.lengthInMeters;
@@ -698,7 +740,6 @@ class _NavigationViewState extends State<NavigationView> {
           _setMapCameraFocus();
 
           _navigationStartTime = DateTime.now();
-          print('se esta ejecutando...');
           _startGuidance(selectedRoute);
         } else {
           final error = routingError?.toString() ?? "Unknown error";
@@ -798,6 +839,7 @@ class _NavigationViewState extends State<NavigationView> {
     }
 
     debugPrint('🧭 Starting visual guidance...');
+    debugPrint('📏 Route length: ${route.lengthInMeters}m, duration: ${route.duration.inMinutes}min');
     _configureTTSLanguage();
 
     try {
@@ -813,51 +855,22 @@ class _NavigationViewState extends State<NavigationView> {
       _visualNavigator!.startRendering(_hereMapController!);
       debugPrint('📡 Started rendering navigator.');
 
-      // Escuchar desviaciones de ruta para recalcular
-      _visualNavigator!.routeDeviationListener = HERE.RouteDeviationListener((
-        deviation,
-      ) {
-        debugPrint("⚠️ Usuario se desvió de la ruta");
+      // Setup route deviation listener first
+      _setupRouteDeviationListener();
 
-        final currentLocation =
-            deviation.currentLocation.originalLocation.coordinates;
-        HERE.GeoCoordinates? destination = HERE.GeoCoordinates(
-          widget.destinationLat,
-          widget.destinationLng,
-        );
+      // Set initial navigation instruction from route's first maneuver
+      _setInitialNavigationInstruction(route);
 
-        print('_routingEngine $_routingEngine');
-
-        _routingEngine?.calculateCarRoute(
-          [HERE.Waypoint(currentLocation), HERE.Waypoint(destination)],
-          HERE.CarOptions(),
-          (HERE.RoutingError? error, List<HERE.Route>? routes) {
-            debugPrint("✅ Nueva ruta recalculada");
-            if (error == null && routes != null && routes.isNotEmpty) {
-              _visualNavigator!.route = routes.first;
-
-              _clearPreviousRoutes();
-              _drawRouteOnMap(routes);
-
-              setState(() {
-                _totalRouteTime = routes.first.duration.inSeconds;
-                _distanceNotifier.value = routes.first.lengthInMeters;
-              });
-            } else {
-              debugPrint("❌ Error recalculando ruta: $error");
-            }
-          },
-        );
-      });
-
-      // Marcar navigator como listo
-      // setState(() {
-      //   _isVisualNavigatorReady = true;
-      // });
-
-      // Delay para setup estable
-      Future.delayed(const Duration(seconds: 2), () {
+      // IMPORTANT: Give the visual navigator a brief moment to initialize
+      // before setting up listeners and starting location updates
+      // This ensures the HERE SDK is ready to process route matching
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (_visualNavigator != null && mounted) {
+          // Setup navigation listeners
+          _setupNavigationListeners();
+          debugPrint('✅ Navigation listeners set up');
+
+          // Start location engine and camera behavior
           _setupNavigationWithStableConnection();
           debugPrint('✅ Navigation guidance setup completed');
         }
@@ -1042,16 +1055,9 @@ class _NavigationViewState extends State<NavigationView> {
   void _setupNavigationWithStableConnection() {
     debugPrint('🔧 Setting up navigation with stable connection...');
 
-    _setupRouteDeviationListener();
-
+    // Start location engine immediately - no delays needed
+    // Navigation listeners are already set up in _startGuidance()
     _startLocationEngineForNavigation();
-
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (_visualNavigator != null && mounted) {
-        _setupNavigationListeners();
-        debugPrint('🎯 Navigation listeners set up after delay');
-      }
-    });
   }
 
   void _startLocationEngineForNavigation() {
@@ -1073,14 +1079,18 @@ class _NavigationViewState extends State<NavigationView> {
           debugPrint('  - Lng: ${location.coordinates.longitude}');
           debugPrint('  - Accuracy: ${location.horizontalAccuracyInMeters}');
 
-          _currentLocation = location.coordinates;
           double? speed = location.speedInMetersPerSecond;
 
+          // CRITICAL: Update location AND speed inside setState to ensure UI sync
+          // This fixes the issue where cursor appears frozen because UI wasn't rebuilding
           if (mounted) {
             setState(() {
+              _currentLocation = location.coordinates;
               _currentSpeed = speed ?? 0;
               _checkSpeedLimit();
             });
+          } else {
+            _currentLocation = location.coordinates;
           }
 
           if (_lastLatitude == 0 && _lastLongitude == 0) {
@@ -1092,6 +1102,7 @@ class _NavigationViewState extends State<NavigationView> {
             location.coordinates.longitude,
           );
 
+          // Send location to visual navigator for cursor movement
           try {
             _visualNavigator!.onLocationUpdated(location);
             debugPrint('✅ Location sent to visual navigator successfully');
@@ -1111,6 +1122,29 @@ class _NavigationViewState extends State<NavigationView> {
     } catch (e) {
       debugPrint('❌ Failed to start location engine for navigation: $e');
       _handleNavigationSetupError('Failed to start location tracking: $e');
+    }
+  }
+
+  /// Sets initial navigation instruction from the route's first maneuver
+  /// This ensures the UI shows something meaningful immediately
+  void _setInitialNavigationInstruction(HERE.Route route) {
+    try {
+      if (route.sections.isNotEmpty) {
+        final firstSection = route.sections.first;
+        if (firstSection.maneuvers.isNotEmpty) {
+          final firstManeuver = firstSection.maneuvers.first;
+          final streetName = getStreetNameFromManeuver(firstManeuver);
+
+          if (mounted) {
+            setState(() {
+              _navigationInstruction = streetName;
+            });
+            debugPrint('📍 Initial navigation instruction set: $streetName');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Could not set initial navigation instruction: $e');
     }
   }
 
@@ -1232,6 +1266,23 @@ class _NavigationViewState extends State<NavigationView> {
     setState(() {
       _hasShownArrivalNotification = true;
     });
+
+    // Handle "navigate to car" case - just show arrival, no parking spaces
+    if (widget.isNavigatingToCar) {
+      AppPopup.showDialogSheet(
+        context,
+        NavigateNotificationWidget(
+          onClose: () {
+            NavigatorHelper.pop();
+          },
+        ),
+      );
+      _showToast(
+        context.l10n.arrivedAtDestination,
+        backgroundColor: AppColors.green600,
+      );
+      return;
+    }
 
     if (!isParkingNavigation) {
       AppPopup.showDialogSheet(
@@ -1525,7 +1576,7 @@ class _NavigationViewState extends State<NavigationView> {
           if (routingError == null &&
               routeList != null &&
               routeList.isNotEmpty) {
-            print('routeList ==> ${routeList.length}');
+            debugPrint('routeList ==> ${routeList.length}');
 
             HERE.Route calculatedRoute = routeList.first;
 
@@ -1538,17 +1589,27 @@ class _NavigationViewState extends State<NavigationView> {
             );
 
             if (_visualNavigator != null && mounted) {
+              // IMPORTANT: Update route on visual navigator FIRST
+              // This ensures cursor continues to track the new route
               _visualNavigator!.route = calculatedRoute;
 
+              // Update state values
               _totalRouteTime = calculatedRoute.duration.inSeconds;
               _distanceNotifier.value = calculatedRoute.lengthInMeters;
-              _addTrafficAwareRoutePolyline(calculatedRoute);
 
-              _addDestinationMarker(calculatedRoute);
-
+              // Update UI state BEFORE drawing polylines to show immediate feedback
               setState(() {
                 _isNavigating = true;
                 _isRecalculatingRoute = false;
+              });
+
+              // Draw polylines AFTER state update to prevent UI freeze
+              // Use addPostFrameCallback to let UI update first
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _addTrafficAwareRoutePolyline(calculatedRoute);
+                  _addDestinationMarker(calculatedRoute);
+                }
               });
 
               debugPrint('✅ Visual navigator updated with new route');
@@ -1834,19 +1895,40 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _addTrafficAwareRoutePolyline(HERE.Route route) {
-    if (_hereMapController == null) return;
+    if (_hereMapController == null) {
+      debugPrint('❌ Cannot add polylines: map controller is null');
+      return;
+    }
 
     debugPrint('🚦 Adding traffic-aware route visualization...');
+    debugPrint('📊 Route has ${route.sections.length} sections');
 
+    // Clear previous polylines
     if (_routePolylines.isNotEmpty) {
-      _hereMapController!.mapScene.removeMapPolylines(_routePolylines);
+      debugPrint('🧹 Clearing ${_routePolylines.length} previous polylines');
+      try {
+        _hereMapController!.mapScene.removeMapPolylines(_routePolylines);
+      } catch (e) {
+        debugPrint('⚠️ Error removing polylines in batch, trying individually: $e');
+        for (var polyline in _routePolylines) {
+          try {
+            _hereMapController!.mapScene.removeMapPolyline(polyline);
+          } catch (e) {
+            // Ignore individual removal errors
+          }
+        }
+      }
       _routePolylines.clear();
     }
 
+    int spanCount = 0;
+    int addedCount = 0;
+
+    // Add polylines one by one for maximum compatibility
     for (var section in route.sections) {
       for (var span in section.spans) {
+        spanCount++;
         HERE.GeoPolyline spanGeometry = span.geometry;
-
         Color trafficColor = _getTrafficColorFromSpan(span);
 
         try {
@@ -1864,13 +1946,14 @@ class _NavigationViewState extends State<NavigationView> {
 
           _hereMapController!.mapScene.addMapPolyline(polyline);
           _routePolylines.add(polyline);
+          addedCount++;
         } catch (e) {
-          debugPrint('❌ Error adding traffic polyline for span: $e');
+          debugPrint('❌ Error adding traffic polyline for span $spanCount: $e');
         }
       }
     }
 
-    debugPrint('✅ Added ${_routePolylines.length} traffic polylines');
+    debugPrint('✅ Added $addedCount/$spanCount traffic polylines to map');
   }
 
   Color _getTrafficColorFromSpan(HERE.Span span) {
@@ -2379,11 +2462,11 @@ class _NavigationViewState extends State<NavigationView> {
                 _distanceNotifier.value = value.lengthInMeters;
                 _addDestinationMarker(value);
                 _setMapCameraFocus();
-                // _resetNavigation();
                 _cleanupCurrentRoute();
+                // Draw the selected route with traffic-aware colors
+                _addTrafficAwareRoutePolyline(value);
                 _startGuidance(value);
                 indexRouteSelected = i;
-                // setState(() {});
               },
               totalRouteTime: _totalRouteTime.toFormattedTime(),
               distanceValue: _distanceNotifier.value.toFormattedDistance(),
