@@ -126,6 +126,15 @@ final class PublishSpaceEvent extends ActivitiesEvent {
 
 final class GetActivitiesEvent extends ActivitiesEvent {
   @override
-  // TODO: implement props
+  List<Object?> get props => [];
+}
+
+final class ExtendTimeEvent extends ActivitiesEvent {
+  const ExtendTimeEvent({required this.spaceId, required this.time});
+
+  final String spaceId;
+  final int time;
+
+  @override
   List<Object?> get props => [];
 }

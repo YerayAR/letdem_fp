@@ -18,6 +18,7 @@ import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
 import 'package:letdem/features/withdrawals/dto/withdraw.dto.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
+import '../../../features/activities/dto/extend_time_space.dto.dart';
 import '../../../features/users/repository/user.repository.dart';
 
 enum Environment { STG, PROD, DEV }
@@ -96,6 +97,9 @@ class EndPoints {
 
   static Endpoint<ConfirmationCodeDTO> confirmReservation(String id) =>
       Endpoint(url: "/reservations/$id/confirm", method: HTTPMethod.POST);
+
+  static Endpoint<ExtendTimeSpaceDTO> extendTimeSpace(String id) =>
+      Endpoint(url: "spaces/$id/extend-expiration", method: HTTPMethod.PUT);
 
   static Endpoint deletePayoutMethod(String id) =>
       Endpoint(url: "/credits/payout-methods/$id", method: HTTPMethod.DELETE);

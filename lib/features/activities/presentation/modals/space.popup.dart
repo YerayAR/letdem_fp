@@ -32,7 +32,6 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/models/payment/payment.model.dart';
 
-import '../../../../utils/connection_utils.dart';
 import '../../../map/presentation/views/route.view.dart';
 
 class SpacePopupSheet extends StatefulWidget {
@@ -461,17 +460,12 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
         return PrimaryButton(
           icon: widget.space.isPremium ? null : Iconsax.location5,
           isLoading: state is ActivitiesLoading,
+          isVerifyConecction: true,
           text:
               space.isPremium
                   ? context.l10n.reserveSpace
                   : context.l10n.navigateToSpace,
           onTap: () async {
-            final isConnected = await ConnectionHelper.showNoConnectionDialog(
-              context,
-            );
-
-            if (!isConnected) return;
-
             final price =
                 double.tryParse((widget.space.price ?? 0).toString()) ?? 0;
 
@@ -488,9 +482,9 @@ class _SpacePopupSheetState extends State<SpacePopupSheet> {
                   },
                 ),
               );
-            }
 
-            if (widget.space.isPremium) {
+              return;
+            } else if (widget.space.isPremium) {
               if (context.userProfile!.defaultPaymentMethod == null) {
                 NavigatorHelper.to(const AddPaymentMethod());
               } else {

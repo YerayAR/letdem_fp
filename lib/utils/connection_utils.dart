@@ -34,24 +34,17 @@ class ConnectionHelper {
   }
 
   /// Muestra un popup si no hay conexión a Internet
-  static Future<bool> showNoConnectionDialog(BuildContext context) async {
-    final isConnected = await checkInternetAccess();
-
-    if (!isConnected) {
-      await AppPopup.showDialogSheet(
-        context,
-        ConfirmationDialog(
-          isError: true,
-          title: 'Sin conexión a Internet',
-          subtext: 'Por favor, verifica tu conexión e inténtalo de nuevo.',
-          onProceed: () {
-            NavigatorHelper.pop();
-          },
-        ),
-      );
-      return false;
-    }
-
-    return true;
+  static Future<void> showNoConnectionDialog(BuildContext context) async {
+    await AppPopup.showDialogSheet(
+      context,
+      ConfirmationDialog(
+        isError: true,
+        title: 'Sin conexión a Internet',
+        subtext: 'Por favor, verifica tu conexión e inténtalo de nuevo.',
+        onProceed: () {
+          NavigatorHelper.pop();
+        },
+      ),
+    );
   }
 }

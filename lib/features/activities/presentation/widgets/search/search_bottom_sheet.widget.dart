@@ -25,7 +25,10 @@ import '../../../../../infrastructure/services/res/navigator.dart';
 import '../../../../map/presentation/views/route.view.dart';
 
 class MapSearchBottomSheet extends StatefulWidget {
-  const MapSearchBottomSheet({super.key});
+  const MapSearchBottomSheet({super.key, this.hintText, this.title});
+
+  final String? title;
+  final String? hintText;
 
   @override
   State<MapSearchBottomSheet> createState() => _MapSearchBottomSheetState();

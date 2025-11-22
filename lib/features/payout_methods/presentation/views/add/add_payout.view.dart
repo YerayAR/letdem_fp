@@ -50,15 +50,16 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
           if (state is PayoutMethodAdded) {
             context.read<PayoutMethodBloc>().add(FetchPayoutMethods());
             AppPopup.showDialogSheet(
-                context,
-                SuccessDialog(
-                  title: context.l10n.payoutMethodAdded,
-                  subtext: context.l10n.payoutMethodAddedDescription,
-                  onProceed: () {
-                    NavigatorHelper.pop();
-                    NavigatorHelper.pop();
-                  },
-                ));
+              context,
+              SuccessDialog(
+                title: context.l10n.payoutMethodAdded,
+                subtext: context.l10n.payoutMethodAddedDescription,
+                onProceed: () {
+                  NavigatorHelper.pop();
+                  NavigatorHelper.pop();
+                },
+              ),
+            );
           }
           // TODO: implement listener
         },
@@ -77,14 +78,19 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
                 label: context.l10n.accountNumber,
                 placeHolder: context.l10n.accountNumberExample,
               ),
+              Dimens.space(1),
               Row(
+                spacing: 10,
                 children: [
-                  Text(context.l10n.makeDefaultPaymentMethod,
+                  Expanded(
+                    child: Text(
+                      context.l10n.makeDefaultPaymentMethod,
                       style: Typo.mediumBody.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.neutral600,
-                      )),
-                  const Spacer(),
+                      ),
+                    ),
+                  ),
                   Transform.scale(
                     scale: 0.8,
                     child: Switch(
@@ -112,15 +118,16 @@ class _AddPayoutMethodViewState extends State<AddPayoutMethodView> {
                     return;
                   }
                   print(
-                      "Account Number: ${_accountNumberController.text.trim()}");
+                    "Account Number: ${_accountNumberController.text.trim()}",
+                  );
                   context.read<PayoutMethodBloc>().add(
-                        AddPayoutMethod(
-                          PayoutMethodDTO(
-                            accountNumber: _accountNumberController.text.trim(),
-                            isDefault: isDefault,
-                          ),
-                        ),
-                      );
+                    AddPayoutMethod(
+                      PayoutMethodDTO(
+                        accountNumber: _accountNumberController.text.trim(),
+                        isDefault: isDefault,
+                      ),
+                    ),
+                  );
                   // Handle add payout method logic
                 },
               ),
