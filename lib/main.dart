@@ -24,6 +24,7 @@ import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
+import 'package:letdem/features/marketplace/data/marketplace_data.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
@@ -44,23 +45,32 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/app_localizations.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
+import 'features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
 import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
 
 Future _initializeHERESDK() async {
+  // Initialize Stripe separately with its own error handling
+  try {
+    print("Stripe init starting...");
+    Stripe.publishableKey = AppCredentials.stripePublishableKey;
+    await Stripe.instance.applySettings();
+    print("Stripe initialized ✅");
+  } catch (e, st) {
+    print("Stripe initialization error: $e");
+    print("Stack trace: $st");
+    // Don't stop HERE SDK initialization if Stripe fails
+  }
+
+  // Initialize HERE SDK
   try {
     print("HERE SDK init starting...");
     SdkContext.init(IsolateOrigin.main);
-
-    Stripe.publishableKey = AppCredentials.stripePublishableKey;
-
-    await Stripe.instance.applySettings();
 
     String accessKeyId = AppCredentials.hereAccessKeyId;
     String accessKeySecret = AppCredentials.hereAccessKeySecret;
@@ -76,10 +86,12 @@ Future _initializeHERESDK() async {
     try {
       await SDKNativeEngine.makeSharedInstance(sdkOptions);
       print("HERE SDK initialized ✅");
-    } on InstantiationException catch (e) {
+    } on InstantiationException catch (e, st) {
+      print("Stack trace: $st");
       print("HERE SDK Instantiation failed ❌: $e");
     }
-  } catch (e) {
+  } catch (e, st) {
+    print("Stack trace: $st");
     print("Error initializing HERE SDK ❌: $e");
   }
 }
@@ -87,7 +99,6 @@ Future _initializeHERESDK() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initializeHERESDK();
-  MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
 
   // OneSignal initialization
   OneSignal.initialize(AppCredentials.oneSignalAppId);
@@ -159,6 +170,7 @@ void main() async {
           RepositoryProvider(create: (_) => MapRepository()),
           RepositoryProvider(create: (_) => ScheduleNotificationsRepository()),
           RepositoryProvider(create: (_) => NotificationRepository()),
+          RepositoryProvider(create: (_) => MarketplaceRepositoryImpl()),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -241,6 +253,12 @@ void main() async {
                   (context) =>
                       CarBloc(carRepository: context.read<CarRepository>()),
             ),
+            BlocProvider(
+              create:
+                  (context) => StoreCatalogBloc(
+                    repository: context.read<MarketplaceRepositoryImpl>(),
+                  ),
+            ),
           ],
           child: const AnnotatedRegion<SystemUiOverlayStyle>(
             value: SystemUiOverlayStyle.dark,
@@ -259,12 +277,12 @@ class LetDemApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: MaterialApp(
-        darkTheme: ThemeData.light(), // Optional, will be ignored
+        darkTheme: ThemeData.light(), // Optional, will be ignored as
         themeMode: ThemeMode.light, // Forces light theme always
         locale: context.watch<LocaleProvider>().defaultLocale,
         localizationsDelegates: const [
           AppLocalizations.delegate, // Add this line
-
+          //:Q
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

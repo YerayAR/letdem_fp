@@ -1,0 +1,1 @@
+export 'catalog/store_catalog.page.dart';

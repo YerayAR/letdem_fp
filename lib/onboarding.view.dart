@@ -4,6 +4,9 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/features/auth/presentation/views/onboard/splash.view.dart';
+import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 /// Interactive Tutorial Onboarding with App Screenshots and Feature Walkthroughs
@@ -45,9 +48,20 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
   final Map<int, PageController> _featureControllers = {};
   final Map<int, int> _currentFeatureIndex = {};
 
+  checkOnboaringShown() {
+    SecureStorageHelper().read("tutorial_step_shown").then((value) {
+      if (value == null || value == 'false') {
+        SecureStorageHelper().write("tutorial_step_shown", 'true');
+      } else {
+        NavigatorHelper.to(SplashView());
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    checkOnboaringShown();
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -85,24 +99,24 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
     // Page 1: Welcome & Overview
     TutorialPage(
       title: 'Welcome to LetDem!',
-      subtitle: 'Your smart parking companion',
+      subtitle: 'Smart parking made simple',
       description:
-          'Learn how to find parking, share your spot, and earn money in just a few simple steps.',
+          'Join a community that shares parking spots in real-time. Find parking instantly, share your spot when leaving, and earn rewards while helping others.',
       tutorialType: TutorialType.welcome,
       icon: Iconsax.car5,
       iconColor: AppColors.primary500,
       features: [
         FeaturesItem(
-          text: 'Find parking spots instantly',
+          text: 'Real-time parking availability',
           top: 160,
           left: -5,
-          phoneImage: 'assets/res/cl.png', // Each feature gets its own image
+          phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Share your spot when leaving',
+          text: 'GPS navigation with traffic alerts',
           top: 220,
           right: -10,
-          phoneImage: 'assets/res/cl.png', // Different image for each
+          phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
           text: 'Earn money & LetDem points',
@@ -111,7 +125,7 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Navigate with real-time alerts',
+          text: 'Community-driven safety alerts',
           top: 360,
           right: 10,
           phoneImage: 'assets/res/cl.png',
@@ -121,40 +135,42 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
 
     // Page 2: Finding Parking Tutorial
     TutorialPage(
-      title: 'Find Parking Spots',
-      subtitle: 'Your step-by-step guide',
+      title: 'Find Parking Instantly',
+      subtitle: 'Never circle the block again',
       description:
-          'Discover nearby parking spaces instantly and navigate with real-time updates.',
+          'View real-time available parking spots on the map. Choose between free community spots or paid guaranteed parking.',
       tutorialType: TutorialType.findParking,
       icon: Iconsax.search_normal_15,
       iconColor: AppColors.primary500,
       features: [
         FeaturesItem(
-          text: 'Explore Nearby Parking',
-          description: 'View all available spots around you on the live map.',
+          text: 'Browse Live Map',
+          description:
+              'See all available free and paid parking spots around you in real-time.',
           top: 160,
           left: -5,
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Tap a Spot',
+          text: 'Check Spot Details',
           description:
-              'Check details like distance, type, and price (if applicable).',
+              'View parking type, distance, price, and photo. Reserve paid spots with one tap.',
           top: 220,
           right: -10,
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Reserve & Navigate',
+          text: 'Navigate with GPS',
           description:
-              'Secure your spot, make payment if needed, and get guided directions.',
+              'Get turn-by-turn directions with real-time traffic, speed camera, and police alerts.',
           top: 290,
           left: -10,
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Arrive & Rate',
-          description: 'Park your vehicle and leave a quick rating for others.',
+          text: 'Rate Your Experience',
+          description:
+              'Confirm if you took the spot or report its status to help the community.',
           top: 360,
           right: 10,
           phoneImage: 'assets/res/cl.png',
@@ -166,29 +182,33 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
     TutorialPage(
       title: 'Share Free Parking',
       subtitle: 'Help others & earn points',
-      description: 'Publish your spot when leaving and earn LetDem points',
+      description:
+          'When you leave your parking spot, share it with the community. Earn +1 LetDem Point when someone uses it.',
       tutorialType: TutorialType.publishFree,
       icon: Iconsax.camera5,
       iconColor: AppColors.secondary500,
       features: [
         FeaturesItem(
-          text: 'Tap Camera Button',
-          description: 'When you\'re ready to leave your spot',
+          text: 'Take a Photo',
+          description:
+              'Capture a clear image of the empty parking spot you\'re leaving.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Take a Photo',
-          description: 'Capture your parking spot clearly',
+          text: 'Location Detected',
+          description:
+              'Your GPS location is automatically captured for accuracy.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
           text: 'Select Type',
-          description: 'Choose: Street, Zone, Garage, etc.',
+          description: 'Choose parking type: Street, Zone, Garage, or Private.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Publish!',
-          description: 'Share with the community & earn points',
+          text: 'Publish & Earn',
+          description:
+              'Share instantly! Earn +1 Point when someone confirms they used your spot.',
           phoneImage: 'assets/res/cl.png',
         ),
       ],
@@ -196,47 +216,90 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
 
     // Page 4: Publishing Paid Parking Tutorial
     TutorialPage(
-      title: 'Earn Money from Your Spot',
-      subtitle: 'Publish paid parking',
-      description: 'Set your price and earn money while you wait',
+      title: 'Earn Money from Parking',
+      subtitle: 'Monetize your waiting time',
+      description:
+          'Publish paid parking when you\'re willing to wait. Set your price (€3-20) and time (1-60 min). Get paid when booked!',
       tutorialType: TutorialType.publishPaid,
       icon: Iconsax.money,
       iconColor: AppColors.green600,
       features: [
         FeaturesItem(
-          text: 'Register Your Vehicle',
-          description: 'Add your car details in Activities tab',
+          text: 'Register Vehicle & Account',
+          description:
+              'Add your vehicle details and create a benefits account to receive payments.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Set Up Payments',
-          description: 'Connect your account to receive money',
+          text: 'Take Photo & Set Location',
+          description:
+              'Capture your parking spot - location is detected automatically.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Publish with Price',
-          description: 'Set time (1–60 min) & price (€3–20)',
+          text: 'Set Price & Wait Time',
+          description:
+              'Choose how long you can wait (1-60 min) and your price (€3-20).',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Wait for Booking',
-          description: 'Get paid when someone reserves',
+          text: 'Get Booked & Paid',
+          description:
+              'When someone reserves, you\'ll get a notification. Confirm with their code and earn money!',
           phoneImage: 'assets/res/cl.png',
         ),
       ],
     ),
 
-    // Page 5: Navigation & Alerts Tutorial
+    // Page 5: Paid Parking Reservation
+    TutorialPage(
+      title: 'Reserve Paid Parking',
+      subtitle: 'Guaranteed spot when you need it',
+      description:
+          'Book a paid parking spot in advance. The owner waits for you. Pay securely and navigate directly.',
+      tutorialType: TutorialType.publishPaid,
+      icon: Iconsax.ticket5,
+      iconColor: Color(0xFF00BCD4),
+      features: [
+        FeaturesItem(
+          text: 'Find Paid Spots',
+          description:
+              'Browse paid parking options with price, wait time, and owner details.',
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Reserve & Pay',
+          description:
+              'Book with your card or LetDem wallet. Payment is held until confirmed.',
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Navigate in Real-Time',
+          description:
+              'Owner can track your arrival. Get turn-by-turn navigation to the spot.',
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Confirm & Complete',
+          description:
+              'Owner enters your confirmation code. Payment releases and you earn +1 Point!',
+          phoneImage: 'assets/res/cl.png',
+        ),
+      ],
+    ),
+
+    // Page 6: Navigation & Smart Alerts
     TutorialPage(
       title: 'Smart Navigation',
-      subtitle: 'Drive safely with alerts',
-      description: 'Get real-time warnings about cameras, police, accidents',
+      subtitle: 'Drive safely with real-time alerts',
+      description:
+          'Integrated GPS with live traffic updates, speed camera warnings, police alerts, and alternative route suggestions.',
       tutorialType: TutorialType.navigation,
       icon: Iconsax.routing_25,
       iconColor: Color(0xFF9C27B0),
       features: [
         FeaturesItem(
-          text: '📍 GPS navigation to parking',
+          text: '🗺️ Turn-by-turn GPS navigation',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -244,7 +307,7 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '🚨 Speed camera alerts',
+          text: '📹 Speed camera & traffic camera alerts (Spain)',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -252,7 +315,7 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '👮 Police presence warnings',
+          text: '👮 Police presence & roadblock warnings',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -268,7 +331,7 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '⚡ Alternative route suggestions',
+          text: '🛣️ Alternative routes & traffic visualization',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -278,49 +341,212 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
       ],
     ),
 
-    // Page 6: Earnings & Points Tutorial
+    // Page 7: Community Alerts
+    TutorialPage(
+      title: 'Report & Share Alerts',
+      subtitle: 'Keep the community informed',
+      description:
+          'Report police, accidents, or road closures. When verified by others, earn +1 LetDem Point for contributing.',
+      tutorialType: TutorialType.navigation,
+      icon: Iconsax.danger5,
+      iconColor: Color(0xFFFF5722),
+      features: [
+        FeaturesItem(
+          text: 'One-Tap Reporting',
+          description:
+              'Quickly report Police, Accident, or Road Closed with automatic location.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Real-Time Alerts',
+          description:
+              'All users within 5km see your alert immediately on their map.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Community Verification',
+          description:
+              'Other drivers confirm if your alert is still there or report it\'s cleared.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Earn Points',
+          description:
+              'Get +1 LetDem Point when your alert is verified by another user.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+      ],
+    ),
+
+    // Page 8: Scheduled Notifications
+    TutorialPage(
+      title: 'Never Miss a Spot',
+      subtitle: 'Smart parking notifications',
+      description:
+          'Set alerts for specific locations and times. Get notified instantly when parking becomes available.',
+      tutorialType: TutorialType.tips,
+      icon: Iconsax.notification5,
+      iconColor: Color(0xFFFF9F43),
+      features: [
+        FeaturesItem(
+          text: 'Search Your Destination',
+          description: 'Use the search bar to find where you need parking.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Set Alert Parameters',
+          description: 'Choose your time range and search radius (500m - 2km).',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Receive Push Notifications',
+          description:
+              'Get instant alerts when parking is published in your defined area.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Manage from Activities',
+          description:
+              'Edit, pause, or delete your scheduled notifications anytime.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+      ],
+    ),
+
+    // Page 9: Earnings & Points System
     TutorialPage(
       title: 'Earn Rewards',
-      subtitle: 'Points & money',
-      description: 'Every contribution gets rewarded',
+      subtitle: 'Points & money for contributing',
+      description:
+          'Every action counts! Earn LetDem Points for free parking and alerts. Make real money with paid parking.',
       tutorialType: TutorialType.rewards,
       icon: Iconsax.cup5,
       iconColor: AppColors.secondary500,
       features: [
         FeaturesItem(
-          text: 'Publish Free Parking',
-          description: '+1 Point when someone uses it',
+          text: 'Free Parking Shared',
+          description: '+1 Point when someone confirms they used your spot.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Publish Paid Parking',
-          description: 'Earn €3–20 per booking',
+          text: 'Paid Parking Booked',
+          description: 'Earn €3-20 per reservation (10% commission to LetDem).',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Report Alerts',
-          description: '+1 Point when verified by others',
+          text: 'Alerts Verified',
+          description:
+              '+1 Point when another user confirms your road alert is accurate.',
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: 'Redeem Points',
-          description: 'Coming soon: Exchange for benefits',
+          text: 'Withdraw Earnings',
+          description:
+              'Transfer funds to your bank (min €10). Track all transactions in Earnings.',
           phoneImage: 'assets/res/cl.png',
         ),
       ],
     ),
 
-    // Page 7: Tips & Best Practices
+    // Page 10: Profile & Account Management
+    TutorialPage(
+      title: 'Your LetDem Profile',
+      subtitle: 'Manage everything in one place',
+      description:
+          'Access your contributions, reservations, earnings, vehicles, payment methods, and preferences.',
+      tutorialType: TutorialType.tips,
+      icon: Iconsax.profile_circle5,
+      iconColor: Color(0xFF3F51B5),
+      features: [
+        FeaturesItem(
+          text: 'Track Contributions',
+          description:
+              'View all your points from parking spots and alerts shared.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Manage Payments',
+          description:
+              'Add cards, bank accounts, and view transaction history.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Register Vehicles',
+          description:
+              'Save your car details, including license plate and eco-label.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+        FeaturesItem(
+          text: 'Customize Preferences',
+          description:
+              'Control notifications, alerts, language, and privacy settings.',
+          top: 0.2,
+          left: 0.1,
+          bottom: 3,
+          right: 3,
+          phoneImage: 'assets/res/cl.png',
+        ),
+      ],
+    ),
+
+    // Page 11: Pro Tips & Best Practices
     TutorialPage(
       title: 'Pro Tips',
-      subtitle: 'Get the most out of LetDem',
-      description: 'Follow these tips for the best experience',
+      subtitle: 'Get the most from LetDem',
+      description:
+          'Follow these best practices to maximize your earnings, find parking faster, and help the community.',
       tutorialType: TutorialType.tips,
       icon: Iconsax.lamp_15,
       iconColor: Color(0xFFFF9F43),
       features: [
         FeaturesItem(
-          text: '📸 Take clear photos of parking spots',
+          text: '📸 Take clear, well-lit photos',
+          description:
+              'Show the parking space clearly so others know exactly where to go.',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -328,7 +554,9 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '⏱️ Publish as soon as you leave',
+          text: '⏱️ Publish immediately when leaving',
+          description:
+              'The sooner you share, the more useful it is to others nearby.',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -336,7 +564,9 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '✅ Rate spots accurately to help others',
+          text: 'Rate spots honestly',
+          description:
+              'Confirm if you took it or report issues - accuracy helps everyone.',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -344,7 +574,9 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '🎯 Check multiple spots before choosing',
+          text: 'Set fair prices for paid parking',
+          description:
+              'Consider time saved and location value. Fair prices = more bookings.',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -352,7 +584,9 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
           phoneImage: 'assets/res/cl.png',
         ),
         FeaturesItem(
-          text: '💰 Set fair prices for paid parking',
+          text: 'Enable notifications',
+          description:
+              'Stay informed about bookings, expirations, and nearby spots.',
           top: 0.2,
           left: 0.1,
           bottom: 3,
@@ -362,7 +596,6 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
       ],
     ),
   ];
-
   void _nextPage() {
     if (_currentPage < _tutorialPages.length - 1) {
       _pageController.nextPage(
@@ -370,8 +603,8 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
         curve: Curves.easeInOut,
       );
     } else {
-      // Navigate to main app or complete onboarding
-      Navigator.of(context).pushReplacementNamed('/home');
+      SecureStorageHelper().write("tutorial_step_shown", 'true');
+      NavigatorHelper.to(SplashView());
     }
   }
 
@@ -445,7 +678,11 @@ class _TutorialOnboardingViewState extends State<TutorialOnboardingView>
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pushReplacementNamed('/home');
+                      SecureStorageHelper().write(
+                        "tutorial_step_shown",
+                        'true',
+                      );
+                      NavigatorHelper.to(SplashView());
                     },
                     child: Text(
                       'Skip',

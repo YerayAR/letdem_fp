@@ -32,6 +32,7 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
 
 import '../../../../common/widgets/appbar.dart';
+import '../../../marketplace/presentation/pages/start/marketplace_start.page.dart';
 import '../../../scheduled_notifications/presentation/views/scheduled_notifications.view.dart';
 import 'reservations/reservation_list.view.dart';
 import 'security/security.view.dart';
@@ -94,24 +95,26 @@ class _ProfileAppBar extends StatelessWidget {
     return StyledAppBar(
       onTap: () => NavigatorHelper.to(const NotificationsView()),
       title: context.l10n.profile,
-      suffix: context.watch<UserBloc>().state is! UserLoaded
-          ? null
-          : context.watch<UserBloc>().state is UserLoaded &&
+      suffix:
+          context.watch<UserBloc>().state is! UserLoaded
+              ? null
+              : context.watch<UserBloc>().state is UserLoaded &&
                   (context.watch<UserBloc>().state as UserLoaded)
                           .unreadNotificationsCount ==
                       0
               ? null
               : CircleAvatar(
-                  radius: 8,
-                  backgroundColor: AppColors.red500,
-                  child: Text(
-                    '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
-                    style: Typo.smallBody.copyWith(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  )),
+                radius: 8,
+                backgroundColor: AppColors.red500,
+                child: Text(
+                  '${(context.watch<UserBloc>().state as UserLoaded).unreadNotificationsCount}',
+                  style: Typo.smallBody.copyWith(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
       icon: Iconsax.notification5,
     );
   }
@@ -141,7 +144,10 @@ class _ProfileHeader extends StatelessWidget {
   }
 
   Widget _buildUserInfo(
-      LetDemUser user, String fullName, BuildContext context) {
+    LetDemUser user,
+    String fullName,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -204,22 +210,30 @@ class _MainActionsSection extends StatelessWidget {
               _settingsRow(context.l10n.contributions, IconlyLight.star, () {
                 NavigatorHelper.to(const ViewAllView());
               }),
-              _settingsRow(
-                  context.l10n.scheduledNotifications, IconlyLight.time_circle,
-                  () {
-                NavigatorHelper.to(const ScheduledNotificationsView());
+              _settingsRow('Marketplace', IconlyLight.bag_2, () {
+                NavigatorHelper.to(const MarketplaceStartView());
               }),
+              _settingsRow(
+                context.l10n.scheduledNotifications,
+                IconlyLight.time_circle,
+                () {
+                  NavigatorHelper.to(const ScheduledNotificationsView());
+                },
+              ),
               _settingsRow(context.l10n.paymentMethods, Iconsax.card, () {
                 NavigatorHelper.to(const PaymentMethodsScreen());
               }),
-              _settingsRow(context.l10n.reservations, IconlyLight.shield_done,
-                  () {
-                NavigatorHelper.to(ReservationHistory());
-              }),
+              _settingsRow(
+                context.l10n.reservations,
+                IconlyLight.shield_done,
+                () {
+                  NavigatorHelper.to(ReservationHistory());
+                },
+              ),
               _buildEarningsRow(context, user),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -251,14 +265,16 @@ class _MainActionsSection extends StatelessWidget {
   }
 
   Widget _statusChip(BuildContext context, EarningAccount? account) {
-    final color = account == null
-        ? AppColors.green600
-        : account.status == EarningStatus.missingInfo
+    final color =
+        account == null
+            ? AppColors.green600
+            : account.status == EarningStatus.missingInfo
             ? Colors.red
             : AppColors.red500;
-    final text = account == null
-        ? context.l10n.connectAccount
-        : getStatusString(account.status, context);
+    final text =
+        account == null
+            ? context.l10n.connectAccount
+            : getStatusString(account.status, context);
     return DecoratedChip(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       backgroundColor: color,
@@ -368,8 +384,10 @@ class _LogoutButton extends StatelessWidget {
             children: [
               Text(
                 context.l10n.logout,
-                style: Typo.largeBody
-                    .copyWith(fontWeight: FontWeight.w700, fontSize: 23),
+                style: Typo.largeBody.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 23,
+                ),
                 textAlign: TextAlign.center,
               ),
               Dimens.space(1),
@@ -385,10 +403,12 @@ class _LogoutButton extends StatelessWidget {
                     child: PrimaryButton(
                       color: AppColors.red500,
                       onTap: () {
-                        BlocProvider.of<CarBloc>(context)
-                            .add(const ClearCarEvent());
-                        BlocProvider.of<UserBloc>(context)
-                            .add(UserLoggedOutEvent());
+                        BlocProvider.of<CarBloc>(
+                          context,
+                        ).add(const ClearCarEvent());
+                        BlocProvider.of<UserBloc>(
+                          context,
+                        ).add(UserLoggedOutEvent());
                       },
                       text: context.l10n.yes,
                     ),
@@ -414,11 +434,7 @@ class _LogoutButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              CupertinoIcons.power,
-              color: AppColors.primary500,
-              size: 23,
-            ),
+            Icon(CupertinoIcons.power, color: AppColors.primary500, size: 23),
             Dimens.space(1),
             Text(
               context.l10n.logout,

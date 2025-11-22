@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(while read file)",
+      "Bash(do mv \"$file\" \"$file/.view.dart/.page.dart\")",
+      "Bash(done)",
+      "Bash(find lib/features/marketplace/presentation/pages -name \"*.view.dart\" -type f -exec bash -c 'mv \"\"$0\"\" \"\"${0/.view.dart/.page.dart}\"\"' {} ;)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

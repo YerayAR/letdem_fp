@@ -70,7 +70,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
   RouteInfo? _routeInfo;
 
-  
   List<routing.Route> _alternativeRoutes = [];
   List<RouteInfo> _alternativeRoutesInfo = [];
   int _selectedRouteIndex = 0;
@@ -83,7 +82,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
   bool _isLoading = true;
   List<routing.Waypoint> _waypoints = [];
 
-  
   double? _latitude;
   double? _longitude;
   String? _destinationStreetName;
@@ -92,11 +90,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
   @override
   void initState() {
     super.initState();
-
-    print("Google Place ID: ${widget.googlePlaceID}");
-    print("Space ID: ${widget.spaceID}");
-    print("Latitude: ${widget.latitude}");
-    print("Longitude: ${widget.longitude}");
 
     if (widget.latitude == null && widget.longitude == null) {
       getInfoFromSpaceID(widget.spaceID);
@@ -263,14 +256,11 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     );
   }
 
-  
   void _calculateRoute(List<routing.Waypoint> waypoints) async {
     try {
       final carOptions = routing.CarOptions();
 
-      
-      carOptions.routeOptions.alternatives =
-          3; 
+      carOptions.routeOptions.alternatives = 3;
 
       _routingEngine!.calculateCarRoute(waypoints, carOptions, (
         routing.RoutingError? routingError,
@@ -281,24 +271,20 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
           return;
         }
 
-        
         setState(() {
           _alternativeRoutes = routeList;
           _alternativeRoutesInfo = [];
 
-          
           for (var route in routeList) {
-            _currentRoute = route; 
+            _currentRoute = route;
             _alternativeRoutesInfo.add(retrieveRouteInfoFromHereMap());
           }
 
-          
           _selectedRouteIndex = 0;
           _currentRoute = routeList[0];
           _routeInfo = _alternativeRoutesInfo[0];
         });
 
-        
         _displayAllRoutes();
       });
     } catch (e) {
@@ -306,17 +292,14 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     }
   }
 
-  
   void _displayAllRoutes() {
     if (_hereMapController == null) return;
 
-    
     for (var polyline in _mapPolylines) {
       _hereMapController!.mapScene.removeMapPolyline(polyline);
     }
     _mapPolylines.clear();
 
-    
     for (int i = 0; i < _alternativeRoutes.length; i++) {
       final route = _alternativeRoutes[i];
       final isSelected = i == _selectedRouteIndex;
@@ -327,16 +310,11 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
         MapPolylineSolidRepresentation(
           MapMeasureDependentRenderSize.withSingleSize(
             RenderSizeUnit.pixels,
-            isSelected ? 10 : 6, 
+            isSelected ? 10 : 6,
           ),
           isSelected
-              ? const Color.fromARGB(255, 0, 122, 255) 
-              : const Color.fromARGB(
-                160,
-                128,
-                128,
-                128,
-              ), 
+              ? const Color.fromARGB(255, 0, 122, 255)
+              : const Color.fromARGB(160, 128, 128, 128),
           LineCap.round,
         ),
       );
@@ -345,11 +323,9 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
       _mapPolylines.add(mapPolyline);
     }
 
-    
     _addMarkers();
   }
 
-  
   void _selectRoute(int index) {
     if (index >= _alternativeRoutes.length) return;
 
@@ -359,19 +335,16 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
       _routeInfo = _alternativeRoutesInfo[index];
     });
 
-    _displayAllRoutes(); 
+    _displayAllRoutes();
   }
 
   void _addMarkers() {
     if (_hereMapController == null) return;
 
-    
     for (var marker in _mapMarkers) {
       _hereMapController!.mapScene.removeMapMarker(marker);
     }
     _mapMarkers.clear();
-
-    
 
     final startCoordinates = GeoCoordinates(
       _currentLocation.latitude,
@@ -387,7 +360,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     _hereMapController!.mapScene.addMapMarker(startMarker);
     _mapMarkers.add(startMarker);
 
-    
     final endCoordinates = GeoCoordinates(
       widget.latitude ?? _latitude!,
       widget.longitude ?? _longitude!,
@@ -417,7 +389,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     _mapMarkers.clear();
   }
 
-  
   bool notifyAvailableSpace = false;
   bool isNotificationScheduled = false;
   DateTime _fromDate = DateTime.now();
@@ -541,7 +512,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
           _buildRouteHeader(routeInfo),
           const SizedBox(height: 16),
 
-          
           _buildAlternativeRoutesSelector(),
 
           const SizedBox(height: 16),
@@ -555,7 +525,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     );
   }
 
-  
   Widget _buildRouteHeader(RouteInfo routeInfo) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -567,7 +536,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Spacer(),
-            
+
             if (_selectedRouteIndex == 0 && _alternativeRoutes.length > 1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -610,7 +579,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     );
   }
 
-  
   Widget _buildAlternativeRoutesSelector() {
     if (_alternativeRoutes.length <= 1) {
       return const SizedBox.shrink();
@@ -660,7 +628,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        
                         Row(
                           children: [
                             Icon(
@@ -689,7 +656,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
                             ),
                           ],
                         ),
-                        
+
                         Row(
                           children: [
                             Icon(
@@ -714,7 +681,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
                             ),
                           ],
                         ),
-                        
+
                         Row(
                           children: [
                             Container(
@@ -757,7 +724,6 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
     );
   }
 
-  
   Color _getTrafficColor(TrafficLevel level) {
     switch (level) {
       case TrafficLevel.low:
@@ -919,7 +885,7 @@ class _NavigationMapScreenState extends State<NavigationMapScreenTest> {
             value: radius,
             min: 100,
             max: 9000,
-            divisions: 89, 
+            divisions: 89,
             onChanged: (value) {
               final roundedValue = (value / 100).round() * 100;
               setState(() => radius = roundedValue.toDouble());
@@ -1159,7 +1125,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                         ? AppColors.neutral500
                         : AppColors.red500,
               ),
-              
+
               color:
                   routeInfo.tafficLevel == TrafficLevel.low
                       ? AppColors.green500
@@ -1321,7 +1287,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
             value: radius,
             min: 100,
             max: 9000,
-            divisions: 89, 
+            divisions: 89,
             onChanged: (value) {
               final roundedValue = (value / 100).round() * 100;
               setState(() => radius = roundedValue.toDouble());

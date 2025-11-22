@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter build:*)",
+      "Bash(pod repo update:*)",
+      "Bash(pod install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

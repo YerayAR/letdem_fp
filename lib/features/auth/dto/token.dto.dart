@@ -8,6 +8,6 @@ class TokenDTO extends DTO {
 
   @override
   Map<String, dynamic> toMap() {
-    return {'token': token, 'device_id': OneSignal.User.pushSubscription.id};
+    return {'token': token, 'device_id':  OneSignal.User.pushSubscription.id !=null &&  OneSignal.User.pushSubscription.id!.isNotEmpty ? OneSignal.User.pushSubscription.id : "unknown"};
   }
 }

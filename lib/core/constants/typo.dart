@@ -31,6 +31,12 @@ class Typo {
     fontWeight: FontWeight.w500,
   );
 
+  // Title
+  static const TextStyle title = TextStyle(
+    fontSize: 18, // px
+    fontWeight: FontWeight.w600,
+  );
+
   // Large Body
   static const TextStyle largeBody = TextStyle(
     fontSize: 16, // px

@@ -67,8 +67,7 @@ class NavigationMapScreen extends StatefulWidget {
 
 class _NavigationMapScreenState extends State<NavigationMapScreen> {
   final List<MapMarker> _mapMarkers = [];
-  final List<MapPolyline> _mapPolylines =
-      []; // ✅ Changed to store multiple polylines
+  final List<MapPolyline> _mapPolylines = [];
   final MapAssetsProvider _assetsProvider = MapAssetsProvider();
   RouteInfo? _routeInfo;
   late geolocator.Position _currentLocation;
@@ -79,7 +78,10 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
   bool _isLoading = true;
   List<routing.Waypoint> _waypoints = [];
 
-  // --
+  List<routing.Route> _alternativeRoutes = [];
+  List<RouteInfo> _alternativeRoutesInfo = [];
+  int _selectedRouteIndex = 0;
+
   double? _latitude;
   double? _longitude;
   String? _destinationStreetName;
@@ -259,108 +261,331 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     );
   }
 
-  void _calculateRoute(List<routing.Waypoint> waypoints) {
+  void _calculateRoute(List<routing.Waypoint> waypoints) async {
     if (_routingEngine == null) return;
 
     final carOptions = routing.CarOptions();
     carOptions.routeOptions.enableTolls = true;
     carOptions.routeOptions.optimizationMode = routing.OptimizationMode.fastest;
 
-    // ✅ Enable traffic data for route calculation
     carOptions.routeOptions.departureTime = DateTime.now();
     carOptions.routeOptions.trafficOptimizationMode =
         routing.TrafficOptimizationMode.timeDependent;
 
+    carOptions.routeOptions.alternatives = 3;
     _routingEngine!.calculateCarRoute(waypoints, carOptions, (
       routing.RoutingError? error,
       List<routing.Route>? routes,
     ) {
       if (error == null && routes != null && routes.isNotEmpty) {
-        _currentRoute = routes.first;
+        setState(() {
+          _alternativeRoutes = routes;
+          _alternativeRoutesInfo = [];
 
-        print('✅ Route calculated with traffic data');
-        print('📊 Sections: ${_currentRoute!.sections.length}');
-        print(
-          '📊 Total spans: ${_currentRoute!.sections.fold(0, (sum, section) => sum + section.spans.length)}',
-        );
+          for (var route in routes) {
+            _currentRoute = route;
+            _alternativeRoutesInfo.add(retrieveRouteInfoFromHereMap());
+          }
 
-        _renderRoute(_currentRoute!);
-        _addMarker(
-          GeoCoordinates(
-            _currentRoute!.geometry.vertices.last.latitude,
-            _currentRoute!.geometry.vertices.last.longitude,
-          ),
-          _assetsProvider.destinationMarker,
-        );
-        _addMarker(
-          GeoCoordinates(
-            _currentRoute!.geometry.vertices.first.latitude,
-            _currentRoute!.geometry.vertices.first.longitude,
-          ),
-          _assetsProvider.currentLocationMarker,
-        );
+          _selectedRouteIndex = 0;
+          _currentRoute = routes[0];
+          _routeInfo = _alternativeRoutesInfo[0];
+        });
 
-        RouteInfo routeInfo = retrieveRouteInfoFromHereMap();
-        if (_routeInfo == null) {
-          setState(() {
-            _routeInfo = routeInfo;
-          });
-        }
-      } else {
-        print(
-          "Route calculation failed: ${error?.toString() ?? 'Unknown error'}",
-        );
-        if (error == routing.RoutingError.noRouteFound) {
-          print("No route found between given points.");
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+
+          _displayAllRoutesWithTraffic();
+
+          _addMarker(
+            GeoCoordinates(
+              _currentRoute!.geometry.vertices.last.latitude,
+              _currentRoute!.geometry.vertices.last.longitude,
+            ),
+            _assetsProvider.destinationMarker,
+          );
+          _addMarker(
+            GeoCoordinates(
+              _currentRoute!.geometry.vertices.first.latitude,
+              _currentRoute!.geometry.vertices.first.longitude,
+            ),
+            _assetsProvider.currentLocationMarker,
+          );
+
+          _zoomToRoute(_currentRoute!);
+        });
       }
     });
   }
 
-  void _renderRoute(routing.Route route) {
-    _displayTrafficAwareRoutePolyline(
-      route,
-    ); // ✅ Changed to traffic-aware method
-    _zoomToRoute(route);
-  }
+  bool _isUpdatingRoutes = false;
 
-  // ✅ NEW METHOD: Display route with traffic-aware coloring
-  void _displayTrafficAwareRoutePolyline(routing.Route route) {
+  void _displayAllRoutesWithTraffic() {
     if (_hereMapController == null) return;
+    _isUpdatingRoutes = true;
 
-    print('🚦 Adding traffic-aware route visualization...');
+    print('🚦 Adding all alternative routes with traffic coloring...');
 
-    // Clear old polylines
     if (_mapPolylines.isNotEmpty) {
       _hereMapController!.mapScene.removeMapPolylines(_mapPolylines);
       _mapPolylines.clear();
     }
 
-    // Process each section
+    for (
+      int routeIndex = 0;
+      routeIndex < _alternativeRoutes.length;
+      routeIndex++
+    ) {
+      final route = _alternativeRoutes[routeIndex];
+      final isSelected = routeIndex == _selectedRouteIndex;
+
+      for (var section in route.sections) {
+        for (var span in section.spans) {
+          GeoPolyline spanGeometry = span.geometry;
+
+          Color lineColor;
+          double lineWidth;
+
+          if (isSelected) {
+            lineColor = _getTrafficColorFromSpan(span);
+            lineWidth = 17;
+          } else {
+            lineColor = const Color.fromARGB(160, 128, 128, 128);
+            lineWidth = 10;
+          }
+
+          try {
+            MapPolyline polyline = MapPolyline.withRepresentation(
+              spanGeometry,
+              MapPolylineSolidRepresentation(
+                MapMeasureDependentRenderSize.withSingleSize(
+                  RenderSizeUnit.pixels,
+                  lineWidth,
+                ),
+                lineColor,
+                LineCap.round,
+              ),
+            );
+
+            _hereMapController!.mapScene.addMapPolyline(polyline);
+            _mapPolylines.add(polyline);
+          } catch (e) {
+            print('❌ Error adding traffic polyline for span: $e');
+          }
+        }
+      }
+    }
+
+    print(
+      '✅ Added ${_mapPolylines.length} traffic polylines for ${_alternativeRoutes.length} routes',
+    );
+    _isUpdatingRoutes = false;
+  }
+
+  void _selectRoute(int index) {
+    if (index >= _alternativeRoutes.length) return;
+
+    setState(() {
+      _selectedRouteIndex = index;
+      _currentRoute = _alternativeRoutes[index];
+      _routeInfo = _alternativeRoutesInfo[index];
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _displayAllRoutesWithTraffic();
+      _zoomToRoute(_currentRoute!);
+    });
+  }
+
+  Widget _buildAlternativeRoutesSelector() {
+    if (_alternativeRoutes.length <= 1) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Alternative Routes',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _alternativeRoutes.length,
+              itemBuilder: (context, index) {
+                final routeInfo = _alternativeRoutesInfo[index];
+                final isSelected = index == _selectedRouteIndex;
+
+                return GestureDetector(
+                  onTap: () => _selectRoute(index),
+                  child: Container(
+                    width: 150,
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color:
+                          isSelected
+                              ? Colors.blue.withOpacity(0.08)
+                              : Colors.grey.withOpacity(0.05),
+                      border: Border.all(
+                        color: isSelected ? Colors.blue : Colors.grey.shade300,
+                        width: isSelected ? 2 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              size: 16,
+                              color:
+                                  isSelected
+                                      ? Colors.blue
+                                      : Colors.grey.shade600,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                parseHours(context, routeInfo.duration),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight:
+                                      isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                  color:
+                                      isSelected ? Colors.blue : Colors.black87,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.route,
+                              size: 16,
+                              color:
+                                  isSelected
+                                      ? Colors.blue
+                                      : Colors.grey.shade600,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              parseMeters(routeInfo.distance),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    isSelected
+                                        ? Colors.blue.shade700
+                                        : Colors.grey.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: _getTrafficColorForLevel(
+                                  routeInfo.tafficLevel,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                formatTrafficLevel(
+                                      routeInfo.tafficLevel,
+                                      context,
+                                    ) ??
+                                    '--',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: _getTrafficColorForLevel(
+                                    routeInfo.tafficLevel,
+                                  ),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getTrafficColorForLevel(TrafficLevel level) {
+    switch (level) {
+      case TrafficLevel.low:
+        return AppColors.green500;
+      case TrafficLevel.moderate:
+        return AppColors.neutral500;
+      case TrafficLevel.heavy:
+        return AppColors.red500;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void _displayTrafficAwareRoutePolyline(routing.Route route) {
+    if (_hereMapController == null) return;
+
+    print('🚦 Adding traffic-aware route visualization...');
+
+    if (_mapPolylines.isNotEmpty) {
+      _hereMapController!.mapScene.removeMapPolylines(_mapPolylines);
+      _mapPolylines.clear();
+    }
+
     for (var section in route.sections) {
-      // Process each span in the section
       for (var span in section.spans) {
-        // Get the geometry for this span
         GeoPolyline spanGeometry = span.geometry;
 
-        // Calculate traffic color based on span data
         Color trafficColor = _getTrafficColorFromSpan(span);
 
         try {
-          // Create polyline for this span
           MapPolyline polyline = MapPolyline.withRepresentation(
             spanGeometry,
             MapPolylineSolidRepresentation(
               MapMeasureDependentRenderSize.withSingleSize(
                 RenderSizeUnit.pixels,
-                17, // Line width
+                17,
               ),
               trafficColor,
               LineCap.round,
             ),
           );
 
-          // Add to map
           _hereMapController!.mapScene.addMapPolyline(polyline);
           _mapPolylines.add(polyline);
         } catch (e) {
@@ -372,25 +597,22 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
     print('✅ Added ${_mapPolylines.length} traffic polylines');
   }
 
-  // ✅ NEW METHOD: Determine traffic color from span data
   Color _getTrafficColorFromSpan(routing.Span span) {
-    // Method 1: Compare duration with baseDuration (RECOMMENDED)
     if (span.duration.inSeconds > 0 && span.baseDuration.inSeconds > 0) {
       double trafficDelay =
           span.duration.inSeconds / span.baseDuration.inSeconds;
 
       if (trafficDelay <= 1.1) {
-        return Colors.green; // Free flow (≤10% delay)
+        return Colors.green;
       } else if (trafficDelay <= 1.3) {
-        return Colors.yellow; // Light traffic (10-30% delay)
+        return Colors.yellow;
       } else if (trafficDelay <= 1.6) {
-        return Colors.orange; // Moderate traffic (30-60% delay)
+        return Colors.orange;
       } else {
-        return Colors.red; // Heavy traffic (>60% delay)
+        return Colors.red;
       }
     }
 
-    // Method 2: Use DynamicSpeedInfo if available
     if (span.dynamicSpeedInfo != null) {
       final speedInfo = span.dynamicSpeedInfo!;
 
@@ -401,34 +623,41 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
             speedInfo.baseSpeedInMetersPerSecond!;
 
         if (speedRatio >= 0.8) {
-          return Colors.green; // >80% of normal speed
+          return Colors.green;
         } else if (speedRatio >= 0.6) {
-          return Colors.yellow; // 60-80% of normal speed
+          return Colors.yellow;
         } else if (speedRatio >= 0.4) {
-          return Colors.orange; // 40-60% of normal speed
+          return Colors.orange;
         } else {
-          return Colors.red; // <40% of normal speed
+          return Colors.red;
         }
       }
     }
 
-    // Fallback: No traffic data available
-    return const Color(0xFF4A90E2); // Default blue for route
+    return const Color(0xFF4A90E2);
   }
 
   void _zoomToRoute(routing.Route route) {
     if (_hereMapController == null) return;
 
     try {
+      final screenHeight = _hereMapController!.viewportSize.height;
+
+      final bottomSheetHeight = screenHeight * 0.5;
+
+      final topPadding = 100.0;
+      final sidePadding = 50.0;
+      final bottomPadding = bottomSheetHeight + 50.0;
+
       final update =
           MapCameraUpdateFactory.lookAtAreaWithGeoOrientationAndViewRectangle(
             route.boundingBox,
             GeoOrientationUpdate(0, 0),
             Rectangle2D(
-              Point2D(50, 50),
+              Point2D(sidePadding, topPadding),
               Size2D(
-                _hereMapController!.viewportSize.width - 100,
-                _hereMapController!.viewportSize.height - 100,
+                _hereMapController!.viewportSize.width - (sidePadding * 2),
+                screenHeight - topPadding - bottomPadding,
               ),
             ),
           );
@@ -504,11 +733,9 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
                     child:
                         _isLoading
                             ? const Center(child: CupertinoActivityIndicator())
-                            : HereMap(
-                              key: UniqueKey(),
-                              onMapCreated: _onMapCreated,
-                            ),
+                            : HereMap(onMapCreated: _onMapCreated),
                   ),
+
                   Positioned(
                     left: 0,
                     bottom: 0,
@@ -527,27 +754,37 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
                                 ),
                                 child: const HomePageShimmer(),
                               )
-                              : NavigateNotificationCard(
-                                spaceInfo: widget.spaceDetails ?? _spaceDetails,
-                                hideToggle: widget.hideToggle,
-                                routeInfo: _routeInfo!,
-                                notification: ScheduledNotification(
-                                  id: "1",
-                                  startsAt: DateTime.now(),
-                                  endsAt: DateTime.now(),
-                                  isExpired: false,
-                                  location: LocationData(
-                                    streetName:
-                                        widget.destinationStreetName ??
-                                        _destinationStreetName ??
-                                        '',
-                                    point: CoordinatesData(
-                                      latitude: widget.latitude ?? _latitude!,
-                                      longitude:
-                                          widget.longitude ?? _longitude!,
+                              : Column(
+                                children: [
+                                  NavigateNotificationCard(
+                                    selectedRoute:
+                                        _alternativeRoutes[_selectedRouteIndex],
+                                    alt: _buildAlternativeRoutesSelector(),
+
+                                    spaceInfo:
+                                        widget.spaceDetails ?? _spaceDetails,
+                                    hideToggle: widget.hideToggle,
+                                    routeInfo: _routeInfo!,
+                                    notification: ScheduledNotification(
+                                      id: "1",
+                                      startsAt: DateTime.now(),
+                                      endsAt: DateTime.now(),
+                                      isExpired: false,
+                                      location: LocationData(
+                                        streetName:
+                                            widget.destinationStreetName ??
+                                            _destinationStreetName ??
+                                            '',
+                                        point: CoordinatesData(
+                                          latitude:
+                                              widget.latitude ?? _latitude!,
+                                          longitude:
+                                              widget.longitude ?? _longitude!,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                     ),
                   ),
@@ -560,14 +797,18 @@ class _NavigationMapScreenState extends State<NavigationMapScreen> {
 class NavigateNotificationCard extends StatefulWidget {
   final ScheduledNotification notification;
   final RouteInfo? routeInfo;
+  final Widget alt;
   final bool hideToggle;
   final Space? spaceInfo;
+  final routing.Route selectedRoute;
 
   const NavigateNotificationCard({
     super.key,
     required this.notification,
     required this.hideToggle,
     required this.routeInfo,
+    required this.alt,
+    required this.selectedRoute,
     this.spaceInfo,
   });
 
@@ -650,6 +891,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
       children: [
         _buildRouteDetails(routeInfo),
         const SizedBox(height: 22),
+        widget.alt,
         _buildLocationInfo(location, widget.spaceInfo),
         const SizedBox(height: 16),
         _buildArrivalInfo(routeInfo),
@@ -731,7 +973,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
                         ? AppColors.neutral500
                         : AppColors.red500,
               ),
-              // low, moderate, heavy
+
               color:
                   routeInfo.tafficLevel == TrafficLevel.low
                       ? AppColors.green500
@@ -893,7 +1135,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
             value: radius,
             min: 100,
             max: 9000,
-            divisions: 89, // (9000 - 100) / 100 = 89 divisions
+            divisions: 89,
             onChanged: (value) {
               final roundedValue = (value / 100).round() * 100;
               setState(() => radius = roundedValue.toDouble());
@@ -962,6 +1204,7 @@ class _NavigateNotificationCardState extends State<NavigateNotificationCard> {
               isNavigatingToParking: widget.spaceInfo != null,
               destinationLat: widget.notification.location.point.latitude,
               destinationLng: widget.notification.location.point.longitude,
+              preCalculatedRoute: widget.selectedRoute,
             ),
       ),
     );

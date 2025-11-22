@@ -406,6 +406,21 @@ class _NavigateContentState extends State<NavigateContent>
     );
   }
 
+  IconData _getManeuverIcon(int index) {
+    // Map your route maneuver actions to icons
+    // You'll need to access the actual maneuver data from your HERE SDK route
+    // This is a placeholder - adjust based on your actual data structure
+    final defaultIcons = [
+      Icons.turn_slight_left,
+      Icons.turn_slight_left,
+      Icons.arrow_upward,
+      Icons.turn_slight_right,
+      Icons.turn_slight_right,
+    ];
+
+    return defaultIcons[index % defaultIcons.length];
+  }
+
   Widget _buildNavigationInstructionCard() {
     IconData directionIcon = Icons.navigation;
 
