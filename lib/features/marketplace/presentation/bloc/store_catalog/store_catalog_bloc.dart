@@ -58,9 +58,13 @@ class StoreCatalogBloc extends Bloc<StoreCatalogEvent, StoreCatalogState> {
     Emitter<StoreCatalogState> emit,
   ) async {
     try {
-      // Convertir el enum a string para enviarlo al backend
-      final categoryName = event.category.name;
-      final stores = await repository.fetchStores(category: categoryName);
+      // Mapear categoría del frontend al slug que usa el backend (Category.name)
+      final backendSlug = _mapCategoryToBackendSlug(event.category);
+
+      // Si es "otro", no filtramos por categoría: traemos todas.
+      final stores = await repository.fetchStores(
+        category: backendSlug.isEmpty ? null : backendSlug,
+      );
 
       if (stores.isEmpty) {
         emit(StoreCatalogEmpty(query: event.category.displayName));
@@ -69,6 +73,26 @@ class StoreCatalogBloc extends Bloc<StoreCatalogEvent, StoreCatalogState> {
       }
     } catch (e) {
       emit(StoreCatalogError(message: 'Error al filtrar: $e'));
+    }
+  }
+
+  /// Traduce las categorías del enum a los `name` reales de Category en backend.
+  String _mapCategoryToBackendSlug(StoreCategory category) {
+    switch (category) {
+      case StoreCategory.clothing:
+        return 'fashion';
+      case StoreCategory.gasoline:
+        return 'automotive';
+      case StoreCategory.commerce:
+        return 'home';
+      case StoreCategory.restaurant:
+        return 'food';
+      case StoreCategory.pharmacy:
+        return 'health';
+      case StoreCategory.supermarket:
+        return 'home';
+      case StoreCategory.other:
+        return '';
     }
   }
 }

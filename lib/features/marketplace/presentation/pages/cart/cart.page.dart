@@ -75,6 +75,29 @@ class CartView extends StatelessWidget {
                     cartState: cartState,
                     availablePoints: availablePoints,
                   ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Seguir comprando',
+                          style: Typo.mediumBody.copyWith(
+                            color: AppColors.primary500,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               );
             },
@@ -132,7 +155,7 @@ class CartView extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Explorar productos',
+                'Seguir comprando',
                 style: Typo.mediumBody.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,

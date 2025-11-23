@@ -10,19 +10,51 @@ import '../../domain/repositories/marketplace_repository.dart';
 
 class MarketplaceRepositoryImpl extends MarketplaceRepository {
   // IMPORTANTE: ajusta la URL con --dart-define=MARKETPLACE_HOST=<url>
+  // Debe coincidir con la IP/puerto donde corre el mismo backend que usa shop-letdem
+  // Host base para marketplace. En producción/staging debe apuntar al mismo
+  // dominio que la API principal (api-staging.letdem.org, api.letdem.com, etc.).
+  // Se puede sobreescribir con --dart-define=MARKETPLACE_HOST=<url>.
   static const String baseHost = String.fromEnvironment(
     'MARKETPLACE_HOST',
-    defaultValue: 'http://192.168.1.34:8000',
+    // DEV: por defecto apunta a tu backend local donde está el marketplace.
+    // En CI/prod se debe sobreescribir con --dart-define=MARKETPLACE_HOST=<url>.
+    defaultValue: 'http://192.168.1.101:8000',
   );
   static const String baseUrl = '$baseHost/v1/marketplace';
 
-  // Helper para normalizar URLs que vienen con localhost del backend
+  // Helper para normalizar URLs de imágenes que vienen del backend
+  // - Reemplaza host localhost/127.0.0.1 por baseHost
+  // - Si la URL es relativa ("/media/..."), la convierte en absoluta usando baseHost
   static String _normalizeUrl(String url) {
     if (url.isEmpty) return url;
-    // Reemplazar localhost por la IP correcta
-    return url
+
+    // Primero normalizamos localhost -> baseHost
+    var normalized = url
         .replaceAll('http://localhost:8000', baseHost)
         .replaceAll('http://127.0.0.1:8000', baseHost);
+
+    // Si es ruta relativa, anteponer baseHost
+    if (normalized.startsWith('/')) {
+      return '$baseHost$normalized';
+    }
+
+    // Si es URL absoluta pero apunta a otro host (por ejemplo 192.168.1.34),
+    // reescribimos el host para que sea siempre baseHost, manteniendo path/query.
+    try {
+      final uri = Uri.parse(normalized);
+      final baseUri = Uri.parse(baseHost);
+
+      if (uri.hasScheme && uri.host.isNotEmpty) {
+        if (uri.host != baseUri.host || uri.port != baseUri.port) {
+          final fixed = baseUri.replace(path: uri.path, query: uri.query);
+          return fixed.toString();
+        }
+      }
+    } catch (_) {
+      // Si falla el parseo, devolvemos la versión normalizada tal cual
+    }
+
+    return normalized;
   }
 
   static bool _isHtmlResponse(http.Response response) {
@@ -88,8 +120,11 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
         // Normalizar URLs de imágenes
         final normalizedData =
             data.map((item) {
-              if (item['image_url'] != null) {
-                item['image_url'] = _normalizeUrl(item['image_url']);
+              // backend expone `image` (ImageField). Lo normalizamos y lo
+              // mapeamos a `image_url` para el modelo Flutter.
+              final raw = item['image_url'] ?? item['image'];
+              if (raw != null && raw is String && raw.isNotEmpty) {
+                item['image_url'] = _normalizeUrl(raw);
               }
               return item;
             }).toList();
@@ -114,8 +149,9 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['image_url'] != null) {
-          data['image_url'] = _normalizeUrl(data['image_url']);
+        final raw = data['image_url'] ?? data['image'];
+        if (raw != null && raw is String && raw.isNotEmpty) {
+          data['image_url'] = _normalizeUrl(raw);
         }
         return Store.fromJson(data);
       } else {
@@ -163,8 +199,11 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
         // Normalizar URLs de imágenes
         final normalizedData =
             data.map((item) {
-              if (item['image_url'] != null) {
-                item['image_url'] = _normalizeUrl(item['image_url']);
+              // backend expone `image` (ImageField). Lo normalizamos y lo
+              // mapeamos a `image_url` para el modelo Flutter.
+              final raw = item['image_url'] ?? item['image'];
+              if (raw != null && raw is String && raw.isNotEmpty) {
+                item['image_url'] = _normalizeUrl(raw);
               }
               return item;
             }).toList();
@@ -184,8 +223,9 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['image_url'] != null) {
-          data['image_url'] = _normalizeUrl(data['image_url']);
+        final raw = data['image_url'] ?? data['image'];
+        if (raw != null && raw is String && raw.isNotEmpty) {
+          data['image_url'] = _normalizeUrl(raw);
         }
         return Product.fromJson(data);
       } else {

@@ -24,7 +24,6 @@ import 'package:letdem/features/earning_account/earning_account_bloc.dart';
 import 'package:letdem/features/earning_account/repository/earning.repository.dart';
 import 'package:letdem/features/map/map_bloc.dart';
 import 'package:letdem/features/map/repository/map.repository.dart';
-import 'package:letdem/features/marketplace/data/marketplace_data.dart';
 import 'package:letdem/features/notifications/notifications_bloc.dart';
 import 'package:letdem/features/notifications/repository/notification.repository.dart';
 import 'package:letdem/features/payment_methods/payment_method_bloc.dart';
@@ -41,16 +40,20 @@ import 'package:letdem/features/wallet/repository/transaction.repository.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/repository/withdrawal.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
+import 'package:letdem/features/marketplace/repository/marketplace_repository.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/l10n/app_localizations.dart';
 import 'package:letdem/l10n/locales.dart';
 import 'package:letdem/notifiers/locale.notifier.dart';
+import 'package:letdem/onboarding.view.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
-import 'features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
 import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
 
@@ -99,6 +102,7 @@ Future _initializeHERESDK() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initializeHERESDK();
+  MapboxOptions.setAccessToken(AppCredentials.mapBoxAccessToken);
 
   // OneSignal initialization
   OneSignal.initialize(AppCredentials.oneSignalAppId);
@@ -170,7 +174,7 @@ void main() async {
           RepositoryProvider(create: (_) => MapRepository()),
           RepositoryProvider(create: (_) => ScheduleNotificationsRepository()),
           RepositoryProvider(create: (_) => NotificationRepository()),
-          RepositoryProvider(create: (_) => MarketplaceRepositoryImpl()),
+          RepositoryProvider(create: (_) => MarketplaceRepository()),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -210,6 +214,15 @@ void main() async {
               create:
                   (context) =>
                       MapBloc(mapRepository: context.read<MapRepository>()),
+            ),
+            // Marketplace BLoCs
+            BlocProvider(
+              create: (context) => StoreCatalogBloc(
+                repository: context.read<MarketplaceRepository>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => CartBloc(),
             ),
             BlocProvider(
               create:
@@ -256,7 +269,7 @@ void main() async {
             BlocProvider(
               create:
                   (context) => StoreCatalogBloc(
-                    repository: context.read<MarketplaceRepositoryImpl>(),
+                    repository: context.read<MarketplaceRepository>(),
                   ),
             ),
           ],

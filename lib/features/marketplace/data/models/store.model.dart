@@ -96,7 +96,7 @@ class Store extends Equatable {
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       category: _parseCategoryFromName(categoryName ?? 'other'),
-      imageUrl: (json['image_url'] ?? json['imageUrl']) as String? ?? '',
+      imageUrl: (json['image_url'] ?? json['imageUrl'] ?? json['image']) as String? ?? '',
       latitude: _parseDouble(json['latitude']),
       longitude: _parseDouble(json['longitude']),
       rating: _parseDouble(json['rating']),
@@ -122,15 +122,22 @@ class Store extends Equatable {
         return StoreCategory.clothing;
       case 'gas_station':
       case 'gasoline':
+      case 'automotive':
         return StoreCategory.gasoline;
       case 'commerce':
         return StoreCategory.commerce;
       case 'restaurant':
+      case 'food':
         return StoreCategory.restaurant;
       case 'pharmacy':
+      case 'health':
         return StoreCategory.pharmacy;
       case 'supermarket':
         return StoreCategory.supermarket;
+      case 'technology':
+      case 'sports':
+      case 'home':
+        return StoreCategory.commerce;
       default:
         return StoreCategory.other;
     }

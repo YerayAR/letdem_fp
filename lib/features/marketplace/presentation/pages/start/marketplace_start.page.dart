@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
@@ -9,13 +10,15 @@ import 'package:letdem/common/widgets/button.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
-import 'package:letdem/features/marketplace/presentation/pages/catalog/store_catalog.page.dart';
-import 'package:letdem/features/marketplace/presentation/pages/purchases/order_history.page.dart';
-import 'package:letdem/features/marketplace/presentation/pages/redeems/pending_vouchers.page.dart';
-import 'package:letdem/features/marketplace/presentation/pages/redeems/virtual_card_generator.page.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/models/earnings_account/earning_account.model.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
+import 'package:letdem/features/marketplace/presentation/views/catalog/store_catalog.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/purchases/order_history.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/redeems/pending_vouchers.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/redeems/virtual_card_generator.view.dart';
+import 'package:letdem/features/marketplace/presentation/views/cart/cart.view.dart';
 
 class MarketplaceStartView extends StatelessWidget {
   const MarketplaceStartView({super.key});
@@ -28,8 +31,13 @@ class MarketplaceStartView extends StatelessWidget {
         children: [
           StyledAppBar(
             title: 'Inicio',
-            icon: IconlyLight.close_square,
-            onTap: () => Navigator.pop(context),
+            icon: Iconsax.shopping_cart,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartView()),
+              );
+            },
           ),
           Expanded(
             child: BlocBuilder<UserBloc, UserState>(
@@ -174,6 +182,7 @@ class MarketplaceStartView extends StatelessWidget {
     );
   }
 
+
   Widget _buildActionButtons(BuildContext context, int points) {
     return Column(
       children: [
@@ -213,8 +222,9 @@ class MarketplaceStartView extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (_) => VirtualCardGeneratorView(availablePoints: points),
+                builder: (_) => VirtualCardGeneratorView(
+                  availablePoints: points,
+                ),
               ),
             );
           },
@@ -294,7 +304,6 @@ class MarketplaceStartView extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildVirtualCardCallout(BuildContext context, int points) {
     return Container(
       decoration: BoxDecoration(

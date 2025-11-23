@@ -24,7 +24,17 @@ import '../../../features/users/repository/user.repository.dart';
 enum Environment { STG, PROD, DEV }
 
 class EndPoints {
-  static String baseURL = "https://api-staging.letdem.org/v1";
+  /// Base URL de la API principal.
+  ///
+  /// - En desarrollo: pasa, por ejemplo, `--dart-define=API_BASE_URL=http://10.0.2.2:8000/v1`.
+  /// - En staging: `--dart-define=API_BASE_URL=https://api-staging.letdem.org/v1`.
+  /// - En producción: `--dart-define=API_BASE_URL=https://api.letdem.com/v1`.
+  ///
+  /// Si no se define, por defecto apunta a `https://api-staging.letdem.org/v1`.
+  static const String baseURL = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://api-staging.letdem.org/v1',
+  );
 
   static bool showApiLogs = true;
   static Endpoint<DeviceIdDTO> updateDeviceIdEndpoint = Endpoint(
