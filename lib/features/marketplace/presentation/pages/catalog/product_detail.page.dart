@@ -5,12 +5,12 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/users/user_bloc.dart';
-import '../../../models/product.model.dart';
-import '../../../models/store.model.dart';
-import '../../../models/cart_item.model.dart';
+import '../../../data/models/product.model.dart';
+import '../../../data/models/store.model.dart';
+import '../../../data/models/cart_item.model.dart';
 import '../cart/cart.view.dart';
-import '../redeems/redeem_type_selection.view.dart';
-import '../purchases/purchase_redeem_question.view.dart';
+import '../redeems/redeem_type_selection.page.dart';
+import '../purchases/purchase_redeem_question.page.dart';
 import '../../bloc/cart/cart_bloc.dart';
 import '../../bloc/cart/cart_event.dart';
 

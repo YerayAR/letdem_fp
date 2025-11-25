@@ -340,10 +340,15 @@
     "description": "Reference to LetDem service fees"
   },
   "helpAndSupport" : "Ayuda y Soporte",
-  "vehicleInformation": "datos de tu vehículo",
+  "vehicleInformation": "Datos del vehículo",
   "@vehicleInformation": {
     "description": "Reference to vehicle information"
   },
+  "alias": "Alias identificativo",
+  "enterAlias": "Ingresa un alias para transferencias",
+  "brandModel": "Marca y modelo",
+  "licensePlate": "Matrícula",
+  "noVehicleRegistered": "No tienes ningún vehículo registrado",
 
   "earningsAccount": "Cuenta de beneficios",
   "@earningsAccount": {

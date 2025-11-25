@@ -4,12 +4,12 @@ import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import '../../bloc/store_catalog_bloc.dart';
-import '../../../models/store.model.dart';
-import '../../widgets/store_card.widget.dart';
-import '../../widgets/category_filter.widget.dart';
+import '../../../data/models/store.model.dart';
+import '../../widgets/common/store_card.widget.dart';
+import '../../widgets/common/category_filter.widget.dart';
 import '../../bloc/cart/cart_bloc.dart';
 import '../../bloc/cart/cart_state.dart';
-import '../cart/cart.view.dart';
+import '../cart/cart.page.dart';
 
 class StoreCatalogView extends StatefulWidget {
   const StoreCatalogView({super.key});

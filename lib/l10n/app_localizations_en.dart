@@ -795,7 +795,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpAndSupport => 'Help & Support';
 
   @override
-  String get vehicleInformation => 'vehicle information';
+  String get vehicleInformation => 'Vehicle information';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get enterAlias => 'Enter an alias for transfers';
+
+  @override
+  String get brandModel => 'Brand and model';
+
+  @override
+  String get licensePlate => 'License plate';
+
+  @override
+  String get noVehicleRegistered => 'No vehicle registered';
 
   @override
   String get earningsAccount => 'earnings account';

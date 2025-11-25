@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
-import '../../bloc/store_products_bloc.dart';
+import '../../bloc/store_products/store_products_bloc.dart';
 import '../../bloc/cart/cart_bloc.dart';
 import '../../bloc/cart/cart_state.dart';
 import '../cart/cart.view.dart';
-import '../../../models/store.model.dart';
-import '../../widgets/product_card.widget.dart';
+import '../../../data/models/store.model.dart';
+import '../../widgets/common/product_card.widget.dart';
 
 class StoreProductsView extends StatefulWidget {
   final Store store;

@@ -1553,8 +1553,38 @@ abstract class AppLocalizations {
   /// Reference to vehicle information
   ///
   /// In en, this message translates to:
-  /// **'vehicle information'**
+  /// **'Vehicle information'**
   String get vehicleInformation;
+
+  /// No description provided for @alias.
+  ///
+  /// In en, this message translates to:
+  /// **'Alias'**
+  String get alias;
+
+  /// No description provided for @enterAlias.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an alias for transfers'**
+  String get enterAlias;
+
+  /// No description provided for @brandModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand and model'**
+  String get brandModel;
+
+  /// No description provided for @licensePlate.
+  ///
+  /// In en, this message translates to:
+  /// **'License plate'**
+  String get licensePlate;
+
+  /// No description provided for @noVehicleRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle registered'**
+  String get noVehicleRegistered;
 
   /// Reference to earnings account
   ///

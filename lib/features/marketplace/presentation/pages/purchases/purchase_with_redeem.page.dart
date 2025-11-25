@@ -7,8 +7,8 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
-import '../../../models/product.model.dart';
-import '../../../models/store.model.dart';
+import '../../../data/models/product.model.dart';
+import '../../../data/models/store.model.dart';
 import '../../../repository/marketplace_repository.dart';
 
 class PurchaseWithRedeemView extends StatefulWidget {

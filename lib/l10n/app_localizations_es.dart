@@ -802,7 +802,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpAndSupport => 'Ayuda y Soporte';
 
   @override
-  String get vehicleInformation => 'datos de tu vehículo';
+  String get vehicleInformation => 'Datos del vehículo';
+
+  @override
+  String get alias => 'Alias identificativo';
+
+  @override
+  String get enterAlias => 'Ingresa un alias para transferencias';
+
+  @override
+  String get brandModel => 'Marca y modelo';
+
+  @override
+  String get licensePlate => 'Matrícula';
+
+  @override
+  String get noVehicleRegistered => 'No tienes ningún vehículo registrado';
 
   @override
   String get earningsAccount => 'Cuenta de beneficios';

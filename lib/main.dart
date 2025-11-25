@@ -40,7 +40,7 @@ import 'package:letdem/features/wallet/repository/transaction.repository.dart';
 import 'package:letdem/features/wallet/wallet_bloc.dart';
 import 'package:letdem/features/withdrawals/repository/withdrawal.repository.dart';
 import 'package:letdem/features/withdrawals/withdrawal_bloc.dart';
-import 'package:letdem/features/marketplace/repository/marketplace_repository.dart';
+import 'package:letdem/features/marketplace/data/repositories/marketplace_repository_impl.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
@@ -174,7 +174,7 @@ void main() async {
           RepositoryProvider(create: (_) => MapRepository()),
           RepositoryProvider(create: (_) => ScheduleNotificationsRepository()),
           RepositoryProvider(create: (_) => NotificationRepository()),
-          RepositoryProvider(create: (_) => MarketplaceRepository()),
+          RepositoryProvider(create: (_) => MarketplaceRepositoryImpl()),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -218,7 +218,7 @@ void main() async {
             // Marketplace BLoCs
             BlocProvider(
               create: (context) => StoreCatalogBloc(
-                repository: context.read<MarketplaceRepository>(),
+                repository: context.read<MarketplaceRepositoryImpl>(),
               ),
             ),
             BlocProvider(
@@ -265,12 +265,6 @@ void main() async {
               create:
                   (context) =>
                       CarBloc(carRepository: context.read<CarRepository>()),
-            ),
-            BlocProvider(
-              create:
-                  (context) => StoreCatalogBloc(
-                    repository: context.read<MarketplaceRepository>(),
-                  ),
             ),
           ],
           child: const AnnotatedRegion<SystemUiOverlayStyle>(

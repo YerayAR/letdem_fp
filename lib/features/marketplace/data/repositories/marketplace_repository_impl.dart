@@ -9,16 +9,12 @@ import '../models/voucher.model.dart';
 import '../../domain/repositories/marketplace_repository.dart';
 
 class MarketplaceRepositoryImpl extends MarketplaceRepository {
-  // IMPORTANTE: ajusta la URL con --dart-define=MARKETPLACE_HOST=<url>
-  // Debe coincidir con la IP/puerto donde corre el mismo backend que usa shop-letdem
-  // Host base para marketplace. En producción/staging debe apuntar al mismo
-  // dominio que la API principal (api-staging.letdem.org, api.letdem.com, etc.).
+  // Host base para marketplace. En STG/PROD debe coincidir con la API principal.
   // Se puede sobreescribir con --dart-define=MARKETPLACE_HOST=<url>.
   static const String baseHost = String.fromEnvironment(
     'MARKETPLACE_HOST',
-    // DEV: por defecto apunta a tu backend local donde está el marketplace.
-    // En CI/prod se debe sobreescribir con --dart-define=MARKETPLACE_HOST=<url>.
-    defaultValue: 'http://192.168.1.101:8000',
+    // Por defecto apuntamos a staging para evitar IPs locales en builds CI/dev.
+    defaultValue: 'https://api-staging.letdem.org',
   );
   static const String baseUrl = '$baseHost/v1/marketplace';
 
@@ -80,7 +76,7 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
   Never _throwHtmlError(String endpoint) {
     throw Exception(
-      'El backend devolvió HTML al llamar $endpoint. Verifica que la URL $baseUrl apunte a tu servidor local y que esté levantado.',
+      'El backend devolvió HTML al llamar $endpoint. Verifica que la URL $baseUrl sea correcta y que el servidor esté disponible.',
     );
   }
 
