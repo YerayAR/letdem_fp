@@ -13,6 +13,7 @@ import '../redeems/redeem_type_selection.page.dart';
 import '../purchases/purchase_redeem_question.page.dart';
 import '../../bloc/cart/cart_bloc.dart';
 import '../../bloc/cart/cart_event.dart';
+import '../../bloc/cart/cart_state.dart';
 
 class ProductDetailView extends StatefulWidget {
   final Product product;
@@ -87,6 +88,48 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 fontWeight: FontWeight.w700,
               ),
             ),
+          ),
+          BlocBuilder<CartBloc, CartState>(
+            builder: (context, cartState) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CartView()),
+                  );
+                },
+                child: Stack(
+                  children: [
+                    Icon(Iconsax.shopping_cart, color: AppColors.neutral600),
+                    if (cartState.itemCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary500,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${cartState.itemCount}',
+                            style: Typo.smallBody.copyWith(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
