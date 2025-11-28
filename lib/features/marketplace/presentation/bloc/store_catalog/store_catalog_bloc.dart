@@ -82,7 +82,7 @@ class StoreCatalogBloc extends Bloc<StoreCatalogEvent, StoreCatalogState> {
       case StoreCategory.clothing:
         return 'fashion';
       case StoreCategory.gasoline:
-        return 'automotive';
+        return 'gas_station';
       case StoreCategory.commerce:
         return 'home';
       case StoreCategory.restaurant:
@@ -90,7 +90,13 @@ class StoreCatalogBloc extends Bloc<StoreCatalogEvent, StoreCatalogState> {
       case StoreCategory.pharmacy:
         return 'health';
       case StoreCategory.supermarket:
-        return 'home';
+        return 'supermarket';
+      case StoreCategory.technology:
+        return 'technology';
+      case StoreCategory.sports:
+        return 'sports';
+      case StoreCategory.automotive:
+        return 'automotive';
       case StoreCategory.other:
         return '';
     }

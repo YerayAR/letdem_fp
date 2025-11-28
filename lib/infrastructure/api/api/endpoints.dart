@@ -36,6 +36,9 @@ class EndPoints {
     defaultValue: 'https://api-staging.letdem.org/v1',
   );
 
+  // Auth Base URL (Staging)
+  static const String authBaseURL = 'https://api-staging.letdem.org/v1';
+
   static bool showApiLogs = true;
   static Endpoint<DeviceIdDTO> updateDeviceIdEndpoint = Endpoint(
     url: "/users/me/update-device-id",
@@ -57,6 +60,7 @@ class EndPoints {
         url: "/auth/password-reset/resend-otp",
         method: HTTPMethod.POST,
         isProtected: false,
+        baseURL: authBaseURL,
       );
 
   // getReservationHistoryEndpoint
@@ -86,6 +90,7 @@ class EndPoints {
     url: "/auth/login",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
   static Endpoint getPayoutMethods = Endpoint(
     url: "/credits/payout-methods",
@@ -118,18 +123,21 @@ class EndPoints {
     url: "/auth/signup",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
 
   static Endpoint<VerifyEmailDTO> verifyEmailEndpoint = Endpoint(
     url: "/auth/account-verification/validate",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
 
   static Endpoint<EmailDTO> resendVerificationCodeEndpoint = Endpoint(
     url: "/auth/account-verification/resend-otp",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
 
   static Endpoint getUserProfileEndpoint = Endpoint(
@@ -141,23 +149,27 @@ class EndPoints {
     url: "/auth/password-reset/request",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
   static Endpoint<VerifyEmailDTO> resetPasswordEndpoint = Endpoint(
     url: "/auth/password-reset/validate",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
 
   static Endpoint<ResetPasswordDTO> resetForgotPasswordEndpoint = Endpoint(
     url: "/auth/password-reset",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
 
   static Endpoint resendForgotPasswordVerificationCodeEndpoint = Endpoint(
     url: "/auth/password-reset/resend-otp",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
 
   static Endpoint locationListEndpoint = Endpoint(
@@ -217,11 +229,13 @@ class EndPoints {
     url: "/auth/social-login",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
   static Endpoint<TokenDTO> socialSignup = Endpoint(
     url: "/auth/social-signup",
     method: HTTPMethod.POST,
     isProtected: false,
+    baseURL: authBaseURL,
   );
   static Endpoint getCar = Endpoint(
     url: "/users/me/car",

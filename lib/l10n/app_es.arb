@@ -1137,6 +1137,33 @@
       }
     }
   },
+  "sendMoney": "Enviar dinero",
+  "recipientAlias": "Alias del destinatario",
+  "enterRecipientAlias": "Ingresa el alias del destinatario",
+  "amountToSend": "Monto a enviar",
+  "pleaseEnterAlias": "Por favor ingresa el alias",
+  "pleaseEnterAmount": "Por favor ingresa el monto",
+  "enterValidAmount": "Ingresa un monto válido",
+  "sendMoneyTitle": "Transferir fondos",
+  "sendMoneySubtitle": "Envía dinero a otro usuario usando su alias identificativo.",
+  "sendMoneyWarning": "Verifica el alias antes de enviar. Las transferencias no se pueden revertir.",
+  "moneySentSuccessfully": "Dinero enviado exitosamente",
+  "moneySentDescription": "Has enviado {amount}€ a {alias} correctamente.",
+  "@moneySentDescription": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "alias": {
+        "type": "String"
+      }
+    }
+  },
+  "purchaseHistory": "Historial de compras",
+  "pendingCards": "Tarjetas pendientes",
+  "generateCard": "Generar tarjeta",
+  "transactionsHistory": "Historial transacciones",
+  "buy": "Comprar",
   "waitingForNavigation": "Esperando a que inicie la navegación...",
   "locationNotAvailable": "Ubicación no disponible"
 }

@@ -413,7 +413,7 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
     required String authToken,
   }) async {
     try {
-      var uri = Uri.parse('$baseUrl/orders/history/');
+      var uri = Uri.parse('$baseUrl/orders/');
 
       if (status != null) {
         uri = uri.replace(queryParameters: {'status': status});

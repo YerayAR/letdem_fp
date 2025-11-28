@@ -7,6 +7,9 @@ enum StoreCategory {
   restaurant,
   pharmacy,
   supermarket,
+  technology,
+  sports,
+  automotive,
   other;
 
   String get displayName {
@@ -17,6 +20,9 @@ enum StoreCategory {
       StoreCategory.restaurant => 'Restaurante',
       StoreCategory.pharmacy => 'Farmacia',
       StoreCategory.supermarket => 'Supermercado',
+      StoreCategory.technology => 'Tecnología',
+      StoreCategory.sports => 'Deportes',
+      StoreCategory.automotive => 'Automotriz',
       StoreCategory.other => 'Otro',
     };
   }
@@ -29,6 +35,9 @@ enum StoreCategory {
       StoreCategory.restaurant => '🍽️',
       StoreCategory.pharmacy => '💊',
       StoreCategory.supermarket => '🛒',
+      StoreCategory.technology => '💻',
+      StoreCategory.sports => '⚽',
+      StoreCategory.automotive => '🚗',
       StoreCategory.other => '📍',
     };
   }
@@ -122,9 +131,11 @@ class Store extends Equatable {
         return StoreCategory.clothing;
       case 'gas_station':
       case 'gasoline':
-      case 'automotive':
         return StoreCategory.gasoline;
+      case 'automotive':
+        return StoreCategory.automotive;
       case 'commerce':
+      case 'home':
         return StoreCategory.commerce;
       case 'restaurant':
       case 'food':
@@ -135,9 +146,9 @@ class Store extends Equatable {
       case 'supermarket':
         return StoreCategory.supermarket;
       case 'technology':
+        return StoreCategory.technology;
       case 'sports':
-      case 'home':
-        return StoreCategory.commerce;
+        return StoreCategory.sports;
       default:
         return StoreCategory.other;
     }

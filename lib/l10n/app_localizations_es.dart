@@ -2515,4 +2515,59 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get locationNotAvailable => 'Ubicación no disponible';
+
+  @override
+  String get sendMoney => 'Enviar dinero';
+
+  @override
+  String get recipientAlias => 'Alias del destinatario';
+
+  @override
+  String get enterRecipientAlias => 'Ingresa el alias del destinatario';
+
+  @override
+  String get amountToSend => 'Monto a enviar';
+
+  @override
+  String get pleaseEnterAlias => 'Por favor ingresa el alias';
+
+  @override
+  String get pleaseEnterAmount => 'Por favor ingresa el monto';
+
+  @override
+  String get enterValidAmount => 'Ingresa un monto válido';
+
+  @override
+  String get sendMoneyTitle => 'Transferir fondos';
+
+  @override
+  String get sendMoneySubtitle =>
+      'Envía dinero a otro usuario usando su alias identificativo.';
+
+  @override
+  String get sendMoneyWarning =>
+      'Verifica el alias antes de enviar. Las transferencias no se pueden revertir.';
+
+  @override
+  String get moneySentSuccessfully => 'Dinero enviado exitosamente';
+
+  @override
+  String moneySentDescription(String amount, String alias) {
+    return 'Has enviado $amount€ a $alias correctamente.';
+  }
+
+  @override
+  String get purchaseHistory => 'Historial de compras';
+
+  @override
+  String get pendingCards => 'Tarjetas pendientes';
+
+  @override
+  String get generateCard => 'Generar tarjeta';
+
+  @override
+  String get transactionsHistory => 'Historial transacciones';
+
+  @override
+  String get buy => 'Comprar';
 }

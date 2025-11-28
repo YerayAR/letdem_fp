@@ -15,7 +15,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 // y se puede sobreescribir con --dart-define=WS_BASE_URL=<url>.
 const String _wsBaseUrl = String.fromEnvironment(
   'WS_BASE_URL',
-  defaultValue: 'wss://api-staging.letdem.org/ws',
+  defaultValue: 'ws:https://api-staging.letdem.org/',
 );
 
 class LocationWebSocketService {
