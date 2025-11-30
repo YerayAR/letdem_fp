@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../infrastructure/storage/storage/storage.service.dart';
@@ -72,6 +73,9 @@ class TrackLocationCubit extends Cubit<TrackLocationState> {
 
 class OwnerTrackLocationSocket {
   WebSocketChannel? _channel;
+  final bool useTestServer;
+
+  OwnerTrackLocationSocket({this.useTestServer = false});
 
   bool get isConnected => _channel != null && _channel!.closeCode == null;
 
@@ -82,9 +86,18 @@ class OwnerTrackLocationSocket {
   }) async {
     final token = await SecureStorageHelper().read('access_token') ?? '';
 
-    final wsUrl = Uri.parse(
-      'ws://api-staging.letdem.org/ws/reservations/track-location?token=$token&reservation_id=$reservationId',
-    );
+    // 🧪 TEST MODE: Use local test server
+    final Uri wsUrl;
+    if (useTestServer) {
+      wsUrl = Uri.parse('ws://localhost:8765/test');
+      debugPrint('🧪 [TEST MODE] Connecting to local test server: $wsUrl');
+      debugPrint('🧪 [TEST MODE] Reservation ID: $reservationId (ignored in test mode)');
+    } else {
+      wsUrl = Uri.parse(
+        'ws://api-staging.letdem.org/ws/reservations/track-location?token=$token&reservation_id=$reservationId',
+      );
+      debugPrint('🌐 [PRODUCTION] Connecting to: $wsUrl');
+    }
 
     _channel = WebSocketChannel.connect(wsUrl);
 

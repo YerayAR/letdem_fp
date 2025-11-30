@@ -114,8 +114,7 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                           ),
                         );
                       },
-                      textColor: Colors.white,
-                      color: AppColors.neutral300,
+                      outline: true,
                       // color:
                       //     isReserved
                       //         ? null
@@ -148,10 +147,13 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
 
                     if (!(widget.payload.status == "PENDING"))
                       PrimaryButton(
-                        isLoading: isStateLoading,
+                        isLoading:
+                            context.watch<ActivitiesBloc>().state
+                                is ActivitiesLoading,
                         isDisabled: isStateLoading,
                         text: context.l10n.cancel,
                         color: AppColors.red500,
+
                         textColor: Colors.white,
                         onTap: () {
                           AppPopup.showDialogSheet(
@@ -166,10 +168,9 @@ class _ConfirmedSpaceReviewViewState extends State<ConfirmedSpaceReviewView> {
                                       .l10n
                                       .cancelReservationConfirmationText,
                               onProceed: () {
-                                NavigatorHelper.pop();
                                 context.read<ActivitiesBloc>().add(
                                   CancelReservationEvent(
-                                    reservationId: widget.payload.id,
+                                    reservationId: widget.payload.space.id,
                                   ),
                                 );
                               },

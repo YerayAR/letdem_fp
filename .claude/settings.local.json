@@ -14,7 +14,16 @@
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(flutter gen-l10n:*)",
+      "Bash(flutter build:*)",
+      "Bash(python3:*)",
+      "Bash(source:*)",
+      "Bash(pip install:*)",
+      "Bash(chmod:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter clean:*)",
+      "Bash(flutter analyze:*)"
     ],
     "deny": [],
     "ask": []

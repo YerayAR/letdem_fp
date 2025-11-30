@@ -609,6 +609,7 @@
   "kmPerHour": "Km/h",
   "speedLimit": "Speed limit",
   "codeConfirmation": "Code",
+  "routeDeviationDetected": "Route deviation detected",
   "recalculatingRoute": "Recalculating route...",
   "youHaveArrived": "You have arrived at your destination!",
   "navigatingToParking": "Navigating to parking space",
@@ -999,6 +1000,12 @@
     }
   },
   "myLocation": "My location",
+  "requester": "Requester",
+  "trackingLocation": "Tracking Location",
+  "waitingForLocation": "Waiting for location...",
+  "currentLocation": "Current location",
+  "carPlate": "Car plate",
+  "tracking": "Tracking",
   "zoomIn": "Zoom In",
   "zoomOut": "Zoom Out",
   "toggleView": "Toggle view",
@@ -1119,5 +1126,43 @@
     }
   },
   "waitingForNavigation": "Waiting for navigation to start...",
-  "locationNotAvailable": "Location data not available"
+  "locationNotAvailable": "Location data not available",
+  "stops": "Stops",
+  "onTheWay": "On the way...",
+  "completed": "Completed",
+  "pending": "Pending",
+  "current": "Current",
+  "addAnotherStop": "Add another stop",
+  "addStop": "Add stop",
+  "searchStop": "Search stop...",
+  "customStop": "Custom stop",
+  "stopAddedToRoute": "Stop added to route",
+  "changeRoute": "Change route",
+  "arrivedAtStop": "You arrived at stop: {stopName}",
+  "@arrivedAtStop": {
+    "description": "Toast message when arriving at a stop",
+    "placeholders": {
+      "stopName": {
+        "type": "String",
+        "description": "The name of the stop"
+      }
+    }
+  },
+  "finalDestination": "final destination",
+  "arrivedAtYourStop": "You arrived at your stop!",
+  "continueToNextStop": "Continue to next stop",
+  "goToFinalDestination": "Go to final destination",
+  "findParking": "Find parking",
+  "canSearchParkingOrContinueTo": "You can search for available parking on the map or continue to {destination}",
+  "@canSearchParkingOrContinueTo": {
+    "description": "Message shown when arriving at a stop",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "description": "The next destination"
+      }
+    }
+  },
+  "noMoreRouteOptions": "No more route options were found.",
+  "alternativeRoutes": "Alternative routes"
 }

@@ -1336,6 +1336,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get codeConfirmation => 'Código';
 
   @override
+  String get routeDeviationDetected => 'Desviación de ruta detectada';
+
+  @override
   String get recalculatingRoute => 'Recalculando ruta...';
 
   @override
@@ -2137,6 +2140,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get myLocation => 'Mi ubicación';
 
   @override
+  String get requester => 'Solicitante';
+
+  @override
+  String get trackingLocation => 'Rastreando Ubicación';
+
+  @override
+  String get waitingForLocation => 'Esperando ubicación...';
+
+  @override
+  String get currentLocation => 'Ubicación actual';
+
+  @override
+  String get carPlate => 'Matrícula';
+
+  @override
+  String get tracking => 'Rastreando';
+
+  @override
   String get zoomIn => 'Acercar';
 
   @override
@@ -2500,4 +2521,66 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get locationNotAvailable => 'Ubicación no disponible';
+
+  @override
+  String get stops => 'Paradas';
+
+  @override
+  String get onTheWay => 'En camino...';
+
+  @override
+  String get completed => 'Completada';
+
+  @override
+  String get current => 'Actual';
+
+  @override
+  String get addAnotherStop => 'Añadir otra parada';
+
+  @override
+  String get addStop => 'Añadir parada';
+
+  @override
+  String get searchStop => 'Buscar parada...';
+
+  @override
+  String get customStop => 'Parada personalizada';
+
+  @override
+  String get stopAddedToRoute => 'Parada añadida a la ruta';
+
+  @override
+  String get changeRoute => 'Cambiar ruta';
+
+  @override
+  String arrivedAtStop(String stopName) {
+    return 'Llegaste a parada: $stopName';
+  }
+
+  @override
+  String get finalDestination => 'destino final';
+
+  @override
+  String get arrivedAtYourStop => '¡Llegaste a tu parada!';
+
+  @override
+  String get continueToNextStop => 'Continuar a siguiente parada';
+
+  @override
+  String get goToFinalDestination => 'Ir a destino final';
+
+  @override
+  String get findParking => 'Buscar estacionamiento';
+
+  @override
+  String canSearchParkingOrContinueTo(String destination) {
+    return 'Puedes buscar estacionamiento disponible en el mapa o continuar a $destination';
+  }
+
+  @override
+  String get noMoreRouteOptions =>
+      'No se encontraron más opciones de ruta disponibles.';
+
+  @override
+  String get alternativeRoutes => 'Rutas alternativas';
 }
