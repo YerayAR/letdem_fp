@@ -526,9 +526,15 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
           );
         }
         
-        // Procesar pago con Stripe
+        // Procesar pago con Stripe usando la tarjeta introducida en el CardField
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
+          data: PaymentMethodParams.card(
+            paymentMethodData: const PaymentMethodData(
+                // Aquí podrías añadir billingDetails si quieres, por ejemplo:
+                // billingDetails: BillingDetails(email: userEmail),
+                ),
+          ),
         );
         
         if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
@@ -540,7 +546,11 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             authToken: token,
             paymentIntentId: paymentIntent.id,
           );
-          
+
+          // Actualizar información del usuario (saldo, puntos, etc.)
+          // tras completar la compra.
+          context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+
           setState(() {
             _isProcessing = false;
             _isPurchaseComplete = true;
@@ -550,6 +560,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
         }
       } else {
         // Compra completada directamente (todo de wallet)
+        // Refrescamos el usuario para que el saldo se actualice en la home.
+        context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+
         setState(() {
           _isProcessing = false;
           _isPurchaseComplete = true;

@@ -196,7 +196,9 @@ class LetDemUser extends Equatable {
       ),
       lastName: json['last_name'] ?? '',
       isSocial: json['is_social'] ?? false,
-      totalPoints: 2000, // Temporalmente siempre 2000 puntos para testing
+      // Usar total_points real del backend; fallback a 0 si no viene.
+      totalPoints: (json['total_points'] as int?) ??
+          int.tryParse(json['total_points']?.toString() ?? '0') ?? 0,
       contributions:
           (json['contributions'] as List)
               .map((e) => Activity.fromJson(e))

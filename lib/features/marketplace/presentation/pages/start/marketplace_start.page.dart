@@ -39,35 +39,72 @@ class MarketplaceStartView extends StatelessWidget {
       backgroundColor: const Color(0xffF5F5F5),
       body: StyledBody(
         children: [
-          StyledAppBar(
-            title: 'Inicio',
-            icon: Iconsax.shopping_cart,
+          _buildMarketplaceHeader(context),
+          Expanded(
+            child: BlocBuilder<UserBloc, UserState>(
+              builder: (context, state) {
+                if (state is UserLoaded) {
+                  // Permite arrastrar hacia abajo para refrescar saldo, puntos, etc.
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<UserBloc>().add(
+                            const FetchUserInfoEvent(isSilent: true),
+                          );
+                      // Pequeño delay para dar tiempo al bloc a actualizar.
+                      await Future.delayed(const Duration(milliseconds: 300));
+                    },
+                    child: ListView(
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        _buildVirtualCardCallout(context, state.user.totalPoints),
+                        Dimens.space(2),
+                        _buildEarningsCard(context, state.user.earningAccount),
+                        Dimens.space(1.5),
+                        _buildWalletActionsRow(context),
+                        Dimens.space(3),
+                        _buildMarketplaceGrid(context, state.user.totalPoints),
+                      ],
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarketplaceHeader(BuildContext context) {
+    return SafeArea(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              'Inicio',
+              style: Typo.heading4,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Solo botón de carrito a la derecha
+          GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const CartView()),
               );
             },
-          ),
-          Expanded(
-            child: BlocBuilder<UserBloc, UserState>(
-              builder: (context, state) {
-                if (state is UserLoaded) {
-                  return ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      _buildVirtualCardCallout(context, state.user.totalPoints),
-                      Dimens.space(2),
-                      _buildEarningsCard(context, state.user.earningAccount),
-                      Dimens.space(1.5),
-                      _buildWalletActionsRow(context),
-                      Dimens.space(3),
-                      _buildMarketplaceGrid(context, state.user.totalPoints),
-                    ],
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: AppColors.neutral50,
+              child: Icon(
+                Iconsax.shopping_cart,
+                color: AppColors.neutral500,
+              ),
             ),
           ),
         ],
