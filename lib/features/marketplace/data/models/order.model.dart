@@ -85,9 +85,9 @@ class Order {
               ?.map((item) => OrderItem.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [],
-      itemsCount: (json['items'] as List<dynamic>?)?.length ?? json['items_count'] as int? ?? 0,
-      created: DateTime.parse(json['created_at'] as String? ?? json['created'] as String),
-      modified: DateTime.tryParse(json['modified'] as String? ?? '') ?? DateTime.now(),
+      itemsCount: json['items_count'] as int? ?? 0,
+      created: DateTime.parse(json['created'] as String),
+      modified: DateTime.parse(json['modified'] as String),
     );
   }
 

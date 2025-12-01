@@ -47,7 +47,7 @@ class Product extends Equatable {
       id: json['id'].toString(),
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
-      imageUrl: (json['image_url'] ?? json['imageUrl'] ?? json['image']) as String? ?? '',
+      imageUrl: (json['image_url'] ?? json['imageUrl']) as String? ?? '',
       price: _parseDouble(json['price']),
       discount: _parseDouble(json['discount']),
       stock: json['stock'] as int? ?? 0,

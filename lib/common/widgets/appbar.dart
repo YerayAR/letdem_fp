@@ -23,15 +23,10 @@ class StyledAppBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Text(
-              title,
-              style: Typo.heading4,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
+          Text(
+            title,
+            style: Typo.heading4,
           ),
-          const SizedBox(width: 12),
           Stack(
             children: [
               GestureDetector(
