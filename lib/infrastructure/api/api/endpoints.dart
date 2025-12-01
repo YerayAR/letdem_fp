@@ -127,7 +127,7 @@ class EndPoints {
       Endpoint(url: "/reservations/$id/confirm", method: HTTPMethod.POST);
 
   static Endpoint<ExtendTimeSpaceDTO> extendTimeSpace(String id) =>
-      Endpoint(url: "spaces/$id/extend-expiration", method: HTTPMethod.PUT);
+      Endpoint(url: "/spaces/$id/extend-expiration", method: HTTPMethod.PUT);
 
   static Endpoint deletePayoutMethod(String id) =>
       Endpoint(url: "/credits/payout-methods/$id", method: HTTPMethod.DELETE);

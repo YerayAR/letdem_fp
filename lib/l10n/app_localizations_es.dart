@@ -1351,6 +1351,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get codeConfirmation => 'Código';
 
   @override
+  String get routeDeviationDetected => 'Desviación de ruta detectada';
+
+  @override
   String get recalculatingRoute => 'Recalculando ruta...';
 
   @override
@@ -2150,6 +2153,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get myLocation => 'Mi ubicación';
+
+  @override
+  String get requester => 'Solicitante';
+
+  @override
+  String get trackingLocation => 'Rastreando Ubicación';
+
+  @override
+  String get waitingForLocation => 'Esperando ubicación...';
+
+  @override
+  String get currentLocation => 'Ubicación actual';
+
+  @override
+  String get carPlate => 'Matrícula';
+
+  @override
+  String get tracking => 'Rastreando';
 
   @override
   String get zoomIn => 'Acercar';
