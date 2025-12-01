@@ -802,7 +802,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpAndSupport => 'Ayuda y Soporte';
 
   @override
-  String get vehicleInformation => 'datos de tu vehículo';
+  String get vehicleInformation => 'Datos del vehículo';
+
+  @override
+  String get alias => 'Alias identificativo';
+
+  @override
+  String get enterAlias => 'Ingresa un alias para transferencias';
+
+  @override
+  String get brandModel => 'Marca y modelo';
+
+  @override
+  String get licensePlate => 'Matrícula';
+
+  @override
+  String get noVehicleRegistered => 'No tienes ningún vehículo registrado';
 
   @override
   String get earningsAccount => 'Cuenta de beneficios';
@@ -2523,64 +2538,57 @@ class AppLocalizationsEs extends AppLocalizations {
   String get locationNotAvailable => 'Ubicación no disponible';
 
   @override
-  String get stops => 'Paradas';
+  String get sendMoney => 'Enviar dinero';
 
   @override
-  String get onTheWay => 'En camino...';
+  String get recipientAlias => 'Alias del destinatario';
 
   @override
-  String get completed => 'Completada';
+  String get enterRecipientAlias => 'Ingresa el alias del destinatario';
 
   @override
-  String get current => 'Actual';
+  String get amountToSend => 'Monto a enviar';
 
   @override
-  String get addAnotherStop => 'Añadir otra parada';
+  String get pleaseEnterAlias => 'Por favor ingresa el alias';
 
   @override
-  String get addStop => 'Añadir parada';
+  String get pleaseEnterAmount => 'Por favor ingresa el monto';
 
   @override
-  String get searchStop => 'Buscar parada...';
+  String get enterValidAmount => 'Ingresa un monto válido';
 
   @override
-  String get customStop => 'Parada personalizada';
+  String get sendMoneyTitle => 'Transferir fondos';
 
   @override
-  String get stopAddedToRoute => 'Parada añadida a la ruta';
+  String get sendMoneySubtitle =>
+      'Envía dinero a otro usuario usando su alias identificativo.';
 
   @override
-  String get changeRoute => 'Cambiar ruta';
+  String get sendMoneyWarning =>
+      'Verifica el alias antes de enviar. Las transferencias no se pueden revertir.';
 
   @override
-  String arrivedAtStop(String stopName) {
-    return 'Llegaste a parada: $stopName';
+  String get moneySentSuccessfully => 'Dinero enviado exitosamente';
+
+  @override
+  String moneySentDescription(String amount, String alias) {
+    return 'Has enviado $amount€ a $alias correctamente.';
   }
 
   @override
-  String get finalDestination => 'destino final';
+  String get purchaseHistory => 'Historial de compras';
 
   @override
-  String get arrivedAtYourStop => '¡Llegaste a tu parada!';
+  String get pendingCards => 'Tarjetas pendientes';
 
   @override
-  String get continueToNextStop => 'Continuar a siguiente parada';
+  String get generateCard => 'Generar tarjeta';
 
   @override
-  String get goToFinalDestination => 'Ir a destino final';
+  String get transactionsHistory => 'Historial transacciones';
 
   @override
-  String get findParking => 'Buscar estacionamiento';
-
-  @override
-  String canSearchParkingOrContinueTo(String destination) {
-    return 'Puedes buscar estacionamiento disponible en el mapa o continuar a $destination';
-  }
-
-  @override
-  String get noMoreRouteOptions =>
-      'No se encontraron más opciones de ruta disponibles.';
-
-  @override
-  String get alternativeRoutes => 'Rutas alternativas';
+  String get buy => 'Comprar';
 }

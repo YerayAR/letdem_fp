@@ -4,9 +4,12 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
-import 'package:letdem/features/marketplace/data/marketplace_data.dart';
+import 'package:letdem/features/payment_methods/presentation/views/add_payment_method.view.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
+import '../../../data/models/product.model.dart';
+import '../../../data/models/store.model.dart';
+import '../../../repository/marketplace_repository.dart';
 
 class PurchaseWithoutRedeemView extends StatefulWidget {
   final Product product;
@@ -21,8 +24,7 @@ class PurchaseWithoutRedeemView extends StatefulWidget {
   });
 
   @override
-  State<PurchaseWithoutRedeemView> createState() =>
-      _PurchaseWithoutRedeemViewState();
+  State<PurchaseWithoutRedeemView> createState() => _PurchaseWithoutRedeemViewState();
 }
 
 class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
@@ -42,10 +44,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               children: [
                 _buildHeader(context),
                 Expanded(
-                  child:
-                      _isPurchaseComplete
-                          ? _buildSuccessScreen(total)
-                          : _buildPurchaseForm(total),
+                  child: _isPurchaseComplete
+                      ? _buildSuccessScreen(total)
+                      : _buildPurchaseForm(total),
                 ),
               ],
             ),
@@ -79,7 +80,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
           Expanded(
             child: Text(
               _isPurchaseComplete ? '¡Compra exitosa!' : 'Compra sin canje',
-              style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+              style: Typo.largeBody.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -132,7 +135,11 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(Iconsax.shopping_cart, color: Colors.white, size: 32),
+            child: Icon(
+              Iconsax.shopping_cart,
+              color: Colors.white,
+              size: 32,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -156,7 +163,11 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               ],
             ),
           ),
-          Icon(Iconsax.wallet_2, color: Colors.white, size: 28),
+          Icon(
+            Iconsax.wallet_2,
+            color: Colors.white,
+            size: 28,
+          ),
         ],
       ),
     );
@@ -179,7 +190,11 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               color: AppColors.primary50,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Iconsax.box, color: AppColors.primary500, size: 28),
+            child: Icon(
+              Iconsax.box,
+              color: AppColors.primary500,
+              size: 28,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -188,12 +203,16 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
               children: [
                 Text(
                   widget.product.name,
-                  style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.store.name,
-                  style: Typo.smallBody.copyWith(color: AppColors.neutral500),
+                  style: Typo.smallBody.copyWith(
+                    color: AppColors.neutral500,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -224,7 +243,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
         children: [
           Text(
             'Desglose de precio',
-            style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
+            style: Typo.mediumBody.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -232,11 +253,15 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             children: [
               Text(
                 'Precio unitario',
-                style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
+                style: Typo.mediumBody.copyWith(
+                  color: AppColors.neutral600,
+                ),
               ),
               Text(
                 '\$${widget.product.finalPrice.toStringAsFixed(2)}',
-                style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w600),
+                style: Typo.mediumBody.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -246,11 +271,15 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             children: [
               Text(
                 'Cantidad',
-                style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
+                style: Typo.mediumBody.copyWith(
+                  color: AppColors.neutral600,
+                ),
               ),
               Text(
                 'x${widget.quantity}',
-                style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w600),
+                style: Typo.mediumBody.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -260,7 +289,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             children: [
               Text(
                 'Total a pagar',
-                style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+                style: Typo.largeBody.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               Text(
                 '\$${total.toStringAsFixed(2)}',
@@ -289,7 +320,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
         children: [
           Text(
             'Método de pago',
-            style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
+            style: Typo.mediumBody.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 12),
           Container(
@@ -301,7 +334,10 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
             child: Row(
               children: [
-                Icon(Iconsax.card, color: AppColors.primary500),
+                Icon(
+                  Iconsax.card,
+                  color: AppColors.primary500,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -338,23 +374,22 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
           ),
           elevation: 4,
         ),
-        child:
-            _isProcessing
-                ? SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-                : Text(
-                  'Confirmar compra • \$${total.toStringAsFixed(2)}',
-                  style: Typo.mediumBody.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
+        child: _isProcessing
+            ? SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
                 ),
+              )
+            : Text(
+                'Confirmar compra • \$${total.toStringAsFixed(2)}',
+                style: Typo.mediumBody.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
       ),
     );
   }
@@ -381,13 +416,17 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             const SizedBox(height: 24),
             Text(
               '¡Compra exitosa!',
-              style: Typo.title.copyWith(fontWeight: FontWeight.w700),
+              style: Typo.title.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               'Tu compra ha sido\nprocesada correctamente',
-              style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
+              style: Typo.mediumBody.copyWith(
+                color: AppColors.neutral600,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -453,13 +492,13 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
     try {
       // Obtener token de autenticación
       final token = await SecureStorageHelper().read('access_token');
-
+      
       if (token == null || token.isEmpty) {
         throw Exception('No estás autenticado');
       }
 
       // Llamar al backend para iniciar la compra
-      final response = await MarketplaceRepositoryImpl().purchaseWithoutRedeem(
+      final response = await MarketplaceRepository().purchaseWithoutRedeem(
         productId: widget.product.id,
         quantity: widget.quantity,
         authToken: token,
@@ -469,11 +508,11 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
       if (response['requires_payment'] == true) {
         final clientSecret = response['client_secret'];
         final paymentBreakdown = response['payment_breakdown'];
-
+        
         // Mostrar información de pago
         final fromWallet = paymentBreakdown['from_wallet'];
         final fromStripe = paymentBreakdown['from_stripe'];
-
+        
         if (fromWallet > 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -486,21 +525,31 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
           );
         }
-
-        // Procesar pago con Stripe
+        
+        // Procesar pago con Stripe usando la tarjeta introducida en el CardField
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
+          data: PaymentMethodParams.card(
+            paymentMethodData: const PaymentMethodData(
+                // Aquí podrías añadir billingDetails si quieres, por ejemplo:
+                // billingDetails: BillingDetails(email: userEmail),
+                ),
+          ),
         );
-
+        
         if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
             paymentIntent.status == PaymentIntentsStatus.Succeeded) {
           // Pago exitoso, confirmar compra en backend
-          await MarketplaceRepositoryImpl().purchaseWithoutRedeem(
+          await MarketplaceRepository().purchaseWithoutRedeem(
             productId: widget.product.id,
             quantity: widget.quantity,
             authToken: token,
             paymentIntentId: paymentIntent.id,
           );
+
+          // Actualizar información del usuario (saldo, puntos, etc.)
+          // tras completar la compra.
+          context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
 
           setState(() {
             _isProcessing = false;
@@ -511,6 +560,9 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
         }
       } else {
         // Compra completada directamente (todo de wallet)
+        // Refrescamos el usuario para que el saldo se actualice en la home.
+        context.read<UserBloc>().add(const FetchUserInfoEvent(isSilent: true));
+
         setState(() {
           _isProcessing = false;
           _isPurchaseComplete = true;
@@ -518,7 +570,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
       }
     } on StripeException catch (e) {
       setState(() => _isProcessing = false);
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -530,16 +582,90 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
       );
     } catch (e) {
       setState(() => _isProcessing = false);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Error al procesar la compra: ${e.toString().replaceAll('Exception: ', '')}',
-            style: Typo.mediumBody.copyWith(color: Colors.white),
+      
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
+      
+      // Detectar si necesita configurar método de pago
+      if (errorMessage.contains('configurar un método de pago') ||
+          errorMessage.contains('payment method')) {
+        _showAddPaymentMethodDialog();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error al procesar la compra: $errorMessage',
+              style: Typo.mediumBody.copyWith(color: Colors.white),
+            ),
+            backgroundColor: AppColors.red500,
           ),
-          backgroundColor: AppColors.red500,
-        ),
-      );
+        );
+      }
     }
+  }
+
+  void _showAddPaymentMethodDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(Iconsax.card, color: AppColors.primary500),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Método de pago requerido',
+                style: Typo.mediumBody.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'No tienes fondos suficientes en tu wallet. Debes configurar un método de pago para completar la compra.',
+          style: Typo.mediumBody.copyWith(
+            color: AppColors.neutral600,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancelar',
+              style: Typo.mediumBody.copyWith(
+                color: AppColors.neutral600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Cerrar dialog
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddPaymentMethod(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary500,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Configurar tarjeta',
+              style: Typo.mediumBody.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

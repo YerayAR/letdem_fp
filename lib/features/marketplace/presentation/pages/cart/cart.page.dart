@@ -9,7 +9,7 @@ import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_event.da
 import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_state.dart';
 import 'package:letdem/features/marketplace/data/models/cart_item.model.dart';
 import 'package:letdem/features/marketplace/presentation/pages/cart/cart_checkout.page.dart';
-import 'package:letdem/features/marketplace/presentation/pages/cart/cart_redeem_type_selection.page.dart';
+import 'package:letdem/features/marketplace/presentation/pages/cart/cart_points_selection.page.dart';
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -75,6 +75,29 @@ class CartView extends StatelessWidget {
                     cartState: cartState,
                     availablePoints: availablePoints,
                   ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Seguir comprando',
+                          style: Typo.mediumBody.copyWith(
+                            color: AppColors.primary500,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               );
             },
@@ -132,7 +155,7 @@ class CartView extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Explorar productos',
+                'Seguir comprando',
                 style: Typo.mediumBody.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -262,8 +285,6 @@ class _CartItemCard extends StatelessWidget {
             const SizedBox(height: 12),
             _buildQuantitySelector(context),
             const SizedBox(height: 12),
-            _buildDiscountToggle(context),
-            const SizedBox(height: 12),
             _buildPriceRow(),
           ],
         ),
@@ -327,60 +348,6 @@ class _CartItemCard extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildDiscountToggle(BuildContext context) {
-    final newPointsNeeded = totalPointsNeeded + (item.applyDiscount ? -500 : 500);
-    final hasEnoughPoints = newPointsNeeded <= availablePoints;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: item.applyDiscount ? AppColors.green50 : AppColors.neutral100,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: item.applyDiscount ? AppColors.green600 : AppColors.neutral200,
-        ),
-      ),
-      child: CheckboxListTile(
-        title: Text(
-          'Aplicar 30% descuento',
-          style: Typo.smallBody.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          item.applyDiscount
-              ? 'Ahorro: \$${item.discount.toStringAsFixed(2)} (500 puntos)'
-              : 'Usa 500 puntos para obtener 30% de descuento',
-          style: Typo.smallBody.copyWith(
-            fontSize: 11,
-            color: item.applyDiscount ? AppColors.green600 : AppColors.neutral600,
-          ),
-        ),
-        value: item.applyDiscount,
-        activeColor: AppColors.green600,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-        onChanged: !item.applyDiscount && !hasEnoughPoints
-            ? null
-            : (value) {
-                if (value != null) {
-                  if (!item.applyDiscount && !hasEnoughPoints) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Puntos insuficientes',
-                          style: Typo.mediumBody.copyWith(color: Colors.white),
-                        ),
-                        backgroundColor: AppColors.red500,
-                      ),
-                    );
-                    return;
-                  }
-                  context.read<CartBloc>().add(ToggleDiscountEvent(item.productId));
-                }
-              },
-      ),
     );
   }
 
@@ -582,7 +549,7 @@ class _CartSummary extends StatelessWidget {
                                   value: context.read<UserBloc>(),
                                 ),
                               ],
-                              child: const CartRedeemTypeSelectionView(),
+                              child: const CartPointsSelectionView(),
                             ),
                           ),
                         );
@@ -606,7 +573,7 @@ class _CartSummary extends StatelessWidget {
                 label: Text(
                   insufficientPoints
                       ? 'Puntos insuficientes para canje'
-                      : 'Proceder al canje',
+                      : 'Confirmar con canje',
                   style: Typo.mediumBody.copyWith(
                     color: insufficientPoints ? AppColors.neutral600 : AppColors.purple600,
                     fontWeight: FontWeight.w700,

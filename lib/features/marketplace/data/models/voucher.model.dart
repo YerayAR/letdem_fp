@@ -10,10 +10,10 @@ class Voucher {
   final DateTime? redeemedAt;
   final String userId;
   final String userEmail;
-  final String productId;
+  final String? productId;
   final String productName;
   final double productPrice;
-  final String storeId;
+  final String? storeId;
   final String storeName;
   final String storeCategory;
   final String scannedCode;
@@ -39,10 +39,10 @@ class Voucher {
     this.redeemedAt,
     required this.userId,
     required this.userEmail,
-    required this.productId,
+    this.productId,
     required this.productName,
     required this.productPrice,
-    required this.storeId,
+    this.storeId,
     required this.storeName,
     required this.storeCategory,
     required this.scannedCode,
@@ -59,38 +59,52 @@ class Voucher {
 
   factory Voucher.fromJson(Map<String, dynamic> json) {
     return Voucher(
-      id: json['id'] as String,
-      code: json['code'] as String,
-      qrCode: json['qr_code'] as String? ?? '',
-      redeemType: json['redeem_type'] as String,
-      status: json['status'] as String,
-      discountPercentage: double.parse(json['discount_percentage'].toString()),
-      pointsUsed: json['points_used'] as int,
-      expiresAt: DateTime.parse(json['expires_at'] as String),
-      redeemedAt: json['redeemed_at'] != null
-          ? DateTime.parse(json['redeemed_at'] as String)
+      // En el backend los IDs suelen ser enteros; usamos toString() para admitir int o String.
+      id: json['id'].toString(),
+      code: (json['code'] ?? '').toString(),
+      qrCode: (json['qr_code'] ?? '').toString(),
+      redeemType: (json['redeem_type'] ?? '').toString(),
+      status: (json['status'] ?? '').toString(),
+      discountPercentage: _parseDouble(json['discount_percentage']),
+      pointsUsed: (json['points_used'] as int?) ??
+          int.tryParse(json['points_used']?.toString() ?? '0') ?? 0,
+      expiresAt: DateTime.parse(json['expires_at'].toString()),
+      redeemedAt: json['redeemed_at'] != null &&
+              json['redeemed_at'].toString().isNotEmpty
+          ? DateTime.parse(json['redeemed_at'].toString())
           : null,
-      userId: json['user'] as String,
-      userEmail: json['user_email'] as String? ?? '',
-      productId: json['product'] as String,
-      productName: json['product_name'] as String? ?? '',
-      productPrice: double.parse(json['product_price'].toString()),
-      storeId: json['store'] as String,
-      storeName: json['store_name'] as String? ?? '',
-      storeCategory: json['store_category'] as String? ?? '',
-      scannedCode: json['scanned_code'] as String? ?? '',
+      userId: json['user']?.toString() ?? '',
+      userEmail: (json['user_email'] ?? '').toString(),
+      // product y store pueden venir nulos en vouchers genéricos
+      productId:
+          json['product'] != null ? json['product'].toString() : null,
+      productName: (json['product_name'] ?? '').toString(),
+      productPrice: _parseDouble(json['product_price']),
+      storeId: json['store'] != null ? json['store'].toString() : null,
+      storeName: (json['store_name'] ?? '').toString(),
+      storeCategory: (json['store_category'] ?? '').toString(),
+      scannedCode: (json['scanned_code'] ?? '').toString(),
       isValid: json['is_valid'] as bool? ?? false,
       isExpired: json['is_expired'] as bool? ?? false,
       canCancel: json['can_cancel'] as bool? ?? false,
-      hoursUntilCancellationDeadline:
-          double.parse(json['hours_until_cancellation_deadline'].toString()),
-      hoursUntilExpiration:
-          double.parse(json['hours_until_expiration'].toString()),
-      discountAmount: double.parse(json['discount_amount'].toString()),
-      finalPrice: double.parse(json['final_price'].toString()),
-      created: DateTime.parse(json['created'] as String),
-      modified: DateTime.parse(json['modified'] as String),
+      hoursUntilCancellationDeadline: _parseDouble(
+        json['hours_until_cancellation_deadline'],
+      ),
+      hoursUntilExpiration: _parseDouble(
+        json['hours_until_expiration'],
+      ),
+      discountAmount: _parseDouble(json['discount_amount']),
+      finalPrice: _parseDouble(json['final_price']),
+      created: DateTime.parse(json['created'].toString()),
+      modified: DateTime.parse(json['modified'].toString()),
     );
+  }
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
 
   String get statusDisplay {

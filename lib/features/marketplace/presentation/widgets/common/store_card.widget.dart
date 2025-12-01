@@ -38,29 +38,77 @@ class StoreCard extends StatelessWidget {
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
-                child: Container(
-                  height: 160,
-                  width: double.infinity,
-                  color: AppColors.primary50,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          store.category.icon,
-                          style: const TextStyle(fontSize: 48),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          store.name,
-                          style: Typo.mediumBody.copyWith(
-                            fontWeight: FontWeight.w700,
+                child: store.imageUrl.isNotEmpty
+                    ? Image.network(
+                        store.imageUrl,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 160,
+                            width: double.infinity,
+                            color: AppColors.primary50,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 160,
+                            width: double.infinity,
+                            color: AppColors.primary50,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    store.category.icon,
+                                    style: const TextStyle(fontSize: 48),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    store.name,
+                                    style: Typo.mediumBody.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        height: 160,
+                        width: double.infinity,
+                        color: AppColors.primary50,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                store.category.icon,
+                                style: const TextStyle(fontSize: 48),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                store.name,
+                                style: Typo.mediumBody.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
               ),
               Positioned(
                 top: 8,

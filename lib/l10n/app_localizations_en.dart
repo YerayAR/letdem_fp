@@ -795,7 +795,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpAndSupport => 'Help & Support';
 
   @override
-  String get vehicleInformation => 'vehicle information';
+  String get vehicleInformation => 'Vehicle information';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get enterAlias => 'Enter an alias for transfers';
+
+  @override
+  String get brandModel => 'Brand and model';
+
+  @override
+  String get licensePlate => 'License plate';
+
+  @override
+  String get noVehicleRegistered => 'No vehicle registered';
 
   @override
   String get earningsAccount => 'earnings account';
@@ -2493,63 +2508,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationNotAvailable => 'Location data not available';
 
   @override
-  String get stops => 'Stops';
+  String get sendMoney => 'Send money';
 
   @override
-  String get onTheWay => 'On the way...';
+  String get recipientAlias => 'Recipient alias';
 
   @override
-  String get completed => 'Completed';
+  String get enterRecipientAlias => 'Enter recipient alias';
 
   @override
-  String get current => 'Current';
+  String get amountToSend => 'Amount to send';
 
   @override
-  String get addAnotherStop => 'Add another stop';
+  String get pleaseEnterAlias => 'Please enter alias';
 
   @override
-  String get addStop => 'Add stop';
+  String get pleaseEnterAmount => 'Please enter amount';
 
   @override
-  String get searchStop => 'Search stop...';
+  String get enterValidAmount => 'Enter a valid amount';
 
   @override
-  String get customStop => 'Custom stop';
+  String get sendMoneyTitle => 'Transfer funds';
 
   @override
-  String get stopAddedToRoute => 'Stop added to route';
+  String get sendMoneySubtitle =>
+      'Send money to another user using their alias.';
 
   @override
-  String get changeRoute => 'Change route';
+  String get sendMoneyWarning =>
+      'Verify the alias before sending. Transfers cannot be reversed.';
 
   @override
-  String arrivedAtStop(String stopName) {
-    return 'You arrived at stop: $stopName';
+  String get moneySentSuccessfully => 'Money sent successfully';
+
+  @override
+  String moneySentDescription(String amount, String alias) {
+    return 'You have sent $amount€ to $alias successfully.';
   }
 
   @override
-  String get finalDestination => 'final destination';
+  String get purchaseHistory => 'Purchase history';
 
   @override
-  String get arrivedAtYourStop => 'You arrived at your stop!';
+  String get pendingCards => 'Pending cards';
 
   @override
-  String get continueToNextStop => 'Continue to next stop';
+  String get generateCard => 'Generate card';
 
   @override
-  String get goToFinalDestination => 'Go to final destination';
+  String get transactionsHistory => 'Transactions history';
 
   @override
-  String get findParking => 'Find parking';
-
-  @override
-  String canSearchParkingOrContinueTo(String destination) {
-    return 'You can search for available parking on the map or continue to $destination';
-  }
-
-  @override
-  String get noMoreRouteOptions => 'No more route options were found.';
-
-  @override
-  String get alternativeRoutes => 'Alternative routes';
+  String get buy => 'Buy';
 }
