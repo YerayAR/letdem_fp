@@ -2534,6 +2534,12 @@ abstract class AppLocalizations {
   /// **'Code'**
   String get codeConfirmation;
 
+  /// No description provided for @routeDeviationDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Route deviation detected'**
+  String get routeDeviationDetected;
+
   /// No description provided for @recalculatingRoute.
   ///
   /// In en, this message translates to:
@@ -3955,6 +3961,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My location'**
   String get myLocation;
+
+  /// No description provided for @requester.
+  ///
+  /// In en, this message translates to:
+  /// **'Requester'**
+  String get requester;
+
+  /// No description provided for @trackingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking Location'**
+  String get trackingLocation;
+
+  /// No description provided for @waitingForLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for location...'**
+  String get waitingForLocation;
+
+  /// No description provided for @currentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location'**
+  String get currentLocation;
+
+  /// No description provided for @carPlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Car plate'**
+  String get carPlate;
+
+  /// No description provided for @tracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking'**
+  String get tracking;
 
   /// No description provided for @zoomIn.
   ///

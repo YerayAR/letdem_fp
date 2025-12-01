@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flashy_flushbar/flashy_flushbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,10 +40,13 @@ import 'package:letdem/features/map/presentation/views/navigate/widgets/navigate
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/space_feedback.widget.dart';
 import 'package:letdem/infrastructure/services/map/map_asset_provider.service.dart';
+import 'package:letdem/infrastructure/services/mapbox_search/models/service.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 import 'package:letdem/infrastructure/toast/toast/tone.dart';
 import 'package:letdem/infrastructure/tts/tts/tts.dart';
 import 'package:letdem/infrastructure/ws/web_socket.service.dart';
+import 'package:letdem/models/navigation/navigation_stop.model.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'widgets/navigate_notification_widget.dart';
@@ -165,6 +169,11 @@ class _NavigationViewState extends State<NavigationView> {
   bool _isOpenRoutes = false;
 
   List<HERE.Route> routesList = [];
+
+  // Stops management
+  List<NavigationStop> _navigationStops = [];
+  int _currentStopIndex = -1; // -1 means no stop, going to final destination
+  bool _showStopsList = false;
 
   @override
   void initState() {
@@ -390,13 +399,19 @@ class _NavigationViewState extends State<NavigationView> {
   void _usePreCalculatedRoute(HERE.Route route) {
     debugPrint('📍 Checking pre-calculated route');
     debugPrint('  - Duration: ${route.duration.inMinutes} minutes');
-    debugPrint('  - Distance: ${(route.lengthInMeters / 1000).toStringAsFixed(1)} km');
+    debugPrint(
+      '  - Distance: ${(route.lengthInMeters / 1000).toStringAsFixed(1)} km',
+    );
     debugPrint('  - Sections: ${route.sections.length}');
 
     // Get the route's starting point
     final routeStart = route.geometry.vertices.first;
-    debugPrint('  - Route start: ${routeStart.latitude}, ${routeStart.longitude}');
-    debugPrint('  - Current location: ${_currentLocation?.latitude}, ${_currentLocation?.longitude}');
+    debugPrint(
+      '  - Route start: ${routeStart.latitude}, ${routeStart.longitude}',
+    );
+    debugPrint(
+      '  - Current location: ${_currentLocation?.latitude}, ${_currentLocation?.longitude}',
+    );
 
     // Check if user is close to the route's starting point (within 100 meters)
     if (_currentLocation != null) {
@@ -406,11 +421,15 @@ class _NavigationViewState extends State<NavigationView> {
         routeStart.latitude,
         routeStart.longitude,
       );
-      debugPrint('  - Distance to route start: ${distanceToRouteStart.toStringAsFixed(0)}m');
+      debugPrint(
+        '  - Distance to route start: ${distanceToRouteStart.toStringAsFixed(0)}m',
+      );
 
       // If user is more than 100m from route start, recalculate the route
       if (distanceToRouteStart > 100) {
-        debugPrint('⚠️ User is too far from route start (${distanceToRouteStart.toStringAsFixed(0)}m), recalculating route...');
+        debugPrint(
+          '⚠️ User is too far from route start (${distanceToRouteStart.toStringAsFixed(0)}m), recalculating route...',
+        );
         _calculateRoute(
           _currentLocation!,
           HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
@@ -686,10 +705,7 @@ class _NavigationViewState extends State<NavigationView> {
             // Alternative routes use simple gray/green color
             final polylineColor = const Color.fromARGB(160, 128, 128, 128);
 
-            final sizesMap = {
-              0.0: 6.0,
-              20.0: 6.0,
-            };
+            final sizesMap = {0.0: 6.0, 20.0: 6.0};
 
             final renderSize = HERE.MapMeasureDependentRenderSize(
               HERE.MapMeasureKind.zoomLevel,
@@ -760,6 +776,214 @@ class _NavigationViewState extends State<NavigationView> {
     _routePolylines.clear();
     _routesOnMap.clear();
     debugPrint("🧹 Rutas previas eliminadas del mapa.");
+  }
+
+  // Stops management methods
+  Future<void> addStop(
+    double? latitude,
+    double? longitude,
+    String streetName,
+    String? googlePlaceId,
+  ) async {
+    debugPrint('🛑 Adding stop at ($latitude, $longitude): $streetName');
+    debugPrint('🛑 Google Place ID: $googlePlaceId');
+
+    double finalLat = latitude ?? 0;
+    double finalLng = longitude ?? 0;
+
+    // If coordinates are 0 or null but we have a googlePlaceId, fetch the coordinates
+    if ((finalLat == 0 || finalLng == 0) && googlePlaceId != null) {
+      debugPrint('📍 Fetching coordinates from Google Place ID...');
+      try {
+        var placeDetails = await HereSearchApiService().getPlaceDetailsLatLng(
+          googlePlaceId,
+        );
+        if (placeDetails != null) {
+          finalLat = placeDetails['lat'] as double;
+          finalLng = placeDetails['lng'] as double;
+          debugPrint('✅ Got coordinates: ($finalLat, $finalLng)');
+        }
+      } catch (e) {
+        debugPrint('❌ Error fetching place details: $e');
+        Toast.showError('Could not get location coordinates');
+        return;
+      }
+    }
+
+    // Validate coordinates
+    if (finalLat == 0 || finalLng == 0) {
+      debugPrint('❌ Invalid coordinates: ($finalLat, $finalLng)');
+      Toast.showError('Invalid location coordinates');
+      return;
+    }
+
+    final newStop = NavigationStop(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      streetName: streetName,
+      coordinates: HERE.GeoCoordinates(finalLat, finalLng),
+      status: _navigationStops.isEmpty ? StopStatus.active : StopStatus.pending,
+      orderIndex: _navigationStops.length,
+    );
+
+    setState(() {
+      _navigationStops.add(newStop);
+      // If this is the first stop, set the current index
+      if (_currentStopIndex == -1 && _navigationStops.length == 1) {
+        _currentStopIndex = 0;
+      }
+    });
+
+    // Recalculate route with all stops
+    _recalculateRouteWithStops();
+  }
+
+  void _recalculateRouteWithStops() {
+    if (_currentLocation == null) {
+      debugPrint('❌ Cannot recalculate route: current location is null');
+      return;
+    }
+
+    debugPrint('🔄 Recalculating route with ${_navigationStops.length} stops');
+
+    // Build waypoints list: current location -> stops -> final destination
+    List<HERE.Waypoint> waypoints = [];
+
+    // Start from current location
+    waypoints.add(HERE.Waypoint(_currentLocation!));
+
+    // Add all pending/active stops
+    for (var stop in _navigationStops.where(
+      (s) => s.status != StopStatus.completed,
+    )) {
+      waypoints.add(HERE.Waypoint(stop.coordinates));
+      debugPrint('  📍 Added waypoint for stop: ${stop.streetName}');
+    }
+
+    // Add final destination
+    waypoints.add(
+      HERE.Waypoint(
+        HERE.GeoCoordinates(_actualDestinationLat, _actualDestinationLng),
+      ),
+    );
+
+    _calculateRouteWithWaypoints(waypoints);
+  }
+
+  void _calculateRouteWithWaypoints(List<HERE.Waypoint> waypoints) {
+    debugPrint('🧭 Calculating route with ${waypoints.length} waypoints...');
+
+    setState(() => _isLoading = true);
+
+    if (_routingEngine == null) {
+      try {
+        _routingEngine = HERE.RoutingEngine();
+        debugPrint('✅ Routing Engine initialized.');
+      } on InstantiationException {
+        debugPrint('❌ Initialization of RoutingEngine failed.');
+        setState(() {
+          _errorMessage = "Failed to initialize routing";
+          _isLoading = false;
+        });
+        return;
+      }
+    }
+
+    final carOptions = HERE.CarOptions();
+    carOptions.routeOptions.enableTolls = true;
+    carOptions.routeOptions.optimizationMode = HERE.OptimizationMode.fastest;
+    carOptions.routeOptions.alternatives =
+        0; // No alternatives when using multiple waypoints
+    carOptions.routeOptions.departureTime = DateTime.now();
+    carOptions.routeOptions.trafficOptimizationMode =
+        HERE.TrafficOptimizationMode.timeDependent;
+
+    debugPrint('🚗 Calculating route with waypoints...');
+
+    _routingEngine!.calculateCarRoute(waypoints, carOptions, (
+      HERE.RoutingError? routingError,
+      List<HERE.Route>? routeList,
+    ) async {
+      if (routingError == null && routeList != null && routeList.isNotEmpty) {
+        debugPrint('✅ Route with waypoints calculated successfully');
+
+        final route = routeList.first;
+
+        if (_visualNavigator != null && mounted) {
+          // IMPORTANT: Just update the route on existing navigator
+          // This preserves camera state (locked/unlocked)
+          _visualNavigator!.route = route;
+
+          // Update state values
+          _totalRouteTime = route.duration.inSeconds;
+          _distanceNotifier.value = route.lengthInMeters;
+          routesList = [route];
+
+          // Update UI state BEFORE drawing polylines
+          setState(() {
+            _isLoading = false;
+          });
+
+          // Draw polylines AFTER state update to prevent UI freeze
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _clearPreviousRoutes();
+              _addTrafficAwareRoutePolyline(route);
+              _addDestinationMarker(route);
+            }
+          });
+
+          debugPrint(
+            '✅ Visual navigator updated with new route (stops preserved camera state)',
+          );
+        }
+      } else {
+        debugPrint('❌ Error calculating route with waypoints: $routingError');
+        setState(() {
+          _errorMessage = "Failed to calculate route with stops";
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  NavigationStop? _getCurrentStop() {
+    if (_currentStopIndex == -1 ||
+        _currentStopIndex >= _navigationStops.length) {
+      return null;
+    }
+    return _navigationStops[_currentStopIndex];
+  }
+
+  void _completeCurrentStopAndContinue() {
+    if (_currentStopIndex >= 0 && _currentStopIndex < _navigationStops.length) {
+      setState(() {
+        _navigationStops[_currentStopIndex] =
+            _navigationStops[_currentStopIndex].copyWith(
+              status: StopStatus.completed,
+            );
+
+        // Move to next stop or final destination
+        _currentStopIndex++;
+        if (_currentStopIndex < _navigationStops.length) {
+          _navigationStops[_currentStopIndex] =
+              _navigationStops[_currentStopIndex].copyWith(
+                status: StopStatus.active,
+              );
+        } else {
+          _currentStopIndex = -1; // Going to final destination
+        }
+
+        // Reset arrival flags to allow next arrival detection
+        _hasShownArrivalNotification = false;
+        _hasShownParkingRating = false;
+        _isPopupDisplayed = false;
+      });
+
+      debugPrint('✅ Completed stop, continuing to next destination');
+
+      // Recalculate route to next destination
+      _recalculateRouteWithStops();
+    }
   }
 
   // void _calculateRoute(
@@ -839,7 +1063,9 @@ class _NavigationViewState extends State<NavigationView> {
     }
 
     debugPrint('🧭 Starting visual guidance...');
-    debugPrint('📏 Route length: ${route.lengthInMeters}m, duration: ${route.duration.inMinutes}min');
+    debugPrint(
+      '📏 Route length: ${route.lengthInMeters}m, duration: ${route.duration.inMinutes}min',
+    );
     _configureTTSLanguage();
 
     try {
@@ -1267,6 +1493,14 @@ class _NavigationViewState extends State<NavigationView> {
       _hasShownArrivalNotification = true;
     });
 
+    // Check if we're at a stop or final destination
+    final currentStop = _getCurrentStop();
+    final isAtStop = currentStop != null && _currentStopIndex >= 0;
+
+    debugPrint(
+      '🎯 Arrival detected - At stop: $isAtStop, Stop: ${currentStop?.streetName}',
+    );
+
     // Handle "navigate to car" case - just show arrival, no parking spaces
     if (widget.isNavigatingToCar) {
       AppPopup.showDialogSheet(
@@ -1284,6 +1518,13 @@ class _NavigationViewState extends State<NavigationView> {
       return;
     }
 
+    // If at a stop, show parking popup and then continue to next destination
+    if (isAtStop) {
+      _handleStopArrival(currentStop!, isParkingNavigation);
+      return;
+    }
+
+    // Otherwise, handle final destination arrival as before
     if (!isParkingNavigation) {
       AppPopup.showDialogSheet(
         context,
@@ -1304,6 +1545,154 @@ class _NavigationViewState extends State<NavigationView> {
       );
       putParkingSpacesOnMap();
     }
+  }
+
+  void _handleStopArrival(NavigationStop stop, bool isParkingNavigation) {
+    debugPrint('🛑 Arrived at stop: ${stop.streetName}');
+
+    _showToast(
+      context.l10n.arrivedAtStop(stop.streetName),
+      backgroundColor: AppColors.primary500,
+    );
+
+    // If navigating to a parking space at this stop, show parking rating
+    if (isParkingNavigation && !_hasShownParkingRating && !_isPopupDisplayed) {
+      _showParkingRatingDialogForStop(stop);
+    } else {
+      // Show available parking spaces on the map first
+      putParkingSpacesOnMap();
+
+      // Show arrival popup with option to continue or find parking
+      if (!_isPopupDisplayed) {
+        setState(() {
+          _isPopupDisplayed = true;
+        });
+
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            AppPopup.showDialogSheet(context, _buildStopArrivalDialog(stop));
+          }
+        });
+      }
+    }
+  }
+
+  Widget _buildStopArrivalDialog(NavigationStop stop) {
+    final hasMoreStops = _currentStopIndex < _navigationStops.length - 1;
+    final nextDestination =
+        hasMoreStops
+            ? _navigationStops[_currentStopIndex + 1].streetName
+            : context.l10n.finalDestination;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: AppColors.primary50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.location_on,
+              size: 32,
+              color: AppColors.primary500,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.arrivedAtYourStop,
+            style: Typo.heading4,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            stop.streetName,
+            style: Typo.mediumBody.copyWith(color: AppColors.neutral500),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            context.l10n.canSearchParkingOrContinueTo(nextDestination),
+            style: Typo.smallBody,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          PrimaryButton(
+            onTap: () {
+              NavigatorHelper.pop();
+              _completeCurrentStopAndContinue();
+            },
+            text:
+                hasMoreStops
+                    ? context.l10n.continueToNextStop
+                    : context.l10n.goToFinalDestination,
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () {
+              NavigatorHelper.pop();
+              // User will select parking from map, stay at current stop
+            },
+            child: Text(
+              context.l10n.findParking,
+              style: Typo.mediumBody.copyWith(
+                color: AppColors.primary500,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showParkingRatingDialogForStop(NavigationStop stop) {
+    setState(() {
+      _hasShownParkingRating = true;
+      _isPopupDisplayed = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        if (_currentSpace != null && _currentSpace!.isPremium) {
+          AppPopup.showBottomSheet(
+            context,
+            ParkingRatingWidget(
+              onSubmit: () {
+                debugPrint(
+                  '✅ Stop parking rated, continuing to next destination',
+                );
+                _completeCurrentStopAndContinue();
+              },
+              spaceID: _currentSpace!.id,
+              isOwner: _currentSpace!.isOwner,
+            ),
+          );
+        } else {
+          AppPopup.showBottomSheet(
+            context,
+            ParkingRatingWidget(
+              spaceID: _currentSpace!.id,
+              onSubmit: () {
+                debugPrint(
+                  '✅ Stop parking feedback submitted, continuing to next destination',
+                );
+                _completeCurrentStopAndContinue();
+              },
+              isOwner: _currentSpace!.isOwner,
+            ),
+          );
+        }
+      }
+    });
   }
 
   void _showParkingRatingDialog() {
@@ -1518,16 +1907,28 @@ class _NavigationViewState extends State<NavigationView> {
         _isRecalculatingRoute = true;
         _lastRerouteTime = now;
 
+        // Show deviation detected toast
         _showToast(
-          context.l10n.recalculatingRoute,
-          backgroundColor: AppColors.red500,
+          context.l10n.routeDeviationDetected,
+          backgroundColor: AppColors.secondary500,
         );
 
-        _rerouteDebounceTimer = Timer(const Duration(milliseconds: 2000), () {
+        // Wait a moment, then show recalculating toast and recalculate
+        _rerouteDebounceTimer = Timer(const Duration(milliseconds: 1500), () {
           if (_isRecalculatingRoute && mounted) {
-            _recalculateRouteFromCurrentLocation(
-              routeDeviation.currentLocation.originalLocation.coordinates,
+            _showToast(
+              context.l10n.recalculatingRoute,
+              backgroundColor: AppColors.primary500,
             );
+
+            // Recalculate after showing the toast
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (_isRecalculatingRoute && mounted) {
+                _recalculateRouteFromCurrentLocation(
+                  routeDeviation.currentLocation.originalLocation.coordinates,
+                );
+              }
+            });
           }
         });
       } else {
@@ -1909,7 +2310,9 @@ class _NavigationViewState extends State<NavigationView> {
       try {
         _hereMapController!.mapScene.removeMapPolylines(_routePolylines);
       } catch (e) {
-        debugPrint('⚠️ Error removing polylines in batch, trying individually: $e');
+        debugPrint(
+          '⚠️ Error removing polylines in batch, trying individually: $e',
+        );
         for (var polyline in _routePolylines) {
           try {
             _hereMapController!.mapScene.removeMapPolyline(polyline);
@@ -2376,7 +2779,26 @@ class _NavigationViewState extends State<NavigationView> {
   }
 
   void _showToast(String message, {Color backgroundColor = Colors.black}) {
-    // Toast implementation
+    FlashyFlushbar(
+      messageStyle: Typo.mediumBody.copyWith(
+        color: backgroundColor == Colors.black ? Colors.white : Colors.black,
+      ),
+      message: message,
+      duration: const Duration(seconds: 3),
+      backgroundColor: backgroundColor,
+      animationDuration: const Duration(milliseconds: 500),
+      trailingWidget: IconButton(
+        icon: Icon(
+          Icons.close,
+          color: backgroundColor == Colors.black ? Colors.white : Colors.black,
+          size: 24,
+        ),
+        onPressed: () {
+          FlashyFlushbar.cancel();
+        },
+      ),
+      isDismissible: false,
+    ).show();
   }
 
   @override
@@ -2446,9 +2868,8 @@ class _NavigationViewState extends State<NavigationView> {
                     context,
                     ConfirmationDialog(
                       isError: true,
-                      title: 'Rutas alternativas',
-                      subtext:
-                          'No se encontraron más opciones de ruta disponibles.',
+                      title: context.l10n.alternativeRoutes,
+                      subtext: context.l10n.noMoreRouteOptions,
                       onProceed: () {
                         NavigatorHelper.pop();
                       },
@@ -2493,6 +2914,9 @@ class _NavigationViewState extends State<NavigationView> {
                   _configureTTSLanguage();
                 }
               },
+              onAddStop: addStop,
+              navigationStops: _navigationStops,
+              currentStopIndex: _currentStopIndex,
             ),
           ),
         );

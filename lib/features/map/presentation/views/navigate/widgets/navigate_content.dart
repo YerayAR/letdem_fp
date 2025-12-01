@@ -13,8 +13,10 @@ import '../../../../../../common/widgets/button.dart';
 import '../../../../../../core/constants/assets.dart';
 import '../../../../../../core/constants/colors.dart';
 import '../../../../../../core/constants/dimens.dart';
+import '../../../../../../models/navigation/navigation_stop.model.dart';
 import '../../../../../activities/presentation/bottom_sheets/add_event_sheet.widget.dart';
 import '../../../../../activities/presentation/widgets/search/search_bottom_sheet.widget.dart';
+import '../../../widgets/navigation/stops_list.widget.dart';
 import 'navigate_bottom.dart';
 
 enum _Direction { none, left, straight, right, uTurn }
@@ -52,6 +54,9 @@ class NavigateContent extends StatefulWidget {
     required this.routesList,
     required this.startGuidance,
     required this.indexRoute,
+    this.onAddStop,
+    this.navigationStops,
+    this.currentStopIndex,
   });
 
   final Function(HereMapController)? onMapCreated;
@@ -84,6 +89,15 @@ class NavigateContent extends StatefulWidget {
   final List<HERE.Route> routesList;
   final Function(int indexRoute) startGuidance;
   final int indexRoute;
+  final Function(
+    double? latitude,
+    double? longitude,
+    String streetName,
+    String? pId,
+  )?
+  onAddStop;
+  final List<NavigationStop>? navigationStops;
+  final int? currentStopIndex;
 
   String get distance {
     return "${(totalRouteTime)} ($distanceValue)";
@@ -265,6 +279,36 @@ class _NavigateContentState extends State<NavigateContent>
     );
   }
 
+  void _showStopsList(BuildContext context) {
+    AppPopup.showBottomSheet(
+      context,
+      StopsListWidget(
+        stops: widget.navigationStops!,
+        currentStopIndex: widget.currentStopIndex ?? -1,
+        onDismiss: () => Navigator.pop(context),
+        onAddStop: () {
+          Navigator.pop(context);
+          _showAddStopSheet(context);
+        },
+      ),
+    );
+  }
+
+  void _showAddStopSheet(BuildContext context) {
+    AppPopup.showBottomSheet(
+      context,
+      MapSearchBottomSheet(
+        title: context.l10n.addStop,
+        hintText: context.l10n.searchStop,
+        onLocationSelected: (latitude, longitude, step, pId) {
+          if (widget.onAddStop != null) {
+            widget.onAddStop!(latitude, longitude, step, pId);
+          }
+        },
+      ),
+    );
+  }
+
   Widget _buildLoadingIndicator() {
     return Center(
       child: Container(
@@ -327,24 +371,61 @@ class _NavigateContentState extends State<NavigateContent>
           //     },
           //   ),
           // ),
-          CircleAvatar(
-            radius: widget.buttonRadius,
-            backgroundColor: const Color(0xFFF4F4F4),
-            child: IconButton(
-              icon: SvgPicture.asset(
-                AppAssets.pointAdd,
-                width: 25,
-                height: 25,
-                color: const Color(0xFF445D6F),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              CircleAvatar(
+                radius: widget.buttonRadius,
+                backgroundColor: const Color(0xFFF4F4F4),
+                child: IconButton(
+                  icon: SvgPicture.asset(
+                    AppAssets.pointAdd,
+                    width: 25,
+                    height: 25,
+                    color: const Color(0xFF445D6F),
+                  ),
+                  onPressed: () {
+                    // If there are stops, show the stops list first
+                    if (widget.navigationStops != null &&
+                        widget.navigationStops!.isNotEmpty) {
+                      _showStopsList(context);
+                    } else {
+                      // Otherwise, show search to add first stop
+                      _showAddStopSheet(context);
+                    }
+                  },
+                ),
               ),
-              onPressed: () {
-                // AppPopup.showBottomSheet(context, const AddEventBottomSheet());
-                AppPopup.showBottomSheet(
-                  context,
-                  const MapSearchBottomSheet(title: 'Añadir ruta'),
-                );
-              },
-            ),
+              // Red badge indicator showing stop count
+              if (widget.navigationStops != null &&
+                  widget.navigationStops!.isNotEmpty)
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 20,
+                      minHeight: 20,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${widget.navigationStops!.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const Spacer(),
           Column(
@@ -375,7 +456,7 @@ class _NavigateContentState extends State<NavigateContent>
                 height: 20,
                 color: const Color(0xFF445D6F),
               ),
-              tooltip: 'Cambiar ruta',
+              tooltip: context.l10n.changeRoute,
               onPressed: widget.openRouter,
             ),
           ),

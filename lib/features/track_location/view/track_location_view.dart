@@ -9,17 +9,24 @@ class TrackLocationView extends StatelessWidget {
     super.key,
     required this.payload,
     required this.spaceId,
+    this.useTestServer = true,
   });
 
   final ReservedSpacePayload payload;
   final String spaceId;
 
+  /// If true, connects to localhost test server instead of production
+  /// Set to true when testing with the Python mock server
+  final bool useTestServer;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Track Location")),
       body: BlocProvider(
-        create: (context) => TrackLocationCubit(OwnerTrackLocationSocket()),
+        create:
+            (context) => TrackLocationCubit(
+              OwnerTrackLocationSocket(useTestServer: useTestServer),
+            ),
         child: TrackLocationContent(payload: payload, spaceId: spaceId),
       ),
     );

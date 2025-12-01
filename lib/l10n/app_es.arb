@@ -517,6 +517,7 @@
   "speedLimitWarning": "Estás conduciendo al límite de velocidad, reduce la velocidad",
   "kmPerHour": "Km/h",
   "speedLimit": "Límite de velocidad",
+  "routeDeviationDetected": "Desviación de ruta detectada",
   "recalculatingRoute": "Recalculando ruta...",
   "youHaveArrived": "¡Has llegado a tu destino!",
   "navigatingToParking": "Navegando al aparcamiento de estacionamiento",
@@ -1002,6 +1003,12 @@
   "minsAgo": "min atrás",
   "hoursAgo": "horas atrás",
   "myLocation": "Mi ubicación",
+  "requester": "Solicitante",
+  "trackingLocation": "Rastreando Ubicación",
+  "waitingForLocation": "Esperando ubicación...",
+  "currentLocation": "Ubicación actual",
+  "carPlate": "Matrícula",
+  "tracking": "Rastreando",
   "zoomIn": "Acercar",
   "priceTooltip": "Este es el precio de una plaza de aparcamiento. El precio máximo que puedes establecer es {max} y el mínimo es {min}.",
   "@priceTooltip": {
@@ -1165,5 +1172,43 @@
   "transactionsHistory": "Historial transacciones",
   "buy": "Comprar",
   "waitingForNavigation": "Esperando a que inicie la navegación...",
-  "locationNotAvailable": "Ubicación no disponible"
+  "locationNotAvailable": "Ubicación no disponible",
+  "stops": "Paradas",
+  "onTheWay": "En camino...",
+  "completed": "Completada",
+  "pending": "Pendiente",
+  "current": "Actual",
+  "addAnotherStop": "Añadir otra parada",
+  "addStop": "Añadir parada",
+  "searchStop": "Buscar parada...",
+  "customStop": "Parada personalizada",
+  "stopAddedToRoute": "Parada añadida a la ruta",
+  "changeRoute": "Cambiar ruta",
+  "arrivedAtStop": "Llegaste a parada: {stopName}",
+  "@arrivedAtStop": {
+    "description": "Mensaje de toast al llegar a una parada",
+    "placeholders": {
+      "stopName": {
+        "type": "String",
+        "description": "El nombre de la parada"
+      }
+    }
+  },
+  "finalDestination": "destino final",
+  "arrivedAtYourStop": "¡Llegaste a tu parada!",
+  "continueToNextStop": "Continuar a siguiente parada",
+  "goToFinalDestination": "Ir a destino final",
+  "findParking": "Buscar estacionamiento",
+  "canSearchParkingOrContinueTo": "Puedes buscar estacionamiento disponible en el mapa o continuar a {destination}",
+  "@canSearchParkingOrContinueTo": {
+    "description": "Mensaje mostrado al llegar a una parada",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "description": "El próximo destino"
+      }
+    }
+  },
+  "noMoreRouteOptions": "No se encontraron más opciones de ruta disponibles.",
+  "alternativeRoutes": "Rutas alternativas"
 }

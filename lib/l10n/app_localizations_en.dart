@@ -1340,6 +1340,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get codeConfirmation => 'Code';
 
   @override
+  String get routeDeviationDetected => 'Route deviation detected';
+
+  @override
   String get recalculatingRoute => 'Recalculating route...';
 
   @override
@@ -2128,6 +2131,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myLocation => 'My location';
+
+  @override
+  String get requester => 'Requester';
+
+  @override
+  String get trackingLocation => 'Tracking Location';
+
+  @override
+  String get waitingForLocation => 'Waiting for location...';
+
+  @override
+  String get currentLocation => 'Current location';
+
+  @override
+  String get carPlate => 'Car plate';
+
+  @override
+  String get tracking => 'Tracking';
 
   @override
   String get zoomIn => 'Zoom In';
