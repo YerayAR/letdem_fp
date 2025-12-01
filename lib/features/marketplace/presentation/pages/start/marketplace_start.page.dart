@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
@@ -203,11 +204,18 @@ class MarketplaceStartView extends StatelessWidget {
         _WalletActionButton(
           icon: '',
           label: 'Enviar',
-          onTap: () => NavigatorHelper.to(const SendMoneyView()),
+          onTap: () => _showSendTypeSelection(context),
           useSvg: false,
           iconData: Iconsax.send_2,
         ),
       ],
+    );
+  }
+
+  void _showSendTypeSelection(BuildContext context) {
+    AppPopup.showDialogSheet(
+      context,
+      const _SendTypeSelectionSheet(),
     );
   }
 
@@ -415,6 +423,163 @@ class _WalletActionButton extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SendTypeSelectionSheet extends StatelessWidget {
+  const _SendTypeSelectionSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 250),
+      tween: Tween(begin: 0.9, end: 1.0),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) {
+        return Transform.scale(scale: value, child: child);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    '¿Qué quieres enviar?',
+                    style: Typo.heading4,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                    onPressed: () => NavigatorHelper.pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Elige si quieres enviar dinero o puntos LetDem.',
+              style: Typo.smallBody.copyWith(color: AppColors.neutral500),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _OptionCard(
+                    title: 'Dinero',
+                    subtitle: 'Envia saldo de tu monedero',
+                    icon: Iconsax.money,
+                    color: AppColors.primary500,
+                    onTap: () {
+                      NavigatorHelper.pop();
+                      NavigatorHelper.to(
+                        const SendMoneyView(
+                          initialType: TransferType.money,
+                          showTypeSelector: false,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _OptionCard(
+                    title: 'Puntos',
+                    subtitle: 'Comparte LetDem Points',
+                    icon: Iconsax.cup,
+                    color: AppColors.secondary500,
+                    onTap: () {
+                      NavigatorHelper.pop();
+                      NavigatorHelper.to(
+                        const SendMoneyView(
+                          initialType: TransferType.points,
+                          showTypeSelector: false,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OptionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _OptionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Ink(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: color.withOpacity(0.1),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: Typo.mediumBody.copyWith(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: Typo.smallBody.copyWith(
+                color: AppColors.neutral600,
+                height: 1.3,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1158,5 +1158,42 @@
   "pendingCards": "Pending cards",
   "generateCard": "Generate card",
   "transactionsHistory": "Transactions history",
-  "buy": "Buy"
+  "buy": "Buy",
+  "stops": "Stops",
+  "onTheWay": "On the way...",
+  "completed": "Completed",
+  "current": "Current",
+  "addAnotherStop": "Add another stop",
+  "addStop": "Add stop",
+  "searchStop": "Search stop...",
+  "customStop": "Custom stop",
+  "stopAddedToRoute": "Stop added to the route",
+  "changeRoute": "Change route",
+  "arrivedAtStop": "Arrived at stop: {stopName}",
+  "@arrivedAtStop": {
+    "description": "Toast message when arriving at a stop",
+    "placeholders": {
+      "stopName": {
+        "type": "String",
+        "description": "The name of the stop"
+      }
+    }
+  },
+  "finalDestination": "final destination",
+  "arrivedAtYourStop": "You've arrived at your stop!",
+  "continueToNextStop": "Continue to next stop",
+  "goToFinalDestination": "Go to final destination",
+  "findParking": "Find parking",
+  "canSearchParkingOrContinueTo": "You can search for available parking on the map or continue to {destination}",
+  "@canSearchParkingOrContinueTo": {
+    "description": "Message shown when arriving at a stop",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "description": "The next destination"
+      }
+    }
+  },
+  "noMoreRouteOptions": "No more route options available.",
+  "alternativeRoutes": "Alternative routes"
 }

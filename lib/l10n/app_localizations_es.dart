@@ -2591,4 +2591,66 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get buy => 'Comprar';
+
+  @override
+  String get stops => 'Paradas';
+
+  @override
+  String get onTheWay => 'En camino...';
+
+  @override
+  String get completed => 'Completada';
+
+  @override
+  String get current => 'Actual';
+
+  @override
+  String get addAnotherStop => 'Añadir otra parada';
+
+  @override
+  String get addStop => 'Añadir parada';
+
+  @override
+  String get searchStop => 'Buscar parada...';
+
+  @override
+  String get customStop => 'Parada personalizada';
+
+  @override
+  String get stopAddedToRoute => 'Parada añadida a la ruta';
+
+  @override
+  String get changeRoute => 'Cambiar ruta';
+
+  @override
+  String arrivedAtStop(String stopName) {
+    return 'Llegaste a parada: $stopName';
+  }
+
+  @override
+  String get finalDestination => 'destino final';
+
+  @override
+  String get arrivedAtYourStop => '¡Llegaste a tu parada!';
+
+  @override
+  String get continueToNextStop => 'Continuar a siguiente parada';
+
+  @override
+  String get goToFinalDestination => 'Ir a destino final';
+
+  @override
+  String get findParking => 'Buscar estacionamiento';
+
+  @override
+  String canSearchParkingOrContinueTo(String destination) {
+    return 'Puedes buscar estacionamiento disponible en el mapa o continuar a $destination';
+  }
+
+  @override
+  String get noMoreRouteOptions =>
+      'No se encontraron más opciones de ruta disponibles.';
+
+  @override
+  String get alternativeRoutes => 'Rutas alternativas';
 }

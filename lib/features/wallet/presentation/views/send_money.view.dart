@@ -17,7 +17,17 @@ import 'package:letdem/infrastructure/services/res/navigator.dart';
 import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 class SendMoneyView extends StatefulWidget {
-  const SendMoneyView({super.key});
+  /// Pantalla de envío. Puede comportarse como:
+  /// - Vista combinada (selector interno de dinero/puntos)
+  /// - Vista dedicada (solo dinero o solo puntos), según [initialType] y [showTypeSelector].
+  const SendMoneyView({
+    super.key,
+    this.initialType = TransferType.money,
+    this.showTypeSelector = true,
+  });
+
+  final TransferType initialType;
+  final bool showTypeSelector;
 
   @override
   State<SendMoneyView> createState() => _SendMoneyViewState();
@@ -30,8 +40,14 @@ class _SendMoneyViewState extends State<SendMoneyView> {
   final _aliasController = TextEditingController();
   final _amountController = TextEditingController();
   final _transferRepository = TransferRepository();
-  TransferType _selectedType = TransferType.money;
+  late TransferType _selectedType;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedType = widget.initialType;
+  }
 
   @override
   void dispose() {
@@ -142,7 +158,9 @@ class _SendMoneyViewState extends State<SendMoneyView> {
         body: StyledBody(
           children: [
             StyledAppBar(
-              title: context.l10n.sendMoney,
+              title: _selectedType == TransferType.money
+                  ? context.l10n.sendMoney
+                  : 'Enviar puntos',
               icon: Icons.close,
               onTap: () => NavigatorHelper.pop(),
             ),
@@ -154,8 +172,8 @@ class _SendMoneyViewState extends State<SendMoneyView> {
                   children: [
                     _buildInfoCard(),
                     Dimens.space(3),
-                    _buildTransferTypeSelector(),
-                    Dimens.space(3),
+                    if (widget.showTypeSelector) _buildTransferTypeSelector(),
+                    if (widget.showTypeSelector) Dimens.space(3),
                     TextInputField(
                       prefixIcon: Iconsax.user,
                       label: context.l10n.recipientAlias,
@@ -169,12 +187,15 @@ class _SendMoneyViewState extends State<SendMoneyView> {
                           ? context.l10n.amountToSend
                           : 'Puntos a enviar',
                       controller: _amountController,
-                      placeHolder: _selectedType == TransferType.money ? '0.00' : '0',
+                      placeHolder:
+                          _selectedType == TransferType.money ? '0.00' : '0',
                       inputType: TextFieldType.number,
+                      // Permitimos dígitos, coma y punto. Luego normalizamos a punto
+                      // en _sendMoney() con replaceAll(',', '.').
                       inputFormatters: _selectedType == TransferType.money
                           ? [
                               FilteringTextInputFormatter.allow(
-                                RegExp(r'^\\d*\\.?\\d{0,2}'),
+                                RegExp(r'[0-9.,]'),
                               ),
                             ]
                           : null,
@@ -235,6 +256,19 @@ class _SendMoneyViewState extends State<SendMoneyView> {
   }
 
   Widget _buildInfoCard() {
+    final isMoney = _selectedType == TransferType.money;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    final title = isMoney
+        ? context.l10n.sendMoneyTitle
+        : (locale == 'es' ? 'Enviar puntos' : 'Send points');
+
+    final subtitle = isMoney
+        ? context.l10n.sendMoneySubtitle
+        : (locale == 'es'
+            ? 'Envía puntos LetDem a otro usuario usando su alias.'
+            : 'Send LetDem points to another user using their alias.');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -262,7 +296,7 @@ class _SendMoneyViewState extends State<SendMoneyView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.l10n.sendMoneyTitle,
+                  title,
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary600,
@@ -270,7 +304,7 @@ class _SendMoneyViewState extends State<SendMoneyView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  context.l10n.sendMoneySubtitle,
+                  subtitle,
                   style: Typo.smallBody.copyWith(
                     color: AppColors.primary500,
                     height: 1.4,
@@ -285,6 +319,15 @@ class _SendMoneyViewState extends State<SendMoneyView> {
   }
 
   Widget _buildWarningCard() {
+    final isMoney = _selectedType == TransferType.money;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    final warningText = isMoney
+        ? context.l10n.sendMoneyWarning
+        : (locale == 'es'
+            ? 'Verifica el alias y la cantidad de puntos antes de enviar. No se pueden revertir.'
+            : 'Verify alias and points amount before sending. Transfers cannot be reversed.');
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -301,7 +344,7 @@ class _SendMoneyViewState extends State<SendMoneyView> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              context.l10n.sendMoneyWarning,
+              warningText,
               style: Typo.smallBody.copyWith(
                 color: AppColors.secondary600,
                 fontSize: 12,

@@ -4765,6 +4765,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Buy'**
   String get buy;
+
+  /// No description provided for @stops.
+  ///
+  /// In en, this message translates to:
+  /// **'Stops'**
+  String get stops;
+
+  /// No description provided for @onTheWay.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way...'**
+  String get onTheWay;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @current.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get current;
+
+  /// No description provided for @addAnotherStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another stop'**
+  String get addAnotherStop;
+
+  /// No description provided for @addStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Add stop'**
+  String get addStop;
+
+  /// No description provided for @searchStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Search stop...'**
+  String get searchStop;
+
+  /// No description provided for @customStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom stop'**
+  String get customStop;
+
+  /// No description provided for @stopAddedToRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop added to the route'**
+  String get stopAddedToRoute;
+
+  /// No description provided for @changeRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Change route'**
+  String get changeRoute;
+
+  /// Toast message when arriving at a stop
+  ///
+  /// In en, this message translates to:
+  /// **'Arrived at stop: {stopName}'**
+  String arrivedAtStop(String stopName);
+
+  /// No description provided for @finalDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'final destination'**
+  String get finalDestination;
+
+  /// No description provided for @arrivedAtYourStop.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve arrived at your stop!'**
+  String get arrivedAtYourStop;
+
+  /// No description provided for @continueToNextStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to next stop'**
+  String get continueToNextStop;
+
+  /// No description provided for @goToFinalDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to final destination'**
+  String get goToFinalDestination;
+
+  /// No description provided for @findParking.
+  ///
+  /// In en, this message translates to:
+  /// **'Find parking'**
+  String get findParking;
+
+  /// Message shown when arriving at a stop
+  ///
+  /// In en, this message translates to:
+  /// **'You can search for available parking on the map or continue to {destination}'**
+  String canSearchParkingOrContinueTo(String destination);
+
+  /// No description provided for @noMoreRouteOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'No more route options available.'**
+  String get noMoreRouteOptions;
+
+  /// No description provided for @alternativeRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative routes'**
+  String get alternativeRoutes;
 }
 
 class _AppLocalizationsDelegate
