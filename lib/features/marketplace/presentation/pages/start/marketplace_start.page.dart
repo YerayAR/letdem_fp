@@ -202,7 +202,7 @@ class MarketplaceStartView extends StatelessWidget {
         const SizedBox(width: 12),
         _WalletActionButton(
           icon: '',
-          label: context.l10n.sendMoney,
+          label: 'Enviar',
           onTap: () => NavigatorHelper.to(const SendMoneyView()),
           useSvg: false,
           iconData: Iconsax.send_2,

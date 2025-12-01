@@ -16,6 +16,7 @@ import 'package:letdem/features/scheduled_notifications/repository/schedule_noti
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
 import 'package:letdem/features/withdrawals/dto/withdraw.dto.dart';
+import 'package:letdem/features/wallet/dto/transfers.dto.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
 import '../../../features/activities/dto/extend_time_space.dto.dart';
@@ -84,6 +85,18 @@ class EndPoints {
   static Endpoint getWithdrawals = Endpoint(
     url: "/credits/withdrawals",
     method: HTTPMethod.GET,
+  );
+
+  /// Transferencias de dinero entre usuarios.
+  static Endpoint<MoneyTransferDTO> sendMoneyTransfer = Endpoint(
+    url: "/credits/transfers/money",
+    method: HTTPMethod.POST,
+  );
+
+  /// Transferencias de puntos entre usuarios.
+  static Endpoint<PointsTransferDTO> sendPointsTransfer = Endpoint(
+    url: "/credits/transfers/points",
+    method: HTTPMethod.POST,
   );
 
   static Endpoint<LoginDTO> loginEndpoint = Endpoint(
