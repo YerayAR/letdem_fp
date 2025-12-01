@@ -795,22 +795,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpAndSupport => 'Help & Support';
 
   @override
-  String get vehicleInformation => 'Vehicle information';
-
-  @override
-  String get alias => 'Alias';
-
-  @override
-  String get enterAlias => 'Enter an alias for transfers';
-
-  @override
-  String get brandModel => 'Brand and model';
-
-  @override
-  String get licensePlate => 'License plate';
-
-  @override
-  String get noVehicleRegistered => 'No vehicle registered';
+  String get vehicleInformation => 'vehicle information';
 
   @override
   String get earningsAccount => 'earnings account';
@@ -2508,61 +2493,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationNotAvailable => 'Location data not available';
 
   @override
-  String get sendMoney => 'Send money';
-
-  @override
-  String get recipientAlias => 'Recipient alias';
-
-  @override
-  String get enterRecipientAlias => 'Enter recipient alias';
-
-  @override
-  String get amountToSend => 'Amount to send';
-
-  @override
-  String get pleaseEnterAlias => 'Please enter alias';
-
-  @override
-  String get pleaseEnterAmount => 'Please enter amount';
-
-  @override
-  String get enterValidAmount => 'Enter a valid amount';
-
-  @override
-  String get sendMoneyTitle => 'Transfer funds';
-
-  @override
-  String get sendMoneySubtitle =>
-      'Send money to another user using their alias.';
-
-  @override
-  String get sendMoneyWarning =>
-      'Verify the alias before sending. Transfers cannot be reversed.';
-
-  @override
-  String get moneySentSuccessfully => 'Money sent successfully';
-
-  @override
-  String moneySentDescription(String amount, String alias) {
-    return 'You have sent $amount€ to $alias successfully.';
-  }
-
-  @override
-  String get purchaseHistory => 'Purchase history';
-
-  @override
-  String get pendingCards => 'Pending cards';
-
-  @override
-  String get generateCard => 'Generate card';
-
-  @override
-  String get transactionsHistory => 'Transactions history';
-
-  @override
-  String get buy => 'Buy';
-
-  @override
   String get stops => 'Stops';
 
   @override
@@ -2587,15 +2517,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customStop => 'Custom stop';
 
   @override
-  String get stopAddedToRoute => 'Stop added to the route';
+  String get stopAddedToRoute => 'Stop added to route';
 
   @override
   String get changeRoute => 'Change route';
 
   @override
   String arrivedAtStop(String stopName) {
-    return 'Arrived at stop: $stopName';
+    return 'You arrived at stop: $stopName';
   }
+
+  @override
+  String get purchaseHistory => 'Purchase history';
+
+  @override
+  String get pendingCards => 'Pending cards';
+
+  @override
+  String get generateCard => 'Generate card';
+
+  @override
+  String get transactionsHistory => 'Transactions history';
+
+  @override
+  String get buy => 'Buy';
 
   @override
   String get finalDestination => 'final destination';
@@ -2618,7 +2563,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get noMoreRouteOptions => 'No more route options available.';
+  String get noMoreRouteOptions => 'No more route options were found.';
 
   @override
   String get alternativeRoutes => 'Alternative routes';

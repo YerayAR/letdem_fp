@@ -3,20 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/features/marketplace/data/models/store.model.dart';
+import 'package:letdem/features/marketplace/presentation/widgets/common/product_card.widget.dart';
+
 import '../../bloc/store_products/store_products_bloc.dart';
-import '../../bloc/cart/cart_bloc.dart';
-import '../../bloc/cart/cart_state.dart';
-import '../cart/cart.view.dart';
-import '../../../data/models/store.model.dart';
-import '../../widgets/common/product_card.widget.dart';
 
 class StoreProductsView extends StatefulWidget {
   final Store store;
 
-  const StoreProductsView({
-    super.key,
-    required this.store,
-  });
+  const StoreProductsView({super.key, required this.store});
 
   @override
   State<StoreProductsView> createState() => _StoreProductsViewState();
@@ -48,9 +43,7 @@ class _StoreProductsViewState extends State<StoreProductsView> {
             _buildHeader(context),
             _buildStoreInfo(),
             _buildSearchBar(),
-            Expanded(
-              child: _buildProductsList(context),
-            ),
+            Expanded(child: _buildProductsList(context)),
           ],
         ),
       ),
@@ -70,12 +63,9 @@ class _StoreProductsViewState extends State<StoreProductsView> {
           Expanded(
             child: Text(
               'Catálogo de Productos',
-              style: Typo.largeBody.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
-          _buildCartIcon(context),
         ],
       ),
     );
@@ -109,19 +99,13 @@ class _StoreProductsViewState extends State<StoreProductsView> {
               children: [
                 Text(
                   widget.store.name,
-                  style: Typo.largeBody.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Row(
                   children: [
-                    Icon(
-                      Iconsax.star5,
-                      size: 14,
-                      color: Colors.amber,
-                    ),
+                    Icon(Iconsax.star5, size: 14, color: Colors.amber),
                     const SizedBox(width: 4),
                     Text(
                       '${widget.store.rating.toStringAsFixed(1)} (${widget.store.reviewCount})',
@@ -153,9 +137,7 @@ class _StoreProductsViewState extends State<StoreProductsView> {
         },
         decoration: InputDecoration(
           hintText: 'Buscar productos...',
-          hintStyle: Typo.mediumBody.copyWith(
-            color: AppColors.neutral400,
-          ),
+          hintStyle: Typo.mediumBody.copyWith(color: AppColors.neutral400),
           prefixIcon: Icon(Iconsax.search_normal, color: AppColors.neutral400),
           filled: true,
           fillColor: Colors.white,
@@ -171,7 +153,10 @@ class _StoreProductsViewState extends State<StoreProductsView> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: AppColors.primary500),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
         ),
         style: Typo.mediumBody,
       ),
@@ -182,9 +167,7 @@ class _StoreProductsViewState extends State<StoreProductsView> {
     return BlocBuilder<StoreProductsBloc, StoreProductsState>(
       builder: (context, state) {
         if (state is StoreProductsLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (state is StoreProductsError) {
@@ -192,11 +175,7 @@ class _StoreProductsViewState extends State<StoreProductsView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Iconsax.close_circle,
-                  size: 48,
-                  color: AppColors.red500,
-                ),
+                Icon(Iconsax.close_circle, size: 48, color: AppColors.red500),
                 const SizedBox(height: 16),
                 Text(
                   state.message,
@@ -249,48 +228,6 @@ class _StoreProductsViewState extends State<StoreProductsView> {
         }
 
         return const SizedBox.shrink();
-      },
-    );
-  }
-
-  Widget _buildCartIcon(BuildContext context) {
-    return BlocBuilder<CartBloc, CartState>(
-      builder: (context, state) {
-        final count = (state as CartState).itemCount;
-        return IconButton(
-          icon: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Icon(Iconsax.shopping_cart, color: AppColors.neutral600),
-              if (count > 0)
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      count.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CartView()),
-            );
-          },
-        );
       },
     );
   }

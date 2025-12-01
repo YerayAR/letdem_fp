@@ -356,15 +356,10 @@
     "description": "Reference to LetDem service fees"
   },
   "helpAndSupport": "Help & Support",
-  "vehicleInformation": "Vehicle information",
+  "vehicleInformation": "vehicle information",
   "@vehicleInformation": {
     "description": "Reference to vehicle information"
   },
-  "alias": "Alias",
-  "enterAlias": "Enter an alias for transfers",
-  "brandModel": "Brand and model",
-  "licensePlate": "License plate",
-  "noVehicleRegistered": "No vehicle registered",
   "earningsAccount": "earnings account",
   "@earningsAccount": {
     "description": "Reference to earnings account"
@@ -1132,44 +1127,18 @@
   },
   "waitingForNavigation": "Waiting for navigation to start...",
   "locationNotAvailable": "Location data not available",
-  "sendMoney": "Send money",
-  "recipientAlias": "Recipient alias",
-  "enterRecipientAlias": "Enter recipient alias",
-  "amountToSend": "Amount to send",
-  "pleaseEnterAlias": "Please enter alias",
-  "pleaseEnterAmount": "Please enter amount",
-  "enterValidAmount": "Enter a valid amount",
-  "sendMoneyTitle": "Transfer funds",
-  "sendMoneySubtitle": "Send money to another user using their alias.",
-  "sendMoneyWarning": "Verify the alias before sending. Transfers cannot be reversed.",
-  "moneySentSuccessfully": "Money sent successfully",
-  "moneySentDescription": "You have sent {amount}€ to {alias} successfully.",
-  "@moneySentDescription": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      },
-      "alias": {
-        "type": "String"
-      }
-    }
-  },
-  "purchaseHistory": "Purchase history",
-  "pendingCards": "Pending cards",
-  "generateCard": "Generate card",
-  "transactionsHistory": "Transactions history",
-  "buy": "Buy",
   "stops": "Stops",
   "onTheWay": "On the way...",
   "completed": "Completed",
+  "pending": "Pending",
   "current": "Current",
   "addAnotherStop": "Add another stop",
   "addStop": "Add stop",
   "searchStop": "Search stop...",
   "customStop": "Custom stop",
-  "stopAddedToRoute": "Stop added to the route",
+  "stopAddedToRoute": "Stop added to route",
   "changeRoute": "Change route",
-  "arrivedAtStop": "Arrived at stop: {stopName}",
+  "arrivedAtStop": "You arrived at stop: {stopName}",
   "@arrivedAtStop": {
     "description": "Toast message when arriving at a stop",
     "placeholders": {
@@ -1179,6 +1148,11 @@
       }
     }
   },
+  "purchaseHistory": "Purchase history",
+  "pendingCards": "Pending cards",
+  "generateCard": "Generate card",
+  "transactionsHistory": "Transactions history",
+  "buy": "Buy",
   "finalDestination": "final destination",
   "arrivedAtYourStop": "You've arrived at your stop!",
   "continueToNextStop": "Continue to next stop",
@@ -1194,6 +1168,6 @@
       }
     }
   },
-  "noMoreRouteOptions": "No more route options available.",
+  "noMoreRouteOptions": "No more route options were found.",
   "alternativeRoutes": "Alternative routes"
 }
