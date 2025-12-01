@@ -624,15 +624,9 @@ class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
           );
         }
         
-        // Procesar pago con Stripe usando la tarjeta introducida en el CardField
+        // Procesar pago con Stripe
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
-          data: PaymentMethodParams.card(
-            paymentMethodData: const PaymentMethodData(
-                // Aquí podrías añadir billingDetails si quieres, por ejemplo:
-                // billingDetails: BillingDetails(email: userEmail),
-                ),
-          ),
         );
         
         if (paymentIntent.status == PaymentIntentsStatus.RequiresCapture ||
