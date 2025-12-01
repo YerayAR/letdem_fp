@@ -29,7 +29,7 @@ class ApiService extends BaseApiService {
     required Function(double v) onProgress,
   }) async {
     try {
-      var uri = "${endpoint.baseURL ?? EndPoints.baseURL}${endpoint.url}";
+      var uri = "${EndPoints.baseURL}${endpoint.url}";
 
       // Handle query parameters
       if (endpoint.queryParameter != null) {
@@ -149,7 +149,7 @@ class ApiService extends BaseApiService {
   // Send an HTTP request and handle the response
   static Future<ApiResponse> sendRequest({required Endpoint endpoint}) async {
     try {
-      var url = "${endpoint.baseURL ?? EndPoints.baseURL}${endpoint.url}";
+      var url = "${EndPoints.baseURL}${endpoint.url}";
 
       endpoint.checkDTO();
 

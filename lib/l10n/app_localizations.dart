@@ -1553,38 +1553,8 @@ abstract class AppLocalizations {
   /// Reference to vehicle information
   ///
   /// In en, this message translates to:
-  /// **'Vehicle information'**
+  /// **'vehicle information'**
   String get vehicleInformation;
-
-  /// No description provided for @alias.
-  ///
-  /// In en, this message translates to:
-  /// **'Alias'**
-  String get alias;
-
-  /// No description provided for @enterAlias.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter an alias for transfers'**
-  String get enterAlias;
-
-  /// No description provided for @brandModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Brand and model'**
-  String get brandModel;
-
-  /// No description provided for @licensePlate.
-  ///
-  /// In en, this message translates to:
-  /// **'License plate'**
-  String get licensePlate;
-
-  /// No description provided for @noVehicleRegistered.
-  ///
-  /// In en, this message translates to:
-  /// **'No vehicle registered'**
-  String get noVehicleRegistered;
 
   /// Reference to earnings account
   ///
@@ -4664,107 +4634,119 @@ abstract class AppLocalizations {
   /// **'Location data not available'**
   String get locationNotAvailable;
 
-  /// No description provided for @sendMoney.
+  /// No description provided for @stops.
   ///
   /// In en, this message translates to:
-  /// **'Send money'**
-  String get sendMoney;
+  /// **'Stops'**
+  String get stops;
 
-  /// No description provided for @recipientAlias.
+  /// No description provided for @onTheWay.
   ///
   /// In en, this message translates to:
-  /// **'Recipient alias'**
-  String get recipientAlias;
+  /// **'On the way...'**
+  String get onTheWay;
 
-  /// No description provided for @enterRecipientAlias.
+  /// No description provided for @completed.
   ///
   /// In en, this message translates to:
-  /// **'Enter recipient alias'**
-  String get enterRecipientAlias;
+  /// **'Completed'**
+  String get completed;
 
-  /// No description provided for @amountToSend.
+  /// No description provided for @current.
   ///
   /// In en, this message translates to:
-  /// **'Amount to send'**
-  String get amountToSend;
+  /// **'Current'**
+  String get current;
 
-  /// No description provided for @pleaseEnterAlias.
+  /// No description provided for @addAnotherStop.
   ///
   /// In en, this message translates to:
-  /// **'Please enter alias'**
-  String get pleaseEnterAlias;
+  /// **'Add another stop'**
+  String get addAnotherStop;
 
-  /// No description provided for @pleaseEnterAmount.
+  /// No description provided for @addStop.
   ///
   /// In en, this message translates to:
-  /// **'Please enter amount'**
-  String get pleaseEnterAmount;
+  /// **'Add stop'**
+  String get addStop;
 
-  /// No description provided for @enterValidAmount.
+  /// No description provided for @searchStop.
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid amount'**
-  String get enterValidAmount;
+  /// **'Search stop...'**
+  String get searchStop;
 
-  /// No description provided for @sendMoneyTitle.
+  /// No description provided for @customStop.
   ///
   /// In en, this message translates to:
-  /// **'Transfer funds'**
-  String get sendMoneyTitle;
+  /// **'Custom stop'**
+  String get customStop;
 
-  /// No description provided for @sendMoneySubtitle.
+  /// No description provided for @stopAddedToRoute.
   ///
   /// In en, this message translates to:
-  /// **'Send money to another user using their alias.'**
-  String get sendMoneySubtitle;
+  /// **'Stop added to route'**
+  String get stopAddedToRoute;
 
-  /// No description provided for @sendMoneyWarning.
+  /// No description provided for @changeRoute.
   ///
   /// In en, this message translates to:
-  /// **'Verify the alias before sending. Transfers cannot be reversed.'**
-  String get sendMoneyWarning;
+  /// **'Change route'**
+  String get changeRoute;
 
-  /// No description provided for @moneySentSuccessfully.
+  /// Toast message when arriving at a stop
   ///
   /// In en, this message translates to:
-  /// **'Money sent successfully'**
-  String get moneySentSuccessfully;
+  /// **'You arrived at stop: {stopName}'**
+  String arrivedAtStop(String stopName);
 
-  /// No description provided for @moneySentDescription.
+  /// No description provided for @finalDestination.
   ///
   /// In en, this message translates to:
-  /// **'You have sent {amount}€ to {alias} successfully.'**
-  String moneySentDescription(String amount, String alias);
+  /// **'final destination'**
+  String get finalDestination;
 
-  /// No description provided for @purchaseHistory.
+  /// No description provided for @arrivedAtYourStop.
   ///
   /// In en, this message translates to:
-  /// **'Purchase history'**
-  String get purchaseHistory;
+  /// **'You arrived at your stop!'**
+  String get arrivedAtYourStop;
 
-  /// No description provided for @pendingCards.
+  /// No description provided for @continueToNextStop.
   ///
   /// In en, this message translates to:
-  /// **'Pending cards'**
-  String get pendingCards;
+  /// **'Continue to next stop'**
+  String get continueToNextStop;
 
-  /// No description provided for @generateCard.
+  /// No description provided for @goToFinalDestination.
   ///
   /// In en, this message translates to:
-  /// **'Generate card'**
-  String get generateCard;
+  /// **'Go to final destination'**
+  String get goToFinalDestination;
 
-  /// No description provided for @transactionsHistory.
+  /// No description provided for @findParking.
   ///
   /// In en, this message translates to:
-  /// **'Transactions history'**
-  String get transactionsHistory;
+  /// **'Find parking'**
+  String get findParking;
 
-  /// No description provided for @buy.
+  /// Message shown when arriving at a stop
   ///
   /// In en, this message translates to:
-  /// **'Buy'**
-  String get buy;
+  /// **'You can search for available parking on the map or continue to {destination}'**
+  String canSearchParkingOrContinueTo(String destination);
+
+  /// No description provided for @noMoreRouteOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'No more route options were found.'**
+  String get noMoreRouteOptions;
+
+  /// No description provided for @alternativeRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative routes'**
+  String get alternativeRoutes;
 }
 
 class _AppLocalizationsDelegate
