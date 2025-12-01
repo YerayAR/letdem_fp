@@ -486,7 +486,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             ),
           );
         }
-
+        
         // Procesar pago con Stripe
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
@@ -501,7 +501,7 @@ class _PurchaseWithoutRedeemViewState extends State<PurchaseWithoutRedeemView> {
             authToken: token,
             paymentIntentId: paymentIntent.id,
           );
-
+          
           setState(() {
             _isProcessing = false;
             _isPurchaseComplete = true;

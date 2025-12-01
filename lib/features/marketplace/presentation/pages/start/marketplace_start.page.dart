@@ -28,8 +28,13 @@ class MarketplaceStartView extends StatelessWidget {
         children: [
           StyledAppBar(
             title: 'Inicio',
-            icon: IconlyLight.close_square,
-            onTap: () => Navigator.pop(context),
+            icon: Iconsax.shopping_cart,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartView()),
+              );
+            },
           ),
           Expanded(
             child: BlocBuilder<UserBloc, UserState>(
@@ -40,12 +45,11 @@ class MarketplaceStartView extends StatelessWidget {
                     children: [
                       _buildVirtualCardCallout(context, state.user.totalPoints),
                       Dimens.space(2),
-                      _buildMonetaryBalanceCard(
-                        context,
-                        state.user.earningAccount,
-                      ),
+                      _buildEarningsCard(context, state.user.earningAccount),
+                      Dimens.space(1.5),
+                      _buildWalletActionsRow(context),
                       Dimens.space(3),
-                      _buildActionButtons(context, state.user.totalPoints),
+                      _buildMarketplaceGrid(context, state.user.totalPoints),
                     ],
                   );
                 }
@@ -58,22 +62,9 @@ class MarketplaceStartView extends StatelessWidget {
     );
   }
 
-  Widget _buildMonetaryBalanceCard(
-    BuildContext context,
-    EarningAccount? earningAccount,
-  ) {
-    final walletBalance =
-        earningAccount?.availableBalance ?? earningAccount?.balance ?? 0.0;
-    String currencyCode = 'EUR';
-    if (earningAccount != null && earningAccount.currency.isNotEmpty) {
-      currencyCode = earningAccount.currency.toUpperCase();
-    }
-    final formatter = NumberFormat.simpleCurrency(name: currencyCode);
-    final formattedBalance = formatter.format(walletBalance);
-    final subtitle =
-        earningAccount == null
-            ? 'Activa tu wallet para usar tu saldo en el marketplace.'
-            : 'Saldo disponible para tus compras en Letdem.';
+  Widget _buildEarningsCard(BuildContext context, EarningAccount? earningAccount) {
+    final balance = earningAccount?.balance ?? 0.0;
+    final formattedBalance = '${balance.toStringAsFixed(2)} €';
 
     return Container(
       decoration: BoxDecoration(

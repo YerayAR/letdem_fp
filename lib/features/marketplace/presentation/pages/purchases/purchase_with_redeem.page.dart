@@ -614,7 +614,7 @@ class _PurchaseWithRedeemViewState extends State<PurchaseWithRedeemView> {
             ),
           );
         }
-
+        
         // Procesar pago con Stripe
         final paymentIntent = await Stripe.instance.confirmPayment(
           paymentIntentClientSecret: clientSecret,
