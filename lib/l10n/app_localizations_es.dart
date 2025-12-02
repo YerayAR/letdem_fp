@@ -2495,10 +2495,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar.';
 
   @override
-  String get unhandledError => 'Error no controlado';
+  String get unhandledError => 'Unhandled error';
 
   @override
-  String get paymentFailed => 'Pago Fallido';
+  String get paymentFailed => 'Payment failed';
 
   @override
   String get changePaymentMethod => 'Cambiar método de pago';
@@ -2558,19 +2558,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get purchaseHistory => 'Purchase history';
+  String get purchaseHistory => 'Historial de compras';
 
   @override
-  String get pendingCards => 'Pending cards';
+  String get pendingCards => 'Tarjetas pendientes';
 
   @override
-  String get generateCard => 'Generate card';
+  String get generateCard => 'Generar tarjeta';
 
   @override
-  String get transactionsHistory => 'Transactions history';
+  String get transactionsHistory => 'Historial de transacciones';
 
   @override
-  String get buy => 'Buy';
+  String get buy => 'Comprar';
 
   @override
   String get finalDestination => 'destino final';

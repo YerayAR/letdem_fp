@@ -58,8 +58,8 @@ class StoreCatalogBloc extends Bloc<StoreCatalogEvent, StoreCatalogState> {
     Emitter<StoreCatalogState> emit,
   ) async {
     try {
-      // Convertir el enum a string para enviarlo al backend
-      final categoryName = event.category.name;
+      // Usar el valor esperado por el backend para la categoría
+      final categoryName = event.category.apiValue;
       final stores = await repository.fetchStores(category: categoryName);
 
       if (stores.isEmpty) {

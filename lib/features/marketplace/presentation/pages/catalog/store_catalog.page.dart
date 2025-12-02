@@ -17,6 +17,7 @@ class StoreCatalogView extends StatefulWidget {
 
 class _StoreCatalogViewState extends State<StoreCatalogView> {
   late TextEditingController _searchController;
+  StoreCategory? _selectedCategory;
 
   @override
   void initState() {
@@ -75,9 +76,19 @@ class _StoreCatalogViewState extends State<StoreCatalogView> {
       child: TextField(
         controller: _searchController,
         onChanged: (query) {
+          // Si el usuario escribe texto, limpiamos el filtro de categoría
           if (query.isEmpty) {
-            context.read<StoreCatalogBloc>().add(const FetchStoresEvent());
+            if (_selectedCategory == null) {
+              context.read<StoreCatalogBloc>().add(const FetchStoresEvent());
+            } else {
+              context.read<StoreCatalogBloc>().add(
+                    FilterStoresByCategoryEvent(_selectedCategory!),
+                  );
+            }
           } else {
+            setState(() {
+              _selectedCategory = null;
+            });
             context.read<StoreCatalogBloc>().add(SearchStoresEvent(query));
           }
         },
@@ -129,21 +140,32 @@ class _StoreCatalogViewState extends State<StoreCatalogView> {
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
-        children:
-            StoreCategory.values.map((category) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: CategoryFilterChip(
-                  category: category,
-                  onTap: () {
-                    _searchController.clear();
-                    context.read<StoreCatalogBloc>().add(
-                      FilterStoresByCategoryEvent(category),
-                    );
-                  },
-                ),
-              );
-            }).toList(),
+        children: StoreCategory.values.map((category) {
+          final isSelected = _selectedCategory == category;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: CategoryFilterChip(
+              category: category,
+              isSelected: isSelected,
+              onTap: () {
+                _searchController.clear();
+                setState(() {
+                  if (isSelected) {
+                    _selectedCategory = null;
+                    context
+                        .read<StoreCatalogBloc>()
+                        .add(const FetchStoresEvent());
+                  } else {
+                    _selectedCategory = category;
+                    context
+                        .read<StoreCatalogBloc>()
+                        .add(FilterStoresByCategoryEvent(category));
+                  }
+                });
+              },
+            ),
+          );
+        }).toList(),
       ),
     );
   }

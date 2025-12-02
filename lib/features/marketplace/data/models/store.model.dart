@@ -9,6 +9,25 @@ enum StoreCategory {
   supermarket,
   other;
 
+  String get apiValue {
+    switch (this) {
+      case StoreCategory.clothing:
+        return 'fashion';
+      case StoreCategory.gasoline:
+        return 'gas_station';
+      case StoreCategory.commerce:
+        return 'commerce';
+      case StoreCategory.restaurant:
+        return 'restaurant';
+      case StoreCategory.pharmacy:
+        return 'pharmacy';
+      case StoreCategory.supermarket:
+        return 'supermarket';
+      case StoreCategory.other:
+        return 'other';
+    }
+  }
+
   String get displayName {
     return switch (this) {
       StoreCategory.clothing => 'Ropa',

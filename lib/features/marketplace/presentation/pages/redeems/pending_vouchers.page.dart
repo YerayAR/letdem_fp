@@ -187,18 +187,8 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
   }
 
   Widget _buildFilterBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -222,11 +212,15 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
           _selectedFilter = value;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.purple600 : AppColors.neutral100,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? AppColors.purple600 : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: isSelected ? AppColors.purple600 : AppColors.neutral300,
+          ),
         ),
         child: Text(
           label,
