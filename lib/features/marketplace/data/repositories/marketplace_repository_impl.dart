@@ -10,9 +10,10 @@ import '../../domain/repositories/marketplace_repository.dart';
 
 class MarketplaceRepositoryImpl extends MarketplaceRepository {
   // IMPORTANTE: ajusta la URL con --dart-define=MARKETPLACE_HOST=<url>
+  // Por defecto apunta al backend de staging.
   static const String baseHost = String.fromEnvironment(
     'MARKETPLACE_HOST',
-    defaultValue: 'http://192.168.1.34:8000',
+    defaultValue: 'https://api-staging.letdem.org',
   );
   static const String baseUrl = '$baseHost/v1/marketplace';
 

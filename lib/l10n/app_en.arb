@@ -1148,8 +1148,13 @@
       }
     }
   },
+  "purchaseHistory": "Purchase history",
+  "pendingCards": "Pending cards",
+  "generateCard": "Generate card",
+  "transactionsHistory": "Transactions history",
+  "buy": "Buy",
   "finalDestination": "final destination",
-  "arrivedAtYourStop": "You arrived at your stop!",
+  "arrivedAtYourStop": "You've arrived at your stop!",
   "continueToNextStop": "Continue to next stop",
   "goToFinalDestination": "Go to final destination",
   "findParking": "Find parking",
@@ -1164,5 +1169,30 @@
     }
   },
   "noMoreRouteOptions": "No more route options were found.",
-  "alternativeRoutes": "Alternative routes"
+  "alternativeRoutes": "Alternative routes",
+  "enterValidAmount": "Please enter a valid amount.",
+  "@enterValidAmount": {
+    "description": "Shown when the user enters an invalid amount for transfers."
+  },
+  "moneySentSuccessfully": "Money sent successfully",
+  "moneySentDescription": "You have sent {amount} to {alias}.",
+  "@moneySentDescription": {
+    "description": "Shown after a successful money transfer.",
+    "placeholders": {
+      "amount": {},
+      "alias": {}
+    }
+  },
+  "sendMoney": "Send money",
+  "recipientAlias": "Recipient alias",
+  "enterRecipientAlias": "Enter the recipient alias",
+  "amountToSend": "Amount to send",
+  "alias": "Alias",
+  "enterAlias": "Choose an alias other users can use to send you money",
+  "brandModel": "Car brand / model",
+  "licensePlate": "License plate",
+  "noVehicleRegistered": "No vehicle registered",
+  "sendMoneyTitle": "Send money from your wallet",
+  "sendMoneySubtitle": "Transfer money instantly to another LetDem user using their alias.",
+  "sendMoneyWarning": "Double-check the alias and amount before sending. Transfers cannot be reversed."
 }

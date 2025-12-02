@@ -4700,6 +4700,36 @@ abstract class AppLocalizations {
   /// **'You arrived at stop: {stopName}'**
   String arrivedAtStop(String stopName);
 
+  /// No description provided for @purchaseHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase history'**
+  String get purchaseHistory;
+
+  /// No description provided for @pendingCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending cards'**
+  String get pendingCards;
+
+  /// No description provided for @generateCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate card'**
+  String get generateCard;
+
+  /// No description provided for @transactionsHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions history'**
+  String get transactionsHistory;
+
+  /// No description provided for @buy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get buy;
+
   /// No description provided for @finalDestination.
   ///
   /// In en, this message translates to:
@@ -4709,7 +4739,7 @@ abstract class AppLocalizations {
   /// No description provided for @arrivedAtYourStop.
   ///
   /// In en, this message translates to:
-  /// **'You arrived at your stop!'**
+  /// **'You\'ve arrived at your stop!'**
   String get arrivedAtYourStop;
 
   /// No description provided for @continueToNextStop.
@@ -4747,6 +4777,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Alternative routes'**
   String get alternativeRoutes;
+
+  /// Shown when the user enters an invalid amount for transfers.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid amount.'**
+  String get enterValidAmount;
+
+  /// No description provided for @moneySentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Money sent successfully'**
+  String get moneySentSuccessfully;
+
+  /// Shown after a successful money transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'You have sent {amount} to {alias}.'**
+  String moneySentDescription(Object amount, Object alias);
+
+  /// No description provided for @sendMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Send money'**
+  String get sendMoney;
+
+  /// No description provided for @recipientAlias.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient alias'**
+  String get recipientAlias;
+
+  /// No description provided for @enterRecipientAlias.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the recipient alias'**
+  String get enterRecipientAlias;
+
+  /// No description provided for @amountToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount to send'**
+  String get amountToSend;
+
+  /// No description provided for @alias.
+  ///
+  /// In en, this message translates to:
+  /// **'Alias'**
+  String get alias;
+
+  /// No description provided for @enterAlias.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an alias other users can use to send you money'**
+  String get enterAlias;
+
+  /// No description provided for @brandModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Car brand / model'**
+  String get brandModel;
+
+  /// No description provided for @licensePlate.
+  ///
+  /// In en, this message translates to:
+  /// **'License plate'**
+  String get licensePlate;
+
+  /// No description provided for @noVehicleRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle registered'**
+  String get noVehicleRegistered;
+
+  /// No description provided for @sendMoneyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send money from your wallet'**
+  String get sendMoneyTitle;
+
+  /// No description provided for @sendMoneySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer money instantly to another LetDem user using their alias.'**
+  String get sendMoneySubtitle;
+
+  /// No description provided for @sendMoneyWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-check the alias and amount before sending. Transfers cannot be reversed.'**
+  String get sendMoneyWarning;
 }
 
 class _AppLocalizationsDelegate

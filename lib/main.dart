@@ -51,6 +51,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
 import 'features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
+import 'features/marketplace/presentation/bloc/cart/cart_bloc.dart';
 import 'firebase_options.dart';
 import 'infrastructure/services/notification/notification.service.dart';
 
@@ -258,6 +259,9 @@ void main() async {
                   (context) => StoreCatalogBloc(
                     repository: context.read<MarketplaceRepositoryImpl>(),
                   ),
+            ),
+            BlocProvider(
+              create: (context) => CartBloc(),
             ),
           ],
           child: const AnnotatedRegion<SystemUiOverlayStyle>(
