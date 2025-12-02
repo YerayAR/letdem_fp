@@ -228,6 +228,11 @@
   "noCarRegistered": "Sin coche registrado",
   "registerCarDetails": "Registra tu coche con los detalles\npor seguridad y accesibilidad",
   "tapToRegisterCar": "Toca para registrar coche",
+  "alias": "Alias",
+  "enterAlias": "Elige un alias para que otros usuarios te envíen dinero",
+  "brandModel": "Marca / modelo del coche",
+  "licensePlate": "Matrícula",
+  "noVehicleRegistered": "No hay ningún vehículo registrado",
   "registerCar": "Registrar coche",
   "updateCarDetails": "Actualizar detalles del coche",
   "update": "Actualizar",
@@ -1178,5 +1183,25 @@
     }
   },
   "noMoreRouteOptions": "No se encontraron más opciones de ruta disponibles.",
-  "alternativeRoutes": "Rutas alternativas"
+  "alternativeRoutes": "Rutas alternativas",
+  "enterValidAmount": "Introduce una cantidad válida.",
+  "@enterValidAmount": {
+    "description": "Se muestra cuando el usuario introduce un importe no válido para las transferencias."
+  },
+  "moneySentSuccessfully": "Dinero enviado correctamente",
+  "moneySentDescription": "Has enviado {amount} € a {alias}.",
+  "@moneySentDescription": {
+    "description": "Se muestra después de una transferencia de dinero exitosa.",
+    "placeholders": {
+      "amount": {},
+      "alias": {}
+    }
+  },
+  "sendMoney": "Enviar dinero",
+  "recipientAlias": "Alias del destinatario",
+  "enterRecipientAlias": "Introduce el alias del destinatario",
+  "amountToSend": "Cantidad a enviar",
+  "sendMoneyTitle": "Enviar dinero desde tu monedero",
+  "sendMoneySubtitle": "Transfiere dinero al instante a otro usuario de LetDem usando su alias.",
+  "sendMoneyWarning": "Revisa bien el alias y la cantidad antes de enviar. Las transferencias no se pueden revertir."
 }

@@ -2567,4 +2567,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alternativeRoutes => 'Alternative routes';
+
+  @override
+  String get enterValidAmount => 'Please enter a valid amount.';
+
+  @override
+  String get moneySentSuccessfully => 'Money sent successfully';
+
+  @override
+  String moneySentDescription(Object amount, Object alias) {
+    return 'You have sent $amount to $alias.';
+  }
+
+  @override
+  String get sendMoney => 'Send money';
+
+  @override
+  String get recipientAlias => 'Recipient alias';
+
+  @override
+  String get enterRecipientAlias => 'Enter the recipient alias';
+
+  @override
+  String get amountToSend => 'Amount to send';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get enterAlias =>
+      'Choose an alias other users can use to send you money';
+
+  @override
+  String get brandModel => 'Car brand / model';
+
+  @override
+  String get licensePlate => 'License plate';
+
+  @override
+  String get noVehicleRegistered => 'No vehicle registered';
+
+  @override
+  String get sendMoneyTitle => 'Send money from your wallet';
+
+  @override
+  String get sendMoneySubtitle =>
+      'Transfer money instantly to another LetDem user using their alias.';
+
+  @override
+  String get sendMoneyWarning =>
+      'Double-check the alias and amount before sending. Transfers cannot be reversed.';
 }

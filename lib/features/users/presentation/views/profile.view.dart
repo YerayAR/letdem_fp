@@ -24,6 +24,7 @@ import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.vi
 import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
+import 'package:letdem/features/users/presentation/widgets/profile_menu_item.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
 import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
@@ -64,9 +65,9 @@ class ProfileView extends StatelessWidget {
                     child: ListView(
                       children: [
                         _ProfileHeader(user: state.user),
-                        _MainActionsSection(user: state.user),
-                        const _AccountSettingsSection(),
-                        const _HelpSection(),
+                        const SizedBox(height: 8),
+                        _MenuGridSection(user: state.user),
+                        const SizedBox(height: 16),
                         const _LogoutButton(),
                       ],
                     ),
@@ -211,179 +212,153 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-class _MainActionsSection extends StatelessWidget {
+class _MenuGridSection extends StatelessWidget {
   final LetDemUser user;
 
-  const _MainActionsSection({required this.user});
+  const _MenuGridSection({required this.user});
 
   @override
   Widget build(BuildContext context) {
-    return ProfileSection(
-      child: [
-        SettingsContainer(
-          child: Column(
-            children: [
-              _settingsRow(context.l10n.contributions, IconlyLight.star, () {
-                NavigatorHelper.to(const ViewAllView());
-              }),
-              _settingsRow('Marketplace', IconlyLight.bag_2, () {
-                NavigatorHelper.to(const MarketplaceStartView());
-              }),
-              _settingsRow(
-                context.l10n.scheduledNotifications,
-                IconlyLight.time_circle,
-                () {
-                  NavigatorHelper.to(const ScheduledNotificationsView());
-                },
-              ),
-              _settingsRow(context.l10n.paymentMethods, Iconsax.card, () {
-                NavigatorHelper.to(const PaymentMethodsScreen());
-              }),
-              _settingsRow(
-                context.l10n.reservations,
-                IconlyLight.shield_done,
-                () {
-                  NavigatorHelper.to(ReservationHistory());
-                },
-              ),
-              _buildEarningsRow(context, user),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _settingsRow(String text, IconData icon, VoidCallback onTap) {
-    return SettingsRow(icon: icon, text: text, onTap: onTap);
-  }
-
-  Widget _buildEarningsRow(BuildContext context, LetDemUser user) {
     final earningAccount = user.earningAccount;
     final status = earningAccount?.status;
     final isAccepted = status == EarningStatus.accepted;
 
-    return SettingsRow(
-      icon: IconlyLight.wallet,
-      text: context.l10n.earnings,
-      showDivider: false,
-      leading: isAccepted ? null : _statusChip(context, earningAccount),
-      onTap: () {
-        EarningAccountService.handleEarningAccountTap(
-          context: context,
-          earningAccount: earningAccount,
-          onSuccess: () {
-            NavigatorHelper.to(const WalletScreen());
-          },
-        );
-      },
+    final menuItems = [
+      _MenuItem(
+        icon: IconlyLight.star,
+        text: context.l10n.contributions,
+        color: AppColors.secondary500,
+        onTap: () => NavigatorHelper.to(const ViewAllView()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.bag_2,
+        text: 'Marketplace',
+        color: AppColors.primary500,
+        onTap: () => NavigatorHelper.to(const MarketplaceStartView()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.time_circle,
+        text: context.l10n.scheduledNotifications,
+        color: AppColors.purple600,
+        onTap: () => NavigatorHelper.to(const ScheduledNotificationsView()),
+      ),
+      _MenuItem(
+        icon: Iconsax.card,
+        text: context.l10n.paymentMethods,
+        color: AppColors.green600,
+        onTap: () => NavigatorHelper.to(const PaymentMethodsScreen()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.shield_done,
+        text: context.l10n.reservations,
+        color: AppColors.red500,
+        onTap: () => NavigatorHelper.to(ReservationHistory()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.wallet,
+        text: context.l10n.earnings,
+        color: AppColors.secondary600,
+        badge: isAccepted ? null : _buildEarningsBadge(context, earningAccount),
+        onTap: () {
+          EarningAccountService.handleEarningAccountTap(
+            context: context,
+            earningAccount: earningAccount,
+            onSuccess: () => NavigatorHelper.to(const WalletScreen()),
+          );
+        },
+      ),
+      _MenuItem(
+        icon: IconlyLight.user,
+        text: context.l10n.basicInformation,
+        color: AppColors.neutral600,
+        onTap: () => NavigatorHelper.to(const EditBasicInfoView()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.filter,
+        text: context.l10n.preferences,
+        color: AppColors.primary400,
+        onTap: () => NavigatorHelper.to(const PreferencesView()),
+      ),
+      _MenuItem(
+        icon: Iconsax.global,
+        text: context.l10n.language,
+        color: AppColors.green500,
+        onTap: () => NavigatorHelper.to(const ChangeLanguageView()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.lock,
+        text: context.l10n.security,
+        color: AppColors.red600,
+        onTap: () => NavigatorHelper.to(const SecurityView()),
+      ),
+      _MenuItem(
+        icon: IconlyLight.info_circle,
+        text: context.l10n.help,
+        color: AppColors.neutral500,
+        onTap: () => NavigatorHelper.to(const HelpScreenView()),
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          childAspectRatio: 1.1,
+        ),
+        itemCount: menuItems.length,
+        itemBuilder: (context, index) {
+          final item = menuItems[index];
+          return ProfileMenuItem(
+            icon: item.icon,
+            text: item.text,
+            onTap: item.onTap,
+            iconColor: item.color,
+            badge: item.badge,
+            index: index,
+          );
+        },
+      ),
     );
   }
 
-  Widget _statusChip(BuildContext context, EarningAccount? account) {
-    final color =
-        account == null
-            ? AppColors.green600
-            : account.status == EarningStatus.missingInfo
+  Widget? _buildEarningsBadge(BuildContext context, EarningAccount? account) {
+    final color = account == null
+        ? AppColors.green600
+        : account.status == EarningStatus.missingInfo
             ? Colors.red
             : AppColors.red500;
-    final text =
-        account == null
-            ? context.l10n.connectAccount
-            : getStatusString(account.status, context);
-    return DecoratedChip(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      backgroundColor: color,
-      textStyle: Typo.smallBody.copyWith(
-        color: Colors.white,
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
+
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 1.5),
       ),
-      text: text,
-      color: color,
     );
   }
 }
 
-class _AccountSettingsSection extends StatelessWidget {
-  const _AccountSettingsSection();
+class _MenuItem {
+  final IconData icon;
+  final String text;
+  final Color color;
+  final VoidCallback onTap;
+  final Widget? badge;
 
-  @override
-  Widget build(BuildContext context) {
-    return ProfileSection(
-      child: [
-        SettingsContainer(
-          child: Column(
-            children: [
-              SettingsRow(
-                icon: IconlyLight.user,
-                text: context.l10n.basicInformation,
-                onTap: () {
-                  NavigatorHelper.to(const EditBasicInfoView());
-                },
-              ),
-              SettingsRow(
-                icon: IconlyLight.filter,
-                text: context.l10n.preferences,
-                onTap: () {
-                  NavigatorHelper.to(const PreferencesView());
-                },
-              ),
-              SettingsRow(
-                icon: Iconsax.global,
-                text: context.l10n.language,
-                onTap: () {
-                  NavigatorHelper.to(const ChangeLanguageView());
-                },
-              ),
-              // help
-              // SettingsRow(
-              //   icon: IconlyLight.info_circle,
-              //   text: context.l10n.help,
-              //   onTap: () {
-              //     NavigatorHelper.to(HelpScreenView());
-              //   },
-              // ),
-              SettingsRow(
-                icon: IconlyLight.lock,
-                text: context.l10n.security,
-                showDivider: false,
-                onTap: () {
-                  NavigatorHelper.to(const SecurityView());
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HelpSection extends StatelessWidget {
-  const _HelpSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return ProfileSection(
-      child: [
-        SettingsContainer(
-          child: Column(
-            children: [
-              SettingsRow(
-                showDivider: false,
-                icon: IconlyLight.info_circle,
-                text: context.l10n.help,
-                onTap: () {
-                  NavigatorHelper.to(const HelpScreenView());
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  _MenuItem({
+    required this.icon,
+    required this.text,
+    required this.color,
+    required this.onTap,
+    this.badge,
+  });
 }
 
 class _LogoutButton extends StatelessWidget {

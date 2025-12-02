@@ -2598,4 +2598,54 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get alternativeRoutes => 'Rutas alternativas';
+
+  @override
+  String get enterValidAmount => 'Introduce una cantidad válida.';
+
+  @override
+  String get moneySentSuccessfully => 'Dinero enviado correctamente';
+
+  @override
+  String moneySentDescription(Object amount, Object alias) {
+    return 'Has enviado $amount € a $alias.';
+  }
+
+  @override
+  String get sendMoney => 'Enviar dinero';
+
+  @override
+  String get recipientAlias => 'Alias del destinatario';
+
+  @override
+  String get enterRecipientAlias => 'Introduce el alias del destinatario';
+
+  @override
+  String get amountToSend => 'Cantidad a enviar';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get enterAlias =>
+      'Elige un alias para que otros usuarios te envíen dinero';
+
+  @override
+  String get brandModel => 'Marca / modelo del coche';
+
+  @override
+  String get licensePlate => 'Matrícula';
+
+  @override
+  String get noVehicleRegistered => 'No hay ningún vehículo registrado';
+
+  @override
+  String get sendMoneyTitle => 'Enviar dinero desde tu monedero';
+
+  @override
+  String get sendMoneySubtitle =>
+      'Transfiere dinero al instante a otro usuario de LetDem usando su alias.';
+
+  @override
+  String get sendMoneyWarning =>
+      'Revisa bien el alias y la cantidad antes de enviar. Las transferencias no se pueden revertir.';
 }
