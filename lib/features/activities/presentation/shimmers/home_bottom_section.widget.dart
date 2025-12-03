@@ -15,7 +15,13 @@ import '../../../../infrastructure/services/mapbox_search/models/service.dart';
 
 class HomeMapBottomSection extends StatelessWidget {
   final VoidCallback onRefreshTriggered;
-  const HomeMapBottomSection({super.key, required this.onRefreshTriggered});
+  final VoidCallback onFindNearestCharger;
+
+  const HomeMapBottomSection({
+    super.key,
+    required this.onRefreshTriggered,
+    required this.onFindNearestCharger,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -66,12 +72,37 @@ class HomeMapBottomSection extends StatelessWidget {
               ),
             ),
             Dimens.space(2),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                context.l10n.whatDoYouWantToDo,
-                style: Typo.largeBody.copyWith(fontWeight: FontWeight.w500),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                      context.l10n.whatDoYouWantToDo,
+                      style: Typo.largeBody.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: onFindNearestCharger,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary50,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.battery_charging_full,
+                      color: AppColors.primary500,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
             ),
             Dimens.space(2),
             Row(
