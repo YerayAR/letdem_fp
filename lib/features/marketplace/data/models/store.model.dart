@@ -7,10 +7,26 @@ enum StoreCategory {
   restaurant,
   pharmacy,
   supermarket,
-  technology,
-  sports,
-  automotive,
   other;
+
+  String get apiValue {
+    switch (this) {
+      case StoreCategory.clothing:
+        return 'fashion';
+      case StoreCategory.gasoline:
+        return 'gas_station';
+      case StoreCategory.commerce:
+        return 'commerce';
+      case StoreCategory.restaurant:
+        return 'restaurant';
+      case StoreCategory.pharmacy:
+        return 'pharmacy';
+      case StoreCategory.supermarket:
+        return 'supermarket';
+      case StoreCategory.other:
+        return 'other';
+    }
+  }
 
   String get displayName {
     return switch (this) {
@@ -20,9 +36,6 @@ enum StoreCategory {
       StoreCategory.restaurant => 'Restaurante',
       StoreCategory.pharmacy => 'Farmacia',
       StoreCategory.supermarket => 'Supermercado',
-      StoreCategory.technology => 'Tecnología',
-      StoreCategory.sports => 'Deportes',
-      StoreCategory.automotive => 'Automotriz',
       StoreCategory.other => 'Otro',
     };
   }
@@ -35,9 +48,6 @@ enum StoreCategory {
       StoreCategory.restaurant => '🍽️',
       StoreCategory.pharmacy => '💊',
       StoreCategory.supermarket => '🛒',
-      StoreCategory.technology => '💻',
-      StoreCategory.sports => '⚽',
-      StoreCategory.automotive => '🚗',
       StoreCategory.other => '📍',
     };
   }
@@ -105,7 +115,7 @@ class Store extends Equatable {
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       category: _parseCategoryFromName(categoryName ?? 'other'),
-      imageUrl: (json['image_url'] ?? json['imageUrl'] ?? json['image']) as String? ?? '',
+      imageUrl: (json['image_url'] ?? json['imageUrl']) as String? ?? '',
       latitude: _parseDouble(json['latitude']),
       longitude: _parseDouble(json['longitude']),
       rating: _parseDouble(json['rating']),
@@ -132,23 +142,14 @@ class Store extends Equatable {
       case 'gas_station':
       case 'gasoline':
         return StoreCategory.gasoline;
-      case 'automotive':
-        return StoreCategory.automotive;
       case 'commerce':
-      case 'home':
         return StoreCategory.commerce;
       case 'restaurant':
-      case 'food':
         return StoreCategory.restaurant;
       case 'pharmacy':
-      case 'health':
         return StoreCategory.pharmacy;
       case 'supermarket':
         return StoreCategory.supermarket;
-      case 'technology':
-        return StoreCategory.technology;
-      case 'sports':
-        return StoreCategory.sports;
       default:
         return StoreCategory.other;
     }

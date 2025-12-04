@@ -129,7 +129,7 @@ class _EditBasicInfoViewState extends State<EditBasicInfoView> {
 
                       Dimens.space(2),
 
-                      // Sección de datos del vehículo (solo lectura)
+                      // Datos de vehículo solo lectura
                       _buildVehicleSection(context),
 
                       Dimens.space(2),

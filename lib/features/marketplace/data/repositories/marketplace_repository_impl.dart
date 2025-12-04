@@ -9,48 +9,18 @@ import '../models/voucher.model.dart';
 import '../../domain/repositories/marketplace_repository.dart';
 
 class MarketplaceRepositoryImpl extends MarketplaceRepository {
-  // Host base para marketplace. En STG/PROD debe coincidir con la API principal.
-  // Se puede sobreescribir con --dart-define=MARKETPLACE_HOST=<url>.
-  static const String baseHost = String.fromEnvironment(
-    'MARKETPLACE_HOST',
-    // Por defecto apuntamos a staging para evitar IPs locales en builds CI/dev.
-    defaultValue: 'https://api-staging.letdem.org',
-  );
+  // IMPORTANTE: por ahora apuntamos siempre al servidor de staging directamente,
+  // sin depender de docker ni de MARKPLACE_HOST.
+  static const String baseHost = 'https://api-staging.letdem.org';
   static const String baseUrl = '$baseHost/v1/marketplace';
 
-  // Helper para normalizar URLs de imágenes que vienen del backend
-  // - Reemplaza host localhost/127.0.0.1 por baseHost
-  // - Si la URL es relativa ("/media/..."), la convierte en absoluta usando baseHost
+  // Helper para normalizar URLs que vienen con localhost del backend
   static String _normalizeUrl(String url) {
     if (url.isEmpty) return url;
-
-    // Primero normalizamos localhost -> baseHost
-    var normalized = url
+    // Reemplazar localhost por la IP correcta
+    return url
         .replaceAll('http://localhost:8000', baseHost)
         .replaceAll('http://127.0.0.1:8000', baseHost);
-
-    // Si es ruta relativa, anteponer baseHost
-    if (normalized.startsWith('/')) {
-      return '$baseHost$normalized';
-    }
-
-    // Si es URL absoluta pero apunta a otro host (por ejemplo 192.168.1.34),
-    // reescribimos el host para que sea siempre baseHost, manteniendo path/query.
-    try {
-      final uri = Uri.parse(normalized);
-      final baseUri = Uri.parse(baseHost);
-
-      if (uri.hasScheme && uri.host.isNotEmpty) {
-        if (uri.host != baseUri.host || uri.port != baseUri.port) {
-          final fixed = baseUri.replace(path: uri.path, query: uri.query);
-          return fixed.toString();
-        }
-      }
-    } catch (_) {
-      // Si falla el parseo, devolvemos la versión normalizada tal cual
-    }
-
-    return normalized;
   }
 
   static bool _isHtmlResponse(http.Response response) {
@@ -76,7 +46,7 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
   Never _throwHtmlError(String endpoint) {
     throw Exception(
-      'El backend devolvió HTML al llamar $endpoint. Verifica que la URL $baseUrl sea correcta y que el servidor esté disponible.',
+      'El backend devolvió HTML al llamar $endpoint. Verifica que la URL $baseUrl apunte a tu servidor local y que esté levantado.',
     );
   }
 
@@ -116,11 +86,8 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
         // Normalizar URLs de imágenes
         final normalizedData =
             data.map((item) {
-              // backend expone `image` (ImageField). Lo normalizamos y lo
-              // mapeamos a `image_url` para el modelo Flutter.
-              final raw = item['image_url'] ?? item['image'];
-              if (raw != null && raw is String && raw.isNotEmpty) {
-                item['image_url'] = _normalizeUrl(raw);
+              if (item['image_url'] != null) {
+                item['image_url'] = _normalizeUrl(item['image_url']);
               }
               return item;
             }).toList();
@@ -145,9 +112,8 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final raw = data['image_url'] ?? data['image'];
-        if (raw != null && raw is String && raw.isNotEmpty) {
-          data['image_url'] = _normalizeUrl(raw);
+        if (data['image_url'] != null) {
+          data['image_url'] = _normalizeUrl(data['image_url']);
         }
         return Store.fromJson(data);
       } else {
@@ -195,11 +161,8 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
         // Normalizar URLs de imágenes
         final normalizedData =
             data.map((item) {
-              // backend expone `image` (ImageField). Lo normalizamos y lo
-              // mapeamos a `image_url` para el modelo Flutter.
-              final raw = item['image_url'] ?? item['image'];
-              if (raw != null && raw is String && raw.isNotEmpty) {
-                item['image_url'] = _normalizeUrl(raw);
+              if (item['image_url'] != null) {
+                item['image_url'] = _normalizeUrl(item['image_url']);
               }
               return item;
             }).toList();
@@ -219,9 +182,8 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final raw = data['image_url'] ?? data['image'];
-        if (raw != null && raw is String && raw.isNotEmpty) {
-          data['image_url'] = _normalizeUrl(raw);
+        if (data['image_url'] != null) {
+          data['image_url'] = _normalizeUrl(data['image_url']);
         }
         return Product.fromJson(data);
       } else {
@@ -413,10 +375,14 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
     required String authToken,
   }) async {
     try {
+      // En backend los endpoints de marketplace cuelgan de /v1/marketplace/
+      // baseUrl ya apunta a /v1/marketplace, así que usamos /orders/
       var uri = Uri.parse('$baseUrl/orders/');
+      print('[ORDER_HISTORY] GET '+uri.toString());
 
-      if (status != null) {
+      if (status != null && status.isNotEmpty) {
         uri = uri.replace(queryParameters: {'status': status});
+        print('[ORDER_HISTORY] with status=$status -> '+uri.toString());
       }
 
       final response = await http
@@ -445,6 +411,19 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
         return OrderHistoryResponse.fromJson(data);
       } else if (response.statusCode == 401) {
         throw Exception('No autorizado. Inicia sesión para ver tu historial');
+      } else if (response.statusCode == 404) {
+        // Si el backend devuelve 404, lo interpretamos como "sin historial" para no romper la UX
+        print('[ORDER_HISTORY] 404 recibido, devolviendo historial vacío');
+        return OrderHistoryResponse(
+          orders: const [],
+          stats: OrderHistoryStats(
+            totalOrders: 0,
+            totalSpent: 0,
+            totalPointsUsed: 0,
+            totalSaved: 0,
+            currentPoints: 0,
+          ),
+        );
       } else {
         throw Exception('Error al cargar historial: ${response.statusCode}');
       }

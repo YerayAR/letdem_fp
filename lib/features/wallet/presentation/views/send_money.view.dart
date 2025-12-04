@@ -11,20 +11,43 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
+import 'package:letdem/features/wallet/repository/transfer.repository.dart';
+import 'package:letdem/infrastructure/api/api/models/error.dart';
 import 'package:letdem/infrastructure/services/res/navigator.dart';
+import 'package:letdem/infrastructure/toast/toast/toast.dart';
 
 class SendMoneyView extends StatefulWidget {
-  const SendMoneyView({super.key});
+  /// Pantalla de envío. Puede comportarse como:
+  /// - Vista combinada (selector interno de dinero/puntos)
+  /// - Vista dedicada (solo dinero o solo puntos), según [initialType] y [showTypeSelector].
+  const SendMoneyView({
+    super.key,
+    this.initialType = TransferType.money,
+    this.showTypeSelector = true,
+  });
+
+  final TransferType initialType;
+  final bool showTypeSelector;
 
   @override
   State<SendMoneyView> createState() => _SendMoneyViewState();
 }
 
+enum TransferType { money, points }
+
 class _SendMoneyViewState extends State<SendMoneyView> {
   final _formKey = GlobalKey<FormState>();
   final _aliasController = TextEditingController();
   final _amountController = TextEditingController();
+  final _transferRepository = TransferRepository();
+  late TransferType _selectedType;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedType = widget.initialType;
+  }
 
   @override
   void dispose() {
@@ -36,30 +59,95 @@ class _SendMoneyViewState extends State<SendMoneyView> {
   void _sendMoney() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final recipient = _aliasController.text.trim();
+    final rawAmount = _amountController.text.replaceAll(',', '.').trim();
+
     setState(() => _isLoading = true);
 
-    // Simular envío (mockeado)
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      if (_selectedType == TransferType.money) {
+        final amount = double.tryParse(rawAmount);
+        if (amount == null || amount <= 0) {
+          Toast.showError(context.l10n.enterValidAmount);
+          return;
+        }
+        if (amount < 1.0) {
+          Toast.showError('El mínimo a enviar es 1 €');
+          return;
+        }
 
-    setState(() => _isLoading = false);
+        await _transferRepository.sendMoney(
+          recipientUuid: recipient,
+          amount: amount,
+        );
 
-    if (!mounted) return;
+        if (!mounted) return;
 
-    AppPopup.showDialogSheet(
-      context,
-      SuccessDialog(
-        title: context.l10n.moneySentSuccessfully,
-        subtext: context.l10n.moneySentDescription(
-          _amountController.text,
-          _aliasController.text,
-        ),
-        buttonText: context.l10n.goBack,
-        onProceed: () {
-          NavigatorHelper.pop();
-          NavigatorHelper.pop();
-        },
-      ),
-    );
+        AppPopup.showDialogSheet(
+          context,
+          SuccessDialog(
+            title: context.l10n.moneySentSuccessfully,
+            subtext: context.l10n.moneySentDescription(
+              amount.toStringAsFixed(2),
+              recipient,
+            ),
+            buttonText: context.l10n.goBack,
+            onProceed: () {
+              NavigatorHelper.pop();
+              NavigatorHelper.pop();
+            },
+          ),
+        );
+      } else {
+        // Envío de puntos
+        final points = int.tryParse(rawAmount);
+        if (points == null || points <= 0) {
+          Toast.showError('Introduce un número entero de puntos válido');
+          return;
+        }
+        if (points < 100) {
+          Toast.showError('El mínimo a enviar es 100 puntos');
+          return;
+        }
+
+        await _transferRepository.sendPoints(
+          recipientUuid: recipient,
+          points: points,
+        );
+
+        if (!mounted) return;
+
+        AppPopup.showDialogSheet(
+          context,
+          SuccessDialog(
+            title: 'Puntos enviados',
+            subtext: 'Has enviado $points puntos a $recipient.',
+            buttonText: context.l10n.goBack,
+            onProceed: () {
+              NavigatorHelper.pop();
+              NavigatorHelper.pop();
+            },
+          ),
+        );
+      }
+    } on ApiError catch (e) {
+      if (!mounted) return;
+
+      String message = e.message;
+      if (e.status == ErrorStatus.badRequest &&
+          message.toLowerCase().contains('insufficient')) {
+        // Backend puede devolver "Insufficient balance" o "Insufficient points".
+        message = context.l10n.insufficientBalance;
+      }
+      Toast.showError(message);
+    } catch (_) {
+      if (!mounted) return;
+      Toast.showError(context.l10n.somethingWentWrongGeneric);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -70,7 +158,9 @@ class _SendMoneyViewState extends State<SendMoneyView> {
         body: StyledBody(
           children: [
             StyledAppBar(
-              title: context.l10n.sendMoney,
+              title: _selectedType == TransferType.money
+                  ? context.l10n.sendMoney
+                  : 'Enviar puntos',
               icon: Icons.close,
               onTap: () => NavigatorHelper.pop(),
             ),
@@ -82,6 +172,8 @@ class _SendMoneyViewState extends State<SendMoneyView> {
                   children: [
                     _buildInfoCard(),
                     Dimens.space(3),
+                    if (widget.showTypeSelector) _buildTransferTypeSelector(),
+                    if (widget.showTypeSelector) Dimens.space(3),
                     TextInputField(
                       prefixIcon: Iconsax.user,
                       label: context.l10n.recipientAlias,
@@ -91,20 +183,29 @@ class _SendMoneyViewState extends State<SendMoneyView> {
                     Dimens.space(2),
                     TextInputField(
                       prefixIcon: Iconsax.money,
-                      label: context.l10n.amountToSend,
+                      label: _selectedType == TransferType.money
+                          ? context.l10n.amountToSend
+                          : 'Puntos a enviar',
                       controller: _amountController,
-                      placeHolder: '0.00',
+                      placeHolder:
+                          _selectedType == TransferType.money ? '0.00' : '0',
                       inputType: TextFieldType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-                      ],
+                      // Permitimos dígitos, coma y punto. Luego normalizamos a punto
+                      // en _sendMoney() con replaceAll(',', '.').
+                      inputFormatters: _selectedType == TransferType.money
+                          ? [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9.,]'),
+                              ),
+                            ]
+                          : null,
                     ),
                     Dimens.space(3),
                     _buildWarningCard(),
                     Dimens.space(4),
                     PrimaryButton(
                       onTap: _sendMoney,
-                      text: context.l10n.sendMoney,
+                      text: 'Enviar',
                       isLoading: _isLoading,
                     ),
                   ],
@@ -117,7 +218,57 @@ class _SendMoneyViewState extends State<SendMoneyView> {
     );
   }
 
+  Widget _buildTransferTypeSelector() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.neutral50,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: ChoiceChip(
+              label: const Text('Dinero'),
+              selected: _selectedType == TransferType.money,
+              onSelected: (_) {
+                setState(() {
+                  _selectedType = TransferType.money;
+                });
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ChoiceChip(
+              label: const Text('Puntos'),
+              selected: _selectedType == TransferType.points,
+              onSelected: (_) {
+                setState(() {
+                  _selectedType = TransferType.points;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoCard() {
+    final isMoney = _selectedType == TransferType.money;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    final title = isMoney
+        ? context.l10n.sendMoneyTitle
+        : (locale == 'es' ? 'Enviar puntos' : 'Send points');
+
+    final subtitle = isMoney
+        ? context.l10n.sendMoneySubtitle
+        : (locale == 'es'
+            ? 'Envía puntos LetDem a otro usuario usando su alias.'
+            : 'Send LetDem points to another user using their alias.');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -145,7 +296,7 @@ class _SendMoneyViewState extends State<SendMoneyView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.l10n.sendMoneyTitle,
+                  title,
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary600,
@@ -153,7 +304,7 @@ class _SendMoneyViewState extends State<SendMoneyView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  context.l10n.sendMoneySubtitle,
+                  subtitle,
                   style: Typo.smallBody.copyWith(
                     color: AppColors.primary500,
                     height: 1.4,
@@ -168,6 +319,15 @@ class _SendMoneyViewState extends State<SendMoneyView> {
   }
 
   Widget _buildWarningCard() {
+    final isMoney = _selectedType == TransferType.money;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    final warningText = isMoney
+        ? context.l10n.sendMoneyWarning
+        : (locale == 'es'
+            ? 'Verifica el alias y la cantidad de puntos antes de enviar. No se pueden revertir.'
+            : 'Verify alias and points amount before sending. Transfers cannot be reversed.');
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -184,7 +344,7 @@ class _SendMoneyViewState extends State<SendMoneyView> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              context.l10n.sendMoneyWarning,
+              warningText,
               style: Typo.smallBody.copyWith(
                 color: AppColors.secondary600,
                 fontSize: 12,

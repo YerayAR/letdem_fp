@@ -115,7 +115,7 @@ class PrimaryButton extends StatelessWidget {
         }
       },
       child: Container(
-        padding: padding,
+        padding: padding ?? const EdgeInsets.symmetric(horizontal: 18),
         height: padding != null ? null : 55,
         width: double.infinity,
         decoration: BoxDecoration(
@@ -149,76 +149,61 @@ class PrimaryButton extends StatelessWidget {
                       LoadingIndicator(
                         color: loadingIndicatorColor ?? Colors.white,
                       ),
-                      // const SizedBox(width: 10),
-                      // Text(
-                      //   randomLoadingText,
-                      //   style: TextStyle(
-                      //     fontSize: 14,
-                      //     fontWeight: FontWeight.w600,
-                      //     color: Colors.white.withOpacity(0.5),
-                      //   ),
-                      // ),
                     ],
                   )
                   : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children:
-                            widgetImage != null
-                                ? [widgetImage!, Dimens.space(1)]
-                                : icon != null
-                                ? [
-                                  Icon(
-                                    icon,
-                                    color:
-                                        outline
-                                            ? color ?? AppColors.primary500
-                                            : textColor ??
-                                                (isDisabled
-                                                    ? Colors.white.withOpacity(
-                                                      0.8,
-                                                    )
-                                                    : Colors.white),
-                                    size: 18,
-                                  ),
-                                  Dimens.space(1),
-                                ]
-                                : [],
-                      ),
-                      Text(
-                        text,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight:
-                              icon != null ? FontWeight.w700 : FontWeight.w600,
-                          color:
-                              textColor ??
-                              (isDisabled
-                                  ? Colors.white.withOpacity(0.8)
-                                  : outline
-                                  ? color ?? AppColors.primary500
-                                  : Colors.white),
+                      if (widgetImage != null) ...[
+                        widgetImage!,
+                        Dimens.space(1),
+                      ],
+                      if (icon != null) ...[
+                        Icon(
+                          icon,
+                          color: outline
+                              ? color ?? AppColors.primary500
+                              : textColor ??
+                                  (isDisabled
+                                      ? Colors.white.withOpacity(0.8)
+                                      : Colors.white),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 4),
+                      ],
+                      Flexible(
+                        child: Text(
+                          text,
+                          maxLines: 2,
+                          softWrap: true,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.visible,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight:
+                                icon != null ? FontWeight.w700 : FontWeight.w600,
+                            color: textColor ??
+                                (isDisabled
+                                    ? Colors.white.withOpacity(0.8)
+                                    : outline
+                                        ? color ?? AppColors.primary500
+                                        : Colors.white),
+                          ),
                         ),
                       ),
-                      Row(
-                        children:
-                            iconRight != null
-                                ? [
-                                  Dimens.space(1),
-                                  Icon(
-                                    iconRight,
-                                    color:
-                                        isDisabled
-                                            ? Colors.white.withOpacity(0.8)
-                                            : outline
-                                            ? color ?? AppColors.primary500
-                                            : Colors.white,
-                                    size: 18,
-                                  ),
-                                ]
-                                : [],
-                      ),
+                      if (iconRight != null) ...[
+                        Dimens.space(1),
+                        Icon(
+                          iconRight!,
+                          color: isDisabled
+                              ? Colors.white.withOpacity(0.8)
+                              : outline
+                                  ? color ?? AppColors.primary500
+                                  : Colors.white,
+                          size: 18,
+                        ),
+                      ],
                     ],
                   ),
         ),

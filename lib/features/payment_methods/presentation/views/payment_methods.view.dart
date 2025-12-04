@@ -153,16 +153,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               const Spacer(),
               Row(
                 children: [
-                  SizedBox(
-                    child: !isDefault
-                        ? null
-                        : DecoratedChip(
-                            text: context.l10n.defaultPayment,
-                            backgroundColor: AppColors.secondary50,
-                            color: AppColors.secondary600,
-                          ),
-                  ),
-                  Dimens.space(1),
+                  // Icono de opciones
                   GestureDetector(
                     onTap: () {
                       AppPopup.showBottomSheet(
@@ -206,6 +197,16 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               ),
             ],
           ),
+          if (isDefault) ...[
+            Dimens.space(1),
+            Text(
+              context.l10n.defaultCardTagline,
+              style: Typo.smallBody.copyWith(
+                color: AppColors.neutral500,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
         ],
       ),
     );

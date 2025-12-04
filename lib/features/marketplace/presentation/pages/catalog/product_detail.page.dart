@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:letdem/core/constants/colors.dart';
-import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
+import 'package:letdem/features/marketplace/data/models/store.model.dart';
 import 'package:letdem/features/users/user_bloc.dart';
+
 import '../../../data/models/product.model.dart';
-import '../../../data/models/store.model.dart';
 import '../../../data/models/cart_item.model.dart';
-import '../cart/cart.view.dart';
-import '../redeems/redeem_type_selection.page.dart';
-import '../purchases/purchase_redeem_question.page.dart';
 import '../../bloc/cart/cart_bloc.dart';
 import '../../bloc/cart/cart_event.dart';
-import '../../bloc/cart/cart_state.dart';
+import '../purchases/purchase_redeem_question.page.dart';
+import '../cart/cart.page.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
 
 class ProductDetailView extends StatefulWidget {
   final Product product;
@@ -38,9 +37,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, userState) {
-        final userPoints = userState is UserLoaded ? userState.user.totalPoints : 0;
+        final userPoints =
+            userState is UserLoaded ? userState.user.totalPoints : 0;
         final baseTotal = widget.product.finalPrice * quantity;
-        final pointsDiscount = (usePoints && userPoints >= requiredPointsFor30Percent ? baseTotal * 0.3 : 0).toDouble();
+        final pointsDiscount =
+            (usePoints && userPoints >= requiredPointsFor30Percent
+                    ? baseTotal * 0.3
+                    : 0)
+                .toDouble();
         final total = baseTotal - pointsDiscount;
 
         return Scaffold(
@@ -57,7 +61,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         _buildStoreInfo(),
                         _buildProductInfo(),
                         _buildQuantitySelector(),
-                        _buildPriceBreakdown(total, baseTotal, pointsDiscount, userPoints),
+                        _buildPriceBreakdown(
+                          total,
+                          baseTotal,
+                          pointsDiscount,
+                          userPoints,
+                        ),
                       ],
                     ),
                   ),
@@ -84,53 +93,18 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           Expanded(
             child: Text(
               'Detalle del producto',
-              style: Typo.largeBody.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          BlocBuilder<CartBloc, CartState>(
-            builder: (context, cartState) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CartView()),
-                  );
-                },
-                child: Stack(
-                  children: [
-                    Icon(Iconsax.shopping_cart, color: AppColors.neutral600),
-                    if (cartState.itemCount > 0)
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary500,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            '${cartState.itemCount}',
-                            style: Typo.smallBody.copyWith(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
+          const SizedBox(width: 12),
+          MarketplaceCartIconButton(onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartView()),
+            );
+          }),
         ],
       ),
     );
@@ -147,62 +121,28 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: widget.product.imageUrl.isNotEmpty
-                ? Image.network(
-                    widget.product.imageUrl,
-                    height: 280,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 280,
-                        width: double.infinity,
-                        color: AppColors.primary50,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 280,
-                        width: double.infinity,
-                        color: AppColors.primary50,
-                        child: Center(
-                          child: Icon(
-                            _getProductIcon(widget.product.name),
-                            color: AppColors.primary500,
-                            size: 80,
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                : Container(
-                    height: 280,
-                    width: double.infinity,
-                    color: AppColors.primary50,
-                    child: Center(
-                      child: Icon(
-                        _getProductIcon(widget.product.name),
-                        color: AppColors.primary500,
-                        size: 80,
-                      ),
-                    ),
-                  ),
+            child: Container(
+              height: 280,
+              width: double.infinity,
+              color: AppColors.primary50,
+              child: Center(
+                child: Icon(
+                  _getProductIcon(widget.product.name),
+                  color: AppColors.primary500,
+                  size: 80,
+                ),
+              ),
+            ),
           ),
           if (widget.product.discount > 0)
             Positioned(
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.red500,
                   borderRadius: BorderRadius.circular(20),
@@ -242,23 +182,16 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               children: [
                 Text(
                   widget.store.name,
-                  style: Typo.mediumBody.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
                 ),
                 Text(
                   widget.store.category.displayName,
-                  style: Typo.smallBody.copyWith(
-                    color: AppColors.neutral400,
-                  ),
+                  style: Typo.smallBody.copyWith(color: AppColors.neutral400),
                 ),
               ],
             ),
           ),
-          Icon(
-            Iconsax.arrow_right,
-            color: AppColors.neutral400,
-          ),
+          Icon(Iconsax.arrow_right, color: AppColors.neutral400),
         ],
       ),
     );
@@ -291,11 +224,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(
-                          Iconsax.star5,
-                          size: 16,
-                          color: Colors.amber,
-                        ),
+                        Icon(Iconsax.star5, size: 16, color: Colors.amber),
                         const SizedBox(width: 4),
                         Text(
                           '${widget.product.rating.toStringAsFixed(1)} (${widget.product.reviewCount} reseñas)',
@@ -309,7 +238,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary50,
                   borderRadius: BorderRadius.circular(8),
@@ -366,9 +298,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         children: [
           Text(
             'Cantidad',
-            style: Typo.mediumBody.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w600),
           ),
           Container(
             decoration: BoxDecoration(
@@ -378,24 +308,32 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: quantity > 1
-                      ? () {
-                          setState(() => quantity--);
-                        }
-                      : null,
+                  onTap:
+                      quantity > 1
+                          ? () {
+                            setState(() => quantity--);
+                          }
+                          : null,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     child: Icon(
                       Iconsax.minus,
                       size: 18,
-                      color: quantity > 1
-                          ? AppColors.neutral600
-                          : AppColors.neutral300,
+                      color:
+                          quantity > 1
+                              ? AppColors.neutral600
+                              : AppColors.neutral300,
                     ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     border: Border(
                       left: BorderSide(color: AppColors.neutral200),
@@ -410,19 +348,24 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: quantity < widget.product.stock
-                      ? () {
-                          setState(() => quantity++);
-                        }
-                      : null,
+                  onTap:
+                      quantity < widget.product.stock
+                          ? () {
+                            setState(() => quantity++);
+                          }
+                          : null,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     child: Icon(
                       Iconsax.add,
                       size: 18,
-                      color: quantity < widget.product.stock
-                          ? AppColors.primary500
-                          : AppColors.neutral300,
+                      color:
+                          quantity < widget.product.stock
+                              ? AppColors.primary500
+                              : AppColors.neutral300,
                     ),
                   ),
                 ),
@@ -434,7 +377,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildPriceBreakdown(double total, double baseTotal, double pointsDiscount, int userPoints) {
+  Widget _buildPriceBreakdown(
+    double total,
+    double baseTotal,
+    double pointsDiscount,
+    int userPoints,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -449,15 +397,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             children: [
               Text(
                 'Precio unitario',
-                style: Typo.mediumBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
+                style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
               ),
               Text(
                 '\$${widget.product.finalPrice.toStringAsFixed(2)}',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -467,27 +411,22 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             children: [
               Text(
                 'Cantidad',
-                style: Typo.mediumBody.copyWith(
-                  color: AppColors.neutral600,
-                ),
+                style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
               ),
               Text(
                 'x$quantity',
-                style: Typo.mediumBody.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
-          if (usePoints && userPoints >= requiredPointsFor30Percent) ...[          const SizedBox(height: 12),
+          if (usePoints && userPoints >= requiredPointsFor30Percent) ...[
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Descuento por puntos (30%)',
-                  style: Typo.mediumBody.copyWith(
-                    color: AppColors.green600,
-                  ),
+                  style: Typo.mediumBody.copyWith(color: AppColors.green600),
                 ),
                 Text(
                   '-\$${pointsDiscount.toStringAsFixed(2)}',
@@ -499,18 +438,13 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ],
             ),
           ],
-          Divider(
-            color: AppColors.neutral200,
-            height: 24,
-          ),
+          Divider(color: AppColors.neutral200, height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Total',
-                style: Typo.largeBody.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
               ),
               Text(
                 '\$${total.toStringAsFixed(2)}',
@@ -525,7 +459,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       ),
     );
   }
-
 
   Widget _buildBottomBar(BuildContext context, double total, int userPoints) {
     final canRedeem = userPoints >= requiredPointsFor30Percent;
@@ -547,9 +480,55 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Fila Cancelar / Comprar ahora
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total',
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.neutral600,
+                  ),
+                ),
+                Text(
+                  '\$${total.toStringAsFixed(2)}',
+                  style: Typo.largeBody.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
+                // Botón de añadir al carrito (a la izquierda)
+                IconButton(
+                  onPressed: () {
+                    final cartItem = CartItem(
+                      productId: widget.product.id,
+                      productName: widget.product.name,
+                      productImage: '',
+                      price: widget.product.finalPrice,
+                      quantity: quantity,
+                    );
+                    context.read<CartBloc>().add(AddToCartEvent(cartItem));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Añadido al carrito',
+                          style: Typo.mediumBody.copyWith(color: Colors.white),
+                        ),
+                        backgroundColor: AppColors.primary500,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Iconsax.shopping_cart),
+                  color: AppColors.primary500,
+                  tooltip: 'Añadir al carrito',
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
@@ -592,7 +571,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ),
                     ),
                     child: Text(
-                      'Confirmar compra',
+                      'Comprar ahora',
                       style: Typo.mediumBody.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -602,236 +581,188 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            // Botón para agregar al carrito
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  final item = CartItem(
-                    productId: widget.product.id,
-                    productName: widget.product.name,
-                    productImage: widget.product.imageUrl,
-                    price: widget.product.finalPrice,
-                    quantity: quantity,
-                  );
-                  context.read<CartBloc>().add(AddToCartEvent(item));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Producto agregado al carrito',
-                        style: Typo.mediumBody.copyWith(color: Colors.white),
-                      ),
-                      backgroundColor: AppColors.primary500,
-                      duration: const Duration(seconds: 2),
-                      action: SnackBarAction(
-                        label: 'Ver carrito',
-                        textColor: Colors.white,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const CartView()),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-                icon: Icon(Iconsax.shopping_cart, color: AppColors.primary500, size: 18),
-                label: Text(
-                  'Agregar al carrito',
-                  style: Typo.mediumBody.copyWith(
-                    color: AppColors.primary500,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.primary200),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  void _showConfirmPurchase(BuildContext context, double total, int userPoints) {
+  void _showConfirmPurchase(
+    BuildContext context,
+    double total,
+    int userPoints,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Confirmar compra',
-                style: Typo.largeBody.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+      builder:
+          (context) => Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primary50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Confirmar compra',
+                    style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          widget.product.name,
-                          style: Typo.mediumBody.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              widget.product.name,
+                              style: Typo.mediumBody.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              'x$quantity',
+                              style: Typo.mediumBody.copyWith(
+                                color: AppColors.neutral600,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'x$quantity',
-                          style: Typo.mediumBody.copyWith(
-                            color: AppColors.neutral600,
+                        const SizedBox(height: 12),
+                        if (usePoints &&
+                            userPoints >= requiredPointsFor30Percent)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.green50,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.verify5,
+                                      size: 16,
+                                      color: AppColors.green600,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Descuento 30% por puntos aplicado',
+                                      style: Typo.smallBody.copyWith(
+                                        color: AppColors.green600,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
                           ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total a pagar',
+                              style: Typo.largeBody.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              '\$${total.toStringAsFixed(2)}',
+                              style: Typo.largeBody.copyWith(
+                                color: AppColors.primary500,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    if (usePoints && userPoints >= requiredPointsFor30Percent)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.green50,
-                              borderRadius: BorderRadius.circular(8),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '✅ Compra confirmada: \$${total.toStringAsFixed(2)}',
+                              style: Typo.mediumBody.copyWith(
+                                color: Colors.white,
+                              ),
                             ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Iconsax.verify5,
-                                  size: 16,
-                                  color: AppColors.green600,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Descuento 30% por puntos aplicado',
-                                  style: Typo.smallBody.copyWith(
-                                    color: AppColors.green600,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            backgroundColor: AppColors.green600,
+                            duration: const Duration(seconds: 3),
                           ),
-                          const SizedBox(height: 12),
-                        ],
+                        );
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.pop(context);
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary500,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Total a pagar',
-                          style: Typo.largeBody.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      child: Text(
+                        'Confirmar',
+                        style: Typo.mediumBody.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
                         ),
-                        Text(
-                          '\$${total.toStringAsFixed(2)}',
-                          style: Typo.largeBody.copyWith(
-                            color: AppColors.primary500,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '✅ Compra confirmada: \$${total.toStringAsFixed(2)}',
-                          style: Typo.mediumBody.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                        backgroundColor: AppColors.green600,
-                        duration: const Duration(seconds: 3),
                       ),
-                    );
-                    Future.delayed(const Duration(seconds: 1), () {
-                      Navigator.pop(context);
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary500,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    'Confirmar',
-                    style: Typo.mediumBody.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.neutral200),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: Typo.mediumBody.copyWith(
+                          color: AppColors.neutral600,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.neutral200),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Cancelar',
-                    style: Typo.mediumBody.copyWith(
-                      color: AppColors.neutral600,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -839,17 +770,22 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final name = productName.toLowerCase();
     if (name.contains('camisa') || name.contains('shirt')) return Iconsax.bag;
     if (name.contains('pantalón') || name.contains('pants')) return Iconsax.bag;
-    if (name.contains('chaqueta') || name.contains('jacket')) return Iconsax.bag;
+    if (name.contains('chaqueta') || name.contains('jacket'))
+      return Iconsax.bag;
     if (name.contains('vestido') || name.contains('dress')) return Iconsax.bag;
     if (name.contains('bolso') || name.contains('bag')) return Iconsax.bag;
-    if (name.contains('leche') || name.contains('milk')) return Iconsax.shopping_cart;
-    if (name.contains('pan') || name.contains('bread')) return Iconsax.shopping_cart;
-    if (name.contains('queso') || name.contains('cheese')) return Iconsax.shopping_cart;
+    if (name.contains('leche') || name.contains('milk'))
+      return Iconsax.shopping_cart;
+    if (name.contains('pan') || name.contains('bread'))
+      return Iconsax.shopping_cart;
+    if (name.contains('queso') || name.contains('cheese'))
+      return Iconsax.shopping_cart;
     if (name.contains('paella')) return Iconsax.shopping_cart;
     if (name.contains('tarta')) return Iconsax.shopping_cart;
     if (name.contains('gasolina') || name.contains('fuel')) return Iconsax.car;
     if (name.contains('aceite') || name.contains('oil')) return Iconsax.car;
-    if (name.contains('paracetamol') || name.contains('vitamina')) return Iconsax.heart;
+    if (name.contains('paracetamol') || name.contains('vitamina'))
+      return Iconsax.heart;
     return Iconsax.box;
   }
 }

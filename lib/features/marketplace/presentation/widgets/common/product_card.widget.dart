@@ -5,7 +5,9 @@ import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/marketplace/data/models/product.model.dart';
 import 'package:letdem/features/marketplace/data/models/store.model.dart';
+import 'package:letdem/features/marketplace/data/models/cart_item.model.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_bloc.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/cart/cart_event.dart';
 import 'package:letdem/features/marketplace/presentation/pages/catalog/product_detail.page.dart';
 
 class ProductCard extends StatelessWidget {
@@ -151,19 +153,42 @@ class ProductCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         if (product.stock > 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary50,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Icon(
-                              Iconsax.add,
-                              size: 14,
-                              color: AppColors.primary500,
+                          InkWell(
+                            borderRadius: BorderRadius.circular(6),
+                            onTap: () {
+                              final item = CartItem(
+                                productId: product.id,
+                                productName: product.name,
+                                productImage: '',
+                                price: product.finalPrice,
+                                quantity: 1,
+                              );
+                              context.read<CartBloc>().add(AddToCartEvent(item));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Añadido al carrito',
+                                    style: Typo.mediumBody.copyWith(color: Colors.white),
+                                  ),
+                                  backgroundColor: AppColors.primary500,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary50,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Iconsax.shopping_cart,
+                                size: 14,
+                                color: AppColors.primary500,
+                              ),
                             ),
                           )
                         else

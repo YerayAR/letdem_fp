@@ -219,19 +219,18 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     Emitter<ActivitiesState> emit,
   ) async {
     try {
-      print('event_id ==> ${event.spaceId}');
-      // emit(ActivitiesLoading());
-
-      // // var base64 = await ImageCompressor.compressImageToBase64(event.image);
-      // await activityRepository.extendTimeSpace(
-      //   eventID: event.spaceId,
-      //   time: event.time,
-      // );
-      // emit(const ActivitiesPublished(totalPointsEarned: 0));
+      emit(ActivitiesLoading());
+      await activityRepository.extendTimeSpace(
+        eventID: event.spaceId,
+        time: event.time,
+      );
+      emit(const ActivitiesPublished(totalPointsEarned: 0));
     } on ApiError catch (err) {
+      Toast.showError(err.message);
       emit(ActivitiesError(error: err.message));
     } catch (err) {
-      print("Unable to publish space");
+      print("Unable to extend space time");
+      emit(const ActivitiesError(error: "Unable to extend space time"));
     }
   }
 }

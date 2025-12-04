@@ -7,7 +7,7 @@ class MarketplaceMenuItem extends StatefulWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final Color? accentColor;
+  final Color accentColor;
   final int index;
 
   const MarketplaceMenuItem({
@@ -16,8 +16,8 @@ class MarketplaceMenuItem extends StatefulWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.accentColor,
-    this.index = 0,
+    required this.accentColor,
+    required this.index,
   });
 
   @override
@@ -39,7 +39,7 @@ class _MarketplaceMenuItemState extends State<MarketplaceMenuItem>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
 
@@ -47,7 +47,7 @@ class _MarketplaceMenuItemState extends State<MarketplaceMenuItem>
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
-    Future.delayed(Duration(milliseconds: 60 * widget.index), () {
+    Future.delayed(Duration(milliseconds: 70 * widget.index), () {
       if (mounted) _controller.forward();
     });
   }
@@ -60,7 +60,7 @@ class _MarketplaceMenuItemState extends State<MarketplaceMenuItem>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.accentColor ?? AppColors.primary500;
+    final color = widget.accentColor;
 
     return AnimatedBuilder(
       animation: _controller,
@@ -81,53 +81,49 @@ class _MarketplaceMenuItemState extends State<MarketplaceMenuItem>
         },
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedScale(
-          scale: _isPressed ? 0.97 : 1.0,
+          scale: _isPressed ? 0.96 : 1.0,
           duration: const Duration(milliseconds: 100),
           child: Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: _isPressed ? 0.15 : 0.06),
-                  blurRadius: _isPressed ? 14 : 10,
-                  offset: const Offset(0, 4),
-                  spreadRadius: _isPressed ? 1 : 0,
+                  color: color.withOpacity(_isPressed ? 0.18 : 0.08),
+                  blurRadius: _isPressed ? 18 : 12,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(12),
+                Container(
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        color.withValues(alpha: _isPressed ? 0.2 : 0.1),
-                        color.withValues(alpha: _isPressed ? 0.1 : 0.03),
+                        color.withOpacity(0.18),
+                        color.withOpacity(0.06),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: Icon(
                     widget.icon,
-                    size: 24,
                     color: color,
+                    size: 24,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Text(
                   widget.title,
                   style: Typo.mediumBody.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.neutral700,
-                    fontSize: 14,
+                    color: AppColors.neutral900,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

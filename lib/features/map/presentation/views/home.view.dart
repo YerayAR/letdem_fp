@@ -7,8 +7,10 @@ import 'package:here_sdk/core.dart';
 import 'package:here_sdk/gestures.dart';
 import 'package:here_sdk/location.dart';
 import 'package:here_sdk/mapview.dart';
+import 'package:here_sdk/search.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/extensions/user.dart';
+import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/features/activities/presentation/modals/space.popup.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_bottom_section.widget.dart';
 import 'package:letdem/features/activities/presentation/shimmers/home_page_shimmer.widget.dart';
@@ -17,7 +19,9 @@ import 'package:letdem/features/auth/models/map_options.model.dart';
 import 'package:letdem/features/auth/models/nearby_payload.model.dart'
     hide Location;
 import 'package:letdem/features/map/map_bloc.dart';
+import 'package:letdem/features/map/presentation/views/navigate/navigate.view.dart';
 import 'package:letdem/features/map/presentation/widgets/navigation/event_feedback.widget.dart';
+import 'package:letdem/infrastructure/services/ev_charging/ev_charging_search.service.dart';
 import 'package:letdem/infrastructure/services/notification/notification.service.dart';
 import 'package:letdem/infrastructure/ws/web_socket.service.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -72,6 +76,13 @@ class _HomeViewState extends State<HomeView>
   final Map<MapMarker, Space> _spaceMarkers = {};
   final Map<MapMarker, Event> _eventMarkers = {};
 
+  // EV charging markers & search state
+  final Map<MapMarker, Place> _evMarkers = {};
+  MapImage? _evChargerIcon;
+  SearchEngine? _searchEngine;
+  EvChargingSearchService? _evChargingSearchService;
+  bool _isSearchingEv = false;
+
   late LocationWebSocketService _locationWebSocketService;
 
   // ---------------------------------------------------------------------------
@@ -81,6 +92,7 @@ class _HomeViewState extends State<HomeView>
   void initState() {
     super.initState();
     _loadAssets();
+    _initEvSearch();
     _getCurrentLocation();
 
     // Handle notification clicks (when user taps the notification)
@@ -204,6 +216,15 @@ class _HomeViewState extends State<HomeView>
   // ---------------------------------------------------------------------------
   // Location Setup
   // ---------------------------------------------------------------------------
+  Future<void> _initEvSearch() async {
+    try {
+      _searchEngine = SearchEngine();
+      _evChargingSearchService = EvChargingSearchService(_searchEngine!);
+    } catch (e) {
+      debugPrint('SearchEngine init failed: $e');
+    }
+  }
+
   Future<void> _getCurrentLocation() async {
     try {
       setState(() => isLocationLoading = true);
@@ -339,6 +360,95 @@ class _HomeViewState extends State<HomeView>
     }
   }
 
+  Future<void> _onEvSearchButtonPressed() async {
+    if (_currentPosition == null || _mapController == null) return;
+    if (_evChargingSearchService == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo inicializar la búsqueda de cargadores'),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSearchingEv = true);
+
+    try {
+      final places = await _evChargingSearchService!
+          .searchNearbyEvChargers(_currentPosition!, 5000);
+
+      if (places.isEmpty) {
+        _clearEvMarkers();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('No se encontraron puntos de carga cercanos'),
+            ),
+          );
+        }
+        return;
+      }
+
+      _clearEvMarkers();
+
+      // Crear el icono una sola vez a partir de los assets ya cargados.
+      if (_evChargerIcon == null) {
+        try {
+          _evChargerIcon = MapImage.withPixelDataAndImageFormat(
+            _assetsProvider.currentLocationMarkerImageData,
+            ImageFormat.png,
+          );
+        } catch (e) {
+          debugPrint('Error creando icono EV: $e');
+        }
+      }
+
+      Place? firstPlaceWithCoords;
+
+      for (final place in places) {
+        final coords = place.geoCoordinates;
+        if (coords == null || _evChargerIcon == null) continue;
+
+        firstPlaceWithCoords ??= place;
+
+        final marker = MapMarker(coords, _evChargerIcon!);
+        _mapController!.mapScene.addMapMarker(marker);
+        _evMarkers[marker] = place;
+      }
+
+      // Centrar cámara en el primer punto de carga encontrado.
+      if (firstPlaceWithCoords?.geoCoordinates != null &&
+          _mapController != null) {
+        final coords = firstPlaceWithCoords!.geoCoordinates!;
+        _mapController!.camera.lookAtPointWithMeasure(
+          coords,
+          MapMeasure(MapMeasureKind.distanceInMeters, 1500),
+        );
+      }
+    } catch (e) {
+      debugPrint('EV search error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al buscar puntos de carga'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSearchingEv = false);
+      }
+    }
+  }
+
+  void _clearEvMarkers() {
+    for (final marker in _evMarkers.keys) {
+      _mapController?.mapScene.removeMapMarker(marker);
+    }
+    _evMarkers.clear();
+  }
+
   // ---------------------------------------------------------------------------
   // Data Fetching
   // ---------------------------------------------------------------------------
@@ -452,9 +562,99 @@ class _HomeViewState extends State<HomeView>
           showSpacePopup(space: _spaceMarkers[topMarker]!);
         } else if (_eventMarkers.containsKey(topMarker)) {
           showEventPopup(event: _eventMarkers[topMarker]!);
+        } else if (_evMarkers.containsKey(topMarker)) {
+          _showEvChargerBottomSheet(_evMarkers[topMarker]!);
         }
       }
     });
+  }
+
+  // ---------------------------------------------------------------------------
+  // EV charger bottom sheet
+  // ---------------------------------------------------------------------------
+
+  void _showEvChargerBottomSheet(Place place) {
+    final coords = place.geoCoordinates;
+    if (coords == null) return;
+
+    final distanceMeters = (_currentPosition == null)
+        ? null
+        : geolocator.Geolocator.distanceBetween(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+            coords.latitude,
+            coords.longitude,
+          );
+
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final address =
+            place.address?.addressText ?? place.address?.street ?? '';
+        final distanceKm =
+            distanceMeters != null ? (distanceMeters / 1000.0) : null;
+
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                place.title ?? 'Punto de carga',
+                style: Theme.of(ctx).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              if (address.isNotEmpty)
+                Text(
+                  address,
+                  style: Theme.of(ctx).textTheme.bodyMedium,
+                ),
+              if (distanceKm != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  '${distanceKm.toStringAsFixed(1)} km aprox.',
+                  style: Theme.of(ctx).textTheme.bodySmall,
+                ),
+              ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _startNavigationTo(coords);
+                  },
+                  icon: const Icon(Icons.ev_station),
+                  label: const Text('Ir aquí'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _startNavigationTo(GeoCoordinates destination) async {
+    if (!mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NavigationView(
+          destinationLat: destination.latitude,
+          destinationLng: destination.longitude,
+          isNavigatingToParking: false,
+          isNavigatingToCar: false,
+          parkingSpaceID: null,
+          preCalculatedRoute: null,
+        ),
+      ),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -544,6 +744,7 @@ class _HomeViewState extends State<HomeView>
                       //     ));
                     }
                   },
+                  onFindNearestCharger: _onEvSearchButtonPressed,
                 ),
                 // Refresh chip on top - only shown when map is moved
                 if (_showRefreshButton)

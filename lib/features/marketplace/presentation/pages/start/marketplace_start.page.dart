@@ -7,18 +7,19 @@ import 'package:intl/intl.dart';
 import 'package:letdem/common/widgets/appbar.dart';
 import 'package:letdem/common/widgets/body.dart';
 import 'package:letdem/common/widgets/button.dart';
+import 'package:letdem/common/popups/popup.dart';
 import 'package:letdem/core/constants/assets.dart';
 import 'package:letdem/core/constants/colors.dart';
 import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/core/extensions/locale.dart';
 import 'package:letdem/core/extensions/user.dart';
-import 'package:letdem/features/marketplace/presentation/bloc/store_catalog_bloc.dart';
-import 'package:letdem/features/marketplace/presentation/views/catalog/store_catalog.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/purchases/order_history.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/redeems/pending_vouchers.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/redeems/virtual_card_generator.view.dart';
-import 'package:letdem/features/marketplace/presentation/views/cart/cart.view.dart';
+import 'package:letdem/features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
+import 'package:letdem/features/marketplace/presentation/pages/catalog/store_catalog.page.dart';
+import 'package:letdem/features/marketplace/presentation/pages/purchases/order_history.page.dart';
+import 'package:letdem/features/marketplace/presentation/pages/redeems/pending_vouchers.page.dart';
+import 'package:letdem/features/marketplace/presentation/pages/redeems/virtual_card_generator.page.dart';
+import 'package:letdem/features/marketplace/presentation/pages/cart/cart.page.dart';
 import 'package:letdem/features/marketplace/presentation/widgets/marketplace_menu_item.widget.dart';
 import 'package:letdem/features/payout_methods/presentation/views/payout.view.dart';
 import 'package:letdem/features/users/presentation/views/orders/orders.view.dart';
@@ -39,35 +40,72 @@ class MarketplaceStartView extends StatelessWidget {
       backgroundColor: const Color(0xffF5F5F5),
       body: StyledBody(
         children: [
-          StyledAppBar(
-            title: 'Inicio',
-            icon: Iconsax.shopping_cart,
+          _buildMarketplaceHeader(context),
+          Expanded(
+            child: BlocBuilder<UserBloc, UserState>(
+              builder: (context, state) {
+                if (state is UserLoaded) {
+                  // Permite arrastrar hacia abajo para refrescar saldo, puntos, etc.
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<UserBloc>().add(
+                            const FetchUserInfoEvent(isSilent: true),
+                          );
+                      // Pequeño delay para dar tiempo al bloc a actualizar.
+                      await Future.delayed(const Duration(milliseconds: 300));
+                    },
+                    child: ListView(
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        _buildVirtualCardCallout(context, state.user.totalPoints),
+                        Dimens.space(2),
+                        _buildEarningsCard(context, state.user.earningAccount),
+                        Dimens.space(1.5),
+                        _buildWalletActionsRow(context),
+                        Dimens.space(3),
+                        _buildMarketplaceGrid(context, state.user.totalPoints),
+                      ],
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarketplaceHeader(BuildContext context) {
+    return SafeArea(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              'Inicio',
+              style: Typo.heading4,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Solo botón de carrito a la derecha
+          GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const CartView()),
               );
             },
-          ),
-          Expanded(
-            child: BlocBuilder<UserBloc, UserState>(
-              builder: (context, state) {
-                if (state is UserLoaded) {
-                  return ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      _buildVirtualCardCallout(context, state.user.totalPoints),
-                      Dimens.space(2),
-                      _buildEarningsCard(context, state.user.earningAccount),
-                      Dimens.space(1.5),
-                      _buildWalletActionsRow(context),
-                      Dimens.space(3),
-                      _buildMarketplaceGrid(context, state.user.totalPoints),
-                    ],
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
+            child: CircleAvatar(
+              radius: 21,
+              backgroundColor: AppColors.neutral50,
+              child: Icon(
+                Iconsax.shopping_cart,
+                color: AppColors.neutral500,
+              ),
             ),
           ),
         ],
@@ -165,12 +203,19 @@ class MarketplaceStartView extends StatelessWidget {
         const SizedBox(width: 12),
         _WalletActionButton(
           icon: '',
-          label: context.l10n.sendMoney,
-          onTap: () => NavigatorHelper.to(const SendMoneyView()),
+          label: 'Enviar',
+          onTap: () => _showSendTypeSelection(context),
           useSvg: false,
           iconData: Iconsax.send_2,
         ),
       ],
+    );
+  }
+
+  void _showSendTypeSelection(BuildContext context) {
+    AppPopup.showDialogSheet(
+      context,
+      const _SendTypeSelectionSheet(),
     );
   }
 
@@ -378,6 +423,163 @@ class _WalletActionButton extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SendTypeSelectionSheet extends StatelessWidget {
+  const _SendTypeSelectionSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 250),
+      tween: Tween(begin: 0.9, end: 1.0),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) {
+        return Transform.scale(scale: value, child: child);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    '¿Qué quieres enviar?',
+                    style: Typo.heading4,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                    onPressed: () => NavigatorHelper.pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Elige si quieres enviar dinero o puntos LetDem.',
+              style: Typo.smallBody.copyWith(color: AppColors.neutral500),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _OptionCard(
+                    title: 'Dinero',
+                    subtitle: 'Envia saldo de tu monedero',
+                    icon: Iconsax.money,
+                    color: AppColors.primary500,
+                    onTap: () {
+                      NavigatorHelper.pop();
+                      NavigatorHelper.to(
+                        const SendMoneyView(
+                          initialType: TransferType.money,
+                          showTypeSelector: false,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _OptionCard(
+                    title: 'Puntos',
+                    subtitle: 'Comparte LetDem Points',
+                    icon: Iconsax.cup,
+                    color: AppColors.secondary500,
+                    onTap: () {
+                      NavigatorHelper.pop();
+                      NavigatorHelper.to(
+                        const SendMoneyView(
+                          initialType: TransferType.points,
+                          showTypeSelector: false,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OptionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _OptionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Ink(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: color.withOpacity(0.1),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: Typo.mediumBody.copyWith(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: Typo.smallBody.copyWith(
+                color: AppColors.neutral600,
+                height: 1.3,
+              ),
+            ),
+          ],
         ),
       ),
     );

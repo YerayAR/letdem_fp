@@ -25,12 +25,14 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      id: json['id'] as String,
-      product: json['product'] as String,
-      productName: json['product_name'] as String? ?? '',
-      productImage: json['product_image'] as String? ?? '',
-      storeName: json['store_name'] as String? ?? '',
-      quantity: json['quantity'] as int,
+      id: json['id']?.toString() ?? '',
+      product: json['product']?.toString() ?? '',
+      productName: json['product_name']?.toString() ?? '',
+      productImage: json['product_image']?.toString() ?? '',
+      storeName: json['store_name']?.toString() ?? '',
+      quantity: json['quantity'] is int
+          ? json['quantity'] as int
+          : int.tryParse(json['quantity']?.toString() ?? '') ?? 0,
       unitPrice: double.parse(json['unit_price'].toString()),
       totalPrice: double.parse(json['total_price'].toString()),
       hasDiscount: json['has_discount'] as bool? ?? false,
@@ -71,11 +73,17 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    DateTime _parseDate(dynamic value) {
+      if (value == null) return DateTime.now();
+      final str = value.toString();
+      return DateTime.tryParse(str) ?? DateTime.now();
+    }
+
     return Order(
-      id: json['id'] as String,
-      userId: json['user'] as String,
-      userEmail: json['user_email'] as String? ?? '',
-      status: json['status'] as String,
+      id: json['id']?.toString() ?? '',
+      userId: json['user']?.toString() ?? '',
+      userEmail: json['user_email']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
       subtotal: double.parse(json['subtotal'].toString()),
       pointsDiscount: double.parse(json['points_discount'].toString()),
       total: double.parse(json['total'].toString()),
@@ -85,9 +93,9 @@ class Order {
               ?.map((item) => OrderItem.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [],
-      itemsCount: (json['items'] as List<dynamic>?)?.length ?? json['items_count'] as int? ?? 0,
-      created: DateTime.parse(json['created_at'] as String? ?? json['created'] as String),
-      modified: DateTime.tryParse(json['modified'] as String? ?? '') ?? DateTime.now(),
+      itemsCount: json['items_count'] as int? ?? 0,
+      created: _parseDate(json['created']),
+      modified: _parseDate(json['modified']),
     );
   }
 
@@ -125,12 +133,15 @@ class OrderHistoryStats {
   });
 
   factory OrderHistoryStats.fromJson(Map<String, dynamic> json) {
+    int _int(dynamic value) =>
+        value is int ? value : int.tryParse(value?.toString() ?? '') ?? 0;
+
     return OrderHistoryStats(
-      totalOrders: json['total_orders'] as int,
-      totalSpent: double.parse(json['total_spent'].toString()),
-      totalPointsUsed: json['total_points_used'] as int,
-      totalSaved: double.parse(json['total_saved'].toString()),
-      currentPoints: json['current_points'] as int,
+      totalOrders: _int(json['total_orders'] ?? 0),
+      totalSpent: double.parse((json['total_spent'] ?? 0).toString()),
+      totalPointsUsed: _int(json['total_points_used'] ?? 0),
+      totalSaved: double.parse((json['total_saved'] ?? 0).toString()),
+      currentPoints: _int(json['current_points'] ?? 0),
     );
   }
 }
@@ -145,11 +156,32 @@ class OrderHistoryResponse {
   });
 
   factory OrderHistoryResponse.fromJson(Map<String, dynamic> json) {
+    final statsJson = json['stats'];
+    final ordersJson = json['orders'];
+
+    final stats = statsJson is Map<String, dynamic>
+        ? OrderHistoryStats.fromJson(statsJson)
+        : OrderHistoryStats(
+            totalOrders: 0,
+            totalSpent: 0,
+            totalPointsUsed: 0,
+            totalSaved: 0,
+            currentPoints: 0,
+          );
+
+    final List<Order> orders;
+    if (ordersJson is List) {
+      orders = ordersJson
+          .whereType<Map<String, dynamic>>()
+          .map((order) => Order.fromJson(order))
+          .toList();
+    } else {
+      orders = const [];
+    }
+
     return OrderHistoryResponse(
-      stats: OrderHistoryStats.fromJson(json['stats'] as Map<String, dynamic>),
-      orders: (json['orders'] as List<dynamic>)
-          .map((order) => Order.fromJson(order as Map<String, dynamic>))
-          .toList(),
+      stats: stats,
+      orders: orders,
     );
   }
 }

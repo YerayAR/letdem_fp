@@ -173,6 +173,118 @@ class HereSearchApiService {
       return [];
     }
   }
+
+  /// Finds the nearest electric vehicle charging station around a given point
+  /// using Google Places Nearby Search API.
+  ///
+  /// Estrategia:
+  /// 1) Intentar primero con `type=electric_vehicle_charging_station`.
+  /// 2) Si no hay resultados, repetir con `keyword` en inglés y español
+  ///    (electrolinera, cargador coche eléctrico, EV charging, etc.).
+  Future<Map<String, double>?> findNearestChargingStation({
+    required double latitude,
+    required double longitude,
+    double radiusInMeters = 5000,
+  }) async {
+    Future<Map<String, double>?> _callNearby({
+      String? type,
+      String? keyword,
+    }) async {
+      final buffer = StringBuffer(
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+      )
+        ..write('?location=$latitude,$longitude')
+        ..write('&radius=$radiusInMeters')
+        ..write('&key=$googleApiKey');
+
+      if (type != null) buffer.write('&type=$type');
+      if (keyword != null) buffer.write('&keyword=$keyword');
+
+      final url = buffer.toString();
+
+      try {
+        if (kDebugMode) {
+          print('📡 [GOOGLE NEARBY] Request URL: $url');
+        }
+
+        final response = await http.get(
+          Uri.parse(url),
+          headers: {"Content-Type": _contentType},
+        );
+
+        if (response.statusCode != 200) {
+          if (kDebugMode) {
+            print(
+              "❌ [GOOGLE NEARBY] Request failed with status: ${response.statusCode}",
+            );
+          }
+          return null;
+        }
+
+        final Map<String, dynamic> jsonBody = jsonDecode(response.body);
+        final List<dynamic> results =
+            jsonBody['results'] as List<dynamic>? ?? const [];
+
+        if (results.isEmpty) {
+          if (kDebugMode) {
+            print('ℹ️ [GOOGLE NEARBY] No places found for this query');
+          }
+          return null;
+        }
+
+        // Nos quedamos con el primer resultado que tenga geometría válida.
+        for (final raw in results) {
+          final place = raw as Map<String, dynamic>;
+          final location = place['geometry']?['location'];
+          if (location == null) continue;
+
+          final lat = (location['lat'] as num?)?.toDouble();
+          final lng = (location['lng'] as num?)?.toDouble();
+          if (lat == null || lng == null) continue;
+
+          if (kDebugMode) {
+            final name = place['name'];
+            print('✅ [GOOGLE NEARBY] Using place: $name ($lat,$lng)');
+          }
+
+          return {
+            'lat': lat,
+            'lng': lng,
+          };
+        }
+
+        return null;
+      } catch (e, st) {
+        if (kDebugMode) {
+          print('💥 [GOOGLE NEARBY] Exception: $e');
+          print(st.toString());
+        }
+        return null;
+      }
+    }
+
+    // 1) Intento estricto por tipo
+    final byType = await _callNearby(
+      type: 'electric_vehicle_charging_station',
+    );
+    if (byType != null) return byType;
+
+    // 2) Fallback por palabras clave (inglés/español)
+    final keywords = [
+      'electric vehicle charging station',
+      'ev charger',
+      'electrolinera',
+      'cargador coche electrico',
+      'punto de carga',
+    ];
+
+    for (final k in keywords) {
+      final byKeyword = await _callNearby(keyword: Uri.encodeQueryComponent(k));
+      if (byKeyword != null) return byKeyword;
+    }
+
+    return null;
+  }
 }
 
 class HerePlace {

@@ -228,6 +228,11 @@
   "noCarRegistered": "Sin coche registrado",
   "registerCarDetails": "Registra tu coche con los detalles\npor seguridad y accesibilidad",
   "tapToRegisterCar": "Toca para registrar coche",
+  "alias": "Alias",
+  "enterAlias": "Elige un alias para que otros usuarios te envíen dinero",
+  "brandModel": "Marca / modelo del coche",
+  "licensePlate": "Matrícula",
+  "noVehicleRegistered": "No hay ningún vehículo registrado",
   "registerCar": "Registrar coche",
   "updateCarDetails": "Actualizar detalles del coche",
   "update": "Actualizar",
@@ -340,15 +345,10 @@
     "description": "Reference to LetDem service fees"
   },
   "helpAndSupport" : "Ayuda y Soporte",
-  "vehicleInformation": "Datos del vehículo",
+  "vehicleInformation": "datos de tu vehículo",
   "@vehicleInformation": {
     "description": "Reference to vehicle information"
   },
-  "alias": "Alias identificativo",
-  "enterAlias": "Ingresa un alias para transferencias",
-  "brandModel": "Marca y modelo",
-  "licensePlate": "Matrícula",
-  "noVehicleRegistered": "No tienes ningún vehículo registrado",
 
   "earningsAccount": "Cuenta de beneficios",
   "@earningsAccount": {
@@ -517,6 +517,7 @@
   "speedLimitWarning": "Estás conduciendo al límite de velocidad, reduce la velocidad",
   "kmPerHour": "Km/h",
   "speedLimit": "Límite de velocidad",
+  "routeDeviationDetected": "Desviación de ruta detectada",
   "recalculatingRoute": "Recalculando ruta...",
   "youHaveArrived": "¡Has llegado a tu destino!",
   "navigatingToParking": "Navegando al aparcamiento de estacionamiento",
@@ -971,6 +972,7 @@
 
   "paymentSuccessfulReservation": "Tu pago se ha realizado con éxito. El aparcamiento ya está reservado.",
   "paymentFailedRequiresAction": "El pago falló o requiere acción adicional",
+  "defaultCardTagline": "LetDem te desea que disfrutes de tu compra.",
   "connectionPending": "Conexión pendiente",
   "connectionPendingMessage": "La conexión de tu cuenta aún está pendiente, serás notificado cuando la conexión esté completa",
   "goBack": "Volver",
@@ -1002,6 +1004,12 @@
   "minsAgo": "min atrás",
   "hoursAgo": "horas atrás",
   "myLocation": "Mi ubicación",
+  "requester": "Solicitante",
+  "trackingLocation": "Rastreando Ubicación",
+  "waitingForLocation": "Esperando ubicación...",
+  "currentLocation": "Ubicación actual",
+  "carPlate": "Matrícula",
+  "tracking": "Rastreando",
   "zoomIn": "Acercar",
   "priceTooltip": "Este es el precio de una plaza de aparcamiento. El precio máximo que puedes establecer es {max} y el mínimo es {min}.",
   "@priceTooltip": {
@@ -1122,8 +1130,14 @@
   "helpScheduledNotificationsStep3Detail2": "• La distancia en metros desde la ubicación seleccionada que se debe considerar como área de notificación.",
   "helpScheduledNotificationsInfo1": "Una vez creada la alerta, podrás gestionarla desde tu perfil, en la sección \"Notificaciones programadas\", donde verás todas tus alertas activas o expiradas.",
   "helpScheduledNotificationsInfo2": "Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar.",
-  "unhandledError": "Error no controlado",
-  "paymentFailed": "Pago Fallido",
+  "helpScheduledNotificationsTitle": "¿Cómo crear notificaciones programadas de aparcamientos?",
+  "helpScheduledNotificationsIntro": "Para programar una notificación de aparcamiento:",
+
+  "purchaseHistory": "Historial de compras",
+  "pendingCards": "Tarjetas pendientes",
+  "generateCard": "Generar tarjeta",
+  "transactionsHistory": "Historial de transacciones",
+  "buy": "Comprar",
   "changePaymentMethod": "Cambiar método de pago",
   "paymentFailedDescription": "La reserva falló porque el pago no se procesó correctamente",
   "errorReserveSpaceDescription": "Por favor, inténtalo de nuevo más tarde. Si el problema persiste, contacta con soporte.",
@@ -1137,33 +1151,64 @@
       }
     }
   },
-  "sendMoney": "Enviar dinero",
-  "recipientAlias": "Alias del destinatario",
-  "enterRecipientAlias": "Ingresa el alias del destinatario",
-  "amountToSend": "Monto a enviar",
-  "pleaseEnterAlias": "Por favor ingresa el alias",
-  "pleaseEnterAmount": "Por favor ingresa el monto",
-  "enterValidAmount": "Ingresa un monto válido",
-  "sendMoneyTitle": "Transferir fondos",
-  "sendMoneySubtitle": "Envía dinero a otro usuario usando su alias identificativo.",
-  "sendMoneyWarning": "Verifica el alias antes de enviar. Las transferencias no se pueden revertir.",
-  "moneySentSuccessfully": "Dinero enviado exitosamente",
-  "moneySentDescription": "Has enviado {amount}€ a {alias} correctamente.",
-  "@moneySentDescription": {
+  "waitingForNavigation": "Esperando a que inicie la navegación...",
+  "locationNotAvailable": "Ubicación no disponible",
+  "stops": "Paradas",
+  "onTheWay": "En camino...",
+  "completed": "Completada",
+  "pending": "Pendiente",
+  "current": "Actual",
+  "addAnotherStop": "Añadir otra parada",
+  "addStop": "Añadir parada",
+  "searchStop": "Buscar parada...",
+  "customStop": "Parada personalizada",
+  "stopAddedToRoute": "Parada añadida a la ruta",
+  "changeRoute": "Cambiar ruta",
+  "arrivedAtStop": "Llegaste a parada: {stopName}",
+  "@arrivedAtStop": {
+    "description": "Mensaje de toast al llegar a una parada",
     "placeholders": {
-      "amount": {
-        "type": "String"
-      },
-      "alias": {
-        "type": "String"
+      "stopName": {
+        "type": "String",
+        "description": "El nombre de la parada"
       }
     }
   },
-  "purchaseHistory": "Historial de compras",
-  "pendingCards": "Tarjetas pendientes",
-  "generateCard": "Generar tarjeta",
-  "transactionsHistory": "Historial transacciones",
-  "buy": "Comprar",
-  "waitingForNavigation": "Esperando a que inicie la navegación...",
-  "locationNotAvailable": "Ubicación no disponible"
+  "finalDestination": "destino final",
+  "arrivedAtYourStop": "¡Llegaste a tu parada!",
+  "continueToNextStop": "Continuar a siguiente parada",
+  "goToFinalDestination": "Ir a destino final",
+  "findParking": "Buscar estacionamiento",
+  "canSearchParkingOrContinueTo": "Puedes buscar estacionamiento disponible en el mapa o continuar a {destination}",
+  "@canSearchParkingOrContinueTo": {
+    "description": "Mensaje mostrado al llegar a una parada",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "description": "El próximo destino"
+      }
+    }
+  },
+  "noMoreRouteOptions": "No se encontraron más opciones de ruta disponibles.",
+  "alternativeRoutes": "Rutas alternativas",
+  "enterValidAmount": "Introduce una cantidad válida.",
+  "@enterValidAmount": {
+    "description": "Se muestra cuando el usuario introduce un importe no válido para las transferencias."
+  },
+  "moneySentSuccessfully": "Dinero enviado correctamente",
+  "moneySentDescription": "Has enviado {amount} € a {alias}.",
+  "@moneySentDescription": {
+    "description": "Se muestra después de una transferencia de dinero exitosa.",
+    "placeholders": {
+      "amount": {},
+      "alias": {}
+    }
+  },
+  "sendMoney": "Enviar dinero",
+  "recipientAlias": "Alias del destinatario",
+  "enterRecipientAlias": "Introduce el alias del destinatario",
+  "amountToSend": "Cantidad a enviar",
+  "sendMoneyTitle": "Enviar dinero desde tu monedero",
+  "sendMoneySubtitle": "Transfiere dinero al instante a otro usuario de LetDem usando su alias.",
+  "sendMoneyWarning": "Revisa bien el alias y la cantidad antes de enviar. Las transferencias no se pueden revertir."
 }

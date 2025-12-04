@@ -795,22 +795,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpAndSupport => 'Help & Support';
 
   @override
-  String get vehicleInformation => 'Vehicle information';
-
-  @override
-  String get alias => 'Alias';
-
-  @override
-  String get enterAlias => 'Enter an alias for transfers';
-
-  @override
-  String get brandModel => 'Brand and model';
-
-  @override
-  String get licensePlate => 'License plate';
-
-  @override
-  String get noVehicleRegistered => 'No vehicle registered';
+  String get vehicleInformation => 'vehicle information';
 
   @override
   String get earningsAccount => 'earnings account';
@@ -1338,6 +1323,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get codeConfirmation => 'Code';
+
+  @override
+  String get routeDeviationDetected => 'Route deviation detected';
 
   @override
   String get recalculatingRoute => 'Recalculating route...';
@@ -2035,6 +2023,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Payment failed or requires further action';
 
   @override
+  String get defaultCardTagline => 'LetDem wishes you a great purchase.';
+
+  @override
   String get connectionPending => 'Connection pending';
 
   @override
@@ -2128,6 +2119,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myLocation => 'My location';
+
+  @override
+  String get requester => 'Requester';
+
+  @override
+  String get trackingLocation => 'Tracking Location';
+
+  @override
+  String get waitingForLocation => 'Waiting for location...';
+
+  @override
+  String get currentLocation => 'Current location';
+
+  @override
+  String get carPlate => 'Car plate';
+
+  @override
+  String get tracking => 'Tracking';
 
   @override
   String get zoomIn => 'Zoom In';
@@ -2487,43 +2496,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationNotAvailable => 'Location data not available';
 
   @override
-  String get sendMoney => 'Send money';
+  String get stops => 'Stops';
 
   @override
-  String get recipientAlias => 'Recipient alias';
+  String get onTheWay => 'On the way...';
 
   @override
-  String get enterRecipientAlias => 'Enter recipient alias';
+  String get completed => 'Completed';
 
   @override
-  String get amountToSend => 'Amount to send';
+  String get current => 'Current';
 
   @override
-  String get pleaseEnterAlias => 'Please enter alias';
+  String get addAnotherStop => 'Add another stop';
 
   @override
-  String get pleaseEnterAmount => 'Please enter amount';
+  String get addStop => 'Add stop';
 
   @override
-  String get enterValidAmount => 'Enter a valid amount';
+  String get searchStop => 'Search stop...';
 
   @override
-  String get sendMoneyTitle => 'Transfer funds';
+  String get customStop => 'Custom stop';
 
   @override
-  String get sendMoneySubtitle =>
-      'Send money to another user using their alias.';
+  String get stopAddedToRoute => 'Stop added to route';
 
   @override
-  String get sendMoneyWarning =>
-      'Verify the alias before sending. Transfers cannot be reversed.';
+  String get changeRoute => 'Change route';
 
   @override
-  String get moneySentSuccessfully => 'Money sent successfully';
-
-  @override
-  String moneySentDescription(String amount, String alias) {
-    return 'You have sent $amount€ to $alias successfully.';
+  String arrivedAtStop(String stopName) {
+    return 'You arrived at stop: $stopName';
   }
 
   @override
@@ -2540,4 +2544,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buy => 'Buy';
+
+  @override
+  String get finalDestination => 'final destination';
+
+  @override
+  String get arrivedAtYourStop => 'You\'ve arrived at your stop!';
+
+  @override
+  String get continueToNextStop => 'Continue to next stop';
+
+  @override
+  String get goToFinalDestination => 'Go to final destination';
+
+  @override
+  String get findParking => 'Find parking';
+
+  @override
+  String canSearchParkingOrContinueTo(String destination) {
+    return 'You can search for available parking on the map or continue to $destination';
+  }
+
+  @override
+  String get noMoreRouteOptions => 'No more route options were found.';
+
+  @override
+  String get alternativeRoutes => 'Alternative routes';
+
+  @override
+  String get enterValidAmount => 'Please enter a valid amount.';
+
+  @override
+  String get moneySentSuccessfully => 'Money sent successfully';
+
+  @override
+  String moneySentDescription(Object amount, Object alias) {
+    return 'You have sent $amount to $alias.';
+  }
+
+  @override
+  String get sendMoney => 'Send money';
+
+  @override
+  String get recipientAlias => 'Recipient alias';
+
+  @override
+  String get enterRecipientAlias => 'Enter the recipient alias';
+
+  @override
+  String get amountToSend => 'Amount to send';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get enterAlias =>
+      'Choose an alias other users can use to send you money';
+
+  @override
+  String get brandModel => 'Car brand / model';
+
+  @override
+  String get licensePlate => 'License plate';
+
+  @override
+  String get noVehicleRegistered => 'No vehicle registered';
+
+  @override
+  String get sendMoneyTitle => 'Send money from your wallet';
+
+  @override
+  String get sendMoneySubtitle =>
+      'Transfer money instantly to another LetDem user using their alias.';
+
+  @override
+  String get sendMoneyWarning =>
+      'Double-check the alias and amount before sending. Transfers cannot be reversed.';
 }

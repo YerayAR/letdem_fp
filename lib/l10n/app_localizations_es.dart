@@ -802,22 +802,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpAndSupport => 'Ayuda y Soporte';
 
   @override
-  String get vehicleInformation => 'Datos del vehículo';
-
-  @override
-  String get alias => 'Alias identificativo';
-
-  @override
-  String get enterAlias => 'Ingresa un alias para transferencias';
-
-  @override
-  String get brandModel => 'Marca y modelo';
-
-  @override
-  String get licensePlate => 'Matrícula';
-
-  @override
-  String get noVehicleRegistered => 'No tienes ningún vehículo registrado';
+  String get vehicleInformation => 'datos de tu vehículo';
 
   @override
   String get earningsAccount => 'Cuenta de beneficios';
@@ -1349,6 +1334,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get codeConfirmation => 'Código';
+
+  @override
+  String get routeDeviationDetected => 'Desviación de ruta detectada';
 
   @override
   String get recalculatingRoute => 'Recalculando ruta...';
@@ -2058,6 +2046,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'El pago falló o requiere acción adicional';
 
   @override
+  String get defaultCardTagline =>
+      'LetDem te desea que disfrutes de tu compra.';
+
+  @override
   String get connectionPending => 'Conexión pendiente';
 
   @override
@@ -2150,6 +2142,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get myLocation => 'Mi ubicación';
+
+  @override
+  String get requester => 'Solicitante';
+
+  @override
+  String get trackingLocation => 'Rastreando Ubicación';
+
+  @override
+  String get waitingForLocation => 'Esperando ubicación...';
+
+  @override
+  String get currentLocation => 'Ubicación actual';
+
+  @override
+  String get carPlate => 'Matrícula';
+
+  @override
+  String get tracking => 'Rastreando';
 
   @override
   String get zoomIn => 'Acercar';
@@ -2489,10 +2499,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Siempre que se publique un aparcamiento dentro del área configurada, recibirás una notificación para que puedas dirigirte rápidamente al lugar.';
 
   @override
-  String get unhandledError => 'Error no controlado';
+  String get unhandledError => 'Unhandled error';
 
   @override
-  String get paymentFailed => 'Pago Fallido';
+  String get paymentFailed => 'Payment failed';
 
   @override
   String get changePaymentMethod => 'Cambiar método de pago';
@@ -2517,43 +2527,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get locationNotAvailable => 'Ubicación no disponible';
 
   @override
-  String get sendMoney => 'Enviar dinero';
+  String get stops => 'Paradas';
 
   @override
-  String get recipientAlias => 'Alias del destinatario';
+  String get onTheWay => 'En camino...';
 
   @override
-  String get enterRecipientAlias => 'Ingresa el alias del destinatario';
+  String get completed => 'Completada';
 
   @override
-  String get amountToSend => 'Monto a enviar';
+  String get current => 'Actual';
 
   @override
-  String get pleaseEnterAlias => 'Por favor ingresa el alias';
+  String get addAnotherStop => 'Añadir otra parada';
 
   @override
-  String get pleaseEnterAmount => 'Por favor ingresa el monto';
+  String get addStop => 'Añadir parada';
 
   @override
-  String get enterValidAmount => 'Ingresa un monto válido';
+  String get searchStop => 'Buscar parada...';
 
   @override
-  String get sendMoneyTitle => 'Transferir fondos';
+  String get customStop => 'Parada personalizada';
 
   @override
-  String get sendMoneySubtitle =>
-      'Envía dinero a otro usuario usando su alias identificativo.';
+  String get stopAddedToRoute => 'Parada añadida a la ruta';
 
   @override
-  String get sendMoneyWarning =>
-      'Verifica el alias antes de enviar. Las transferencias no se pueden revertir.';
+  String get changeRoute => 'Cambiar ruta';
 
   @override
-  String get moneySentSuccessfully => 'Dinero enviado exitosamente';
-
-  @override
-  String moneySentDescription(String amount, String alias) {
-    return 'Has enviado $amount€ a $alias correctamente.';
+  String arrivedAtStop(String stopName) {
+    return 'Llegaste a parada: $stopName';
   }
 
   @override
@@ -2566,8 +2571,85 @@ class AppLocalizationsEs extends AppLocalizations {
   String get generateCard => 'Generar tarjeta';
 
   @override
-  String get transactionsHistory => 'Historial transacciones';
+  String get transactionsHistory => 'Historial de transacciones';
 
   @override
   String get buy => 'Comprar';
+
+  @override
+  String get finalDestination => 'destino final';
+
+  @override
+  String get arrivedAtYourStop => '¡Llegaste a tu parada!';
+
+  @override
+  String get continueToNextStop => 'Continuar a siguiente parada';
+
+  @override
+  String get goToFinalDestination => 'Ir a destino final';
+
+  @override
+  String get findParking => 'Buscar estacionamiento';
+
+  @override
+  String canSearchParkingOrContinueTo(String destination) {
+    return 'Puedes buscar estacionamiento disponible en el mapa o continuar a $destination';
+  }
+
+  @override
+  String get noMoreRouteOptions =>
+      'No se encontraron más opciones de ruta disponibles.';
+
+  @override
+  String get alternativeRoutes => 'Rutas alternativas';
+
+  @override
+  String get enterValidAmount => 'Introduce una cantidad válida.';
+
+  @override
+  String get moneySentSuccessfully => 'Dinero enviado correctamente';
+
+  @override
+  String moneySentDescription(Object amount, Object alias) {
+    return 'Has enviado $amount € a $alias.';
+  }
+
+  @override
+  String get sendMoney => 'Enviar dinero';
+
+  @override
+  String get recipientAlias => 'Alias del destinatario';
+
+  @override
+  String get enterRecipientAlias => 'Introduce el alias del destinatario';
+
+  @override
+  String get amountToSend => 'Cantidad a enviar';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get enterAlias =>
+      'Elige un alias para que otros usuarios te envíen dinero';
+
+  @override
+  String get brandModel => 'Marca / modelo del coche';
+
+  @override
+  String get licensePlate => 'Matrícula';
+
+  @override
+  String get noVehicleRegistered => 'No hay ningún vehículo registrado';
+
+  @override
+  String get sendMoneyTitle => 'Enviar dinero desde tu monedero';
+
+  @override
+  String get sendMoneySubtitle =>
+      'Transfiere dinero al instante a otro usuario de LetDem usando su alias.';
+
+  @override
+  String get sendMoneyWarning =>
+      'Revisa bien el alias y la cantidad antes de enviar. Las transferencias no se pueden revertir.';
 }

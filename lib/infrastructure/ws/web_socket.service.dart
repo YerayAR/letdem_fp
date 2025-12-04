@@ -13,9 +13,13 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 //   wss://api-staging.letdem.org/ws
 //   wss://api.letdem.com/ws
 // y se puede sobreescribir con --dart-define=WS_BASE_URL=<url>.
+//
+// NOTA: La URL por defecto anterior estaba mal formada ("ws:https://...")
+// y provocaba errores de ruta tipo "http:\\0https:\\". Usamos ahora
+// directamente el endpoint wss válido de staging.
 const String _wsBaseUrl = String.fromEnvironment(
   'WS_BASE_URL',
-  defaultValue: 'ws:https://api-staging.letdem.org/',
+  defaultValue: 'wss://api-staging.letdem.org/ws',
 );
 
 class LocationWebSocketService {

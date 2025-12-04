@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
@@ -17,12 +18,16 @@ import 'package:letdem/features/auth/presentation/views/login.view.dart';
 import 'package:letdem/features/car/car_bloc.dart';
 import 'package:letdem/features/notifications/presentation/views/notification.view.dart';
 import 'package:letdem/features/payment_methods/presentation/views/payment_methods.view.dart';
+import 'package:letdem/features/track_location/mock/mock_data.dart';
 import 'package:letdem/features/users/models/user.model.dart';
 import 'package:letdem/features/users/presentation/views/edit/edit_basic_info.view.dart';
 import 'package:letdem/features/users/presentation/views/help/help.view.dart';
 import 'package:letdem/features/users/presentation/views/language/change_language.view.dart';
 import 'package:letdem/features/users/presentation/views/preferences/preferences.view.dart';
 import 'package:letdem/features/users/presentation/widgets/profile_menu_item.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/profile_section.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_container.widget.dart';
+import 'package:letdem/features/users/presentation/widgets/settings_row.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/features/wallet/presentation/views/wallet.view.dart';
 import 'package:letdem/infrastructure/services/earnings/eranings.service.dart';
@@ -32,6 +37,7 @@ import 'package:letdem/models/earnings_account/earning_account.model.dart';
 import '../../../../common/widgets/appbar.dart';
 import '../../../marketplace/presentation/pages/start/marketplace_start.page.dart';
 import '../../../scheduled_notifications/presentation/views/scheduled_notifications.view.dart';
+import '../../../track_location/view/track_location_view.dart';
 import 'reservations/reservation_list.view.dart';
 import 'security/security.view.dart';
 
@@ -57,7 +63,6 @@ class ProfileView extends StatelessWidget {
                 if (state is UserLoaded) {
                   return Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.only(bottom: 20),
                       children: [
                         _ProfileHeader(user: state.user),
                         const SizedBox(height: 8),
@@ -127,30 +132,18 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fullName = '${user.firstName} ${user.lastName}'.trim();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.neutral200.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    return ProfileSection(
+      child: [
+        SettingsContainer(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildUserInfo(user, fullName, context),
+              _buildUserPoints(user, context),
+            ],
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(child: _buildUserInfo(user, fullName, context)),
-            _buildUserPoints(user, context),
-          ],
-        ),
-      ),
+      ],
     );
   }
 
@@ -159,18 +152,31 @@ class _ProfileHeader extends StatelessWidget {
     String fullName,
     BuildContext context,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          fullName.isEmpty ? context.l10n.nameNotProvided : fullName,
-          style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          user.email,
-          style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
-        ),
-      ],
+    return GestureDetector(
+      onTap:
+          kDebugMode
+              ? () {
+                NavigatorHelper.to(
+                  TrackLocationView(
+                    payload: MockTrackLocationData.createDummyPayload(),
+                    spaceId: '2',
+                  ),
+                );
+              }
+              : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            fullName.isEmpty ? context.l10n.nameNotProvided : fullName,
+            style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+          ),
+          Text(
+            user.email,
+            style: Typo.mediumBody.copyWith(color: AppColors.neutral400),
+          ),
+        ],
+      ),
     );
   }
 

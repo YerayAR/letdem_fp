@@ -25,10 +25,22 @@ import '../../../../../infrastructure/services/res/navigator.dart';
 import '../../../../map/presentation/views/route.view.dart';
 
 class MapSearchBottomSheet extends StatefulWidget {
-  const MapSearchBottomSheet({super.key, this.hintText, this.title});
+  const MapSearchBottomSheet({
+    super.key,
+    this.hintText,
+    this.title,
+    this.onLocationSelected,
+  });
 
   final String? title;
   final String? hintText;
+  final Function(
+    double? latitude,
+    double? longitude,
+    String step,
+    String? placeId,
+  )?
+  onLocationSelected;
 
   @override
   State<MapSearchBottomSheet> createState() => _MapSearchBottomSheetState();
@@ -102,9 +114,19 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
 
   void _navigateToRoute(
     String streetName,
-    String? googlePlaceID, [
+    String? googlePlaceID,
     CoordinatesData? coordinates,
-  ]) {
+  ) {
+    if (widget.onLocationSelected != null) {
+      NavigatorHelper.pop();
+      widget.onLocationSelected!(
+        coordinates?.latitude ?? 0,
+        coordinates?.longitude ?? 0,
+        streetName,
+        googlePlaceID,
+      );
+      return;
+    }
     NavigatorHelper.to(
       NavigationMapScreen(
         destinationStreetName: streetName,
@@ -124,7 +146,8 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
     var fullName = '${place.description} ';
 
     DatabaseHelper().savePlace(place);
-    _navigateToRoute(fullName, place.placeId);
+    // HerePlace doesn't have coordinates, so pass null and use placeId to fetch them
+    _navigateToRoute(fullName, place.placeId, null);
   }
 
   // ---------------------------------------------------------------------------
@@ -135,7 +158,7 @@ class _MapSearchBottomSheetState extends State<MapSearchBottomSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          context.l10n.whereAreYouGoing,
+          widget.title ?? context.l10n.whereAreYouGoing,
           style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
         ),
         IconButton(

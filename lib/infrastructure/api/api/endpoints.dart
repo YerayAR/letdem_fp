@@ -16,6 +16,7 @@ import 'package:letdem/features/scheduled_notifications/repository/schedule_noti
 import 'package:letdem/features/search/dto/post_location.dto.dart';
 import 'package:letdem/features/users/dto/edit_basic_info.dto.dart';
 import 'package:letdem/features/withdrawals/dto/withdraw.dto.dart';
+import 'package:letdem/features/wallet/dto/transfers.dto.dart';
 import 'package:letdem/infrastructure/api/api/models/endpoint.dart';
 
 import '../../../features/activities/dto/extend_time_space.dto.dart';
@@ -26,18 +27,13 @@ enum Environment { STG, PROD, DEV }
 class EndPoints {
   /// Base URL de la API principal.
   ///
-  /// - En desarrollo: pasa, por ejemplo, `--dart-define=API_BASE_URL=http://10.0.2.2:8000/v1`.
-  /// - En staging: `--dart-define=API_BASE_URL=https://api-staging.letdem.org/v1`.
-  /// - En producción: `--dart-define=API_BASE_URL=https://api.letdem.com/v1`.
-  ///
-  /// Si no se define, por defecto apunta a `https://api-staging.letdem.org/v1`.
+  /// Usa la variable de entorno `API_BASE_URL` si está definida, por ejemplo:
+  ///   --dart-define=API_BASE_URL=https://api-staging.letdem.org/v1
+  /// Si no se define, por defecto apunta a staging.
   static const String baseURL = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'https://api-staging.letdem.org/v1',
   );
-
-  // Auth Base URL (Staging)
-  static const String authBaseURL = 'https://api-staging.letdem.org/v1';
 
   static bool showApiLogs = true;
   static Endpoint<DeviceIdDTO> updateDeviceIdEndpoint = Endpoint(
@@ -60,7 +56,6 @@ class EndPoints {
         url: "/auth/password-reset/resend-otp",
         method: HTTPMethod.POST,
         isProtected: false,
-        baseURL: authBaseURL,
       );
 
   // getReservationHistoryEndpoint
@@ -86,11 +81,22 @@ class EndPoints {
     method: HTTPMethod.GET,
   );
 
+  /// Transferencias de dinero entre usuarios.
+  static Endpoint<MoneyTransferDTO> sendMoneyTransfer = Endpoint(
+    url: "/credits/transfers/money",
+    method: HTTPMethod.POST,
+  );
+
+  /// Transferencias de puntos entre usuarios.
+  static Endpoint<PointsTransferDTO> sendPointsTransfer = Endpoint(
+    url: "/credits/transfers/points",
+    method: HTTPMethod.POST,
+  );
+
   static Endpoint<LoginDTO> loginEndpoint = Endpoint(
     url: "/auth/login",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
   static Endpoint getPayoutMethods = Endpoint(
     url: "/credits/payout-methods",
@@ -114,7 +120,7 @@ class EndPoints {
       Endpoint(url: "/reservations/$id/confirm", method: HTTPMethod.POST);
 
   static Endpoint<ExtendTimeSpaceDTO> extendTimeSpace(String id) =>
-      Endpoint(url: "spaces/$id/extend-expiration", method: HTTPMethod.PUT);
+      Endpoint(url: "/spaces/$id/extend-expiration", method: HTTPMethod.PUT);
 
   static Endpoint deletePayoutMethod(String id) =>
       Endpoint(url: "/credits/payout-methods/$id", method: HTTPMethod.DELETE);
@@ -123,21 +129,18 @@ class EndPoints {
     url: "/auth/signup",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
 
   static Endpoint<VerifyEmailDTO> verifyEmailEndpoint = Endpoint(
     url: "/auth/account-verification/validate",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
 
   static Endpoint<EmailDTO> resendVerificationCodeEndpoint = Endpoint(
     url: "/auth/account-verification/resend-otp",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
 
   static Endpoint getUserProfileEndpoint = Endpoint(
@@ -149,27 +152,23 @@ class EndPoints {
     url: "/auth/password-reset/request",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
   static Endpoint<VerifyEmailDTO> resetPasswordEndpoint = Endpoint(
     url: "/auth/password-reset/validate",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
 
   static Endpoint<ResetPasswordDTO> resetForgotPasswordEndpoint = Endpoint(
     url: "/auth/password-reset",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
 
   static Endpoint resendForgotPasswordVerificationCodeEndpoint = Endpoint(
     url: "/auth/password-reset/resend-otp",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
 
   static Endpoint locationListEndpoint = Endpoint(
@@ -229,13 +228,11 @@ class EndPoints {
     url: "/auth/social-login",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
   static Endpoint<TokenDTO> socialSignup = Endpoint(
     url: "/auth/social-signup",
     method: HTTPMethod.POST,
     isProtected: false,
-    baseURL: authBaseURL,
   );
   static Endpoint getCar = Endpoint(
     url: "/users/me/car",
