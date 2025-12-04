@@ -7,7 +7,12 @@ import 'package:letdem/features/marketplace/data/models/store.model.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 
 import '../../../data/models/product.model.dart';
+import '../../../data/models/cart_item.model.dart';
+import '../../bloc/cart/cart_bloc.dart';
+import '../../bloc/cart/cart_event.dart';
 import '../purchases/purchase_redeem_question.page.dart';
+import '../cart/cart.page.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
 
 class ProductDetailView extends StatefulWidget {
   final Product product;
@@ -89,8 +94,17 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             child: Text(
               'Detalle del producto',
               style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: 12),
+          MarketplaceCartIconButton(onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartView()),
+            );
+          }),
         ],
       ),
     );
@@ -466,9 +480,55 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Botones de compra normal
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total',
+                  style: Typo.mediumBody.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.neutral600,
+                  ),
+                ),
+                Text(
+                  '\$${total.toStringAsFixed(2)}',
+                  style: Typo.largeBody.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
+                // Botón de añadir al carrito (a la izquierda)
+                IconButton(
+                  onPressed: () {
+                    final cartItem = CartItem(
+                      productId: widget.product.id,
+                      productName: widget.product.name,
+                      productImage: '',
+                      price: widget.product.finalPrice,
+                      quantity: quantity,
+                    );
+                    context.read<CartBloc>().add(AddToCartEvent(cartItem));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Añadido al carrito',
+                          style: Typo.mediumBody.copyWith(color: Colors.white),
+                        ),
+                        backgroundColor: AppColors.primary500,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Iconsax.shopping_cart),
+                  color: AppColors.primary500,
+                  tooltip: 'Añadir al carrito',
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
@@ -495,12 +555,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (_) => PurchaseRedeemQuestionView(
-                                product: widget.product,
-                                store: widget.store,
-                                quantity: quantity,
-                              ),
+                          builder: (_) => PurchaseRedeemQuestionView(
+                            product: widget.product,
+                            store: widget.store,
+                            quantity: quantity,
+                          ),
                         ),
                       );
                     },
@@ -512,7 +571,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ),
                     ),
                     child: Text(
-                      'Confirmar compra',
+                      'Comprar ahora',
                       style: Typo.mediumBody.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

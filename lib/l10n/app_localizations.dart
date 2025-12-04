@@ -3758,6 +3758,12 @@ abstract class AppLocalizations {
   /// **'Payment failed or requires further action'**
   String get paymentFailedRequiresAction;
 
+  /// No description provided for @defaultCardTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'LetDem wishes you a great purchase.'**
+  String get defaultCardTagline;
+
   /// No description provided for @connectionPending.
   ///
   /// In en, this message translates to:

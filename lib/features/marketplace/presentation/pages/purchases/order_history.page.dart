@@ -8,6 +8,9 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/marketplace/data/marketplace_data.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/order_history/order_history_cubit.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/order_history/order_history_state.dart';
+import 'package:letdem/features/marketplace/presentation/widgets/common/cart_icon_button.widget.dart';
+import '../cart/cart.page.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
 
 class OrderHistoryView extends StatelessWidget {
   const OrderHistoryView({super.key});
@@ -39,6 +42,17 @@ class _OrderHistoryContent extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.neutral900),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: MarketplaceCartIconButton(onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartView()),
+              );
+            }),
+          ),
+        ],
       ),
       body: BlocBuilder<OrderHistoryCubit, OrderHistoryState>(
         builder: (context, state) {
@@ -286,7 +300,7 @@ class _OrderHistoryContent extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Orden #${order.id.substring(0, 8)}',
+                      'Orden #${order.id.substring(0, order.id.length.clamp(0, 8))}',
                       style: Typo.mediumBody.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -541,5 +555,16 @@ class _OrderHistoryContent extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _MarketplaceCartIconButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _MarketplaceCartIconButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return MarketplaceCartIconButton(onTap: onTap);
   }
 }

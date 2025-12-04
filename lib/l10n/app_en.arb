@@ -954,6 +954,7 @@
   "pleaseEnterYourName": "Please enter your name",
   "paymentSuccessfulReservation": "Your payment was successful. The space is now reserved.",
   "paymentFailedRequiresAction": "Payment failed or requires further action",
+  "defaultCardTagline": "LetDem wishes you a great purchase.",
   "connectionPending": "Connection pending",
   "connectionPendingMessage": "Your account connection is still pending, you will be notified when the connection is complete",
   "goBack": "Go Back",

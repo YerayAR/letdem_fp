@@ -972,6 +972,7 @@
 
   "paymentSuccessfulReservation": "Tu pago se ha realizado con éxito. El aparcamiento ya está reservado.",
   "paymentFailedRequiresAction": "El pago falló o requiere acción adicional",
+  "defaultCardTagline": "LetDem te desea que disfrutes de tu compra.",
   "connectionPending": "Conexión pendiente",
   "connectionPendingMessage": "La conexión de tu cuenta aún está pendiente, serás notificado cuando la conexión esté completa",
   "goBack": "Volver",

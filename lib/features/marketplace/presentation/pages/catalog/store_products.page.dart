@@ -7,6 +7,8 @@ import 'package:letdem/features/marketplace/data/models/store.model.dart';
 import 'package:letdem/features/marketplace/presentation/widgets/common/product_card.widget.dart';
 
 import '../../bloc/store_products/store_products_bloc.dart';
+import '../cart/cart.page.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
 
 class StoreProductsView extends StatefulWidget {
   final Store store;
@@ -64,8 +66,17 @@ class _StoreProductsViewState extends State<StoreProductsView> {
             child: Text(
               'Catálogo de Productos',
               style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: 12),
+          MarketplaceCartIconButton(onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartView()),
+            );
+          }),
         ],
       ),
     );

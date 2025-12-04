@@ -2023,6 +2023,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Payment failed or requires further action';
 
   @override
+  String get defaultCardTagline => 'LetDem wishes you a great purchase.';
+
+  @override
   String get connectionPending => 'Connection pending';
 
   @override

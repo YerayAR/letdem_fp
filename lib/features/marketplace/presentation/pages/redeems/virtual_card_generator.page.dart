@@ -10,8 +10,11 @@ import 'package:letdem/core/constants/dimens.dart';
 import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/marketplace/data/marketplace_data.dart';
 import 'package:letdem/features/marketplace/presentation/pages/redeems/pending_vouchers.page.dart';
+import 'package:letdem/features/marketplace/presentation/pages/cart/cart.page.dart';
+import 'package:letdem/features/marketplace/presentation/widgets/common/cart_icon_button.widget.dart';
 import 'package:letdem/features/users/user_bloc.dart';
 import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
 
 class VirtualCardGeneratorView extends StatefulWidget {
   final int availablePoints;
@@ -50,6 +53,12 @@ class _VirtualCardGeneratorViewState extends State<VirtualCardGeneratorView> {
             title: 'Generar tarjeta virtual',
             icon: Icons.close,
             onTap: () => Navigator.of(context).pop(),
+            suffix: MarketplaceCartIconButton(onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartView()),
+              );
+            }),
           ),
           Expanded(
             child: ListView(
@@ -393,77 +402,134 @@ class _VirtualCardGeneratorViewState extends State<VirtualCardGeneratorView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (dialogContext) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: Text(
-              'Tarjeta generada',
-              style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Código',
-                  style: Typo.smallBody.copyWith(color: AppColors.neutral600),
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          'Tarjeta generada',
+          style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tarjeta estilo "bancaria" con el código
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF4C1D95),
+                    Color(0xFF6D28D9),
+                    Color(0xFFEC4899),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                Dimens.space(0.5),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary50,
-                    borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
                   ),
-                  child: Text(
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Icon(
+                          Icons.credit_card,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Tarjeta virtual LetDem',
+                        style: Typo.smallBody.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'ONLINE',
+                        style: Typo.smallBody.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Dimens.space(2),
+                  Text(
                     voucher.code,
-                    style: Typo.mediumBody.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
+                    style: Typo.largeBody.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 4,
+                      fontSize: 24,
                     ),
                   ),
-                ),
-                Dimens.space(1),
-                Text(
-                  'Usaste ${voucher.pointsUsed} puntos. Puedes ver la tarjeta en la sección de pendientes.',
-                  style: Typo.smallBody.copyWith(color: AppColors.neutral600),
-                ),
-              ],
+                  Dimens.space(1),
+                  Text(
+                    '${voucher.pointsUsed} puntos · ${voucher.discountPercentage.toInt()}% de descuento',
+                    style: Typo.smallBody.copyWith(
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Listo',
-                  style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const PendingVouchersView(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary500,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Ver tarjetas'),
-              ),
-            ],
+            Dimens.space(1.5),
+            Text(
+              'Puedes ver esta tarjeta en la sección de pendientes.',
+              style: Typo.smallBody.copyWith(color: AppColors.neutral600),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'Listo',
+              style: Typo.mediumBody.copyWith(color: AppColors.neutral600),
+            ),
           ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const PendingVouchersView(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary500,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Ver tarjetas'),
+          ),
+        ],
+      ),
     );
   }
 

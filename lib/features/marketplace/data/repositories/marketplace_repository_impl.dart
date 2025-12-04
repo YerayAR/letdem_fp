@@ -9,12 +9,9 @@ import '../models/voucher.model.dart';
 import '../../domain/repositories/marketplace_repository.dart';
 
 class MarketplaceRepositoryImpl extends MarketplaceRepository {
-  // IMPORTANTE: ajusta la URL con --dart-define=MARKETPLACE_HOST=<url>
-  // Por defecto apunta al backend de staging.
-  static const String baseHost = String.fromEnvironment(
-    'MARKETPLACE_HOST',
-    defaultValue: 'https://api-staging.letdem.org',
-  );
+  // IMPORTANTE: por ahora apuntamos siempre al servidor de staging directamente,
+  // sin depender de docker ni de MARKPLACE_HOST.
+  static const String baseHost = 'https://api-staging.letdem.org';
   static const String baseUrl = '$baseHost/v1/marketplace';
 
   // Helper para normalizar URLs que vienen con localhost del backend
@@ -378,10 +375,14 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
     required String authToken,
   }) async {
     try {
-      var uri = Uri.parse('$baseUrl/orders/history/');
+      // En backend los endpoints de marketplace cuelgan de /v1/marketplace/
+      // baseUrl ya apunta a /v1/marketplace, así que usamos /orders/
+      var uri = Uri.parse('$baseUrl/orders/');
+      print('[ORDER_HISTORY] GET '+uri.toString());
 
-      if (status != null) {
+      if (status != null && status.isNotEmpty) {
         uri = uri.replace(queryParameters: {'status': status});
+        print('[ORDER_HISTORY] with status=$status -> '+uri.toString());
       }
 
       final response = await http
@@ -410,6 +411,19 @@ class MarketplaceRepositoryImpl extends MarketplaceRepository {
         return OrderHistoryResponse.fromJson(data);
       } else if (response.statusCode == 401) {
         throw Exception('No autorizado. Inicia sesión para ver tu historial');
+      } else if (response.statusCode == 404) {
+        // Si el backend devuelve 404, lo interpretamos como "sin historial" para no romper la UX
+        print('[ORDER_HISTORY] 404 recibido, devolviendo historial vacío');
+        return OrderHistoryResponse(
+          orders: const [],
+          stats: OrderHistoryStats(
+            totalOrders: 0,
+            totalSpent: 0,
+            totalPointsUsed: 0,
+            totalSaved: 0,
+            currentPoints: 0,
+          ),
+        );
       } else {
         throw Exception('Error al cargar historial: ${response.statusCode}');
       }

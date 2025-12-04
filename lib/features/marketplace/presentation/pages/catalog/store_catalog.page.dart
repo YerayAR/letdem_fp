@@ -7,6 +7,9 @@ import 'package:letdem/features/marketplace/data/models/store.model.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/store_catalog/store_catalog_bloc.dart';
 import 'package:letdem/features/marketplace/presentation/widgets/common/category_filter.widget.dart';
 import 'package:letdem/features/marketplace/presentation/widgets/common/store_card.widget.dart';
+import 'package:letdem/features/marketplace/presentation/widgets/common/cart_icon_button.widget.dart';
+import '../cart/cart.page.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
 
 class StoreCatalogView extends StatefulWidget {
   const StoreCatalogView({super.key});
@@ -63,8 +66,17 @@ class _StoreCatalogViewState extends State<StoreCatalogView> {
             child: Text(
               'Catálogo de Tiendas',
               style: Typo.largeBody.copyWith(fontWeight: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: 12),
+          MarketplaceCartIconButton(onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartView()),
+            );
+          }),
         ],
       ),
     );

@@ -8,6 +8,11 @@ import 'package:letdem/core/constants/typo.dart';
 import 'package:letdem/features/marketplace/data/marketplace_data.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/pending_vouchers/pending_vouchers_cubit.dart';
 import 'package:letdem/features/marketplace/presentation/bloc/pending_vouchers/pending_vouchers_state.dart';
+import 'package:letdem/features/marketplace/presentation/widgets/common/cart_icon_button.widget.dart';
+import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
+import '../../widgets/common/cart_icon_button.widget.dart';
+import 'package:letdem/infrastructure/storage/storage/storage.service.dart';
+import '../cart/cart.page.dart';
 
 class PendingVouchersView extends StatelessWidget {
   const PendingVouchersView({super.key});
@@ -35,6 +40,56 @@ class _PendingVouchersContent extends StatefulWidget {
 class _PendingVouchersContentState extends State<_PendingVouchersContent> {
   String _selectedFilter = 'all'; // all, online, in_store
 
+  final _repository = MarketplaceRepositoryImpl();
+  bool _isLoadingOrders = false;
+  String? _ordersError;
+  List<Order> _ordersWithCanje = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrdersWithCanje();
+  }
+
+  Future<void> _loadOrdersWithCanje() async {
+    setState(() {
+      _isLoadingOrders = true;
+      _ordersError = null;
+    });
+
+    try {
+      final token = await SecureStorageHelper().read('access_token');
+      if (token == null || token.isEmpty) {
+        setState(() {
+          _ordersWithCanje = [];
+          _ordersError = 'No estás autenticado';
+        });
+        return;
+      }
+
+      final history = await _repository.fetchOrderHistory(authToken: token);
+      final orders = history.orders.where((o) => o.usedPoints).toList();
+
+      if (!mounted) return;
+      setState(() {
+        _ordersWithCanje = orders;
+        _ordersError = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _ordersWithCanje = [];
+        _ordersError = e.toString().replaceAll('Exception: ', '');
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingOrders = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +102,17 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.neutral900),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: MarketplaceCartIconButton(onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartView()),
+              );
+            }),
+          ),
+        ],
       ),
       body: BlocConsumer<PendingVouchersCubit, PendingVouchersState>(
         listener: (context, state) {
@@ -140,29 +206,32 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
             final filteredVouchers = _filterVouchers(vouchers);
 
             return RefreshIndicator(
-              onRefresh:
-                  () => context.read<PendingVouchersCubit>().refreshVouchers(),
+              onRefresh: () async {
+                await context.read<PendingVouchersCubit>().refreshVouchers();
+                await _loadOrdersWithCanje();
+              },
               child: Column(
                 children: [
                   _buildFilterBar(),
                   Expanded(
-                    child:
-                        filteredVouchers.isEmpty
+                    child: _selectedFilter == 'in_store'
+                        ? _buildInStoreList(filteredVouchers, state is PendingVouchersCancelling)
+                        : filteredVouchers.isEmpty
                             ? _buildEmptyFilterState()
                             : ListView(
-                              padding: EdgeInsets.all(Dimens.defaultMargin),
-                              children: [
-                                _buildInfoCard(),
-                                Dimens.space(2),
-                                ...filteredVouchers.map(
-                                  (voucher) => _buildVoucherCard(
-                                    context,
-                                    voucher,
-                                    state is PendingVouchersCancelling,
+                                padding: EdgeInsets.all(Dimens.defaultMargin),
+                                children: [
+                                  _buildInfoCard(),
+                                  Dimens.space(2),
+                                  ...filteredVouchers.map(
+                                    (voucher) => _buildVoucherCard(
+                                      context,
+                                      voucher,
+                                      state is PendingVouchersCancelling,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                   ),
                 ],
               ),
@@ -228,6 +297,117 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
             color: isSelected ? Colors.white : AppColors.neutral700,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInStoreList(List<Voucher> inStoreVouchers, bool isCancelling) {
+    if (_isLoadingOrders) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if ((_ordersWithCanje.isEmpty && inStoreVouchers.isEmpty)) {
+      return _buildEmptyFilterState();
+    }
+
+    return ListView(
+      padding: EdgeInsets.all(Dimens.defaultMargin),
+      children: [
+        _buildInfoCard(),
+        if (_ordersError != null) ...[
+          Dimens.space(1),
+          Text(
+            _ordersError!,
+            style: Typo.smallBody.copyWith(
+              color: AppColors.red600,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Dimens.space(2),
+        ],
+        if (_ordersWithCanje.isNotEmpty) ...[
+          Text(
+            'Compras con canje (en tienda)',
+            style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
+          ),
+          Dimens.space(1.5),
+          ..._ordersWithCanje.map(_buildInStoreOrderCard),
+          Dimens.space(2),
+        ],
+        if (inStoreVouchers.isNotEmpty) ...[
+          Text(
+            'Vouchers en tienda',
+            style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
+          ),
+          Dimens.space(1.5),
+          ...inStoreVouchers.map(
+            (voucher) => _buildVoucherCard(
+              context,
+              voucher,
+              isCancelling,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildInStoreOrderCard(Order order) {
+    final dateFormat = DateFormat('dd MMM yyyy, HH:mm', 'es');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Compra con canje',
+                  style: Typo.mediumBody.copyWith(fontWeight: FontWeight.w700),
+                ),
+                Text(
+                  dateFormat.format(order.created),
+                  style: Typo.smallBody.copyWith(color: AppColors.neutral600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${order.itemsCount} producto(s)',
+              style: Typo.mediumBody,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '\$${order.total.toStringAsFixed(2)}',
+              style: Typo.largeBody.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary500,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Usaste ${order.pointsUsedAmount} puntos en esta compra',
+              style: Typo.smallBody.copyWith(
+                color: AppColors.neutral600,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -309,278 +489,155 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color:
-              isExpiringSoon
-                  ? AppColors.secondary600.withOpacity(0.3)
-                  : AppColors.neutral200,
-          width: isExpiringSoon ? 2 : 1,
-        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header con tipo de canje
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color:
-                  voucher.redeemType == 'ONLINE'
-                      ? AppColors.purple50
-                      : AppColors.primary50,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  voucher.redeemType == 'ONLINE'
-                      ? Iconsax.global
-                      : Iconsax.shop,
-                  size: 18,
-                  color:
-                      voucher.redeemType == 'ONLINE'
-                          ? AppColors.purple600
-                          : AppColors.primary600,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  voucher.redeemTypeDisplay,
-                  style: Typo.mediumBody.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color:
-                        voucher.redeemType == 'ONLINE'
-                            ? AppColors.purple600
-                            : AppColors.primary600,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary50,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    voucher.statusDisplay,
-                    style: Typo.smallBody.copyWith(
-                      color: AppColors.secondary600,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF4C1D95),
+                Color(0xFF6D28D9),
+                Color(0xFFEC4899),
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
-
-          Padding(
+          child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Producto y tienda
+                // Fila superior: tipo de canje + estado
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.primary500.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                       child: Icon(
-                        Iconsax.box,
-                        color: AppColors.primary500,
-                        size: 24,
+                        voucher.redeemType == 'ONLINE'
+                            ? Iconsax.global
+                            : Iconsax.shop,
+                        size: 18,
+                        color: Colors.white,
                       ),
                     ),
-                    Dimens.space(2),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            voucher.productName,
-                            style: Typo.mediumBody.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            voucher.storeName,
-                            style: Typo.smallBody.copyWith(
-                              color: AppColors.neutral600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                Dimens.space(2),
-                const Divider(),
-                Dimens.space(2),
-
-                // Descuento y precio
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                    const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Descuento',
+                          'Tarjeta virtual',
                           style: Typo.smallBody.copyWith(
-                            color: AppColors.neutral500,
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 4),
                         Text(
-                          '${voucher.discountPercentage.toInt()}% OFF',
-                          style: Typo.mediumBody.copyWith(
-                            color: AppColors.green600,
-                            fontWeight: FontWeight.w700,
+                          voucher.redeemTypeDisplay,
+                          style: Typo.smallBody.copyWith(
+                            color: Colors.white.withOpacity(0.8),
                           ),
                         ),
                       ],
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Precio final',
-                          style: Typo.smallBody.copyWith(
-                            color: AppColors.neutral500,
-                          ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        voucher.statusDisplay,
+                        style: Typo.smallBody.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '\$${voucher.finalPrice.toStringAsFixed(2)}',
-                          style: Typo.mediumBody.copyWith(
-                            color: AppColors.purple600,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
 
                 Dimens.space(2),
 
-                // Puntos usados
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.neutral50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Iconsax.star_1,
-                        size: 16,
-                        color: AppColors.secondary500,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${voucher.pointsUsed} puntos usados',
-                        style: Typo.smallBody.copyWith(
-                          color: AppColors.neutral700,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                // Código grande de la tarjeta
+                Text(
+                  voucher.code,
+                  style: Typo.largeBody.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 4,
+                    fontSize: 22,
                   ),
                 ),
 
-                Dimens.space(2),
+                Dimens.space(1),
 
-                // Tiempo de expiración
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color:
-                        isExpiringSoon
-                            ? AppColors.secondary50
-                            : AppColors.primary50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color:
-                          isExpiringSoon
-                              ? AppColors.secondary600.withOpacity(0.3)
-                              : AppColors.primary600.withOpacity(0.3),
-                      width: 1,
+                // Producto y tienda en una sola línea compacta
+                Text(
+                  '${voucher.productName} · ${voucher.storeName}',
+                  style: Typo.smallBody.copyWith(
+                    color: Colors.white.withOpacity(0.88),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+
+                Dimens.space(1.5),
+
+                // Fila con puntos y expiración
+                Row(
+                  children: [
+                    Icon(
+                      Iconsax.star_1,
+                      size: 16,
+                      color: Colors.amber.shade300,
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isExpiringSoon ? Iconsax.warning_2 : Iconsax.clock,
-                        size: 18,
-                        color:
-                            isExpiringSoon
-                                ? AppColors.secondary600
-                                : AppColors.primary600,
+                    const SizedBox(width: 6),
+                    Text(
+                      '${voucher.pointsUsed} pts',
+                      style: Typo.smallBody.copyWith(
+                        color: Colors.white.withOpacity(0.9),
+                        fontWeight: FontWeight.w600,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isExpiringSoon ? '¡Expira pronto!' : 'Expira el',
-                              style: Typo.smallBody.copyWith(
-                                color:
-                                    isExpiringSoon
-                                        ? AppColors.secondary600
-                                        : AppColors.primary600,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              dateFormat.format(voucher.expiresAt),
-                              style: Typo.smallBody.copyWith(
-                                color: AppColors.neutral700,
-                              ),
-                            ),
-                            if (hoursRemaining > 0)
-                              Text(
-                                'Quedan ${hoursRemaining}h',
-                                style: Typo.smallBody.copyWith(
-                                  color:
-                                      isExpiringSoon
-                                          ? AppColors.secondary600
-                                          : AppColors.neutral600,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                          ],
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(
+                      isExpiringSoon ? Iconsax.warning_2 : Iconsax.clock,
+                      size: 16,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        isExpiringSoon
+                            ? 'Expira pronto · ${dateFormat.format(voucher.expiresAt)}'
+                            : 'Expira el ${dateFormat.format(voucher.expiresAt)}',
+                        style: Typo.smallBody.copyWith(
+                          color: Colors.white.withOpacity(0.9),
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
 
                 if (voucher.canCancel) ...[
@@ -588,35 +645,30 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed:
-                          isCancelling
-                              ? null
-                              : () => _showCancelDialog(context, voucher),
+                      onPressed: isCancelling
+                          ? null
+                          : () => _showCancelDialog(context, voucher),
                       icon: Icon(
                         Iconsax.close_circle,
                         size: 18,
-                        color:
-                            isCancelling
-                                ? AppColors.neutral400
-                                : AppColors.red600,
+                        color: isCancelling
+                            ? Colors.white70
+                            : Colors.red.shade100,
                       ),
                       label: Text(
                         isCancelling ? 'Cancelando...' : 'Cancelar canje',
                         style: Typo.mediumBody.copyWith(
-                          color:
-                              isCancelling
-                                  ? AppColors.neutral400
-                                  : AppColors.red600,
+                          color: isCancelling
+                              ? Colors.white70
+                              : Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color:
-                              isCancelling
-                                  ? AppColors.neutral300
-                                  : AppColors.red600,
+                          color: Colors.white.withOpacity(0.5),
                         ),
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -627,7 +679,7 @@ class _PendingVouchersContentState extends State<_PendingVouchersContent> {
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
